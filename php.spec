@@ -9,7 +9,7 @@
 #   These extensions BuildRequires proprietary libraries...
 # - deal with modules removed from php and not moved to PECL
 #   (existing only in php4):
-#   db, domxml, hyperwave, java, mcal, overload, qtdom, xslt
+#   db, domxml, hyperwave, java, mcal, overload, qtdom
 # - enabling sybase+sybase_ct+mssql together causes SEGV beside warnings
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
@@ -75,7 +75,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.3
-Release:	4.2%{?with_hardened:hardened}
+Release:	4.3%{?with_hardened:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -1342,6 +1342,9 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
+# Maybe it would be nice to add it here?
+#Provides:	php-xslt
+Obsoletes:	php-xslt
 
 %description xsl
 This is a dynamic shared object (DSO) for PHP that will add new XSL

@@ -1,10 +1,5 @@
 #
 # TODO:
-# - cpdf.so needs -lgd
-# - memleak detected (even with no modules loaded):
-#   $ php -i >/dev/null
-#   /home/comp/rpm/BUILD/php-5.0.4/main/fopen_wrappers.c(548) :  Freeing 0x08052970 (17 bytes), script=-
-#   === Total 1 memory leaks detected ===
 # - loading pgsql+mnogosearch+snmp (only in this order!) causes php -i to SEGV on exit
 #   (postgresql-libs-8.0.1-1, net-snmp-libs-5.2.1-0.2, mnogosearch-lib-3.2.32-1)
 #   (only php.cli; php.cgi and apache2 module are not affected)
@@ -87,7 +82,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-Release:	2%{?with_hardened:hardened}
+Release:	2.1%{?with_hardened:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -131,6 +126,7 @@ Patch24:	%{name}-uint32_t.patch
 Patch25:	%{name}-hwapi-link.patch
 Patch26:	%{name}-dba-link.patch
 Patch27:	%{name}-install_gd_headers.patch
+Patch28:	%{name}-cpdf-fix.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1425,6 +1421,7 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch28 -p1
 %ifarch amd64
 %patch22 -p1
 %endif

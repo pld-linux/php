@@ -1472,6 +1472,7 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
 	--enable-yp=shared \
+	--enable-soap=shared \
 	--with-bz2=shared \
 	%{?with_cpdf:--with-cpdflib=shared} \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \

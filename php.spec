@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 -- язык препроцессирования HTML-файлов, выполняемый на
 Summary(uk):	PHP Верс╕╖ 5 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.2
-Release:	2
+Release:	3
 Epoch:		3
 Group:		Libraries
 License:	PHP
@@ -192,7 +192,7 @@ BuildRequires:	zlib-devel >= 1.0.9
 %if %{_apache2}
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
-PreReq:		apache >= 2.0.40
+PreReq:		apache >= 2.0.52
 Requires:	apache(modules-api) = %{apache_modules_api}
 %else
 PreReq:		apache(EAPI) < 2.0.0

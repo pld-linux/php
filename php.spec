@@ -9,7 +9,7 @@
 #   These extensions BuildRequires proprietary libraries...
 # - deal with modules removed from php and not moved to PECL
 #   (existing only in php4):
-#   db, domxml, hyperwave, java, mcal, overload, qtdom
+#   db, hyperwave, java, mcal, overload, qtdom
 # - enabling sybase+sybase_ct+mssql together causes SEGV beside warnings
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
@@ -535,7 +535,9 @@ Summary(pl):	Modu³ DOM dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:       php-domxml = %{epoch}:%{version}-%{release}
+# it has some compatibility functions
+Provides:	php-domxml = %{epoch}:%{version}-%{release}
+Obsoletes:	php-domxml <= 3:4.3.8-1
 
 %description dom
 This is a dynamic shared object (DSO) for PHP that will add new DOM
@@ -1348,7 +1350,8 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
 # Maybe it would be nice to add it here?
 #Provides:	php-xslt
-Obsoletes:	php-xslt
+# actually not true, functionality is similar, but API differs
+Obsoletes:	php-xslt <= 3:4.3.8-1
 
 %description xsl
 This is a dynamic shared object (DSO) for PHP that will add new XSL

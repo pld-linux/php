@@ -4,18 +4,6 @@
 # Automatic pear requirements finding:
 %include	/usr/lib/rpm/macros.php
 
-%define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq '\\-2\\.[0-9]+\\.' && echo 1 || echo 0)
-%define	apxs		/usr/sbin/apxs
-
-%if %{_apache2}
-%define	without_recode		1
-%define	without_mm		1
-%endif
-
-%ifnarch %{ix86}
-%define	without_msession	1
-%endif
-
 # Conditional build:
 %bcond_with interbase   # - with InterBase extension module	(BR: proprietary libs)
 %bcond_with java        # - with Java extension module		(BR: jdk)
@@ -46,6 +34,18 @@
 %bcond_without xml      # - without XML extension module
 %bcond_without xmlrpc   # - without XML-RPC extension module
 %bcond_without xslt     # - without XSLT extension module
+
+%define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq '\\-2\\.[0-9]+\\.' && echo 1 || echo 0)
+%define	apxs		/usr/sbin/apxs
+
+%if %{_apache2}
+%define	without_recode		1
+%define	without_mm		1
+%endif
+
+%ifnarch %{ix86}
+%define	without_msession	1
+%endif
 
 Summary:	The PHP HTML-embedded scripting language for use with Apache
 Summary(fr):	Le langage de script embarque-HTML PHP pour Apache

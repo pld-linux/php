@@ -42,6 +42,7 @@
 %bcond_without	simplexml	# without simplexml extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
+%bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
@@ -52,7 +53,7 @@
 %bcond_with	mono		# without Mono extensions module
 %bcond_with	yaz		# without YAZ extension module
 # Breaks build
-%bcond_with	sybase		# without Sybase and Sybase-CT extension modules
+%bcond_with	sybase		# without Sybase extension module
 #
 %define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq '\\-2\\.[0-9]+\\.' && echo 1 || echo 0)
 %define	apxs		/usr/sbin/apxs
@@ -76,7 +77,7 @@ Summary(ru):	PHP Версии 5 -- язык препроцессирования HTML-файлов, выполняемый на
 Summary(uk):	PHP Верс╕╖ 5 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.1
-Release:	0.1
+Release:	0.2
 Epoch:		3
 Group:		Libraries
 License:	PHP
@@ -138,7 +139,7 @@ BuildRequires:	expat-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	fcgi-devel
 BuildRequires:	flex
-%if %{with mssql} || %{with sybase}
+%if %{with mssql} || %{with sybase} || %{with sybase_ct}
 BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
@@ -1566,7 +1567,8 @@ for i in fcgi cgi cli apxs ; do
 	--with-regex=php \
 	--without-sablot-js \
 	%{?with_snmp:--with-snmp=shared} \
-	%{?with_sybase:--with-sybase-ct=shared,/usr --with-sybase=shared,/usr} \
+	%{?with_sybase:--with-sybase=shared,/usr} \
+	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	%{?with_sqlite:--with-sqlite=shared,/usr} \
 	--with-t1lib=shared \
 	%{?with_tidy:--with-tidy=shared} \
@@ -1578,6 +1580,8 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_yaz:--with-yaz=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr
+
+#	%{?with_sybase:--with-sybase-ct=shared,/usr --with-sybase=shared,/usr} \
 
 cp -f Makefile Makefile.$i
 # left for debugging purposes

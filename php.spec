@@ -55,7 +55,7 @@ Summary(ru):	PHP Версии 4 -- язык препроцессирования HTML-файлов, выполняемый на
 Summary(uk):	PHP Верс╕╖ 4 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	4.2.3
-Release:	15
+Release:	16
 Epoch:		3
 Group:		Libraries
 License:	PHP

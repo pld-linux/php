@@ -20,7 +20,6 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
-%bcond_with	xslt            # with XSLT extension module
 %bcond_without	cpdf		# without cpdf extension module
 %bcond_without	curl		# without CURL extension module
 %bcond_without	domxslt		# without DOM XSLT/EXSLT support in DOM XML extension module
@@ -178,7 +177,6 @@ BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-php-pearprov >= 4.0.2-100
 BuildRequires:	rpmbuild(macros) >= 1.120
-%{?with_xslt:BuildRequires:	sablotron-devel >= 0.96}
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
@@ -1317,20 +1315,6 @@ Modu³ PHP dodaj±cy obs³ugê XMLRPC.
 
 Uwaga: to jest modu³ eksperymentalny.
 
-%package xslt
-Summary:	xslt extension module for PHP
-Summary(pl):	Modu³ xslt dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description xslt
-This is a dynamic shared object (DSO) for PHP that will add xslt
-support.
-
-%description xslt -l pl
-Modu³ PHP umo¿liwiaj±cy korzystanie z technologii xslt.
-
 %package yaz
 Summary:	yaz extension module for PHP
 Summary(pl):	Modu³ yaz dla PHP
@@ -1503,7 +1487,6 @@ for i in fcgi cgi cli apxs ; do
 	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
 	%{!?with_xml:--disable-xml}%{?with_xml:--enable-xml=shared} \
-	%{?with_xslt:--enable-xslt=shared} \
 	--enable-yp=shared \
 	--with-bz2=shared \
 	%{?with_cpdf:--with-cpdflib=shared} \
@@ -1565,7 +1548,6 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_odbc:--with-unixODBC=shared} \
 	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
 	--with-xsl \
-	%{?with_xslt:--with-xslt-sablot=shared} \
 	%{?with_yaz:--with-yaz=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr
@@ -2178,14 +2160,6 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove xmlrpc %{_sysconfdir}/php.ini
 fi
 
-%post xslt
-%{_sbindir}/php-module-install install xslt %{_sysconfdir}/php.ini
-
-%preun xslt
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove xslt %{_sysconfdir}/php.ini
-fi
-
 %post yaz
 %{_sbindir}/php-module-install install yaz %{_sysconfdir}/php.ini
 
@@ -2563,12 +2537,6 @@ fi
 %files xmlrpc
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/xmlrpc.so
-%endif
-
-%if %{with xslt}
-%files xslt
-%defattr(644,root,root,755)
-%attr(755,root,root) %{extensionsdir}/xslt.so
 %endif
 
 %if %{with yaz}

@@ -109,6 +109,7 @@ Patch23:	%{name}-lib64.patch
 Patch24:	%{name}-phpize.patch
 Patch25:	%{name}-gd_imagerotate_enable.patch
 Patch26:	%{name}-uint32_t.patch
+Patch27:	%{name}-hwapi-link.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1389,6 +1390,7 @@ cp php.ini-dist php.ini
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
+%patch27 -p1
 
 %{?with_hardened:zcat %{SOURCE9} | patch -p1}
 

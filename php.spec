@@ -61,7 +61,7 @@
 %if %{_apache2}
 %undefine	with_mm
 %endif
-%ifnarch %{ix86} amd64 sparc sparcv9 ppc
+%ifnarch %{ix86} amd64 sparc sparcv9 alpha ppc
 %undefine	with_interbase
 %endif
 # x86-only libs
@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 -- язык препроцессирования HTML-файлов, выполняемый на
 Summary(uk):	PHP Верс╕╖ 5 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.2
-Release:	4
+Release:	5
 Epoch:		3
 Group:		Libraries
 License:	PHP

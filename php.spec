@@ -510,6 +510,20 @@ file I/O support.
 %description dio -l pl
 Modu³ PHP dodaj±cy obs³ugê bezpo¶rednich operacji I/O na plikach.
 
+%package dom
+Summary:	DOM extension module for PHP
+Summary(pl):	Modu³ DOM dla PHP
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description dom
+This is a dynamic shared object (DSO) for PHP that will add new DOM
+support.
+
+%description dom -l pl
+Modu³ PHP dodaj±cy now± obs³ugê DOM.
+
 %package exif
 Summary:	exif extension module for PHP
 Summary(pl):	Modu³ exif dla PHP
@@ -1419,6 +1433,7 @@ for i in fcgi cgi cli apxs ; do
 	--enable-dba=shared \
 	--enable-dbx=shared \
 	--enable-dio=shared \
+	--enable-dom=shared \
 	--enable-exif=shared \
 	--enable-filepro=shared \
 	--enable-ftp=shared \
@@ -1448,7 +1463,6 @@ for i in fcgi cgi cli apxs ; do
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	%{?with_db3:--with-db3}%{!?with_db3:--with-db4} \
 	--with-dbase=shared \
-	--with-dom=shared \
 %if %{with wddx} || %{with xmlrpc}
 	--with-expat-dir=shared,/usr \
 %else
@@ -1686,6 +1700,14 @@ fi
 %preun dio
 if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove dio %{_sysconfdir}/php.ini
+fi
+
+%post dom
+%{_sbindir}/php-module-install install dom %{_sysconfdir}/php.ini
+
+%preun dom
+if [ "$1" = "0" ]; then
+	%{_sbindir}/php-module-install remove dom %{_sysconfdir}/php.ini
 fi
 
 %post exif
@@ -2212,6 +2234,10 @@ fi
 %files dio
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/dio.so
+
+%files dom
+%defattr(644,root,root,755)
+%attr(755,root,root) %{extensionsdir}/dom.so
 
 %if %{with fam}
 %files fam

@@ -1,0 +1,12 @@
+diff -burN php-5.0.3.orig/scripts/Makefile.frag php-5.0.3/scripts/Makefile.frag
+--- php-5.0.3.orig/scripts/Makefile.frag	2005-02-10 07:43:48.406281496 +0100
++++ php-5.0.3/scripts/Makefile.frag	2005-02-10 07:44:19.768513712 +0100
+@@ -30,6 +30,8 @@
+ 	main/ \
+ 	main/streams/ \
+ 	regex/ \
++	ext/gd \
++	ext/gd/libgd/ \
+ 	ext/iconv/ \
+ 	ext/libxml/ \
+ 	ext/standard/ \

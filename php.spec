@@ -877,7 +877,13 @@ Requires:	mysql-libs >= 4.1.0
 
 %description mysqli
 This is a dynamic shared object (DSO) for PHP that will add MySQLi
-support.
+(Improved MySQL) support. The difference between it and mysql module
+is that it provides access to functionality of MySQL 4.1 and above.
+
+%description mysqli -l pl
+Modu³ PHP umo¿liwiaj±cy udoskonalony dostêp do bazy danych MySQL.
+Ró¿nic± miêdzy nim a modu³em mysql jest dostêp do funkcjonalno¶ci
+MySQL 4.1 i wy¿ej.
 
 %package ncurses
 Summary:	ncurses module for PHP

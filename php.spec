@@ -11,6 +11,7 @@
 #   db, domxml, hyperwave, java, mcal, overload, qtdom, xslt
 # - enabling sybase+sybase_ct+mssql together causes SEGV beside warnings
 # - mime_magic can't handle new "string/*" entries in magic.mime
+# - make additional headers added by mail patch configurable
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support

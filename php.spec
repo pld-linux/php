@@ -909,8 +909,8 @@ Um módulo para aplicações PHP que usam bancos de dados MySQL.
 Summary:	ncurses module for PHP
 Summary(pl):	Modu³ ncurses dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-program = %{epoch}:%{version}-%{release}
-Requires:	%{name}-program = %{epoch}:%{version}-%{release}
+Requires(post,preun):	%{name}-cli = %{epoch}:%{version}-%{release}
+Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 
 %description ncurses
 This PHP module adds support for ncurses functions (only for cli and
@@ -1075,8 +1075,8 @@ sprawdzanie pisowni s³owa i sugerowanie poprawek.
 Summary:	readline extension module for PHP
 Summary(pl):	Modu³ readline dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-program = %{epoch}:%{version}-%{release}
-Requires:	%{name}-program = %{epoch}:%{version}-%{release}
+Requires(post,preun):	%{name}-cli = %{epoch}:%{version}-%{release}
+Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 
 %description readline
 This PHP module adds support for readline functions (only for cli and

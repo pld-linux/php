@@ -16,7 +16,6 @@
 %bcond_without	curl		# without CURL extension module
 %bcond_without	db3		# use db packages instead of db3 (3.x) for Berkeley DB support
 %bcond_without	domxslt		# without DOM XSLT/EXSLT support in DOM XML extension module
-%bcond_without	gif		# build GD extension module with gd library without GIF support
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
@@ -65,7 +64,7 @@ Summary(uk):	PHP Верс╕╖ 4 -- мова препроцесування HTML-файл╕в, виконувана на сер
 Name:		php
 Version:	4.3.8
 %define	_rc	%{nil}
-Release:	0.3
+Release:	0.7
 Epoch:		3
 Group:		Libraries
 License:	PHP
@@ -111,6 +110,7 @@ Patch28:	%{name}-sybase-fix.patch
 Patch29:	%{name}-mssql-fix.patch
 Patch30:	%{name}-lib64.patch
 Patch31:	%{name}-mnogosearch-fix.patch
+Patch32:	%{name}-gd_imagerotate_enable.patch
 Icon:		php4.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -136,9 +136,8 @@ BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
 %{?with_fribidi:BuildRequires:	fribidi-devel >= 0.10.4}
-BuildRequires:	gd-devel >= 2.0.1
-%{?with_gif:BuildRequires:	gd-devel(gif)}
-%{!?with_gif:BuildConflicts:	gd-devel(gif)}
+BuildRequires:	gd-devel >= 2.0.28-1.3
+BuildRequires:	gd-devel(gif)
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2 }
@@ -656,9 +655,9 @@ Summary(pl):	ModuЁ GD dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}
 Requires:	%{name}-common = %{epoch}:%{version}
-Requires:	gd >= 2.0.1
-%{?with_gif:Requires:	gd(gif)}
-%{?with_gif:Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}}
+Requires:	gd >= 2.0.28-1.3
+Requires:	gd(gif)
+Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}
 
 %description gd
 This is a dynamic shared object (DSO) for PHP that will add GD
@@ -1558,6 +1557,7 @@ cp php.ini-dist php.ini
 %patch30 -p1
 %endif
 %patch31 -p1
+%patch32 -p1
 
 %build
 CFLAGS="%{rpmcflags} -DEAPI=1 -I%{_prefix}/X11R6/include"

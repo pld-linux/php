@@ -21,7 +21,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
-%bcond_with	mysqli		# with mysqli support (Requires mysql > 4.1)
+%bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
 %bcond_without	cpdf		# without cpdf extension module
 %bcond_without	curl		# without CURL extension module
 %bcond_without	fam		# without FAM (File Alteration Monitor) extension module

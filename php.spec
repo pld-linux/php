@@ -10,7 +10,6 @@
 #   These extensions BuildRequires proprietary libraries...
 # - fix building of sybase extensions
 # - test if php.cgi segfaults after ctrl+d when overload.so is loaded
-# - build simplexml as shared (now it's static)
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -38,7 +37,6 @@
 %bcond_without	pgsql		# without PostgreSQL extension module
 %bcond_without	pspell		# without pspell extension module
 %bcond_without	recode		# without recode extension module
-%bcond_without	simplexml	# without simplexml extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
 %bcond_without	sybase		# without Sybase extension module
@@ -46,7 +44,6 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-%bcond_without	xml		# without XML and DOMXML extension modules
 #
 %define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq '\\-2\\.[0-9]+\\.' && echo 1 || echo 0)
 %define	apxs		/usr/sbin/apxs
@@ -120,15 +117,15 @@ BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison
 BuildRequires:	bzip2-devel
-%{?with_curl:BuildRequires:	curl-devel >= 7.12.0 }
+%{?with_curl:BuildRequires:	curl-devel >= 7.12.0}
 BuildRequires:	cyrus-sasl-devel
 %{?with_db3:BuildRequires:	db3-devel >= 3.1}
 %{!?with_db3:BuildRequires:	db-devel >= 4.0}
 BuildRequires:	elfutils-devel
-%if %{with xml} || %{with xmlrpc}
+%if %{with wddx} || %{with xmlrpc}
 BuildRequires:	expat-devel
-%{?with_fam:BuildRequires:	fam-devel}
 %endif
+%{?with_fam:BuildRequires:	fam-devel}
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	fcgi-devel
 BuildRequires:	flex
@@ -148,7 +145,7 @@ BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libtiff-devel
 BuildRequires:	libtool >= 1.4.3
-%{?with_xml:BuildRequires:	libxml2-devel >= 2.5.10}
+BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.0.18
 %{?with_mhash:BuildRequires:	mhash-devel}
 %{?with_ming:BuildRequires:	ming-devel >= 0.1.0}
@@ -1080,20 +1077,6 @@ Modu³ PHP umo¿liwiaj±cy korzystanie z pamiêci dzielonej.
 
 Uwaga: to jest modu³ eksperymentalny.
 
-%package simplexml
-Summary:	SimpleXML extension module for PHP
-Summary(pl):	Modu³ SimpleXML dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-%{common} = %{epoch}:%{version}-%{release}
-
-%description simplexml
-This is a dynamic shared object (DSO) for PHP that will add SimpleXML
-support.
-
-%description simplexml -l pl
-Modu³ PHP dodaj±cy obs³ugê SimpleXML.
-
 %package snmp
 Summary:	SNMP extension module for PHP
 Summary(pl):	Modu³ SNMP dla PHP
@@ -1449,7 +1432,6 @@ for i in fcgi cgi cli apxs ; do
 	--enable-session \
 	--enable-shared \
 	--enable-shmop=shared \
-	%{?with_simplexml:--enable-simplexml} \
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
@@ -1459,15 +1441,15 @@ for i in fcgi cgi cli apxs ; do
 	--enable-sockets=shared \
 	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
-	%{!?with_xml:--disable-xml}%{?with_xml:--enable-xml=shared} \
+	--enable-xml=shared \
 	--enable-yp=shared \
 	--with-bz2=shared \
 	%{?with_cpdf:--with-cpdflib=shared} \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	%{?with_db3:--with-db3}%{!?with_db3:--with-db4} \
 	--with-dbase=shared \
-	%{?with_xml:--with-dom=shared} \
-%if %{with xml} || %{with xmlrpc}
+	--with-dom=shared \
+%if %{with wddx} || %{with xmlrpc}
 	--with-expat-dir=shared,/usr \
 %else
 	--without-expat-dir \
@@ -1521,8 +1503,6 @@ for i in fcgi cgi cli apxs ; do
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr
-
-#	%{?with_sybase:--with-sybase-ct=shared,/usr --with-sybase=shared,/usr} \
 
 cp -f Makefile Makefile.$i
 # left for debugging purposes
@@ -2026,14 +2006,6 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove shmop %{_sysconfdir}/php.ini
 fi
 
-%post simplexml
-%{_sbindir}/php-module-install install simplexml %{_sysconfdir}/php.ini
-
-%preun simplexml
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove simplexml %{_sysconfdir}/php.ini
-fi
-
 %post snmp
 %{_sbindir}/php-module-install install snmp %{_sysconfdir}/php.ini
 
@@ -2476,18 +2448,9 @@ fi
 %attr(755,root,root) %{extensionsdir}/wddx.so
 %endif
 
-%if %{with xml}
 %files xml
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/xml.so
-%endif
-
-# FIXME: build as shared module
-%if 0 && %{with simplexml}
-%files simplexml
-%defattr(644,root,root,755)
-%attr(755,roor,root) %{extensionsdir}/simplexml.so
-%endif
 
 %if %{with xmlrpc}
 %files xmlrpc

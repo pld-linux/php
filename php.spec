@@ -1551,7 +1551,7 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_hyperwave:--with-hwapi=shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
 	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
-	%{?with_java:--with-java=/usr/lib/java} \
+	%{?with_java:--with-java=%{_libdir}/java } \
 	--with-jpeg-dir=/usr \
 	%{?with_ldap:--with-ldap=shared} \
 	--with-mcrypt=shared \

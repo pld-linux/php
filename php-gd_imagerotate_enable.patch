@@ -1,6 +1,6 @@
---- ./ext/gd/gd.c.org	Fri May 21 01:38:05 2004
-+++ ./ext/gd/gd.c	Thu Aug 12 14:48:38 2004
-@@ -162,8 +162,8 @@
+--- ./ext/gd/gd.c.org	2004-08-17 01:08:56.000000000 +0200
++++ ./ext/gd/gd.c	2004-10-18 14:24:15.797275104 +0200
+@@ -209,8 +209,8 @@
  	PHP_FE(imagecopyresampled,						NULL)
  #endif
  
@@ -10,7 +10,7 @@
  	PHP_FE(imageantialias,							NULL)
  #endif
  
-@@ -361,11 +361,11 @@
+@@ -416,11 +416,11 @@
  #ifdef GD2_FMT_COMPRESSED
  	REGISTER_LONG_CONSTANT("IMG_GD2_COMPRESSED", GD2_FMT_COMPRESSED, CONST_CS | CONST_PERSISTENT);
  #endif
@@ -21,26 +21,26 @@
  	REGISTER_LONG_CONSTANT("IMG_EFFECT_OVERLAY", gdEffectOverlay, CONST_CS | CONST_PERSISTENT);
 +#if HAVE_GD_BUNDLED
  	REGISTER_LONG_CONSTANT("GD_BUNDLED", 1, CONST_CS | CONST_PERSISTENT);
- #else
- 	REGISTER_LONG_CONSTANT("GD_BUNDLED", 0, CONST_CS | CONST_PERSISTENT);
-@@ -1088,7 +1088,6 @@
+ 	/* Section Filters */
+ 	REGISTER_LONG_CONSTANT("IMG_FILTER_NEGATE", IMAGE_FILTER_NEGATE, CONST_CS | CONST_PERSISTENT);
+@@ -1191,7 +1191,6 @@
  /* }}} */
  #endif
  
 -#ifdef HAVE_GD_BUNDLED
- /* {{{ proto int imagerotate(int src_im, float angle, int bgdcolor)
+ /* {{{ proto resource imagerotate(resource src_im, float angle, int bgdcolor)
     Rotate an image using a custom angle */
  PHP_FUNCTION(imagerotate)
-@@ -1118,7 +1117,6 @@
+@@ -1221,7 +1220,6 @@
  	}
  }
  /* }}} */
 -#endif
  
  #if HAVE_GD_IMAGESETTILE
- /* {{{ proto int imagesettile(resource image, resource tile)
---- ./ext/gd/php_gd.h.org	Mon Mar 31 10:49:30 2003
-+++ ./ext/gd/php_gd.h	Thu Aug 12 14:46:23 2004
+ /* {{{ proto bool imagesettile(resource image, resource tile)
+--- ./ext/gd/php_gd.h.org	2004-01-08 18:32:08.000000000 +0100
++++ ./ext/gd/php_gd.h	2004-10-18 14:24:34.372451248 +0200
 @@ -103,8 +103,8 @@
  PHP_FUNCTION(imagecopyresampled);
  #endif

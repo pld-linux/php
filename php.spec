@@ -107,9 +107,10 @@ Patch25:	%{name}-no_pear_install.patch
 Patch26:	%{name}-zlib.patch
 Patch27:	%{name}-db-shared.patch
 Patch28:	%{name}-sybase-fix.patch
-Patch30:	%{name}-lib64.patch
-Patch31:	%{name}-mnogosearch-fix.patch
-Patch32:	%{name}-gd_imagerotate_enable.patch
+Patch29:	%{name}-lib64.patch
+Patch30:	%{name}-mnogosearch-fix.patch
+Patch31:	%{name}-gd_imagerotate_enable.patch
+Patch32:	%{name}-uint32_t.patch
 Icon:		php4.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1552,9 +1553,10 @@ cp php.ini-dist php.ini
 %patch27 -p1
 %patch28 -p1
 %ifarch amd64
-%patch30 -p1
+%patch29 -p1
 %endif
-#%patch31 -p1
+#%patch30 -p1
+%patch31 -p1
 %patch32 -p1
 
 %build

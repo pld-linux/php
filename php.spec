@@ -2554,7 +2554,9 @@ fi
 %files sybase
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/sybase.so
+%endif
 
+%if %{with sybase_ct}
 %files sybase-ct
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/sybase_ct.so

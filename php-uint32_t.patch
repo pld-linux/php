@@ -6,7 +6,7 @@ adds missing include in zend_strtod.c (caused build to fail on sparc)
   */
  
  #include <zend_strtod.h>
-+#include <idn-int.h>
++#include <stdint.h>
  
  #if defined(LIBC_SCCS) && !defined(lint)
  static char *rcsid = "$OpenBSD: strtod.c,v 1.19 2004/02/03 16:52:11 drahn Exp $";

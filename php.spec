@@ -91,32 +91,31 @@ Source9:	http://www.hardened-php.net/hardened-php-%{version}-0.2.5.patch.gz
 # Source9-md5:	cc91bb34a066135f1ef7cb1d4ba00b0d
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
-Patch2:		%{name}-xml-expat-fix.patch
-Patch3:		%{name}-mail.patch
-Patch4:		%{name}-link-libs.patch
-Patch5:		%{name}-libpq_fs_h_path.patch
-Patch6:		%{name}-wddx-fix.patch
-Patch7:		%{name}-msession-shared-lib.patch
-Patch8:		%{name}-build_modules.patch
-Patch9:		%{name}-sapi-ini-file.patch
-Patch10:	%{name}-no-metaccld.patch
-Patch11:	%{name}-session-unregister.patch
-Patch12:	%{name}-ini.patch
-Patch13:	%{name}-acam.patch
-Patch14:	%{name}-xmlrpc-fix.patch
-Patch15:	%{name}-libtool.patch
-Patch16:	%{name}-allow-db31.patch
-Patch17:	%{name}-threads-acfix.patch
-Patch18:	%{name}-tsrmlsfetchgcc2.patch
-Patch19:	%{name}-no_pear_install.patch
-Patch20:	%{name}-zlib.patch
-Patch21:	%{name}-sybase-fix.patch
-Patch22:	%{name}-mnogosearch-fix.patch
-Patch23:	%{name}-nohttpd.patch
-Patch24:	%{name}-lib64.patch
-Patch25:	%{name}-phpize.patch
-Patch26:	%{name}-gd_imagerotate_enable.patch
-Patch27:	%{name}-uint32_t.patch
+Patch2:		%{name}-mail.patch
+Patch3:		%{name}-link-libs.patch
+Patch4:		%{name}-libpq_fs_h_path.patch
+Patch5:		%{name}-wddx-fix.patch
+Patch6:		%{name}-msession-shared-lib.patch
+Patch7:		%{name}-build_modules.patch
+Patch8:		%{name}-sapi-ini-file.patch
+Patch9:		%{name}-no-metaccld.patch
+Patch10:	%{name}-session-unregister.patch
+Patch11:	%{name}-ini.patch
+Patch12:	%{name}-acam.patch
+Patch13:	%{name}-xmlrpc-fix.patch
+Patch14:	%{name}-libtool.patch
+Patch15:	%{name}-allow-db31.patch
+Patch16:	%{name}-threads-acfix.patch
+Patch17:	%{name}-tsrmlsfetchgcc2.patch
+Patch18:	%{name}-no_pear_install.patch
+Patch19:	%{name}-zlib.patch
+Patch20:	%{name}-sybase-fix.patch
+Patch21:	%{name}-mnogosearch-fix.patch
+Patch22:	%{name}-nohttpd.patch
+Patch23:	%{name}-lib64.patch
+Patch24:	%{name}-phpize.patch
+Patch25:	%{name}-gd_imagerotate_enable.patch
+Patch26:	%{name}-uint32_t.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1402,7 +1401,7 @@ php-pear-* (php-pear-PEAR, php-pear-Archive_Tar, itp).
 %setup -q
 %patch0 -p1
 %patch1 -p1
-#%patch2 -p1
+%patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
@@ -1411,11 +1410,11 @@ php-pear-* (php-pear-PEAR, php-pear-Archive_Tar, itp).
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
-%patch11 -p1
 cp php.ini-dist php.ini
-%patch12 -p1
+%patch11 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
+%patch12 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
@@ -1426,13 +1425,12 @@ cp php.ini-dist php.ini
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
-%patch23 -p1
 %ifarch amd64
-%patch24 -p1
+%patch23 -p1
 %endif
+%patch24 -p1
 %patch25 -p1
 %patch26 -p1
-%patch27 -p1
 
 %{?with_hardened:zcat %{SOURCE9} | patch -p1}
 

@@ -6,44 +6,44 @@
 %define	apxs		/usr/sbin/apxs
 
 %if %{_apache2}
-%define	_without_recode		1
-%define	_without_mm		1
+%define	without_recode		1
+%define	without_mm		1
 %endif
 
 %ifnarch %{ix86}
-%define	_without_msession	1
+%define	without_msession	1
 %endif
 
 # Conditional build:
-# _with_interbase	- with InterBase extension module	(BR: proprietary libs)
-# _with_java		- with Java extension module		(BR: jdk)
-# _with_oci8		- with Oracle oci8 extension module	(BR: proprietary libs)
-# _with_oracle		- with oracle extension module		(BR: proprietary libs)
-# _with_pcntl		- with pcntl extension module		(problems: SEGV on exit)
-# _without_cpdf		- without cpdf extension module
-# _without_curl		- without CURL extension module
-# _without_domxslt	- without DOM XSLT/EXSLT support in DOM XML extension module
-# _without_gif		- build GD extension module with gd library without GIF support
-# _without_imap		- without IMAP extension module
-# _without_ldap		- without LDAP extension module
-# _without_mhash	- without mhash extension module
-# _without_ming		- without ming extension module
-# _without_mm		- without mm support for session storage
-# _without_mnogosearch	- without mnogosearch extension module
-# _without_msession	- without msession extension module
-# _without_odbc		- without ODBC extension module
-# _without_openssl	- without OpenSSL support and OpenSSL extension module
-# _without_pcre		- without PCRE extension module
-# _without_pdf		- without PDF extension module
-# _without_pspell	- without pspell extension module
-# _without_pgsql	- without PostgreSQL extension module
-# _without_snmp		- without SNMP extension module
-# _without_recode	- without recode extension module
-# _without_sybase_ct	- without Sybase-CT extension module
-# _without_wddx		- without WDDX extension module
-# _without_xml		- without XML extension module
-# _without_xmlrpc	- without XML-RPC extension module
-# _without_xslt		- without XSLT extension module
+%bcond_with interbase   # - with InterBase extension module	(BR: proprietary libs)
+%bcond_with java        # - with Java extension module		(BR: jdk)
+%bcond_with oci8        # - with Oracle oci8 extension module	(BR: proprietary libs)
+%bcond_with oracle      # - with oracle extension module		(BR: proprietary libs)
+%bcond_with pcntl       # - with pcntl extension module		(problems: SEGV on exit)
+%bcond_without cpdf     # - without cpdf extension module
+%bcond_without curl     # - without CURL extension module
+%bcond_without domxslt  # - without DOM XSLT/EXSLT support in DOM XML extension module
+%bcond_without gif      # - build GD extension module with gd library without GIF support
+%bcond_without imap     # - without IMAP extension module
+%bcond_without ldap     # - without LDAP extension module
+%bcond_without mhash    # - without mhash extension module
+%bcond_without ming     # - without ming extension module
+%bcond_without mm       # - without mm support for session storage
+%bcond_without mnogosearch  # - without mnogosearch extension module
+%bcond_without msession # - without msession extension module
+%bcond_without odbc     # - without ODBC extension module
+%bcond_without openssl  # - without OpenSSL support and OpenSSL extension module
+%bcond_without pcre     # - without PCRE extension module
+%bcond_without pdf      # - without PDF extension module
+%bcond_without pspell   # - without pspell extension module
+%bcond_without pgsql    # - without PostgreSQL extension module
+%bcond_without snmp     # - without SNMP extension module
+%bcond_without recode   # - without recode extension module
+%bcond_without sybase_ct # - without Sybase-CT extension module
+%bcond_without wddx     # - without WDDX extension module
+%bcond_without xml      # - without XML extension module
+%bcond_without xmlrpc   # - without XML-RPC extension module
+%bcond_without xslt     # - without XSLT extension module
 
 Summary:	The PHP HTML-embedded scripting language for use with Apache
 Summary(fr):	Le langage de script embarque-HTML PHP pour Apache
@@ -64,7 +64,7 @@ Source2:	zend.gif
 Source3:	http://www.php.net/distributions/manual/%{name}_manual_en.tar.bz2
 # Source3-md5:	d89cb5124f95d2c30fb0d0e2dfe5de4e
 Source4:	%{name}-module-install
-Source5:	%{name}-mod_php.conf
+Source5:	%{name}-mod_%{name}.conf
 Source6:	%{name}-cgi.ini
 Source7:	%{name}-apache.ini
 Patch0:		%{name}-shared.patch
@@ -84,7 +84,7 @@ Patch13:	%{name}-mcal-shared-lib.patch
 Patch14:	%{name}-msession-shared-lib.patch
 Patch15:	%{name}-build_modules.patch
 Patch16:	%{name}-sapi-ini-file.patch
-Patch17:	%{name}-php_iconv_string_declaration.patch
+Patch17:	%{name}-%{name}_iconv_string_declaration.patch
 Patch18:	%{name}-pear-cosmetic.patch
 Patch19:	%{name}-mnogosearch.patch
 Patch20:	%{name}-ini.patch
@@ -102,23 +102,26 @@ BuildRequires:	automake >= 1.4d
 BuildRequires:	bison
 BuildRequires:	bzip2-devel
 BuildRequires:	cracklib-devel >= 2.7-15
-%{!?_without_curl:BuildRequires:	curl-devel}
+%{?with_curl:BuildRequires:	curl-devel}
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db3-devel >= 3.1.17
-%if %(expr %{?_without_xml:0}%{!?_without_xml:1} + %{?_without_xmlrpc:0}%{!?_without_xmlrpc:1})
+%if %{defined with_xml} || %{defined with_xmlrpc}
 BuildRequires:	expat-devel
 %endif
 BuildRequires:	flex
-%{!?_without_sybase_ct:BuildRequires:	freetds-devel}
+%{?with_sybase_ct:BuildRequires: freetds-devel}
 BuildRequires:	freetype-devel >= 2.0
 BuildRequires:	gd-devel >= 2.0.1
-%{!?_without_gif:BuildRequires:	gd-devel(gif)}
-%{?_without_gif:BuildConflicts: gd-devel(gif)}
+%if %{defined with_gif}
+BuildRequires: gd-devel(gif)
+%else
+BuildConflicts: gd-devel(gif)
+%endif
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
-%{!?_without_imap:BuildRequires: imap-devel >= 1:2001-0.BETA.200107022325.2 }
-%{?_with_java:BuildRequires:	jdk >= 1.1}
-%{!?_without_cpdf:BuildRequires:	libcpdf-devel >= 2.02r1-2}
+%{?with_imap:BuildRequires: imap-devel >= 1:2001-0.BETA.200107022325.2 }
+%{?with_java:BuildRequires:	jdk >= 1.1}
+%{?with_cpdf:BuildRequires:	libcpdf-devel >= 2.02r1-2}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcal-devel
@@ -126,31 +129,31 @@ BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng >= 1.0.8
 BuildRequires:	libtiff-devel
 BuildRequires:	libtool >= 0:1.4.2-9
-%{!?_without_xml:BuildRequires:	libxml2-devel >= 2.2.7}
-%{!?_without_domxslt:BuildRequires:	libxslt-devel >= 1.0.3}
-%{!?_without_mhash:BuildRequires:	mhash-devel}
-%{!?_without_ming:BuildRequires:	ming-devel >= 0.1.0}
-%{!?_without_mm:BuildRequires:	mm-devel >= 1.1.3}
-%{!?_without_mnogosearch:BuildRequires:	mnogosearch-devel >= 3.2.6}
+%{?with_xml:BuildRequires:	libxml2-devel >= 2.2.7}
+%{?with_domxslt:BuildRequires:	libxslt-devel >= 1.0.3}
+%{?with_mhash:BuildRequires:	mhash-devel}
+%{?with_ming:BuildRequires:	ming-devel >= 0.1.0}
+%{?with_mm:BuildRequires:	mm-devel >= 1.1.3}
+%{?with_mnogosearch:BuildRequires:	mnogosearch-devel >= 3.2.6}
 BuildRequires:	mysql-devel >= 3.23.32
-%{!?_without_ldap:BuildRequires: openldap-devel >= 2.0}
-%if %(expr %{?_without_openssl:0}%{!?_without_openssl:1} + %{?_without_ldap:0}%{!?_without_ldap:1})
+%{?with_ldap:BuildRequires: openldap-devel >= 2.0}
+%if %{defined with_openssl} || %{defined with_ldap}
 BuildRequires:	openssl-devel >= 0.9.6m
 %endif
 BuildRequires:	pam-devel
-%{!?_without_pdf:BuildRequires:	pdflib-devel >= 4.0.0}
+%{?with_pdf:BuildRequires:	pdflib-devel >= 4.0.0}
 BuildRequires:	perl
-%{!?_without_msession:BuildRequires:	phoenix-devel}
-%{!?_without_pgsql:BuildRequires:	postgresql-devel}
-%{!?_without_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
-%{!?_without_pspell:BuildRequires:	pspell-devel}
-%{!?_without_recode:BuildRequires:	recode-devel >= 3.5d-3}
+%{?with_msession:BuildRequires:	phoenix-devel}
+%{?with_pgsql:BuildRequires:	postgresql-devel}
+%{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
+%{?with_pspell:BuildRequires:	pspell-devel}
+%{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-php-pearprov >= 4.0.2-100
-%{!?_without_xslt:BuildRequires:	sablotron-devel}
+%{?with_xslt:BuildRequires:	sablotron-devel}
 BuildRequires:	t1lib-devel
-%{!?_without_snmp:BuildRequires: ucd-snmp-devel >= 4.2.6}
-%{!?_without_odbc:BuildRequires: unixODBC-devel}
-%{!?_without_xmlrpc:BuildRequires:	xmlrpc-epi-devel}
+%{?with_snmp:BuildRequires: ucd-snmp-devel >= 4.2.6}
+%{?with_odbc:BuildRequires: unixODBC-devel}
+%{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel}
 BuildRequires:	yaz-devel
 BuildRequires:	zip
 BuildRequires:	zlib-devel >= 1.0.9
@@ -336,7 +339,7 @@ Summary:	bcmath extension module for PHP
 Summary(pl):	Modu³ bcmath dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description bcmath
 This is a dynamic shared object (DSO) for Apache that will add bc
@@ -351,7 +354,7 @@ Summary:	Bzip2 extension module for PHP
 Summary(pl):	Modu³ bzip2 dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description bzip2
 This is a dynamic shared object (DSO) for Apache that will add
@@ -365,7 +368,7 @@ Summary:	Calendar extension module for PHP
 Summary(pl):	Modu³ funkcji kalendarza dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description calendar
 This is a dynamic shared object (DSO) for Apache that will add
@@ -380,7 +383,7 @@ Summary:	cpdf extension module for PHP
 Summary(pl):	Modu³ cpdf dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description cpdf
 This is a dynamic shared object (DSO) for Apache that will add libcpdf
@@ -394,7 +397,7 @@ Summary:	crack extension module for PHP
 Summary(pl):	Modu³ crack dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description crack
 This is a dynamic shared object (DSO) for Apache that will add
@@ -412,7 +415,7 @@ Summary:	ctype extension module for PHP
 Summary(pl):	Modu³ ctype dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description ctype
 This is a dynamic shared object (DSO) for Apache that will add ctype
@@ -426,7 +429,7 @@ Summary:	curl extension module for PHP
 Summary(pl):	Modu³ curl dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description curl
 This is a dynamic shared object (DSO) for Apache that will add curl
@@ -440,7 +443,7 @@ Summary:	DBA extension module for PHP
 Summary(pl):	Modu³ DBA dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description dba
 This is a dynamic shared object (DSO) for Apache that will add
@@ -455,7 +458,7 @@ Summary:	DBase extension module for PHP
 Summary(pl):	Modu³ DBase dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description dbase
 This is a dynamic shared object (DSO) for Apache that will add DBase
@@ -469,7 +472,7 @@ Summary:	DBX extension module for PHP
 Summary(pl):	Modu³ DBX dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description dbx
 This is a dynamic shared object (DSO) for Apache that will add DB
@@ -486,7 +489,7 @@ Summary:	Direct I/O extension module for PHP
 Summary(pl):	Modu³ Direct I/O dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description dio
 This is a dynamic shared object (DSO) for Apache that will add direct
@@ -505,7 +508,7 @@ Summary:	DOM XML extension module for PHP
 Summary(pl):	Modu³ DOM XML dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description domxml
 This is a dynamic shared object (DSO) for Apache that will add DOM XML
@@ -523,7 +526,7 @@ Summary:	exif extension module for PHP
 Summary(pl):	Modu³ exif dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description exif
 This is a dynamic shared object (DSO) for Apache that will add exif
@@ -537,7 +540,7 @@ Summary:	filePro extension module for PHP
 Summary(pl):	Modu³ filePro dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description filepro
 This is a dynamic shared object (DSO) for Apache that will add PHP
@@ -552,7 +555,7 @@ Summary:	FTP extension module for PHP
 Summary(pl):	Modu³ FTP dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description ftp
 This is a dynamic shared object (DSO) for Apache that will add FTP
@@ -566,9 +569,9 @@ Summary:	GD extension module for PHP
 Summary:	Modu³ GD dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
-%{!?_without_gif:Requires:	gd(gif)}
-%{!?_without_gif:Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}}
+Requires:	%{name}-common = %{version}
+%{?with_gif:Requires:	gd(gif)}
+%{?with_gif:Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}}
 
 %description gd
 This is a dynamic shared object (DSO) for Apache that will add GD
@@ -585,7 +588,7 @@ Summary:	gettext extension module for PHP
 Summary(pl):	Modu³ gettext dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description gettext
 This is a dynamic shared object (DSO) for Apache that will add gettext
@@ -599,7 +602,7 @@ Summary:	gmp extension module for PHP
 Summary(pl):	Modu³ gmp dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description gmp
 This is a dynamic shared object (DSO) for Apache that will add
@@ -613,7 +616,7 @@ Summary:	Hyperwave extension module for PHP
 Summary(pl):	Modu³ Hyperwave dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description hyperwave
 This is a dynamic shared object (DSO) for Apache that will add
@@ -627,7 +630,7 @@ Summary:	iconv extension module for PHP
 Summary(pl):	Modu³ iconv dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description iconv
 This is a dynamic shared object (DSO) for Apache that will add iconv
@@ -642,7 +645,7 @@ Summary(pl):	Modu³ IMAP dla PHP
 Summary(pt_BR):	Um módulo para aplicações PHP que usam IMAP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description imap
 This is a dynamic shared object (DSO) for Apache that will add IMAP
@@ -659,7 +662,7 @@ Summary:	Interbase database module for PHP
 Summary(pl):	Modu³ bazy danych Interbase dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 Autoreq:	false
 
 %description interbase
@@ -676,7 +679,7 @@ Summary:	Java extension module for PHP
 Summary(pl):	Modu³ Javy dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description java
 This is a dynamic shared object (DSO) for Apache that will add JAVA
@@ -693,7 +696,7 @@ Summary(pl):	Modu³ LDAP dla PHP
 Summary(pt_BR):	Um módulo para aplicações PHP que usam LDAP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description ldap
 This is a dynamic shared object (DSO) for Apache that will add LDAP
@@ -710,7 +713,7 @@ Summary:	mbstring extension module for PHP
 Summary(pl):	Modu³ mbstring dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description mbstring
 This is a dynamic shared object (DSO) for Apache that will add
@@ -724,7 +727,7 @@ Summary:	mcal extension module for PHP
 Summary(pl):	Modu³ mcal dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description mcal
 This is a dynamic shared object (DSO) for Apache that will add mcal
@@ -739,7 +742,7 @@ Summary:	mcrypt extension module for PHP
 Summary(pl):	Modu³ mcrypt dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description mcrypt
 This is a dynamic shared object (DSO) for Apache that will add mcrypt
@@ -753,7 +756,7 @@ Summary:	mhash extension module for PHP
 Summary(pl):	Modu³ mhash dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description mhash
 This is a dynamic shared object (DSO) for Apache that will add mhash
@@ -767,7 +770,7 @@ Summary:	ming extension module for PHP
 Summary(pl):	Modu³ ming dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description ming
 This is a dynamic shared object (DSO) for Apache that will add ming
@@ -782,7 +785,7 @@ Summary:	mnoGoSearch extension module for PHP
 Summary(pl):	Modu³ mnoGoSearch dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description mnogosearch
 This is a dynamic shared object (DSO) for Apache that will allow you
@@ -797,7 +800,7 @@ Summary:	msession extension module for PHP
 Summary(pl):	Modu³ msession dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description msession
 This is a dynamic shared object (DSO) for Apache that will allow you
@@ -817,7 +820,7 @@ Summary(pl):	Modu³ bazy danych MySQL dla PHP
 Summary(pt_BR):	Um módulo para aplicações PHP que usam bancos de dados MySQL
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description mysql
 This is a dynamic shared object (DSO) for Apache that will add MySQL
@@ -835,7 +838,7 @@ Summary:	Oracle 8 database module for PHP
 Summary(pl):	Modu³ bazy danych Oracle 8 dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 Autoreq:	false
 
 %description oci8
@@ -853,7 +856,7 @@ Summary(pl):	Modu³ ODBC dla PHP
 Summary(pt_BR):	Um módulo para aplicações PHP que usam bases de dados ODBC
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 Requires:	unixODBC >= 2.1.1-3
 
 %description odbc
@@ -871,7 +874,7 @@ Summary:	OpenSSL extension module for PHP
 Summary(pl):	Modu³ OpenSSL dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description openssl
 This is a dynamic shared object (DSO) for Apache that will add OpenSSL
@@ -889,7 +892,7 @@ Summary:	Oracle 7 database module for PHP
 Summary(pl):	Modu³ bazy danych Oracle 7 dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 Autoreq:	false
 
 %description oracle
@@ -904,7 +907,7 @@ Summary:	Overload extension module for PHP
 Summary(pl):	Modu³ Overload dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description overload
 This is a dynamic shared object (DSO) for Apache that will add
@@ -922,7 +925,7 @@ Summary:	Process Control extension module for PHP
 Summary(pl):	Modu³ Process Control dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-cgi = %{version}
-Requires:		%{name}-cgi = %{version}
+Requires:	%{name}-cgi = %{version}
 
 %description pcntl
 This is a dynamic shared object (DSO) for Apache that will add process
@@ -944,7 +947,7 @@ Summary:	PCRE extension module for PHP
 Summary(pl):	Modu³ PCRE dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description pcre
 This is a dynamic shared object (DSO) for Apache that will add Perl
@@ -960,7 +963,7 @@ Summary(pl):	Modu³ do tworzenia plików PDF dla PHP
 Group:		Libraries
 PreReq:		pdflib
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description pdf
 This is a dynamic shared object (DSO) for Apache that will add PDF
@@ -975,7 +978,7 @@ Summary:	PostgreSQL database module for PHP
 Summary(pl):	Modu³ bazy danych PostgreSQL dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description pgsql
 This is a dynamic shared object (DSO) for Apache that will add
@@ -994,7 +997,7 @@ Summary:	POSIX extension module for PHP
 Summary(pl):	Modu³ POSIX dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description posix
 This is a dynamic shared object (DSO) for Apache that will add POSIX
@@ -1008,7 +1011,7 @@ Summary:	pspell extension module for PHP
 Summary(pl):	Modu³ pspell dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description pspell
 This is a dynamic shared object (DSO) for Apache that will add pspell
@@ -1024,7 +1027,7 @@ Summary:	recode extension module for PHP
 Summary(pl):	Modu³ recode dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 Requires:	recode >= 3.5d-3
 
 %description recode
@@ -1040,7 +1043,7 @@ Summary:	session extension module for PHP
 Summary(pl):	Modu³ session dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description session
 This is a dynamic shared object (DSO) for Apache that will add session
@@ -1054,7 +1057,7 @@ Summary:	Shared Memory Operations extension module for PHP
 Summary(pl):	Modu³ shmop dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description shmop
 This is a dynamic shared object (DSO) for Apache that will add Shared
@@ -1072,7 +1075,7 @@ Summary:	SNMP extension module for PHP
 Summary(pl):	Modu³ SNMP dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description snmp
 This is a dynamic shared object (DSO) for Apache that will add SNMP
@@ -1086,7 +1089,7 @@ Summary:	sockets extension module for PHP
 Summary(pl):	Modu³ socket dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description sockets
 This is a dynamic shared object (DSO) for Apache that will add sockets
@@ -1104,7 +1107,7 @@ Summary:	Sybase-CT extension module for PHP
 Summary(pl):	Modu³ Sybase-CT dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description sybase-ct
 This is a dynamic shared object (DSO) for Apache that will add Sybase
@@ -1119,7 +1122,7 @@ Summary:	SysV sem extension module for PHP
 Summary(pl):	Modu³ SysV sem dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description sysvsem
 This is a dynamic shared object (DSO) for Apache that will add SysV
@@ -1133,7 +1136,7 @@ Summary:	SysV shm extension module for PHP
 Summary(pl):	Modu³ SysV shm dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description sysvshm
 This is a dynamic shared object (DSO) for Apache that will add SysV
@@ -1148,7 +1151,7 @@ Summary(pl):	Modu³ wddx dla PHP
 Group:		Libraries
 PreReq:		%{name}-session = %{version}
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description wddx
 This is a dynamic shared object (DSO) for Apache that will add wddx
@@ -1162,7 +1165,7 @@ Summary:	XML extension module for PHP
 Summary(pl):	Modu³ XML dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description xml
 This is a dynamic shared object (DSO) for Apache that will add XML
@@ -1180,7 +1183,7 @@ Summary:	xmlrpc extension module for PHP
 Summary(pl):	Modu³ xmlrpc dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description xmlrpc
 This is a dynamic shared object (DSO) for Apache that will add XMLRPC
@@ -1198,7 +1201,7 @@ Summary:	xslt extension module for PHP
 Summary(pl):	Modu³ xslt dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description xslt
 This is a dynamic shared object (DSO) for Apache that will add xslt
@@ -1212,7 +1215,7 @@ Summary:	yaz extension module for PHP
 Summary(pl):	Modu³ yaz dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description yaz
 This is a dynamic shared object (DSO) for Apache that will add yaz
@@ -1228,7 +1231,7 @@ Summary:	NIS (yp) extension module for PHP
 Summary(pl):	Modu³ NIS (yp) dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description yp
 This is a dynamic shared object (DSO) for Apache that will add NIS
@@ -1243,7 +1246,7 @@ Summary:	zip extension module for PHP
 Summary(pl):	Modu³ zip dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description zip
 This is a dynamic shared object (DSO) for Apache that will add ZZipLib
@@ -1258,7 +1261,7 @@ Summary:	Zlib extension module for PHP
 Summary(pl):	Modu³ zlib dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{version}
-Requires:		%{name}-common = %{version}
+Requires:	%{name}-common = %{version}
 
 %description zlib
 This is a dynamic shared object (DSO) for Apache that will add
@@ -1359,7 +1362,7 @@ EXTENSION_DIR="%{extensionsdir}"; export EXTENSION_DIR
 %{__aclocal}
 autoconf
 #for i in cgi fastcgi apxs ; do
-PROG_SENDMAIL="/usr/lib/sendmail"; export PROG_SENDMAIL
+PROG_SENDMAIL="%{_prefix}/lib/sendmail"; export PROG_SENDMAIL
 for i in cgi apxs ; do
 %configure \
 	`[ $i = cgi ] && echo --enable-discard-path` \
@@ -1385,7 +1388,7 @@ for i in cgi apxs ; do
 	--enable-magic-quotes \
 	--enable-mbstring=shared --disable-mbstr-enc-trans --enable-mbregex \
 	--enable-overload=shared \
-	%{?_with_pcntl:--enable-pcntl=shared}%{!?_with_pcntl:--disable-pcntl} \
+	%{?with_pcntl:--enable-pcntl=shared}%{!?with_pcntl:--disable-pcntl} \
 	--enable-posix=shared \
 	--enable-session \
 	--enable-shared \
@@ -1397,20 +1400,25 @@ for i in cgi apxs ; do
 	--enable-safe-mode \
 	--enable-sockets=shared \
 	--enable-ucd-snmp-hack \
-	%{!?_without_wddx:--enable-wddx=shared} \
-	%{?_without_xml:--disable-xml}%{!?_without_xml:--enable-xml=shared} \
-	%{!?_without_xslt:--enable-xslt=shared} \
+	%{?with_wddx:--enable-wddx=shared} \
+	%{!?with_xml:--disable-xml}%{?with_xml:--enable-xml=shared} \
+	%{?with_xslt:--enable-xslt=shared} \
 	--enable-yp=shared \
 	--with-bz2=shared \
-	%{!?_without_cpdf:--with-cpdflib=shared} \
+	%{?with_cpdf:--with-cpdflib=shared} \
+	--with-cpdflin
 	--with-crack=shared \
-	%{?_without_curl:--without-curl}%{!?_without_curl:--with-curl=shared} \
+%if %{defined with_curl}
+	--with-curl=shared \
+%else
+	--without-curl \
+%endif
 	--without-db2 \
 	--with-db3 \
 	--with-dbase=shared \
 	--with-dom=shared \
-	%{!?_without_domxslt:--with-dom-xslt=shared --with-dom-exslt=shared} \
-%if %(expr %{?_without_xml:0}%{!?_without_xml:1} + %{?_without_xmlrpc:0}%{!?_without_xmlrpc:1})
+	%{?with_domxslt:--with-dom-xslt=shared --with-dom-exslt=shared} \
+%if %{defined with_xml} || %{defined with_xmlrpc}
 	--with-expat-dir=shared,/usr \
 %else
 	--without-expat-dir \
@@ -1423,39 +1431,39 @@ for i in cgi apxs ; do
 	--with-gdbm \
 	--with-gmp=shared \
 	--with-hyperwave=shared \
-	%{!?_without_imap:--with-imap=shared --with-imap-ssl} \
-	%{?_with_interbase:--with-interbase=shared} \
-	%{?_with_java:--with-java=/usr/lib/java} \
+	%{?with_imap:--with-imap=shared --with-imap-ssl} \
+	%{?with_interbase:--with-interbase=shared} \
+	%{?with_java:--with-java=/usr/lib/java} \
 	--with-jpeg-dir=shared,/usr \
-	%{!?_without_ldap:--with-ldap=shared} \
+	%{?with_ldap:--with-ldap=shared} \
 	--with-mcal=shared,/usr \
 	--with-mcrypt=shared \
-	%{!?_without_mhash:--with-mhash=shared} \
-	%{!?_without_ming:--with-ming=shared} \
-	%{!?_without_mm:--with-mm} \
-	%{?_without_mnogosearch:--without-mnogosearch}%{!?_without_mnogosearch:--with-mnogosearch=shared,/usr} \
-	%{!?_without_msession:--with-msession=shared}%{?_without_msession:--without-msession} \
+	%{?with_mhash:--with-mhash=shared} \
+	%{?with_ming:--with-ming=shared} \
+	%{?with_mm:--with-mm} \
+	%{!?with_mnogosearch:--without-mnogosearch}%{?with_mnogosearch:--with-mnogosearch=shared,/usr} \
+	%{?with_msession:--with-msession=shared}%{!?with_msession:--without-msession} \
 	--with-mysql=shared,/usr \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
-	%{?_with_oci8:--with-oci8=shared} \
-	%{!?_without_openssl:--with-openssl=shared} \
-	%{?_with_oracle:--with-oracle=shared} \
-	%{?_without_pcre:--without-pcre-regex}%{!?_without_pcre:--with-pcre-regex=shared} \
-	%{!?_without_pdf:--with-pdflib=shared} \
+	%{?with_oci8:--with-oci8=shared} \
+	%{?with_openssl:--with-openssl=shared} \
+	%{?with_oracle:--with-oracle=shared} \
+	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared} \
+	%{?with_pdf:--with-pdflib=shared} \
 	--with-pear=%{php_pear_dir} \
-	%{?_without_pgsql:--without-pgsql}%{!?_without_pgsql:--with-pgsql=shared,/usr} \
+	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
 	--with-png-dir=shared,/usr \
-	%{!?_without_pspell:--with-pspell=shared} \
-	%{!?_without_recode:--with-recode=shared} \
+	%{?with_pspell:--with-pspell=shared} \
+	%{?with_recode:--with-recode=shared} \
 	--with-regex=php \
 	--with-sablot-js=shared,no \
-	%{!?_without_snmp:--with-snmp=shared} \
-	%{!?_without_sybase_ct:--with-sybase-ct=shared,/usr} \
+	%{?with_snmp:--with-snmp=shared} \
+	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	--with-t1lib=shared \
 	--with-tiff-dir=shared,/usr \
-	%{!?_without_odbc:--with-unixODBC=shared} \
-	%{?_without_xmlrpc:--without-xmlrpc}%{!?_without_xmlrpc:--with-xmlrpc=shared,/usr} \
-	%{!?_without_xslt:--with-xslt-sablot=shared} \
+	%{?with_odbc:--with-unixODBC=shared} \
+	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
+	%{?with_xslt:--with-xslt-sablot=shared} \
 	--with-yaz=shared \
 	--with-zip=shared \
 	--with-zlib=shared \
@@ -1492,7 +1500,7 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/{apache,cgi}} 
 	INSTALL_ROOT=$RPM_BUILD_ROOT \
 	INSTALL_IT="install libs/libphp4.so $RPM_BUILD_ROOT%{_libdir}/apache/ ; install libs/libphp_common*.so.*.*.* $RPM_BUILD_ROOT%{_libdir}"
 
-%{?_with_java:install ext/java/php_java.jar $RPM_BUILD_ROOT%{_libdir}}
+%{?with_java:install ext/java/php_java.jar $RPM_BUILD_ROOT%{_libdir}}
 
 install .libs/php $RPM_BUILD_ROOT%{_bindir}/php
 
@@ -2069,7 +2077,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/calendar.so
 
-%if %{?_without_cpdf:0}%{!?_without_cpdf:1}
+%if %{defined with_cpdf}
 %files cpdf
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/cpdf.so
@@ -2083,7 +2091,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/ctype.so
 
-%if %{!?_without_curl:1}%{?_without_curl:0}
+%if %{defined with_curl}
 %files curl
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/curl.so
@@ -2141,26 +2149,26 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/iconv.so
 
-%if %{?_without_imap:0}%{!?_without_imap:1}
+%if %{defined with_imap}
 %files imap
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/imap.so
 %endif
 
-%if %{?_with_interbase:1}%{!?_with_interbase:0}
+%if %{defined with_interbase}
 %files interbase
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/interbase.so
 %endif
 
-%if %{?_with_java:1}%{!?_with_java:0}
+%if %{defined with_java}
 %files java
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/java.so
 %{_libdir}/php_java.jar
 %endif
 
-%if %{?_without_ldap:0}%{!?_without_ldap:1}
+%if %{defined with_ldap}
 %files ldap
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/ldap.so
@@ -2178,25 +2186,25 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/mcrypt.so
 
-%if %{!?_without_mhash:1}%{?_without_mhash:0}
+%if %{defined with_mhash}
 %files mhash
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/mhash.so
 %endif
 
-%if %{!?_without_ming:1}%{?_without_ming:0}
+%if %{defined with_ming}
 %files ming
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/ming.so
 %endif
 
-%if %{!?_without_mnogosearch:1}%{?_without_mnogosearch:0}
+%if %{defined with_mnogosearch}
 %files mnogosearch
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/mnogosearch.so
 %endif
 
-%if %{?_without_msession:0}%{!?_without_msession:1}
+%if %{defined with_msession}
 %files msession
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/msession.so
@@ -2206,25 +2214,25 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/mysql.so
 
-%if %{?_with_oci8:1}%{!?_with_oci8:0}
+%if %{defined with_oci8}
 %files oci8
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/oci8.so
 %endif
 
-%if %{?_without_odbc:0}%{!?_without_odbc:1}
+%if %{defined with_odbc}
 %files odbc
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/odbc.so
 %endif
 
-%if %{?_without_openssl:0}%{!?_without_openssl:1}
+%if %{defined with_openssl}
 %files openssl
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/openssl.so
 %endif
 
-%if %{?_with_oracle:1}%{!?_with_oracle:0}
+%if %{defined with_oracle}
 %files oracle
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/oracle.so
@@ -2234,25 +2242,25 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/overload.so
 
-%if %{?_with_pcntl:1}%{!?_with_pcntl:0}
+%if %{defined with_pcntl}
 %files pcntl
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/pcntl.so
 %endif
 
-%if %{?_without_pcre:0}%{!?_without_pcre:1}
+%if %{defined with_pcre}
 %files pcre
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/pcre.so
 %endif
 
-%if %{?_without_pdf:0}%{!?_without_pdf:1}
+%if %{defined with_pdf}
 %files pdf
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/pdf.so
 %endif
 
-%if %{!?_without_pgsql:1}%{?_without_pgsql:0}
+%if %{defined with_pgsql}
 %files pgsql
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/pgsql.so
@@ -2262,13 +2270,13 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/posix.so
 
-%if %{!?_without_pspell:1}%{?_without_pspell:0}
+%if %{defined with_pspell}
 %files pspell
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/pspell.so
 %endif
 
-%if %{?_without_recode:0}%{!?_without_recode:1}
+%if %{defined with_recode}
 %files recode
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/recode.so
@@ -2283,7 +2291,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/shmop.so
 
-%if %{?_without_snmp:0}%{!?_without_snmp:1}
+%if %{defined with_snmp}
 %files snmp
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/snmp.so
@@ -2293,7 +2301,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/sockets.so
 
-%if %{?_without_sybase_ct:0}%{!?_without_sybase_ct:1}
+%if %{defined with_sybase_ct}
 %files sybase-ct
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/sybase_ct.so
@@ -2307,25 +2315,25 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/sysvshm.so
 
-%if %{?_without_wddx:0}%{!?_without_wddx:1}
+%if %{defined with_wddx}
 %files wddx
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/wddx.so
 %endif
 
-%if %{?_without_xml:0}%{!?_without_xml:1}
+%if %{defined with_xml}
 %files xml
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/xml.so
 %endif
 
-%if %{?_without_xmlrpc:0}%{!?_without_xmlrpc:1}
+%if %{defined with_xmlrpc}
 %files xmlrpc
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/xmlrpc.so
 %endif
 
-%if %{?_without_xslt:0}%{!?_without_xslt:1}
+%if %{defined with_xslt}
 %files xslt
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/xslt.so

@@ -78,14 +78,14 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 -- язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.0.1
-Release:	0.2
+Version:	5.0.2
+Release:	0.1
 Epoch:		3
 Group:		Libraries
 License:	PHP
 #Source0:	http://www.php.net/distributions/%{name}-%{version}%{_pre}.tar.bz2
 Source0:	http://pl2.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	b12042826ddba29fba3ae5a2eac3c391
+# Source0-md5:	579f82f3d6a61b669183b2ebce357a1e
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source4:	%{name}-module-install
@@ -192,7 +192,8 @@ BuildRequires:	t1lib-devel
 BuildRequires:	zlib-devel >= 1.0.9
 # apache 1.3 vs apache 2.0
 %if %{_apache2}
-BuildRequires:	apr-devel >= 1:0.9.4-1
+BuildRequires:	apr-devel >= 1:1.0.0
+BuildRequires:	apr-util-devel >= 1:1.0.0
 PreReq:		apache >= 2.0.40
 Requires:	apache(modules-api) = %{apache_modules_api}
 %else
@@ -1462,11 +1463,14 @@ rm -f ext/recode/config9.m4
 
 # fix lib path in phpize
 cd scripts/
-sed 's,lib/php,%{_lib}/php,' phpize.in > phpize.in.tmp
-mv -f phpize.in.tmp phpize.in
+sed -i -e 's,lib/php,%{_lib}/php,' phpize.in
+cd ..
+
+# new apr
+sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4
 
 %build
-CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include"
+CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include `%{_bindir}/apr-1-config --includes` `%{_bindir}/apu-1-config --includes`"
 EXTENSION_DIR="%{extensionsdir}"; export EXTENSION_DIR
 ./buildconf --force
 %{__libtoolize}

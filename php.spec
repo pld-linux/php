@@ -122,7 +122,6 @@ Patch27:	%{name}-gd_imagerotate_enable.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
-BuildRequires:	apache-devel
 %{?with_pspell:BuildRequires:	aspell-devel}
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake >= 1.4d
@@ -191,11 +190,13 @@ BuildRequires:	t1lib-devel
 BuildRequires:	zlib-devel >= 1.0.9
 # apache 1.3 vs apache 2.0
 %if %{_apache2}
+BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
-PreReq:		apache >= 2.0.52
+PreReq:		apache >= 2.0.52-2
 Requires:	apache(modules-api) = %{apache_modules_api}
 %else
+BuildRequires:	apache1-devel
 PreReq:		apache(EAPI) < 2.0.0
 PreReq:		apache(EAPI) >= 1.3.9
 Requires(post,preun):	%{apxs}

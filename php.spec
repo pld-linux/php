@@ -1,15 +1,14 @@
 #
 # TODO:
-# - make sure that session-unregister patch is no longer needed
-#   (any crash reports related to session modules?)
 # - think of including support for:
 #    - mcve,
 #    - ovrimos,
 #    - pfpro,
 #    - ircg,
 #   These extensions BuildRequires proprietary libraries...
-# - fix building of sybase extensions
-# - test if php.cgi segfaults after ctrl+d when overload.so is loaded
+# - deal with modules removed from php and not moved to PECL
+#   (existing only in php4):
+#   db, domxml, hyperwave, mcal, overload, qtdom, xslt
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support

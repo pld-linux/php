@@ -22,7 +22,6 @@
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
 %bcond_without	cpdf		# without cpdf extension module
 %bcond_without	curl		# without CURL extension module
-%bcond_without	domxslt		# without DOM XSLT/EXSLT support in DOM XML extension module
 %bcond_without	fam		# without FAM (File Alteration Monitor) extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
@@ -145,9 +144,8 @@ BuildRequires:	freetype-devel >= 2.0
 BuildRequires:	gd-devel >= 2.0.28-4
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
-%{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2 }
+%{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
 %{?with_cpdf:BuildRequires:	libcpdf-devel >= 2.02r1-2}
-BuildRequires:	libgcrypt-devel
 BuildRequires:	libidn-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
@@ -156,7 +154,7 @@ BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libtiff-devel
 BuildRequires:	libtool >= 1.4.3
 %{?with_xml:BuildRequires:	libxml2-devel >= 2.5.10}
-%{?with_domxslt:BuildRequires:	libxslt-devel >= 1.0.3}
+BuildRequires:	libxslt-devel >= 1.0.18
 %{?with_mhash:BuildRequires:	mhash-devel}
 %{?with_ming:BuildRequires:	ming-devel >= 0.1.0}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
@@ -1315,6 +1313,21 @@ Modu³ PHP dodaj±cy obs³ugê XMLRPC.
 
 Uwaga: to jest modu³ eksperymentalny.
 
+%package xsl
+Summary:	xsl extension module for PHP
+Summary(pl):	Modu³ xsl dla PHP
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	libxslt >= 1.0.18
+
+%description xsl
+This is a dynamic shared object (DSO) for PHP that will add new XSL
+support (using libxslt).
+
+%description xsl -l pl
+Modu³ PHP dodaj±cy now± obs³ugê XSLT (przy u¿yciu libxslt).
+
 %package yaz
 Summary:	yaz extension module for PHP
 Summary(pl):	Modu³ yaz dla PHP
@@ -1494,7 +1507,6 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_db3:--with-db3}%{!?with_db3:--with-db4} \
 	--with-dbase=shared \
 	%{?with_xml:--with-dom=shared} \
-	%{?with_domxslt:--with-dom-xslt=shared --with-dom-exslt=shared} \
 %if %{with xml} || %{with xmlrpc}
 	--with-expat-dir=shared,/usr \
 %else
@@ -1547,7 +1559,7 @@ for i in fcgi cgi cli apxs ; do
 	--with-tiff-dir=/usr \
 	%{?with_odbc:--with-unixODBC=shared} \
 	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
-	--with-xsl \
+	--with-xsl=shared \
 	%{?with_yaz:--with-yaz=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr
@@ -2160,6 +2172,14 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove xmlrpc %{_sysconfdir}/php.ini
 fi
 
+%post xsl
+%{_sbindir}/php-module-install install xsl %{_sysconfdir}/php.ini
+
+%preun xsl
+if [ "$1" = "0" ]; then
+	%{_sbindir}/php-module-install remove xsl %{_sysconfdir}/php.ini
+fi
+
 %post yaz
 %{_sbindir}/php-module-install install yaz %{_sysconfdir}/php.ini
 
@@ -2538,6 +2558,10 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/xmlrpc.so
 %endif
+
+%files xsl
+%defattr(644,root,root,755)
+%attr(755,root,root) %{extensionsdir}/xsl.so
 
 %if %{with yaz}
 %files yaz

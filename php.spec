@@ -189,7 +189,7 @@ BuildRequires:	t1lib-devel
 BuildRequires:	zlib-devel >= 1.0.9
 # apache 1.3 vs apache 2.0
 %if %{_apache2}
-BuildRequires:  apr-devel >= 1:0.9.4-1
+BuildRequires:	apr-devel >= 1:0.9.4-1
 PreReq:		apache >= 2.0.40
 Requires:	apache(modules-api) = %{apache_modules_api}
 %else
@@ -1186,7 +1186,7 @@ without running a separate RDBMS process.
 
 SQLite is not a client library used to connect to a big database server.
 SQLite is the server. The SQLite library reads and writes directly to
-and from the database files on disk. 
+and from the database files on disk.
 
 %description sqlite -l pl
 SQLite jest napisan± w C bibliotek± implementuj±c± osadzalny silnik
@@ -1554,7 +1554,7 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_msession:--with-msession=shared}%{!?with_msession:--without-msession} \
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
-	--with-mysql-sock=/var/lib/mysql/mysql.sock \
+	--with-mysql-sock=/var/lib/mysql/mysqldb/mysql.sock \
 	--with-ncurses=shared \
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
@@ -1952,7 +1952,7 @@ fi
 
 %preun mssql
 if [ "$1" = "0" ]; then
-        %{_sbindir}/php-module-install remove mssql %{_sysconfdir}/php.ini
+	%{_sbindir}/php-module-install remove mssql %{_sysconfdir}/php.ini
 fi
 
 %post mysql

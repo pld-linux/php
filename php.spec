@@ -61,7 +61,7 @@
 %if %{_apache2}
 %undefine	with_mm
 %endif
-%ifnarch %{ix86} sparc sparcv9 ppc
+%ifnarch %{ix86} amd64 sparc sparcv9 ppc
 %undefine	with_interbase
 %endif
 # x86-only libs

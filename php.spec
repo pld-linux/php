@@ -20,6 +20,7 @@
 %bcond_with	java		# with Java extension module		(BR: jdk)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
+%bcond_with	xslt		# with XSLT extension module
 %bcond_without	cpdf		# without cpdf extension module
 %bcond_without	curl		# without CURL extension module
 %bcond_without	domxslt		# without DOM XSLT/EXSLT support in DOM XML extension module
@@ -48,7 +49,6 @@
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	xml		# without XML and DOMXML extension modules
-%bcond_without	xslt		# without XSLT extension module
 # To be verified
 # Removed from sources?
 %bcond_with	mono		# without Mono extensions module

@@ -64,7 +64,7 @@ Summary(uk):	PHP Верс╕╖ 4 -- мова препроцесування HTML-файл╕в, виконувана на сер
 Name:		php
 Version:	4.3.10
 %define	_rc	%{nil}
-Release:	0.1
+Release:	0.2
 Epoch:		3
 Group:		Libraries
 License:	PHP
@@ -111,6 +111,7 @@ Patch29:	%{name}-lib64.patch
 Patch30:	%{name}-mnogosearch-fix.patch
 Patch31:	%{name}-gd_imagerotate_enable.patch
 Patch32:	%{name}-uint32_t.patch
+Patch33:	%{name}-va_copy.patch
 Icon:		php4.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1558,6 +1559,7 @@ cp php.ini-dist php.ini
 #%patch30 -p1
 %patch31 -p1
 %patch32 -p1
+%patch33 -p1
 
 %build
 CFLAGS="%{rpmcflags} -DEAPI=1 -I%{_prefix}/X11R6/include"

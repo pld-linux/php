@@ -75,14 +75,16 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.0.2
-Release:	8.2
+Version:	5.0.3
+%define _suf	RC1
+Release:	0.%{_suf}
 Epoch:		3
 Group:		Libraries
 License:	PHP
 #Source0:	http://www.php.net/distributions/%{name}-%{version}%{_pre}.tar.bz2
-Source0:	http://pl2.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	579f82f3d6a61b669183b2ebce357a1e
+#Source0:	http://pl2.php.net/distributions/%{name}-%{version}%{_suf}.tar.bz2
+Source0:	http://snaps.php.net/~andi/%{name}-%{version}%{_suf}.tar.bz2
+# Source0-md5:	9abb5c1558865eab14674f96a6238348
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source4:	%{name}-module-install
@@ -1426,7 +1428,7 @@ dostarczanych z PHP, nale©y zainstalowaФ odpowiednie pakiety
 php-pear-* (php-pear-PEAR, php-pear-Archive_Tar, itp).
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{_suf}
 %patch0 -p1
 %patch1 -p1
 #%patch2 -p1

@@ -15,7 +15,7 @@
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary libs)
-%bcond_with	hardened	# build with hardened patch applied (http://www.hardenet.php/)
+%bcond_with	hardened	# build with hardened patch applied (http://www.hardened-php.net/)
 %bcond_with	hyperwave	# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	java		# with Java extension module		(BR: jdk)

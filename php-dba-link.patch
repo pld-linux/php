@@ -1,0 +1,11 @@
+--- php-5.0.3/ext/dba/config.m4.orig	2004-12-26 16:47:32.795841000 +0100
++++ php-5.0.3/ext/dba/config.m4	2004-12-26 18:23:10.936511416 +0100
+@@ -185,6 +185,8 @@
+ #endif
+           ],[
+             THIS_LIBS=$LIB
++            LDFLAGS=$old_LDFLAGS
++            LIBS=$old_LIBS
+             break
+           ])
+         ])

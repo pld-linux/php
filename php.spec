@@ -76,7 +76,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.2
-Release:	8.1
+Release:	8.2
 Epoch:		3
 Group:		Libraries
 License:	PHP
@@ -322,7 +322,6 @@ Summary(ru):	Разделяемые библиотеки для php
 Summary(uk):	Б╕бл╕отеки сп╕льного використання для php
 Group:		Libraries
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
-Obsoletes:	php-session <= %{epoch}:%{version}-%{release}
 
 %description common
 Common files needed by both apache module and CGI.

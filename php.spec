@@ -39,12 +39,12 @@
 %define	apxs		/usr/sbin/apxs
 
 %if %{_apache2}
-%undefine	without_recode
-%undefine	without_mm
+%undefine	with_recode
+%undefine	with_mm
 %endif
 
 %ifnarch %{ix86}
-%undefine	without_msession
+%undefine	with_msession
 %endif
 
 Summary:	The PHP HTML-embedded scripting language for use with Apache
@@ -99,6 +99,7 @@ Patch24:	%{name}-wrap.patch
 Patch25:	%{name}-sessid.patch
 # similar to CAN-2004-0263(?)
 Patch26:	%{name}-vhost.patch
+Patch27:	%{name}-gd_free.patch
 Icon:		php4.gif
 URL:		http://www.php.net/
 BuildRequires:	apache-devel
@@ -1355,6 +1356,7 @@ cp php.ini-dist php.ini
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
+%patch27 -p1
 
 install -d manual
 bzip2 -dc %{SOURCE3} | tar -xf - -C manual
@@ -1411,7 +1413,7 @@ for i in cgi apxs ; do
 	--enable-yp=shared \
 	--with-bz2=shared \
 	%{?with_cpdf:--with-cpdflib=shared} \
-	--with-cpdflin
+	--with-cpdflin \
 	--with-crack=shared \
 %if %{defined with_curl}
 	--with-curl=shared \

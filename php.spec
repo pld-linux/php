@@ -50,7 +50,7 @@
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
 #
-%define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq '\\-2\\.[0-9]+\\.' && echo 1 || echo 0)
+%define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq -e '-2\\.[0-9]+\\.' && echo 1 || echo 0)
 %if %{_apache2}
 %define	apxs		/usr/sbin/apxs
 %else

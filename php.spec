@@ -16,7 +16,7 @@
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary libs)
 %bcond_with	hardened	# build with hardened patch applied (http://www.hardened-php.net/)
-%bcond_with	hyperwave	# with Hw API support			(BR: proprietary libs)
+%bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	java		# with Java extension module		(BR: jdk)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
@@ -647,19 +647,19 @@ length number support with GNU MP library.
 Modu³ PHP umo¿liwiaj±cy korzystanie z biblioteki gmp do obliczeñ na
 liczbach o dowolnej d³ugo¶ci.
 
-%package hyperwave
-Summary:	Hyperwave extension module for PHP
-Summary(pl):	Modu³ Hyperwave dla PHP
+%package hwapi
+Summary:	Hyperwave API extension module for PHP
+Summary(pl):	Modu³ API Hyperwave dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
-%description hyperwave
-This is a dynamic shared object (DSO) for PHP that will add Hyperwave
-support.
+%description hwapi
+This is a dynamic shared object (DSO) for PHP that will add official
+Hyperwave API support.
 
-%description hyperwave -l pl
-Modu³ PHP dodaj±cy obs³ugê Hyperwave.
+%description hwapi -l pl
+Modu³ PHP dodaj±cy oficjaln± obs³ugê API Hyperwave.
 
 %package iconv
 Summary:	iconv extension module for PHP
@@ -1552,7 +1552,7 @@ for i in fcgi cgi cli apxs ; do
 	--with-gd=shared,/usr \
 	--with-gdbm \
 	--with-gmp=shared \
-	%{?with_hyperwave:--with-hwapi=shared} \
+	%{?with_hwapi:--with-hwapi=shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
 	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
 	%{?with_java:--with-java=%{_libdir}/java } \
@@ -1849,12 +1849,12 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove gmp %{_sysconfdir}/php.ini
 fi
 
-%post hyperwave
-%{_sbindir}/php-module-install install hyperwave %{_sysconfdir}/php.ini
+%post hwapi
+%{_sbindir}/php-module-install install hwapi %{_sysconfdir}/php.ini
 
-%preun hyperwave
+%preun hwapi
 if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove hyperwave %{_sysconfdir}/php.ini
+	%{_sbindir}/php-module-install remove hwapi %{_sysconfdir}/php.ini
 fi
 
 %post iconv
@@ -2378,10 +2378,10 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/gmp.so
 
-%if %{with hyperwave}
-%files hyperwave
+%if %{with hwapi}
+%files hwapi
 %defattr(644,root,root,755)
-%attr(755,root,root) %{extensionsdir}/hyperwave.so
+%attr(755,root,root) %{extensionsdir}/hwapi.so
 %endif
 
 %files iconv

@@ -12,10 +12,6 @@
 # - test if php.cgi segfaults after ctrl+d when overload.so is loaded
 # - build simplexml as shared (now it's static)
 #
-# Note:
-# According to http://bugs.php.net/bug.php?id=30286 sybase module is
-# currently not maintained. Using of sybase_ct is recommended instead.
-#
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary libs)
@@ -1216,11 +1212,13 @@ Obsoletes:	php-sybase-ct
 
 %description sybase
 This is a dynamic shared object (DSO) for PHP that will add Sybase and
-MS SQL databases support through SYBDB library.
+MS SQL databases support through SYBDB library. Currently Sybase module
+is not maintained. Using Sybase-CT module is recommended instead.
 
 %description sybase -l pl
 Modu³ PHP dodaj±cy obs³ugê baz danych Sybase oraz MS SQL poprzez
-bibliotekê SYBDB.
+bibliotekê SYBDB. W chwili obecnej modu³ Sybase nie jest wspierany.
+Zaleca siê u¿ywanie modu³u Sybase-CT.
 
 %package sybase-ct
 Summary:	Sybase-CT extension module for PHP

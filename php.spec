@@ -142,8 +142,7 @@ BuildRequires:	flex
 BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
-BuildRequires:	gd-devel >= 2.0.20
-BuildRequires:	gd-devel(gif)
+BuildRequires:	gd-devel >= 2.0.28
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2 }
@@ -599,8 +598,7 @@ Summary(pl):	Modu³ GD dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	gd >= 2.0.20
-Requires:	gd(gif)
+Requires:	gd >= 2.0.28
 Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}
 
 %description gd

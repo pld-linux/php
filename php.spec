@@ -138,7 +138,6 @@ BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
 %{?with_cpdf:BuildRequires:	libcpdf-devel >= 2.02r1-2}
-BuildRequires:	libidn-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4

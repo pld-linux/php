@@ -13,6 +13,7 @@
 # - enabling sybase+sybase_ct+mssql together causes SEGV beside warnings
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
+# - apply -hardened patch by default ?
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -74,13 +75,15 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.0.3
-Release:	4.3%{?with_hardened:hardened}
+Version:	5.0.4
+%define		_suf	RC1
+Release:	0.%{_suf}.1%{?with_hardened:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
-Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	fd26455febdddee0977ce226b9108d9c
+##Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+Source0:	http://downloads.php.net/zeev/%{name}-%{version}%{_suf}.tar.bz2
+# Source0-md5:	909ed6a29bb45ba663795773821a6aef
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -89,7 +92,7 @@ Source5:	%{name}-cgi-fcgi.ini
 Source6:	%{name}-cgi.ini
 Source7:	%{name}-apache.ini
 Source8:	%{name}-cli.ini
-Source9:	http://www.hardened-php.net/hardened-php-%{version}-0.2.5.patch.gz
+Source9:	http://www.hardened-php.net/hardened-php-5.0.3-0.2.5.patch.gz
 # Source9-md5:	cc91bb34a066135f1ef7cb1d4ba00b0d
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
@@ -115,12 +118,11 @@ Patch20:	%{name}-sybase-fix.patch
 Patch21:	%{name}-mnogosearch-fix.patch
 Patch22:	%{name}-nohttpd.patch
 Patch23:	%{name}-lib64.patch
-Patch24:	%{name}-phpize.patch
-Patch25:	%{name}-gd_imagerotate_enable.patch
-Patch26:	%{name}-uint32_t.patch
-Patch27:	%{name}-hwapi-link.patch
-Patch28:	%{name}-dba-link.patch
-Patch29:	%{name}-install_gd_headers.patch
+Patch24:	%{name}-gd_imagerotate_enable.patch
+Patch25:	%{name}-uint32_t.patch
+Patch26:	%{name}-hwapi-link.patch
+Patch27:	%{name}-dba-link.patch
+Patch28:	%{name}-install_gd_headers.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1382,7 +1384,7 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{_suf}
 # this patch is broken by design, breaks --enable-versioning for example
 %patch0 -p1
 %patch1 -p1
@@ -1418,7 +1420,6 @@ cp php.ini-dist php.ini
 %patch26 -p1
 %patch27 -p1
 %patch28 -p1
-%patch29 -p1
 
 %{?with_hardened:zcat %{SOURCE9} | patch -p1}
 

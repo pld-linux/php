@@ -206,6 +206,7 @@ PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php
+Conflicts:	php4
 
 %define		_sysconfdir	/etc/php
 %define		extensionsdir	%{_libdir}/php
@@ -324,6 +325,7 @@ Summary(uk):	Б╕бл╕отеки сп╕льного використання для php
 Group:		Libraries
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Obsoletes:	php-session <= %{epoch}:%{version}-%{release}
+Conflicts:	php4-common
 
 %description common
 Common files needed by both apache module and CGI.
@@ -350,6 +352,7 @@ Requires:	autoconf
 Requires:	automake
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Obsoletes:	php-pear-devel
+Conflicts:	php4-devel
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.

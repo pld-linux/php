@@ -8,7 +8,7 @@
 #    - pfpro,
 #    - ircg,
 #   These extensions BuildRequires proprietary libraries...
-# - fix building of mono, sybase extensions
+# - fix building of sybase extensions
 # - test if php.cgi segfaults after ctrl+d when overload.so is loaded
 # - build simplexml as shared (now it's static)
 #
@@ -47,10 +47,6 @@
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	xml		# without XML and DOMXML extension modules
-# To be verified
-# Removed from sources?
-%bcond_with	mono		# without Mono extensions module
-%bcond_with	yaz		# without YAZ extension module
 #
 %define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq '\\-2\\.[0-9]+\\.' && echo 1 || echo 0)
 %define	apxs		/usr/sbin/apxs
@@ -158,7 +154,6 @@ BuildRequires:	libxslt-devel >= 1.0.18
 %{?with_ming:BuildRequires:	ming-devel >= 0.1.0}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{?with_mnogosearch:BuildRequires:	mnogosearch-devel >= 3.2.6}
-%{?with_mono:BuildRequires:	mono-devel}
 BuildRequires:	mysql-devel >= 4.0.0
 BuildRequires:	ncurses-ext-devel
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.0}
@@ -180,7 +175,6 @@ BuildRequires:	t1lib-devel
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
 %{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel}
-%{?with_yaz:BuildRequires:	yaz-devel >= 1.9}
 BuildRequires:	zlib-devel >= 1.0.9
 # apache 1.3 vs apache 2.0
 %if %{_apache2}
@@ -807,21 +801,6 @@ access mnoGoSearch free search engine.
 Modu³ PHP dodaj±cy pozwalaj±cy na dostêp do wolnodostêpnego silnika
 wyszukiwarki mnoGoSearch.
 
-%package mono
-Summary:	Mono extension module for PHP
-Summary(pl):	Modu³ Mono dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description mono
-This is a dynamic shared object (DSO) for PHP that will allow you to
-access .NET assemblies via free Mono library.
-
-%description mono -l pl
-Modu³ PHP pozwalaj±cy na dostêp do wstawek .NET za pomoc± darmowej
-biblioteki Mono.
-
 %package msession
 Summary:	msession extension module for PHP
 Summary(pl):	Modu³ msession dla PHP
@@ -1327,23 +1306,6 @@ support (using libxslt).
 %description xsl -l pl
 Modu³ PHP dodaj±cy now± obs³ugê XSLT (przy u¿yciu libxslt).
 
-%package yaz
-Summary:	yaz extension module for PHP
-Summary(pl):	Modu³ yaz dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	yaz >= 1.9
-
-%description yaz
-This is a dynamic shared object (DSO) for PHP that will add yaz
-support. yaz toolkit implements the Z39.50 protocol for information
-retrieval.
-
-%description yaz -l pl
-Modu³ PHP umo¿liwiaj±cy korzystanie z yaz - implementacji protoko³u
-Z39.50 s³u¿±cego do pozyskiwania informacji.
-
 %package yp
 Summary:	NIS (yp) extension module for PHP
 Summary(pl):	Modu³ NIS (yp) dla PHP
@@ -1530,7 +1492,6 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{!?with_mnogosearch:--without-mnogosearch}%{?with_mnogosearch:--with-mnogosearch=shared,/usr} \
-	%{?with_mono:--with-mono} \
 	%{?with_msession:--with-msession=shared}%{!?with_msession:--without-msession} \
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
@@ -1558,7 +1519,6 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_odbc:--with-unixODBC=shared} \
 	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
 	--with-xsl=shared \
-	%{?with_yaz:--with-yaz=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr
 
@@ -1900,14 +1860,6 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove mnogosearch %{_sysconfdir}/php.ini
 fi
 
-%post mono
-%{_sbindir}/php-module-install install mono %{_sysconfdir}/php.ini
-
-%preun mono
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mono %{_sysconfdir}/php.ini
-fi
-
 %post msession
 %{_sbindir}/php-module-install install msession %{_sysconfdir}/php.ini
 
@@ -2178,14 +2130,6 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove xsl %{_sysconfdir}/php.ini
 fi
 
-%post yaz
-%{_sbindir}/php-module-install install yaz %{_sysconfdir}/php.ini
-
-%preun yaz
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove yaz %{_sysconfdir}/php.ini
-fi
-
 %post yp
 %{_sbindir}/php-module-install install yp %{_sysconfdir}/php.ini
 
@@ -2391,12 +2335,6 @@ fi
 %attr(755,root,root) %{extensionsdir}/mnogosearch.so
 %endif
 
-%if %{with mono}
-%files mono
-%defattr(644,root,root,755)
-%attr(755,root,root) %{extensionsdir}/mono.so
-%endif
-
 %if %{with msession}
 %files msession
 %defattr(644,root,root,755)
@@ -2560,12 +2498,6 @@ fi
 %files xsl
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/xsl.so
-
-%if %{with yaz}
-%files yaz
-%defattr(644,root,root,755)
-%attr(755,root,root) %{extensionsdir}/yaz.so
-%endif
 
 %files yp
 %defattr(644,root,root,755)

@@ -12,6 +12,10 @@
 # - test if php.cgi segfaults after ctrl+d when overload.so is loaded
 # - build simplexml as shared (now it's static)
 #
+# Note:
+# According to http://bugs.php.net/bug.php?id=30286 sybase module is
+# currently not maintained. Using of sybase_ct is recommended instead.
+#
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary libs)
@@ -42,6 +46,7 @@
 %bcond_without	simplexml	# without simplexml extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
+%bcond_without	sybase		# without Sybase extension module
 %bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
@@ -52,8 +57,6 @@
 # Removed from sources?
 %bcond_with	mono		# without Mono extensions module
 %bcond_with	yaz		# without YAZ extension module
-# Breaks build
-%bcond_with	sybase		# without Sybase extension module
 #
 %define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq '\\-2\\.[0-9]+\\.' && echo 1 || echo 0)
 %define	apxs		/usr/sbin/apxs
@@ -77,7 +80,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.2
-Release:	7
+Release:	8
 Epoch:		3
 Group:		Libraries
 License:	PHP

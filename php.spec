@@ -1646,7 +1646,7 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/{apache,cgi}} 
 install libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache
 
 # compatibility (/usr/bin/php used to be CGI SAPI)
-ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php
+ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 %{?with_java:install ext/java/php_java.jar $RPM_BUILD_ROOT%{extensionsdir}}
 
@@ -2260,12 +2260,12 @@ fi
 %files cgi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.cgi
-%attr(755,root,root) %{_bindir}/php
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-cgi.ini
 
 %files cli
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.cli
+%attr(755,root,root) %{_bindir}/php
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-cli.ini
 %{_mandir}/man1/php.1*
 

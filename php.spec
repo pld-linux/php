@@ -24,7 +24,6 @@
 %bcond_without	curl		# without CURL extension module
 %bcond_without	domxslt		# without DOM XSLT/EXSLT support in DOM XML extension module
 %bcond_without	fam		# without FAM (File Alteration Monitor) extension module
-%bcond_without	gif		# build GD extension module with gd library without GIF support
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
@@ -144,8 +143,7 @@ BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
 BuildRequires:	gd-devel >= 2.0.20
-%{?with_gif:BuildRequires:	gd-devel(gif)}
-%{!?with_gif:BuildConflicts:	gd-devel(gif)}
+BuildRequires:	gd-devel(gif)
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2 }
@@ -602,8 +600,8 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	gd >= 2.0.20
-%{?with_gif:Requires:	gd(gif)}
-%{?with_gif:Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}}
+Requires:	gd(gif)
+Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}
 
 %description gd
 This is a dynamic shared object (DSO) for PHP that will add GD

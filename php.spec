@@ -205,7 +205,6 @@ PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php
-Conflicts:	php4
 
 %define		_sysconfdir	/etc/php
 %define		extensionsdir	%{_libdir}/php

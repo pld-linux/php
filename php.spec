@@ -21,6 +21,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
+%bcond_with	mysqli		# with mysqli support (Requires mysql > 4.1)
 %bcond_without	cpdf		# without cpdf extension module
 %bcond_without	curl		# without CURL extension module
 %bcond_without	fam		# without FAM (File Alteration Monitor) extension module
@@ -156,6 +157,7 @@ BuildRequires:	libxslt-devel >= 1.0.18
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{?with_mnogosearch:BuildRequires:	mnogosearch-devel >= 3.2.6}
 BuildRequires:	mysql-devel >= 4.0.0
+%{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
 BuildRequires:	ncurses-ext-devel
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.0}
 %if %{with openssl} || %{with ldap}
@@ -866,6 +868,17 @@ Modu³ PHP umo¿liwiaj±cy dostêp do bazy danych MySQL.
 %description mysql -l pt_BR
 Um módulo para aplicações PHP que usam bancos de dados MySQL.
 
+%package mysqli
+Summary:	MySQLi module for PHP
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	mysql-libs >= 4.1.0
+
+%description mysqli
+This is a dynamic shared object (DSO) for PHP that will add MySQLi
+support.
+
 %package ncurses
 Summary:	ncurses module for PHP
 Summary(pl):	Modu³ ncurses dla PHP
@@ -1501,6 +1514,7 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
+	%{?with_mysqli:--with-mysqli=shared} \
 	--with-ncurses=shared \
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
@@ -1910,6 +1924,14 @@ fi
 %preun mysql
 if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove mysql %{_sysconfdir}/php.ini
+fi
+
+%post mysqli
+%{_sbindir}/php-module-install install mysqli %{_sysconfdir}/php.ini
+
+%preun mysqli
+if [ "$1" = "0" ]; then
+	%{_sbindir}/php-module-install remove mysqli %{_sysconfdir}/php.ini
 fi
 
 %post ncurses
@@ -2375,6 +2397,12 @@ fi
 %files mysql
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/mysql.so
+
+%if %{with mysqli}
+%files mysqli
+%defattr(644,root,root,755)
+%attr(755,root,root) %{extensionsdir}/mysqli.so
+%endif
 
 %files ncurses
 %defattr(644,root,root,755)

@@ -80,8 +80,7 @@ Release:	1
 Epoch:		3
 Group:		Libraries
 License:	PHP
-#Source0:	http://www.php.net/distributions/%{name}-%{version}%{_pre}.tar.bz2
-Source0:	http://pl2.php.net/distributions/%{name}-%{version}.tar.bz2
+Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	fd26455febdddee0977ce226b9108d9c
 Source1:	FAQ.%{name}
 Source2:	zend.gif

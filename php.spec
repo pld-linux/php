@@ -62,14 +62,13 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 4 -- язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 4 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	4.3.10
-%define	_rc	%{nil}
+Version:	4.3.11
 Release:	1
 Epoch:		3
 Group:		Libraries
 License:	PHP
-Source0:	http://www.php.net/distributions/%{name}-%{version}%{_rc}.tar.bz2
-# Source0-md5:	7e56824dae9679c59a8234eb848aa542
+Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+# Source0-md5:	fbc67d240812136a9842bc1f2a217b7a
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -85,7 +84,6 @@ Patch3:		%{name}-mail.patch
 Patch4:		%{name}-link-libs.patch
 Patch5:		%{name}-libpq_fs_h_path.patch
 Patch6:		%{name}-wddx-fix.patch
-Patch7:		%{name}-cpdf-fix.patch
 Patch8:		%{name}-hyperwave-fix.patch
 Patch9:		%{name}-xslt-gcc33.patch
 Patch10:	%{name}-java-norpath.patch
@@ -1519,7 +1517,7 @@ PEAR (PHP Extension and Application Repository) - Rozszerzenie PHP i
 Repozytorium Aplikacji. Ten pakiet zawiera aplikacje potrzebne do
 
 %prep
-%setup -q -n %{name}-%{version}%{_rc}
+%setup -q
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1527,7 +1525,6 @@ Repozytorium Aplikacji. Ten pakiet zawiera aplikacje potrzebne do
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%patch7 -p1
 %patch8 -p1
 # Not really needed?
 #%patch9 -p1

@@ -76,14 +76,14 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-%define		_suf	RC1
+%define		_suf	RC2
 Release:	0.%{_suf}.1%{?with_hardened:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
 ##Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 Source0:	http://downloads.php.net/zeev/%{name}-%{version}%{_suf}.tar.bz2
-# Source0-md5:	909ed6a29bb45ba663795773821a6aef
+# Source0-md5:	7db1352ac963a072cffa331af4a3271e
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install

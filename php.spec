@@ -77,7 +77,7 @@ Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на серв
 Name:		php
 Version:	5.0.4
 %define		_suf	RC2
-Release:	0.%{_suf}.1%{?with_hardened:hardened}
+Release:	0.%{_suf}.2%{?with_hardened:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -535,6 +535,7 @@ Summary(pl):	ModuЁ DOM dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:       php-domxml = %{epoch}:%{version}-%{release}
 
 %description dom
 This is a dynamic shared object (DSO) for PHP that will add new DOM

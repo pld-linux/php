@@ -15,6 +15,7 @@
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary libs)
+%bcond_with	hardened	# build with hardened patch applied (http://www.hardenet.php/)
 %bcond_with	hyperwave	# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	java		# with Java extension module		(BR: jdk)
@@ -76,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.3
-Release:	1
+Release:	1%{?with_hardened:hardened}
 Epoch:		3
 Group:		Libraries
 License:	PHP
@@ -89,6 +90,8 @@ Source5:	%{name}-mod_%{name}.conf
 Source6:	%{name}-cgi.ini
 Source7:	%{name}-apache.ini
 Source8:	%{name}-cli.ini
+Source9:	http://www.hardened-php.net/hardened-php-%{version}-0.2.5.patch.gz
+# Source9-md5:	cc91bb34a066135f1ef7cb1d4ba00b0d
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-xml-expat-fix.patch
@@ -1459,6 +1462,8 @@ cp php.ini-dist php.ini
 %patch25 -p1
 %patch26 -p1
 %patch27 -p1
+
+%{?with_hardened:zcat %{SOURCE9} | patch -p1}
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

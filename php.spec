@@ -49,7 +49,11 @@
 %bcond_without	xmlrpc		# without XML-RPC extension module
 #
 %define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq '\\-2\\.[0-9]+\\.' && echo 1 || echo 0)
+%if %{_apache2}
 %define	apxs		/usr/sbin/apxs
+%else
+%define apxs		/usr/sbin/apxs1
+%endif
 # some problems with apache 2.x
 %if %{_apache2}
 %undefine	with_mm
@@ -200,6 +204,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir	/etc/php
 %define		extensionsdir	%{_libdir}/php
 %define		httpdir		/home/services/httpd
+%if %{_apache2}
+%define		apachelib	%{_libdir}/apache
+%else
+%define		apachelib	%{_libdir}/apache1
+%endif
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -1560,13 +1569,8 @@ done
 
 # fix install paths, avoid evil rpaths
 %{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
-%if %{_apache2}
-%{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}/apache'|" libphp5.la
-%{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache |' libphp5.la
-%else
-%{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}/apache1'|" libphp5.la
-%{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache1 |' libphp5.la
-%endif
+%{__perl} -pi -e "s|^libdir=.*|libdir='%{apachelib}'|" libphp5.la
+%{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{apachelib} |' libphp5.la
 
 # for fcgi: -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0
 # -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1(die) -DHAVE_SYS_PARAM_H=1
@@ -1586,28 +1590,24 @@ rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%if %{_apache2}
-install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/{apache,cgi}} \
+install -d $RPM_BUILD_ROOT{%{_libdir}/php,%{apachelib},%{_sysconfdir}/{apache,cgi}} \
 	$RPM_BUILD_ROOT%{httpdir}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/var/run/php \
+%if %{_apache2}
 	$RPM_BUILD_ROOT/etc/httpd/httpd.conf
 %else
-install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache1},%{_sysconfdir}/{apache,cgi}} \
-	$RPM_BUILD_ROOT%{httpdir}/icons \
-	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
-	$RPM_BUILD_ROOT/var/run/php \
 	$RPM_BUILD_ROOT/etc/apache/apache.conf
 %endif
 
 %{__make} install \
 	INSTALL_ROOT=$RPM_BUILD_ROOT \
-	INSTALL_IT="\$(LIBTOOL) --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir} ; \$(LIBTOOL) --mode=install install libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache ; \$(LIBTOOL) --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi ; \$(LIBTOOL) --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi" \
+	INSTALL_IT="\$(LIBTOOL) --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir} ; \$(LIBTOOL) --mode=install install libphp5.la $RPM_BUILD_ROOT%{apachelib}; \$(LIBTOOL) --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi ; \$(LIBTOOL) --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi" \
 	INSTALL_CLI="\$(LIBTOOL) --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli"
 
-# ToDo:
+# TODO:
 # Why make install doesn't install libphp5.so ?
-install libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache
+install libs/libphp5.so $RPM_BUILD_ROOT%{apachelib}
 
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
@@ -1626,7 +1626,7 @@ cp -f Zend/LICENSE{,.Zend}
 # Directories created for pear:
 install -d $RPM_BUILD_ROOT%{php_pear_dir}/{Archive,Console,Crypt,HTML/Template,Image,Net,Science,XML}
 
-rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
+rm -f $RPM_BUILD_ROOT%{apachelib}/libphp5.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -2198,10 +2198,8 @@ fi
 %defattr(644,root,root,755)
 %if %{_apache2}
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/httpd/httpd.conf/*_mod_php.conf
-%attr(755,root,root) %{_libdir}/apache/libphp5.so
-%else
-%attr(755,root,root) %{_libdir}/apache1/libphp5.so
 %endif
+%attr(755,root,root) %{apachelib}/libphp5.so
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
 
 %files fcgi

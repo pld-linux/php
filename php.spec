@@ -326,6 +326,7 @@ Summary(ru):	Разделяемые библиотеки для php
 Summary(uk):	Б╕бл╕отеки сп╕льного використання для php
 Group:		Libraries
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
+Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Obsoletes:	php-session < 3:4.2.1-2
 
 %description common

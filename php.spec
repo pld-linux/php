@@ -1362,31 +1362,6 @@ compression support to PHP.
 %description zlib -l pl
 Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 
-%package pear
-Summary:	PEAR - PHP Extension and Application Repository
-Summary(pl):	PEAR - rozszerzenie PHP i repozytorium aplikacji
-Group:		Development/Languages/PHP
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
-Obsoletes:	php-pear-additional_classes
-
-%description pear
-PEAR - PHP Extension and Application Repository.
-
-Please note that this package provides only basic directory structure.
-If you want to use base PEAR classes (PEAR.php, PEAR/*.php), that come
-with PHP, please install appropriate php-pear-* (php-pear-PEAR,
-php-PEAR-Archive_Tar, etc) packages.
-
-%description pear -l pl
-PEAR (PHP Extension and Application Repository) - rozszerzenie PHP i
-repozytorium aplikacji.
-
-Nale¿y pamiêtaæ, ¿e ten pakiet dostarcza tylko podstawow± strukturê
-katalogów. Aby u¿yæ podstawowych klas PEAR (PEAR.php PEAR/*.php),
-dostarczanych z PHP, nale¿y zainstalowaæ odpowiednie pakiety
-php-pear-* (php-pear-PEAR, php-pear-Archive_Tar, itp).
-
 %prep
 %setup -q
 %patch0 -p1
@@ -1622,9 +1597,6 @@ install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
 install %{SOURCE1} .
 
 cp -f Zend/LICENSE{,.Zend}
-
-# Directories created for pear:
-install -d $RPM_BUILD_ROOT%{php_pear_dir}/{Archive,Console,Crypt,HTML/Template,Image,Net,Science,XML}
 
 rm -f $RPM_BUILD_ROOT%{apachelib}/libphp5.la
 
@@ -2554,16 +2526,3 @@ fi
 %files zlib
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/zlib.so
-
-%files pear
-%defattr(644,root,root,755)
-%dir %{php_pear_dir}
-%dir %{php_pear_dir}/Archive
-%dir %{php_pear_dir}/Console
-%dir %{php_pear_dir}/Crypt
-%dir %{php_pear_dir}/HTML
-%dir %{php_pear_dir}/HTML/Template
-%dir %{php_pear_dir}/Image
-%dir %{php_pear_dir}/Net
-%dir %{php_pear_dir}/Science
-%dir %{php_pear_dir}/XML

@@ -1554,7 +1554,7 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_msession:--with-msession=shared}%{!?with_msession:--without-msession} \
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
-	--with-mysql-sock=/var/lib/mysql/mysqldb/mysql.sock \
+	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	--with-ncurses=shared \
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \

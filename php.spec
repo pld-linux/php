@@ -1,4 +1,6 @@
-#
+
+# SECURITY: CAN-2003-0097 CAN-2003-0166 CAN-2003-0172(?) CAN-2003-0860 CAN-2003-0861 CAN-2003-0863 CAN-2004-0263(?) CAN-2004-0594 CAN-2004-0595 CAN-2004-0958 CAN-2004-0959
+
 # Automatic pear requirements finding:
 %include	/usr/lib/rpm/macros.php
 
@@ -91,8 +93,11 @@ Patch20:	%{name}-ini.patch
 Patch21:	%{name}-acam.patch
 Patch22:	%{name}-xmlrpc-fix.patch
 Patch23:	%{name}-iconv-bug18039.patch
+# CAN-2002-1396
 Patch24:	%{name}-wrap.patch
+# CAN-2003-0442
 Patch25:	%{name}-sessid.patch
+# similar to CAN-2004-0263(?)
 Patch26:	%{name}-vhost.patch
 Icon:		php4.gif
 URL:		http://www.php.net/

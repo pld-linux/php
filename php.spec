@@ -98,30 +98,29 @@ Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
 Patch3:		%{name}-link-libs.patch
 Patch4:		%{name}-libpq_fs_h_path.patch
-Patch5:		%{name}-wddx-fix.patch
-Patch6:		%{name}-msession-shared-lib.patch
-Patch7:		%{name}-build_modules.patch
-Patch8:		%{name}-sapi-ini-file.patch
-Patch9:		%{name}-no-metaccld.patch
-Patch10:	%{name}-session-unregister.patch
-Patch11:	%{name}-ini.patch
-Patch12:	%{name}-acam.patch
-Patch13:	%{name}-xmlrpc-fix.patch
-Patch14:	%{name}-libtool.patch
-Patch15:	%{name}-allow-db31.patch
-Patch16:	%{name}-threads-acfix.patch
-Patch17:	%{name}-tsrmlsfetchgcc2.patch
-Patch18:	%{name}-no_pear_install.patch
-Patch19:	%{name}-zlib.patch
-Patch20:	%{name}-sybase-fix.patch
-Patch21:	%{name}-mnogosearch-fix.patch
-Patch22:	%{name}-nohttpd.patch
-Patch23:	%{name}-lib64.patch
-Patch24:	%{name}-gd_imagerotate_enable.patch
-Patch25:	%{name}-uint32_t.patch
-Patch26:	%{name}-hwapi-link.patch
-Patch27:	%{name}-dba-link.patch
-Patch28:	%{name}-install_gd_headers.patch
+Patch5:		%{name}-msession-shared-lib.patch
+Patch6:		%{name}-build_modules.patch
+Patch7:		%{name}-sapi-ini-file.patch
+Patch8:		%{name}-no-metaccld.patch
+Patch9:		%{name}-session-unregister.patch
+Patch10:	%{name}-ini.patch
+Patch11:	%{name}-acam.patch
+Patch12:	%{name}-xmlrpc-fix.patch
+Patch13:	%{name}-libtool.patch
+Patch14:	%{name}-allow-db31.patch
+Patch15:	%{name}-threads-acfix.patch
+Patch16:	%{name}-tsrmlsfetchgcc2.patch
+Patch17:	%{name}-no_pear_install.patch
+Patch18:	%{name}-zlib.patch
+Patch19:	%{name}-sybase-fix.patch
+Patch20:	%{name}-mnogosearch-fix.patch
+Patch21:	%{name}-nohttpd.patch
+Patch22:	%{name}-lib64.patch
+Patch23:	%{name}-gd_imagerotate_enable.patch
+Patch24:	%{name}-uint32_t.patch
+Patch25:	%{name}-hwapi-link.patch
+Patch26:	%{name}-dba-link.patch
+Patch27:	%{name}-install_gd_headers.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -135,7 +134,7 @@ BuildRequires:	cyrus-sasl-devel
 %{?with_db3:BuildRequires:	db3-devel >= 3.1}
 %{!?with_db3:BuildRequires:	db-devel >= 4.0}
 BuildRequires:	elfutils-devel
-%if %{with wddx} || %{with xmlrpc}
+%if %{with xmlrpc}
 BuildRequires:	expat-devel
 %endif
 %{?with_fam:BuildRequires:	fam-devel}
@@ -1295,6 +1294,7 @@ Summary:	wddx extension module for PHP
 Summary(pl):	Modu³ wddx dla PHP
 Group:		Libraries
 PreReq:		%{name}-session = %{epoch}:%{version}-%{release}
+PreReq:		%{name}-xml = %{epoch}:%{version}-%{release}
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
@@ -1400,11 +1400,11 @@ Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
-%patch10 -p1
 cp php.ini-dist php.ini
-%patch11 -p1
+%patch10 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
+%patch11 -p1
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
@@ -1415,15 +1415,14 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%patch22 -p1
 %ifarch amd64
-%patch23 -p1
+%patch22 -p1
 %endif
+%patch23 -p1
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
 %patch27 -p1
-%patch28 -p1
 
 %{?with_hardened:zcat %{SOURCE9} | patch -p1}
 
@@ -1502,7 +1501,7 @@ for i in fcgi cgi cli apxs ; do
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	%{?with_db3:--with-db3}%{!?with_db3:--with-db4} \
 	--with-dbase=shared \
-%if %{with wddx} || %{with xmlrpc}
+%if %{with xmlrpc}
 	--with-expat-dir=shared,/usr \
 %else
 	--without-expat-dir \

@@ -1,6 +1,14 @@
 #
 # TODO:
 # - cpdf.so needs -lgd
+# - memleak detected (even with no modules loaded):
+#   $ php -i >/dev/null
+#   /home/comp/rpm/BUILD/php-5.0.4/main/fopen_wrappers.c(548) :  Freeing 0x08052970 (17 bytes), script=-
+#   === Total 1 memory leaks detected ===
+# - loading pgsql+mnogosearch+snmp (only in this order!) causes php -i to SEGV on exit
+#   (postgresql-libs-8.0.1-1, net-snmp-libs-5.2.1-0.2, mnogosearch-lib-3.2.32-1)
+#   (only php.cli; php.cgi and apache2 module are not affected)
+#
 # - php-shared is SERIOUSLY broken. Try compiling with --enable-versioning.
 # - think of including support for:
 #    - mcve,

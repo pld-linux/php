@@ -2605,11 +2605,11 @@ fi
 %attr(755,root,root) %{extensionsdir}/xmlrpc.so
 %endif
 
-#%if %{with xslt}
-#%files xslt
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{extensionsdir}/xslt.so
-#%endif
+%if %{with xslt}
+%files xslt
+%defattr(644,root,root,755)
+%attr(755,root,root) %{extensionsdir}/xslt.so
+%endif
 
 %if %{with yaz}
 %files yaz

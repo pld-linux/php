@@ -18,7 +18,6 @@
 %bcond_with	hardened	# build with hardened patch applied (http://www.hardened-php.net/)
 %bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
-%bcond_with	java		# with Java extension module		(BR: jdk)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
 %bcond_with	xslt            # with XSLT extension module
@@ -148,7 +147,6 @@ BuildRequires:	gd-devel >= 2.0.28-4
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2 }
-%{?with_java:BuildRequires:	jdk >= 1.1}
 %{?with_cpdf:BuildRequires:	libcpdf-devel >= 2.02r1-2}
 BuildRequires:	libgcrypt-devel
 BuildRequires:	libidn-devel
@@ -659,7 +657,7 @@ This is a dynamic shared object (DSO) for PHP that will add official
 Hyperwave API support.
 
 %description hwapi -l pl
-Modu³ PHP dodaj±cy oficjaln± obs³ugê API Hyperwave.
+Modu³ PHP dodaj±cy obs³ugê Hyperwave.
 
 %package iconv
 Summary:	iconv extension module for PHP
@@ -707,30 +705,6 @@ and Firebird database support.
 
 %description interbase -l pl
 Modu³ PHP umo¿liwiaj±cy dostêp do baz danych InterBase i Firebird.
-
-%package java
-Summary:	Java extension module for PHP
-Summary(pl):	Modu³ Javy dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description java
-This is a dynamic shared object (DSO) for PHP that will add Java
-support to PHP. This extension provides a simple and effective means
-for creating and invoking methods on Java objects from PHP.
-
-Note: it requires setting LD_LIBRARY_PATH to JRE directories
-containing JVM libraries (e.g. libjava.so, libverify.so and libjvm.so
-for Sun's JRE) before starting Apache or PHP interpreter.
-
-%description java -l pl
-Modu³ PHP dodaj±cy wsparcie dla Javy. Umo¿liwia odwo³ywanie siê do
-obiektów Javy z poziomu PHP.
-
-Uwaga: modu³ wymaga ustawienia LD_LIBRARY_PATH na katalogi JRE
-zawieraj±ce biblioteki JVM (np. libjava.so, libverify.so i libjvm.so
-dla JRE Suna) przed uruchomieniem Apache'a lub interpretera PHP.
 
 %package ldap
 Summary:	LDAP extension module for PHP
@@ -1555,7 +1529,6 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_hwapi:--with-hwapi=shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
 	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
-	%{?with_java:--with-java=%{_libdir}/java } \
 	--with-jpeg-dir=/usr \
 	%{?with_ldap:--with-ldap=shared} \
 	--with-mcrypt=shared \
@@ -1650,8 +1623,6 @@ install libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache
 
 # compatibility (/usr/bin/php used to be CGI SAPI)
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
-
-%{?with_java:install ext/java/php_java.jar $RPM_BUILD_ROOT%{extensionsdir}}
 
 install php.ini	$RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 install %{SOURCE6} %{SOURCE7} %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}
@@ -1879,14 +1850,6 @@ fi
 %preun interbase
 if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove interbase %{_sysconfdir}/php.ini
-fi
-
-%post java
-%{_sbindir}/php-module-install install java %{_sysconfdir}/php.ini
-
-%preun java
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove java %{_sysconfdir}/php.ini
 fi
 
 %post ldap
@@ -2398,13 +2361,6 @@ fi
 %files interbase
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/interbase.so
-%endif
-
-%if %{with java}
-%files java
-%defattr(644,root,root,755)
-%attr(755,root,root) %{extensionsdir}/java.so
-%{extensionsdir}/php_java.jar
 %endif
 
 %if %{with ldap}

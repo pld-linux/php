@@ -1,5 +1,6 @@
 #
 # TODO:
+# - cpdf.so needs -lgd
 # - php-shared is SERIOUSLY broken. Try compiling with --enable-versioning.
 # - think of including support for:
 #    - mcve,

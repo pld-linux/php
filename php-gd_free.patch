@@ -1,0 +1,46 @@
+diff -ur php-4.2.3.orig/ext/gd/gd.c php-4.2.3/ext/gd/gd.c
+--- php-4.2.3.orig/ext/gd/gd.c	Tue Sep  3 15:09:29 2002
++++ php-4.2.3/ext/gd/gd.c	Sun Jan  2 17:42:49 2005
+@@ -1011,10 +1011,10 @@
+ 		io_ctx = gdNewDynamicCtx (8, data);
+ 		if (io_ctx) {
+ 			if (getmbi(gdGetC, io_ctx) == 0 && skipheader(gdGetC, io_ctx) == 0 ) {
+-				io_ctx->free(io_ctx);
++				io_ctx->gd_free(io_ctx);
+ 				return PHP_GDIMG_TYPE_WBM;
+ 			} else
+-				io_ctx->free(io_ctx);
++				io_ctx->gd_free(io_ctx);
+ 		}
+ 	}
+ #endif
+@@ -1206,7 +1206,7 @@
+ 		} else {
+ 			im = (*ioctx_func_p)(io_ctx);
+ 		}
+-		io_ctx->free(io_ctx);
++		io_ctx->gd_free(io_ctx);
+ #endif
+ 	} else {
+ 		if (image_type == PHP_GDIMG_TYPE_GD2PART) {
+diff -ur php-4.2.3.orig/ext/gd/gd_ctx.c php-4.2.3/ext/gd/gd_ctx.c
+--- php-4.2.3.orig/ext/gd/gd_ctx.c	Sun Aug  5 18:21:29 2001
++++ php-4.2.3/ext/gd/gd_ctx.c	Sun Jan  2 17:43:54 2005
+@@ -67,7 +67,7 @@
+ 		ctx = emalloc(sizeof(gdIOCtx));
+ 		ctx->putC = _php_image_output_putc;
+ 		ctx->putBuf = _php_image_output_putbuf;
+-		ctx->free = _php_image_output_ctxfree;
++		ctx->gd_free = _php_image_output_ctxfree;
+ 
+ #if APACHE && defined(CHARSET_EBCDIC)
+ 		/* XXX this is unlikely to work any more thies@thieso.net */
+@@ -95,7 +95,7 @@
+ 			break;
+ 	}
+ 	
+-	ctx->free(ctx);
++	ctx->gd_free(ctx);
+ 
+ 	if(fp) {
+ 		fflush(fp);

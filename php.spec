@@ -39,12 +39,12 @@
 %define	apxs		/usr/sbin/apxs
 
 %if %{_apache2}
-%define	without_recode		1
-%define	without_mm		1
+%undefine	without_recode
+%undefine	without_mm
 %endif
 
 %ifnarch %{ix86}
-%define	without_msession	1
+%undefine	without_msession
 %endif
 
 Summary:	The PHP HTML-embedded scripting language for use with Apache

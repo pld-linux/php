@@ -76,7 +76,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.3
-%define _suf	RC1
+%define _suf	RC2
 Release:	0.%{_suf}
 Epoch:		3
 Group:		Libraries
@@ -84,7 +84,7 @@ License:	PHP
 #Source0:	http://www.php.net/distributions/%{name}-%{version}%{_pre}.tar.bz2
 #Source0:	http://pl2.php.net/distributions/%{name}-%{version}%{_suf}.tar.bz2
 Source0:	http://snaps.php.net/~andi/%{name}-%{version}%{_suf}.tar.bz2
-# Source0-md5:	9abb5c1558865eab14674f96a6238348
+# Source0-md5:	f97b2555304f324ec819212ffd1dd971
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source4:	%{name}-module-install
@@ -114,12 +114,11 @@ Patch18:	%{name}-tsrmlsfetchgcc2.patch
 Patch19:	%{name}-no_pear_install.patch
 Patch20:	%{name}-zlib.patch
 Patch21:	%{name}-sybase-fix.patch
-Patch22:	%{name}-mssql-fix.patch
-Patch23:	%{name}-mnogosearch-fix.patch
-Patch24:	%{name}-nohttpd.patch
-Patch25:	%{name}-lib64.patch
-Patch26:	%{name}-phpize.patch
-Patch27:	%{name}-gd_imagerotate_enable.patch
+Patch22:	%{name}-mnogosearch-fix.patch
+Patch23:	%{name}-nohttpd.patch
+Patch24:	%{name}-lib64.patch
+Patch25:	%{name}-phpize.patch
+Patch26:	%{name}-gd_imagerotate_enable.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1456,12 +1455,11 @@ cp php.ini-dist php.ini
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
-%patch24 -p1
 %ifarch amd64
-%patch25 -p1
+%patch24 -p1
 %endif
+%patch25 -p1
 %patch26 -p1
-%patch27 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

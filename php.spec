@@ -1,6 +1,5 @@
 #
 # TODO:
-# - fastcgi option in cgi SAPI? or separate fcgi SAPI?
 # - make sure that session-unregister patch is no longer needed
 #   (any crash reports related to session modules?)
 #
@@ -62,15 +61,12 @@ Summary(ru):	PHP Версии 4 -- язык препроцессирования HTML-файлов, выполняемый на
 Summary(uk):	PHP Верс╕╖ 4 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	4.3.5
-%define	_pre	RC1
-%define	_version	4.3.5%{_pre}
-Release:	0.%{_pre}
+Release:	2
 Epoch:		3
 Group:		Libraries
 License:	PHP
-#Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://downloads.php.net/ilia/%{name}-%{_version}.tar.bz2
-# Source0-md5:	54e55ce2c0bc6b5488497cf54376ff48
+Source0:	http://downloads.php.net/ilia/%{name}-%{version}.tar.bz2
+# Source0-md5:	29e61c125ac6278897c6c219f5d100d1
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source4:	%{name}-module-install
@@ -108,8 +104,7 @@ Patch26:	%{name}-zlib.patch
 Patch27:	%{name}-db-shared.patch
 Patch28:	%{name}-sybase-fix.patch
 Patch29:	%{name}-mssql-fix.patch
-Patch30:	%{name}-db42.patch
-Patch31:	%{name}-lib64.patch
+Patch30:	%{name}-lib64.patch
 Icon:		php4.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -160,7 +155,7 @@ BuildRequires:	mysql-devel >= 3.23.32
 BuildRequires:	ncurses-devel
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.0}
 %if %{with openssl} || %{with ldap}
-BuildRequires:	openssl-devel >= 0.9.7c
+BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 BuildRequires:	pam-devel
 %{?with_pdf:BuildRequires:	pdflib-devel >= 4.0.0}
@@ -182,7 +177,7 @@ BuildRequires:	t1lib-devel
 BuildRequires:	zip
 BuildRequires:	zlib-devel >= 1.0.9
 BuildRequires:	zziplib-devel
-#BuildRequires:	fcgi-devel
+BuildRequires:	fcgi-devel
 # apache 1.3 vs apache 2.0
 %if %{_apache2}
 BuildRequires:  apr-devel >= 1:0.9.4-1
@@ -270,6 +265,19 @@ PHP4 - це мова написання скрипт╕в, що вбудовуються в HTML-код. PHP
 ма╓те також встановити пакет %{name}-common. Якщо вам потр╕бен
 ╕нтерпретатор PHP в якост╕ модуля apache, встанов╕ть пакет apache-php.
 
+%package fcgi
+Summary:	PHP as FastCGI program
+Summary(pl):	PHP jako program FastCGI
+Group:		Development/Languages/PHP
+PreReq:		%{name}-common = %{epoch}:%{version}
+Provides:	php-program = %{epoch}:%{version}-%{release}
+
+%description fcgi
+PHP as FastCGI program.
+
+%description fcgi -l pl
+PHP jako program FastCGI.
+
 %package cgi
 Summary:	PHP as CGI program
 Summary(pl):	PHP jako program CGI
@@ -303,9 +311,7 @@ Summary(ru):	Разделяемые библиотеки для php
 Summary(uk):	Б╕бл╕отеки сп╕льного використання для php
 Group:		Libraries
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
-Provides:	%{name}-openssl = %{epoch}:%{version}-%{release}
 Obsoletes:	%{name}-session <= %{epoch}:%{version}-%{release}
-Obsoletes:	%{name}-openssl <= %{epoch}:%{version}-%{release}
 
 %description common
 Common files needed by both apache module and CGI.
@@ -1351,7 +1357,7 @@ handlers for different XML events.
 
 %description xml -l pl
 ModuЁ PHP umo©liwiaj╠cy parsowanie plikСw XML i obsЁugЙ zdarzeЯ
-zwi╠zanych z tymi plikami. Pozwala on tworzyФ analizatory XML i
+zwi╠zanych z tymi plikami. Pozwala on tworzyФ analizatory XML-a i
 nastЙpnie definiowaФ procedury obsЁugi dla rС©nych zdarzeЯ XML.
 
 %package xmlrpc
@@ -1472,7 +1478,7 @@ PEAR/*.php), dostarczanych z PHP, zainstaluj odpowiednie pakiety
 php-pear-* (php-pear-PEAR, php-pear-Archive_Tar, itp).
 
 %prep
-%setup -q -n %{name}-%{_version}
+%setup -q
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1506,9 +1512,8 @@ cp php.ini-dist php.ini
 %patch27 -p1
 %patch28 -p1
 %patch29 -p1
-%patch30 -p1
 %ifarch amd64
-%patch31 -p1
+%patch30 -p1
 %endif
 
 %build
@@ -1519,13 +1524,14 @@ EXTENSION_DIR="%{extensionsdir}"; export EXTENSION_DIR
 %{__aclocal}
 %{__autoconf}
 PROG_SENDMAIL="/usr/lib/sendmail"; export PROG_SENDMAIL
-for i in cgi cli apxs ; do
+for i in fcgi cgi cli apxs ; do
 %configure \
 	`[ $i = cgi ] && echo --enable-discard-path` \
 	`[ $i = cli ] && echo --disable-cgi` \
 	`[ $i = fcgi ] && echo --enable-fastcgi --with-fastcgi=/usr` \
 %if %{_apache2}
 	`[ $i = apxs ] && echo --with-apxs2=%{apxs}` \
+	--enable-experimental-zts \
 %else
 	`[ $i = apxs ] && echo --with-apxs=%{apxs}` \
 %endif
@@ -1605,7 +1611,7 @@ for i in cgi cli apxs ; do
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	--with-ncurses=shared \
 	%{?with_oci8:--with-oci8=shared} \
-	%{?with_openssl:--with-openssl} \
+	%{?with_openssl:--with-openssl=shared,/usr} \
 	%{?with_oracle:--with-oracle=shared} \
 	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared} \
 	%{?with_pdf:--with-pdflib=shared} \
@@ -1629,7 +1635,6 @@ for i in cgi cli apxs ; do
 	--with-zip=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr
-# --with-openssl=shared not supported in 4.3.2
 
 cp -f Makefile Makefile.$i
 # left for debugging purposes
@@ -1650,16 +1655,21 @@ done
 %{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}/apache'|" libphp4.la
 %{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache |' libphp4.la
 
+# for fcgi: -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0
+# -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1(die) -DHAVE_SYS_PARAM_H=1
+# -DPHP_FASTCGI=1 -DPHP_FCGI_STATIC=1 -DPHP_WRITE_STDOUT=1
+
+%{__make} sapi/cgi/php -f Makefile.fcgi \
+	CFLAGS_CLEAN="%{rpmcflags} -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0 -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1 -DHAVE_SYS_PARAM_H=1 -DPHP_FASTCGI=1 -DPHP_FCGI_STATIC=1 -DPHP_WRITE_STDOUT=1"
+cp -r sapi/cgi sapi/fcgi
+rm -rf sapi/cgi/.libs sapi/cgi/*.lo
+
 # notes:
 # -DENABLE_CHROOT_FUNC=1 (cgi,fcgi) is used in ext/standard/dir.c (libphp_common)
 # -DPHP_WRITE_STDOUT is used also for cli, but not set by its config.m4
 
 %{__make} sapi/cgi/php -f Makefile.cgi \
 	CFLAGS_CLEAN="%{rpmcflags} -DDISCARD_PATH=1 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0 -DPHP_WRITE_STDOUT=1"
-
-# for fcgi: -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0
-# -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1(die) -DHAVE_SYS_PARAM_H=1
-# -DPHP_FASTCGI=1 -DPHP_FCGI_STATIC=1 -DPHP_WRITE_STDOUT=1
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -1671,7 +1681,7 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/{apache,cgi}} 
 
 %{__make} install \
 	INSTALL_ROOT=$RPM_BUILD_ROOT \
-	INSTALL_IT="\$(LIBTOOL) --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir} ; \$(LIBTOOL) --mode=install install libphp4.la $RPM_BUILD_ROOT%{_libdir}/apache ; \$(LIBTOOL) --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi" \
+	INSTALL_IT="\$(LIBTOOL) --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir} ; \$(LIBTOOL) --mode=install install libphp4.la $RPM_BUILD_ROOT%{_libdir}/apache ; \$(LIBTOOL) --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi ; \$(LIBTOOL) --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi" \
 	INSTALL_CLI="\$(LIBTOOL) --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli"
 
 # compatibility (/usr/bin/php used to be CGI SAPI)
@@ -1681,6 +1691,7 @@ ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php
 
 install php.ini	$RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 install %{SOURCE6} %{SOURCE7} %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}
+install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT%{httpdir}/icons
 install %{SOURCE4} $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE5} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
@@ -2324,6 +2335,11 @@ fi
 %attr(755,root,root) %{_libdir}/apache/libphp4.so
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
 
+%files fcgi
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/php.fcgi
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-cgi-fcgi.ini
+
 %files cgi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.cgi
@@ -2559,12 +2575,11 @@ fi
 %attr(755,root,root) %{extensionsdir}/odbc.so
 %endif
 
-# shared openssl module not supported in 4.3.2
-#%if %{with openssl}
-#%files openssl
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{extensionsdir}/openssl.so
-#%endif
+%if %{with openssl}
+%files openssl
+%defattr(644,root,root,755)
+%attr(755,root,root) %{extensionsdir}/openssl.so
+%endif
 
 %if %{with oracle}
 %files oracle

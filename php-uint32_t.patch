@@ -1,7 +1,6 @@
-adds missing include in zend_strtod.c (caused build to fail on sparc)
-
---- php-5.0.3/Zend/zend_strtod.c~	2004-12-14 09:41:35.000000000 +0100
-+++ php-5.0.3/Zend/zend_strtod.c	2004-12-21 08:45:10.050119856 +0100
+diff -burN php-4.3.10.orig/Zend/zend_strtod.c php-4.3.10/Zend/zend_strtod.c
+--- php-4.3.10.orig/Zend/zend_strtod.c	2004-12-28 20:08:49.616697784 +0100
++++ php-4.3.10/Zend/zend_strtod.c	2004-12-28 20:09:17.572447864 +0100
 @@ -90,6 +90,7 @@
   */
  

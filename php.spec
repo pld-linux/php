@@ -11,6 +11,7 @@
 # - fix building of mono, sybase extensions
 # - test if php.cgi segfaults after ctrl+d when overload.so is loaded
 # - build simplexml as shared (now it's static)
+# - SECURITY: http://securitytracker.com/alerts/2004/Sep/1011307.html
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support

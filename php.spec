@@ -70,7 +70,6 @@ Group:		Libraries
 License:	PHP
 Source0:	http://www.php.net/distributions/%{name}-%{version}%{_rc}.tar.bz2
 # Source0-md5:	7e56824dae9679c59a8234eb848aa542
-# Source0-size:	4001681
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install

@@ -23,6 +23,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
+%bcond_with	apache1		# build with apache1
 %bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
 %bcond_without	cpdf		# without cpdf extension module
 %bcond_without	curl		# without CURL extension module
@@ -49,8 +50,8 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-#
-%define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq -e '-2\\.[0-9]+\\.' && echo 1 || echo 0)
+
+%define	_apache2	%{?with_apache1:0}%{!?with_apache1:1}
 %if %{_apache2}
 %define	apxs		/usr/sbin/apxs
 %else

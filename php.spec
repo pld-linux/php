@@ -8,7 +8,7 @@
 #   These extensions BuildRequires proprietary libraries...
 # - deal with modules removed from php and not moved to PECL
 #   (existing only in php4):
-#   db, domxml, hyperwave, mcal, overload, qtdom, xslt
+#   db, domxml, hyperwave, java, mcal, overload, qtdom, xslt
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support

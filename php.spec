@@ -118,7 +118,7 @@ Patch23:	%{name}-mnogosearch-fix.patch
 Patch24:	%{name}-nohttpd.patch
 Patch25:	%{name}-lib64.patch
 Patch26:	%{name}-phpize.patch
-Icon:		php4.gif
+Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 BuildRequires:	apache-devel

@@ -14,7 +14,7 @@
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
-%bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary libs)
+%bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	hardened	# build with hardened patch applied (http://www.hardened-php.net/)
 %bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
@@ -55,7 +55,7 @@
 %ifnarch %{ix86} amd64 sparc sparcv9 alpha ppc
 %undefine	with_interbase
 %endif
-# x86-only libs
+# x86-only lib
 %ifnarch %{ix86}
 %undefine	with_msession
 %endif
@@ -76,8 +76,9 @@ Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	fd26455febdddee0977ce226b9108d9c
 Source1:	FAQ.%{name}
 Source2:	zend.gif
-Source4:	%{name}-module-install
-Source5:	%{name}-mod_%{name}.conf
+Source3:	%{name}-module-install
+Source4:	%{name}-mod_%{name}.conf
+Source5:	%{name}-cgi-fcgi.ini
 Source6:	%{name}-cgi.ini
 Source7:	%{name}-apache.ini
 Source8:	%{name}-cli.ini
@@ -115,7 +116,7 @@ Patch28:	%{name}-dba-link.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
-%{?with_pspell:BuildRequires:	aspell-devel}
+%{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison
@@ -184,15 +185,14 @@ PreReq:		apache >= 2.0.52-2
 Requires:	apache(modules-api) = %{apache_modules_api}
 %else
 BuildRequires:	apache1-devel
-PreReq:		apache(EAPI) < 2.0.0
-PreReq:		apache(EAPI) >= 1.3.9
+PreReq:		apache1(EAPI) >= 1.3.9
 Requires(post,preun):	%{apxs}
 Requires(post,preun):	%{__perl}
 %endif
 PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
-BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/php
 %define		extensionsdir	%{_libdir}/php
@@ -734,8 +734,8 @@ Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description mbstring
-This is a dynamic shared object (DSO) for PHP that will add
-multibyte string support.
+This is a dynamic shared object (DSO) for PHP that will add multibyte
+string support.
 
 %description mbstring -l pl
 Modu³ PHP dodaj±cy obs³ugê ci±gów znaków wielobajtowych.
@@ -1409,7 +1409,11 @@ cd ..
 sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4
 
 %build
+%if %{_apache2}
 CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include `%{_bindir}/apr-1-config --includes` `%{_bindir}/apu-1-config --includes`"
+%else
+CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include"
+%endif
 EXTENSION_DIR="%{extensionsdir}"; export EXTENSION_DIR
 ./buildconf --force
 %{__libtoolize}
@@ -1535,8 +1539,13 @@ done
 
 # fix install paths, avoid evil rpaths
 %{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
+%if %{_apache2}
 %{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}/apache'|" libphp5.la
 %{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache |' libphp5.la
+%else
+%{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}/apache1'|" libphp5.la
+%{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache1 |' libphp5.la
+%endif
 
 # for fcgi: -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0
 # -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1(die) -DHAVE_SYS_PARAM_H=1
@@ -1556,11 +1565,19 @@ rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 
 %install
 rm -rf $RPM_BUILD_ROOT
+%if %{_apache2}
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/{apache,cgi}} \
 	$RPM_BUILD_ROOT%{httpdir}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/var/run/php \
 	$RPM_BUILD_ROOT/etc/httpd/httpd.conf
+%else
+install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache1},%{_sysconfdir}/{apache,cgi}} \
+	$RPM_BUILD_ROOT%{httpdir}/icons \
+	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
+	$RPM_BUILD_ROOT/var/run/php \
+	$RPM_BUILD_ROOT/etc/apache/apache.conf
+%endif
 
 %{__make} install \
 	INSTALL_ROOT=$RPM_BUILD_ROOT \
@@ -1571,15 +1588,15 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/{apache,cgi}} 
 # Why make install doesn't install libphp5.so ?
 install libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache
 
-# compatibility (/usr/bin/php used to be CGI SAPI)
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 install php.ini	$RPM_BUILD_ROOT%{_sysconfdir}/php.ini
-install %{SOURCE6} %{SOURCE7} %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}
-install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+install %{SOURCE5} %{SOURCE6} %{SOURCE7} %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT%{httpdir}/icons
-install %{SOURCE4} $RPM_BUILD_ROOT%{_sbindir}
-install %{SOURCE5} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
+install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
+%if %{_apache2}
+install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
+%endif
 
 install %{SOURCE1} .
 
@@ -1596,12 +1613,16 @@ rm -rf $RPM_BUILD_ROOT
 %post
 %if ! %{_apache2}
 %{__perl} -pi -e 's|^#AddType application/x-httpd-php \.php|AddType application/x-httpd-php .php|' \
-	/etc/httpd/httpd.conf
+	/etc/apache/apache.conf
 %{apxs} -e -a -n php5 %{_pkglibdir}/libphp5.so 1>&2
-%endif
+if [ -f /var/lock/subsys/apache ]; then
+	/etc/rc.d/init.d/apache restart 1>&2
+fi
+%else
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 fi
+%endif
 
 %if %{_apache2}
 %postun
@@ -1616,9 +1637,9 @@ if [ "$1" = "0" ]; then
 	%{apxs} -e -A -n php5 %{_pkglibdir}/libphp5.so 1>&2
 	%{__perl} -pi -e \
 		's|^AddType application/x-httpd-php \.php|#AddType application/x-httpd-php .php|' \
-		/etc/httpd/httpd.conf
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
+		/etc/apache/apache.conf
+	if [ -f /var/lock/subsys/apache ]; then
+		/etc/rc.d/init.d/apache restart 1>&2
 	fi
 fi
 %endif
@@ -2148,8 +2169,10 @@ fi
 %defattr(644,root,root,755)
 %if %{_apache2}
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/httpd/httpd.conf/*_mod_php.conf
-%endif
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
+%else
+%attr(755,root,root) %{_libdir}/apache1/libphp5.so
+%endif
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
 
 %files fcgi
@@ -2179,7 +2202,6 @@ fi
 %dir %{_sysconfdir}
 %attr(644,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php.ini
 %attr(770,root,http) %dir %verify(not group mode) /var/run/php
-
 %{httpdir}/icons/*
 %attr(755,root,root) %{_sbindir}/*
 %attr(755,root,root) %{_libdir}/libphp_common-*.so

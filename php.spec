@@ -1,5 +1,6 @@
 #
 # TODO:
+# - php-shared is SERIOUSLY broken. Try compiling with --enable-versioning.
 # - think of including support for:
 #    - mcve,
 #    - ovrimos,
@@ -74,8 +75,8 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.3
-Release:	4%{?with_hardened:hardened}
-Epoch:		3
+Release:	4.2%{?with_hardened:hardened}
+Epoch:		4
 Group:		Libraries
 License:	PHP
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
@@ -1137,6 +1138,20 @@ support.
 %description snmp -l pl
 ModuЁ PHP dodaj╠cy obsЁugЙ SNMP.
 
+%package soap
+Summary:        soap extension module for PHP
+Summary(pl):    ModuЁ soap dla PHP
+Group:          Libraries
+Requires(post,preun):   %{name}-common = %{epoch}:%{version}-%{release}
+Requires:       %{name}-common = %{epoch}:%{version}-%{release}
+
+%description soap
+This is a dynamic shared object (DSO) for PHP that will add SOAP/WSDL
+support.
+
+%description soap -l pl
+ModuЁ PHP dodaj╠cy obsЁugЙ SOAP/WSDL.
+
 %package sockets
 Summary:	sockets extension module for PHP
 Summary(pl):	ModuЁ socket dla PHP
@@ -1365,6 +1380,7 @@ ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
 %setup -q
+# this patch is broken by design, breaks --enable-versioning for example
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -2065,6 +2081,14 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove snmp %{_sysconfdir}/php.ini
 fi
 
+%post soap
+%{_sbindir}/php-module-install install soap %{_sysconfdir}/php.ini
+
+%preun soap
+if [ "$1" = "0" ]; then
+        %{_sbindir}/php-module-install remove soap %{_sysconfdir}/php.ini
+fi
+
 %post sockets
 %{_sbindir}/php-module-install install sockets %{_sysconfdir}/php.ini
 
@@ -2461,6 +2485,10 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/snmp.so
 %endif
+
+%files soap
+%defattr(644,root,root,755)
+%attr(755,root,root) %{extensionsdir}/soap.so
 
 %files sockets
 %defattr(644,root,root,755)

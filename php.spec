@@ -116,6 +116,7 @@ Patch23:	%{name}-nohttpd.patch
 Patch24:	%{name}-lib64.patch
 Patch25:	%{name}-phpize.patch
 Patch26:	%{name}-gd_imagerotate_enable.patch
+Patch27:	%{name}-uint32_t.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1457,6 +1458,7 @@ cp php.ini-dist php.ini
 %endif
 %patch25 -p1
 %patch26 -p1
+%patch27 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

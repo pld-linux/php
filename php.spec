@@ -1559,7 +1559,9 @@ cp php.ini-dist php.ini
 #%patch30 -p1
 %patch31 -p1
 %patch32 -p1
+%ifarch ppc
 %patch33 -p1
+%endif
 
 %build
 CFLAGS="%{rpmcflags} -DEAPI=1 -I%{_prefix}/X11R6/include"

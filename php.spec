@@ -76,14 +76,12 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-%define		_suf	RC2
-Release:	0.%{_suf}.2%{?with_hardened:hardened}
+Release:	1%{?with_hardened:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
-##Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://downloads.php.net/zeev/%{name}-%{version}%{_suf}.tar.bz2
-# Source0-md5:	7db1352ac963a072cffa331af4a3271e
+Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+# Source0-md5:	47727afde39329d5cebda4cb5e5ecee0
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -1389,7 +1387,7 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{version}%{_suf}
+%setup -q
 # this patch is broken by design, breaks --enable-versioning for example
 %patch0 -p1
 %patch1 -p1

@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 -- язык препроцессирования HTML-файлов, выполняемый на
 Summary(uk):	PHP Верс╕╖ 5 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.2
-Release:	3
+Release:	4
 Epoch:		3
 Group:		Libraries
 License:	PHP
@@ -118,6 +118,7 @@ Patch23:	%{name}-mnogosearch-fix.patch
 Patch24:	%{name}-nohttpd.patch
 Patch25:	%{name}-lib64.patch
 Patch26:	%{name}-phpize.patch
+Patch27:	%{name}-gd_imagerotate_enable.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -143,7 +144,7 @@ BuildRequires:	flex
 BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
-BuildRequires:	gd-devel >= 2.0.28
+BuildRequires:	gd-devel >= 2.0.28-4
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2 }
@@ -603,7 +604,7 @@ Summary(pl):	ModuЁ GD dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	gd >= 2.0.28
+Requires:	gd >= 2.0.28-4
 Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}
 
 %description gd
@@ -1455,6 +1456,7 @@ cp php.ini-dist php.ini
 %patch25 -p1
 %endif
 %patch26 -p1
+%patch27 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

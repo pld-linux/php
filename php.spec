@@ -8,6 +8,7 @@
 # - loading pgsql+mnogosearch+snmp (only in this order!) causes php -i to SEGV on exit
 #   (postgresql-libs-8.0.1-1, net-snmp-libs-5.2.1-0.2, mnogosearch-lib-3.2.32-1)
 #   (only php.cli; php.cgi and apache2 module are not affected)
+#   same result on mysql+curl+msession (on php.cli -i or php.cgi with empty imput)
 #
 # - php-shared is SERIOUSLY broken. Try compiling with --enable-versioning.
 # - think of including support for:

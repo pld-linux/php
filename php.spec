@@ -21,7 +21,6 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
-%bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
 %bcond_without	cpdf		# without cpdf extension module
 %bcond_without	curl		# without CURL extension module
 %bcond_without	fam		# without FAM (File Alteration Monitor) extension module
@@ -49,11 +48,7 @@
 %bcond_without	xmlrpc		# without XML-RPC extension module
 #
 %define	_apache2	%(rpm -q apache-devel 2> /dev/null | grep -Eq '\\-2\\.[0-9]+\\.' && echo 1 || echo 0)
-%if %{_apache2}
 %define	apxs		/usr/sbin/apxs
-%else
-%define apxs		/usr/sbin/apxs1
-%endif
 # some problems with apache 2.x
 %if %{_apache2}
 %undefine	with_mm
@@ -74,7 +69,7 @@ Summary(ru):	PHP ÷ÅÒÓÉÉ 5 - ÑÚÙË ÐÒÅÐÒÏÃÅÓÓÉÒÏ×ÁÎÉÑ HTML-ÆÁÊÌÏ×, ×ÙÐÏÌÎÑÅÍÙÊ ÎÁ 
 Summary(uk):	PHP ÷ÅÒÓ¦§ 5 - ÍÏ×Á ÐÒÅÐÒÏÃÅÓÕ×ÁÎÎÑ HTML-ÆÁÊÌ¦×, ×ÉËÏÎÕ×ÁÎÁ ÎÁ ÓÅÒ×ÅÒ¦
 Name:		php
 Version:	5.0.3
-Release:	3%{?with_hardened:hardened}
+Release:	5%{?with_hardened:hardened}
 Epoch:		3
 Group:		Libraries
 License:	PHP
@@ -119,6 +114,7 @@ Patch25:	%{name}-gd_imagerotate_enable.patch
 Patch26:	%{name}-uint32_t.patch
 Patch27:	%{name}-hwapi-link.patch
 Patch28:	%{name}-dba-link.patch
+Patch29:	%{name}-install_gd_headers.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -161,7 +157,6 @@ BuildRequires:	libxslt-devel >= 1.0.18
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{?with_mnogosearch:BuildRequires:	mnogosearch-devel >= 3.2.6}
 BuildRequires:	mysql-devel >= 4.0.0
-%{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
 BuildRequires:	ncurses-ext-devel
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.0}
 %if %{with openssl} || %{with ldap}
@@ -204,11 +199,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir	/etc/php
 %define		extensionsdir	%{_libdir}/php
 %define		httpdir		/home/services/httpd
-%if %{_apache2}
-%define		apachelib	%{_libdir}/apache
-%else
-%define		apachelib	%{_libdir}/apache1
-%endif
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -877,23 +867,6 @@ Modu³ PHP umo¿liwiaj±cy dostêp do bazy danych MySQL.
 %description mysql -l pt_BR
 Um módulo para aplicações PHP que usam bancos de dados MySQL.
 
-%package mysqli
-Summary:	MySQLi module for PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	mysql-libs >= 4.1.0
-
-%description mysqli
-This is a dynamic shared object (DSO) for PHP that will add MySQLi
-(Improved MySQL) support. The difference between it and mysql module
-is that it provides access to functionality of MySQL 4.1 and above.
-
-%description mysqli -l pl
-Modu³ PHP umo¿liwiaj±cy udoskonalony dostêp do bazy danych MySQL.
-Ró¿nic± miêdzy nim a modu³em mysql jest dostêp do funkcjonalno¶ci
-MySQL 4.1 i wy¿ej.
-
 %package ncurses
 Summary:	ncurses module for PHP
 Summary(pl):	Modu³ ncurses dla PHP
@@ -1362,6 +1335,31 @@ compression support to PHP.
 %description zlib -l pl
 Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 
+%package pear
+Summary:	PEAR - PHP Extension and Application Repository
+Summary(pl):	PEAR - rozszerzenie PHP i repozytorium aplikacji
+Group:		Development/Languages/PHP
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pear-additional_classes
+
+%description pear
+PEAR - PHP Extension and Application Repository.
+
+Please note that this package provides only basic directory structure.
+If you want to use base PEAR classes (PEAR.php, PEAR/*.php), that come
+with PHP, please install appropriate php-pear-* (php-pear-PEAR,
+php-PEAR-Archive_Tar, etc) packages.
+
+%description pear -l pl
+PEAR (PHP Extension and Application Repository) - rozszerzenie PHP i
+repozytorium aplikacji.
+
+Nale¿y pamiêtaæ, ¿e ten pakiet dostarcza tylko podstawow± strukturê
+katalogów. Aby u¿yæ podstawowych klas PEAR (PEAR.php PEAR/*.php),
+dostarczanych z PHP, nale¿y zainstalowaæ odpowiednie pakiety
+php-pear-* (php-pear-PEAR, php-pear-Archive_Tar, itp).
+
 %prep
 %setup -q
 %patch0 -p1
@@ -1398,6 +1396,7 @@ cp php.ini-dist php.ini
 %patch26 -p1
 %patch27 -p1
 %patch28 -p1
+%patch29 -p1
 
 %{?with_hardened:zcat %{SOURCE9} | patch -p1}
 
@@ -1504,7 +1503,6 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
-	%{?with_mysqli:--with-mysqli=shared} \
 	--with-ncurses=shared \
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
@@ -1544,8 +1542,13 @@ done
 
 # fix install paths, avoid evil rpaths
 %{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
-%{__perl} -pi -e "s|^libdir=.*|libdir='%{apachelib}'|" libphp5.la
-%{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{apachelib} |' libphp5.la
+%if %{_apache2}
+%{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}/apache'|" libphp5.la
+%{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache |' libphp5.la
+%else
+%{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}/apache1'|" libphp5.la
+%{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache1 |' libphp5.la
+%endif
 
 # for fcgi: -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0
 # -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1(die) -DHAVE_SYS_PARAM_H=1
@@ -1565,24 +1568,28 @@ rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_libdir}/php,%{apachelib},%{_sysconfdir}/{apache,cgi}} \
+%if %{_apache2}
+install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/{apache,cgi}} \
 	$RPM_BUILD_ROOT%{httpdir}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/var/run/php \
-%if %{_apache2}
 	$RPM_BUILD_ROOT/etc/httpd/httpd.conf
 %else
+install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache1},%{_sysconfdir}/{apache,cgi}} \
+	$RPM_BUILD_ROOT%{httpdir}/icons \
+	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
+	$RPM_BUILD_ROOT/var/run/php \
 	$RPM_BUILD_ROOT/etc/apache/apache.conf
 %endif
 
 %{__make} install \
 	INSTALL_ROOT=$RPM_BUILD_ROOT \
-	INSTALL_IT="\$(LIBTOOL) --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir} ; \$(LIBTOOL) --mode=install install libphp5.la $RPM_BUILD_ROOT%{apachelib}; \$(LIBTOOL) --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi ; \$(LIBTOOL) --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi" \
+	INSTALL_IT="\$(LIBTOOL) --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir} ; \$(LIBTOOL) --mode=install install libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache ; \$(LIBTOOL) --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi ; \$(LIBTOOL) --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi" \
 	INSTALL_CLI="\$(LIBTOOL) --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli"
 
-# TODO:
+# ToDo:
 # Why make install doesn't install libphp5.so ?
-install libs/libphp5.so $RPM_BUILD_ROOT%{apachelib}
+install libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache
 
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
@@ -1598,7 +1605,10 @@ install %{SOURCE1} .
 
 cp -f Zend/LICENSE{,.Zend}
 
-rm -f $RPM_BUILD_ROOT%{apachelib}/libphp5.la
+# Directories created for pear:
+install -d $RPM_BUILD_ROOT%{php_pear_dir}/{Archive,Console,Crypt,HTML/Template,Image,Net,Science,XML}
+
+rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1904,14 +1914,6 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove mysql %{_sysconfdir}/php.ini
 fi
 
-%post mysqli
-%{_sbindir}/php-module-install install mysqli %{_sysconfdir}/php.ini
-
-%preun mysqli
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mysqli %{_sysconfdir}/php.ini
-fi
-
 %post ncurses
 if [ -f %{_sysconfdir}/php-cgi.ini ]; then
 %{_sbindir}/php-module-install install ncurses %{_sysconfdir}/php-cgi.ini
@@ -2170,8 +2172,10 @@ fi
 %defattr(644,root,root,755)
 %if %{_apache2}
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/httpd/httpd.conf/*_mod_php.conf
+%attr(755,root,root) %{_libdir}/apache/libphp5.so
+%else
+%attr(755,root,root) %{_libdir}/apache1/libphp5.so
 %endif
-%attr(755,root,root) %{apachelib}/libphp5.so
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
 
 %files fcgi
@@ -2374,12 +2378,6 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/mysql.so
 
-%if %{with mysqli}
-%files mysqli
-%defattr(644,root,root,755)
-%attr(755,root,root) %{extensionsdir}/mysqli.so
-%endif
-
 %files ncurses
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/ncurses.so
@@ -2526,3 +2524,16 @@ fi
 %files zlib
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/zlib.so
+
+%files pear
+%defattr(644,root,root,755)
+%dir %{php_pear_dir}
+%dir %{php_pear_dir}/Archive
+%dir %{php_pear_dir}/Console
+%dir %{php_pear_dir}/Crypt
+%dir %{php_pear_dir}/HTML
+%dir %{php_pear_dir}/HTML/Template
+%dir %{php_pear_dir}/Image
+%dir %{php_pear_dir}/Net
+%dir %{php_pear_dir}/Science
+%dir %{php_pear_dir}/XML

@@ -60,7 +60,7 @@
 %if %{_apache2}
 %define	apxs		/usr/sbin/apxs
 %else
-%define apxs		/usr/sbin/apxs1
+%define	apxs		/usr/sbin/apxs1
 %endif
 # some problems with apache 2.x
 %if %{_apache2}
@@ -1140,7 +1140,7 @@ Summary(pl):	Modu³ SNMP dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:       %{name}-sockets = %{epoch}:%{version}-%{release}
+Requires:	%{name}-sockets = %{epoch}:%{version}-%{release}
 
 %description snmp
 This is a dynamic shared object (DSO) for PHP that will add SNMP
@@ -1150,11 +1150,11 @@ support.
 Modu³ PHP dodaj±cy obs³ugê SNMP.
 
 %package soap
-Summary:        soap extension module for PHP
-Summary(pl):    Modu³ soap dla PHP
-Group:          Libraries
-Requires(post,preun):   %{name}-common = %{epoch}:%{version}-%{release}
-Requires:       %{name}-common = %{epoch}:%{version}-%{release}
+Summary:	soap extension module for PHP
+Summary(pl):	Modu³ soap dla PHP
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description soap
 This is a dynamic shared object (DSO) for PHP that will add SOAP/WSDL
@@ -2101,7 +2101,7 @@ fi
 
 %preun soap
 if [ "$1" = "0" ]; then
-        %{_sbindir}/php-module-install remove soap %{_sysconfdir}/php.ini
+	%{_sbindir}/php-module-install remove soap %{_sysconfdir}/php.ini
 fi
 
 %post sockets

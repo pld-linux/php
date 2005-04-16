@@ -323,6 +323,7 @@ Summary(pl):	WspСlne pliki dla moduЁu apache'a i programu CGI
 Summary(ru):	Разделяемые библиотеки для php
 Summary(uk):	Б╕бл╕отеки сп╕льного використання для php
 Group:		Libraries
+# because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	php-common(apache-modules-api) = %{apache_modules_api}

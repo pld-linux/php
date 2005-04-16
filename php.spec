@@ -1,10 +1,5 @@
 #
 # TODO:
-# - loading pgsql+mnogosearch+snmp (only in this order!) causes php -i to SEGV on exit
-#   (postgresql-libs-8.0.1-1, net-snmp-libs-5.2.1-0.2, mnogosearch-lib-3.2.32-1)
-#   (only php.cli; php.cgi and apache2 module are not affected)
-#   same result on mysql+curl+msession (on php.cli -i or php.cgi with empty imput)
-#
 # - php-shared is SERIOUSLY broken. Try compiling with --enable-versioning.
 # - think of including support for:
 #    - mcve,
@@ -15,7 +10,6 @@
 # - deal with modules removed from php and not moved to PECL
 #   (existing only in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
-# - enabling sybase+sybase_ct+mssql together causes SEGV beside warnings
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
@@ -329,6 +323,7 @@ Summary(pl):	WspСlne pliki dla moduЁu apache'a i programu CGI
 Summary(ru):	Разделяемые библиотеки для php
 Summary(uk):	Б╕бл╕отеки сп╕льного використання для php
 Group:		Libraries
+Requires:	glibc >= 6:2.3.5
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Obsoletes:	php-session < 3:4.2.1-2

@@ -81,7 +81,7 @@ Epoch:		4
 Group:		Libraries
 License:	PHP
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	47727afde39329d5cebda4cb5e5ecee0
+# Source0-md5:	fb1aac107870f897d26563a9cc5053c0
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -90,8 +90,8 @@ Source5:	%{name}-cgi-fcgi.ini
 Source6:	%{name}-cgi.ini
 Source7:	%{name}-apache.ini
 Source8:	%{name}-cli.ini
-Source9:	http://www.hardened-php.net/hardened-php-5.0.3-0.2.5.patch.gz
-# Source9-md5:	cc91bb34a066135f1ef7cb1d4ba00b0d
+Source9:	http://www.hardened-php.net/hardened-php-5.0.4-0.2.7.patch.gz
+# Source9-md5:	60b3a09d4ea271961a0abe480a5368a2
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch

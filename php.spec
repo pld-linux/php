@@ -1428,7 +1428,7 @@ cp php.ini-dist php.ini
 %patch25 -p1
 %patch26 -p1
 %patch27 -p1
-%patch28 -p1
+%patch29 -p1
 
 %{?with_hardened:zcat %{SOURCE9} | patch -p1}
 

@@ -28,7 +28,7 @@
 %bcond_without	curl		# without CURL extension module
 %bcond_without	fam		# without FAM (File Alteration Monitor) extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_without	interbase	# without InterBase extension module
+%bcond_with		interbase	# without InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	ming		# without ming extension module

@@ -614,6 +614,7 @@ Summary(pl):	Modu³ FTP dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-openssl = %{epoch}:%{version}-%{release}
 
 %description ftp
 This is a dynamic shared object (DSO) for PHP that will add FTP

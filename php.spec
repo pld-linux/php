@@ -409,8 +409,8 @@ Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description bzip2
-This is a dynamic shared object (DSO) for PHP that will add
-bzip2 compression support to PHP.
+This is a dynamic shared object (DSO) for PHP that will add bzip2
+compression support to PHP.
 
 %description bzip2 -l pl
 Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji bzip2.
@@ -555,8 +555,8 @@ Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description exif
-This is a dynamic shared object (DSO) for PHP that will add EXIF
-tags support in image files.
+This is a dynamic shared object (DSO) for PHP that will add EXIF tags
+support in image files.
 
 %description exif -l pl
 Modu³ PHP dodaj±cy obs³ugê znaczników EXIF w plikach obrazków.
@@ -866,7 +866,8 @@ This is a dynamic shared object (DSO) for PHP that will add MS SQL
 databases support through FreeTDS library.
 
 %description mssql -l pl
-Modu³ PHP dodaj±cy obs³ugê baz danych MS SQL poprzez bibliotekê FreeTDS.
+Modu³ PHP dodaj±cy obs³ugê baz danych MS SQL poprzez bibliotekê
+FreeTDS.
 
 %package mysql
 Summary:	MySQL database module for PHP
@@ -1291,7 +1292,7 @@ This is a dynamic shared object (DSO) for PHP that will add Tidy
 support.
 
 %description tidy -l pl
-Modu³ PHP dodaj±cy umo¿liwiaj±cy korzystanie z tidy.
+Modu³ PHP umo¿liwiaj±cy korzystanie z tidy.
 
 %package wddx
 Summary:	wddx extension module for PHP
@@ -1420,7 +1421,7 @@ cp php.ini-dist php.ini
 %patch20 -p1
 %patch21 -p1
 %patch28 -p1
-%ifarch amd64
+%if "%{_lib}" == "lib64"
 %patch22 -p1
 %endif
 %patch23 -p1
@@ -1496,12 +1497,12 @@ for i in fcgi cgi cli apxs ; do
 	--enable-track-vars \
 	--enable-trans-sid \
 	--enable-safe-mode \
+	--enable-soap=shared \
 	--enable-sockets=shared \
 	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
 	--enable-yp=shared \
-	--enable-soap=shared \
 	--with-bz2=shared \
 	%{?with_cpdf:--with-cpdflib=shared} \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \

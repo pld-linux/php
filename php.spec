@@ -1,15 +1,5 @@
 #
 # TODO:
-# - cpdf.so needs -lgd
-# - memleak detected (even with no modules loaded):
-#   $ php -i >/dev/null
-#   /home/comp/rpm/BUILD/php-5.0.4/main/fopen_wrappers.c(548) :  Freeing 0x08052970 (17 bytes), script=-
-#   === Total 1 memory leaks detected ===
-# - loading pgsql+mnogosearch+snmp (only in this order!) causes php -i to SEGV on exit
-#   (postgresql-libs-8.0.1-1, net-snmp-libs-5.2.1-0.2, mnogosearch-lib-3.2.32-1)
-#   (only php.cli; php.cgi and apache2 module are not affected)
-#   same result on mysql+curl+msession (on php.cli -i or php.cgi with empty imput)
-#
 # - php-shared is SERIOUSLY broken. Try compiling with --enable-versioning.
 # - think of including support for:
 #    - mcve,
@@ -20,10 +10,10 @@
 # - deal with modules removed from php and not moved to PECL
 #   (existing only in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
-# - enabling sybase+sybase_ct+mssql together causes SEGV beside warnings
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
+# - ftp module needs to be linked with -lssl if openssl module is enabled
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -65,13 +55,13 @@
 %if %{_apache2}
 %define	apxs		/usr/sbin/apxs
 %else
-%define apxs		/usr/sbin/apxs1
+%define	apxs		/usr/sbin/apxs1
 %endif
 # some problems with apache 2.x
 %if %{_apache2}
 %undefine	with_mm
 %endif
-%ifnarch %{ix86} amd64 sparc sparcv9 alpha ppc
+%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha ppc
 %undefine	with_interbase
 %endif
 # x86-only lib
@@ -87,12 +77,12 @@ Summary(ru):	PHP ÷ÅÒÓÉÉ 5 - ÑÚÙË ĞÒÅĞÒÏÃÅÓÓÉÒÏ×ÁÎÉÑ HTML-ÆÁÊÌÏ×, ×ÙĞÏÌÎÑÅÍÙÊ ÎÁ 
 Summary(uk):	PHP ÷ÅÒÓ¦§ 5 - ÍÏ×Á ĞÒÅĞÒÏÃÅÓÕ×ÁÎÎÑ HTML-ÆÁÊÌ¦×, ×ÉËÏÎÕ×ÁÎÁ ÎÁ ÓÅÒ×ÅÒ¦
 Name:		php
 Version:	5.0.4
-Release:	2%{?with_hardened:hardened}
+Release:	7%{?with_hardened:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	47727afde39329d5cebda4cb5e5ecee0
+# Source0-md5:	fb1aac107870f897d26563a9cc5053c0
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -101,8 +91,8 @@ Source5:	%{name}-cgi-fcgi.ini
 Source6:	%{name}-cgi.ini
 Source7:	%{name}-apache.ini
 Source8:	%{name}-cli.ini
-Source9:	http://www.hardened-php.net/hardened-php-5.0.3-0.2.5.patch.gz
-# Source9-md5:	cc91bb34a066135f1ef7cb1d4ba00b0d
+Source9:	http://www.hardened-php.net/hardened-php-5.0.4-0.2.7.patch.gz
+# Source9-md5:	60b3a09d4ea271961a0abe480a5368a2
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -131,6 +121,8 @@ Patch24:	%{name}-uint32_t.patch
 Patch25:	%{name}-hwapi-link.patch
 Patch26:	%{name}-dba-link.patch
 Patch27:	%{name}-install_gd_headers.patch
+Patch28:	%{name}-cpdf-fix.patch
+Patch29:	%{name}-gcc4.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -187,7 +179,7 @@ BuildRequires:	%{__perl}
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-php-pearprov >= 4.0.2-100
-BuildRequires:	rpmbuild(macros) >= 1.120
+BuildRequires:	rpmbuild(macros) >= 1.213
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
@@ -333,6 +325,8 @@ Summary(pl):	Wspólne pliki dla modu³u apache'a i programu CGI
 Summary(ru):	òÁÚÄÅÌÑÅÍÙÅ ÂÉÂÌÉÏÔÅËÉ ÄÌÑ php
 Summary(uk):	â¦ÂÌ¦ÏÔÅËÉ ÓĞ¦ÌØÎÏÇÏ ×ÉËÏÒÉÓÔÁÎÎÑ ÄÌÑ php
 Group:		Libraries
+# because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
+Requires:	glibc >= 6:2.3.5
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Obsoletes:	php-session < 3:4.2.1-2
@@ -416,8 +410,8 @@ Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description bzip2
-This is a dynamic shared object (DSO) for PHP that will add
-bzip2 compression support to PHP.
+This is a dynamic shared object (DSO) for PHP that will add bzip2
+compression support to PHP.
 
 %description bzip2 -l pl
 Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji bzip2.
@@ -562,8 +556,8 @@ Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description exif
-This is a dynamic shared object (DSO) for PHP that will add EXIF
-tags support in image files.
+This is a dynamic shared object (DSO) for PHP that will add EXIF tags
+support in image files.
 
 %description exif -l pl
 Modu³ PHP dodaj±cy obs³ugê znaczników EXIF w plikach obrazków.
@@ -873,7 +867,8 @@ This is a dynamic shared object (DSO) for PHP that will add MS SQL
 databases support through FreeTDS library.
 
 %description mssql -l pl
-Modu³ PHP dodaj±cy obs³ugê baz danych MS SQL poprzez bibliotekê FreeTDS.
+Modu³ PHP dodaj±cy obs³ugê baz danych MS SQL poprzez bibliotekê
+FreeTDS.
 
 %package mysql
 Summary:	MySQL database module for PHP
@@ -1144,6 +1139,7 @@ Summary(pl):	Modu³ SNMP dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-sockets = %{epoch}:%{version}-%{release}
 
 %description snmp
 This is a dynamic shared object (DSO) for PHP that will add SNMP
@@ -1153,11 +1149,11 @@ support.
 Modu³ PHP dodaj±cy obs³ugê SNMP.
 
 %package soap
-Summary:        soap extension module for PHP
-Summary(pl):    Modu³ soap dla PHP
-Group:          Libraries
-Requires(post,preun):   %{name}-common = %{epoch}:%{version}-%{release}
-Requires:       %{name}-common = %{epoch}:%{version}-%{release}
+Summary:	soap extension module for PHP
+Summary(pl):	Modu³ soap dla PHP
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description soap
 This is a dynamic shared object (DSO) for PHP that will add SOAP/WSDL
@@ -1297,7 +1293,7 @@ This is a dynamic shared object (DSO) for PHP that will add Tidy
 support.
 
 %description tidy -l pl
-Modu³ PHP dodaj±cy umo¿liwiaj±cy korzystanie z tidy.
+Modu³ PHP umo¿liwiaj±cy korzystanie z tidy.
 
 %package wddx
 Summary:	wddx extension module for PHP
@@ -1425,7 +1421,8 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%ifarch amd64
+%patch28 -p1
+%if "%{_lib}" == "lib64"
 %patch22 -p1
 %endif
 %patch23 -p1
@@ -1433,6 +1430,7 @@ cp php.ini-dist php.ini
 %patch25 -p1
 %patch26 -p1
 %patch27 -p1
+%patch29 -p1
 
 %{?with_hardened:zcat %{SOURCE9} | patch -p1}
 
@@ -1500,12 +1498,12 @@ for i in fcgi cgi cli apxs ; do
 	--enable-track-vars \
 	--enable-trans-sid \
 	--enable-safe-mode \
+	--enable-soap=shared \
 	--enable-sockets=shared \
 	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
 	--enable-yp=shared \
-	--enable-soap=shared \
 	--with-bz2=shared \
 	%{?with_cpdf:--with-cpdflib=shared} \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
@@ -2103,7 +2101,7 @@ fi
 
 %preun soap
 if [ "$1" = "0" ]; then
-        %{_sbindir}/php-module-install remove soap %{_sysconfdir}/php.ini
+	%{_sbindir}/php-module-install remove soap %{_sysconfdir}/php.ini
 fi
 
 %post sockets

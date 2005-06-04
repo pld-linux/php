@@ -1287,6 +1287,7 @@ Summary(pl):	Modu³ Tidy dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	tidy
 
 %description tidy
 This is a dynamic shared object (DSO) for PHP that will add Tidy
@@ -2158,6 +2159,14 @@ fi
 %preun sysvshm
 if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove sysvshm %{_sysconfdir}/php.ini
+fi
+
+%post tidy
+%{_sbindir}/php-module-install install tidy %{_sysconfdir}/php.ini
+
+%preun tidy
+if [ "$1" = "0" ]; then
+	%{_sbindir}/php-module-install remove tidy %{_sysconfdir}/php.ini
 fi
 
 %post wddx

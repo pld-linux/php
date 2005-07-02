@@ -18,7 +18,7 @@
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
-%bcond_with	hardened	# build with hardened patch applied (http://www.hardened-php.net/)
+%bcond_with	hardening	# build with hardening patch applied (http://www.hardened-php.net/)
 %bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-Release:	7%{?with_hardened:hardened}
+Release:	7%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -91,8 +91,8 @@ Source5:	%{name}-cgi-fcgi.ini
 Source6:	%{name}-cgi.ini
 Source7:	%{name}-apache.ini
 Source8:	%{name}-cli.ini
-Source9:	http://www.hardened-php.net/hardened-php-5.0.4-0.2.7.patch.gz
-# Source9-md5:	60b3a09d4ea271961a0abe480a5368a2
+Source9:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
+# Source9-md5:	47a742fa9fab2826ad10c13a2376111a
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -1433,7 +1433,7 @@ cp php.ini-dist php.ini
 %patch27 -p1
 %patch29 -p1
 
-%{?with_hardened:zcat %{SOURCE9} | patch -p1}
+%{?with_hardening:zcat %{SOURCE9} | patch -p1}
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

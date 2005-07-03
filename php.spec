@@ -123,7 +123,7 @@ Patch26:	%{name}-dba-link.patch
 Patch27:	%{name}-install_gd_headers.patch
 Patch28:	%{name}-cpdf-fix.patch
 Patch29:	%{name}-gcc4.patch
-Patch30:    %{name}-hardening-fix.patch
+Patch30:	%{name}-hardening-fix.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}

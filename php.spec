@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-Release:	7%{?with_hardening:hardened}.1
+Release:	7.1%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -1642,6 +1642,15 @@ rm -f $RPM_BUILD_ROOT%{apachelib}/libphp5.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+%if %{_apache2}
+%triggerpostun -n php < 3:5.0.4-7.1
+# for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
+if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
+	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
+	mv -f %{_sysconfdir}/php-apache.ini.rpmsave %{_sysconfdir}/php-apache2handler.ini
+fi
+%endif
 
 %post
 %if ! %{_apache2}

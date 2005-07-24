@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-Release:	7%{?with_hardening:hardened}
+Release:	7%{?with_hardening:hardened}.1
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -1631,6 +1631,7 @@ install %{SOURCE2} php.gif $RPM_BUILD_ROOT%{httpdir}/icons
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
 %if %{_apache2}
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
+mv $RPM_BUILD_ROOT%{_sysconfdir}/php-apache{,2handler}.ini
 %endif
 
 install %{SOURCE1} .
@@ -2225,9 +2226,11 @@ fi
 %defattr(644,root,root,755)
 %if %{_apache2}
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/httpd/httpd.conf/*_mod_php.conf
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache2handler.ini
+%else
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
 %endif
 %attr(755,root,root) %{apachelib}/libphp5.so
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
 
 %files fcgi
 %defattr(644,root,root,755)

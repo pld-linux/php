@@ -1644,7 +1644,7 @@ rm -f $RPM_BUILD_ROOT%{apachelib}/libphp5.la
 rm -rf $RPM_BUILD_ROOT
 
 %if %{_apache2}
-%triggerpostun -n php < 3:5.0.4-7.1
+%triggerpostun -- php < 3:5.0.4-7.1
 # for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
 if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
 	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}

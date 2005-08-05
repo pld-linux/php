@@ -62,13 +62,13 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 4 -- язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 4 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	4.3.11
-Release:	1.2
+Version:	4.4.0
+Release:	1
 Epoch:		3
 Group:		Libraries
 License:	PHP
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	fbc67d240812136a9842bc1f2a217b7a
+# Source0-md5:	e85b606fe48198bfcd785e5a5b1c9613
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -84,6 +84,7 @@ Patch3:		%{name}-mail.patch
 Patch4:		%{name}-link-libs.patch
 Patch5:		%{name}-libpq_fs_h_path.patch
 Patch6:		%{name}-wddx-fix.patch
+Patch7:		%{name}-lib.patch
 Patch8:		%{name}-hyperwave-fix.patch
 Patch9:		%{name}-xslt-gcc33.patch
 Patch10:	%{name}-java-norpath.patch
@@ -110,6 +111,7 @@ Patch30:	%{name}-mnogosearch-fix.patch
 Patch31:	%{name}-gd_imagerotate_enable.patch
 Patch32:	%{name}-uint32_t.patch
 Patch33:	%{name}-va_copy.patch
+Patch34:	%{name}-pgsql-fix.patch
 Icon:		php4.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1525,6 +1527,7 @@ Repozytorium Aplikacji. Ten pakiet zawiera aplikacje potrzebne do
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 %patch8 -p1
 # Not really needed?
 #%patch9 -p1
@@ -1559,6 +1562,7 @@ cp php.ini-dist php.ini
 %ifarch ppc
 %patch33 -p1
 %endif
+%patch34 -p1
 
 %build
 CFLAGS="%{rpmcflags} -DEAPI=1 -I%{_prefix}/X11R6/include"
@@ -1640,7 +1644,7 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
 	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
 	%{?with_java:--with-java=/usr/lib/java} \
-	--with-jpeg-dir=shared,/usr \
+	--with-jpeg-dir=/usr \
 	%{?with_ldap:--with-ldap=shared} \
 	--with-mcal=shared,/usr \
 	--with-mcrypt=shared \
@@ -1661,7 +1665,7 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_pdf:--with-pdflib=shared} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
-	--with-png-dir=shared,/usr \
+	--with-png-dir=/usr \
 	%{?with_pspell:--with-pspell=shared} \
 	--with-readline=shared \
 	%{?with_recode:--with-recode=shared} \
@@ -1671,7 +1675,7 @@ for i in fcgi cgi cli apxs ; do
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase:--with-sybase-ct=shared,/usr --with-sybase=shared,/usr} \
 	--with-t1lib=shared \
-	--with-tiff-dir=shared,/usr \
+	--with-tiff-dir=/usr \
 	%{?with_odbc:--with-unixODBC=shared} \
 	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
 	%{?with_xslt:--with-xslt-sablot=shared} \
@@ -2412,7 +2416,6 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/phpextdist
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
@@ -2422,6 +2425,8 @@ fi
 %ifarch amd64
 %{_ulibdir}/php/build
 %endif
+%{_mandir}/man1/php-config.1*
+%{_mandir}/man1/phpize.1*
 
 %files bcmath
 %defattr(644,root,root,755)

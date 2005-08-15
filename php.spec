@@ -1,4 +1,3 @@
-#
 # TODO:
 # - php-shared is SERIOUSLY broken. Try compiling with --enable-versioning.
 # - think of including support for:
@@ -14,6 +13,12 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - ftp module needs to be linked with -lssl if openssl module is enabled
+# - finish apache1/apache2 package split. currently don't know how to resolve:
+#  apache1-mod_php4-4.4.0-4.44 obsoleted by apache-mod_php-5.0.4-8.3
+#  it's because apache1-mod_php4 Provides:   php = %{epoch}:%{version}-%{release}
+#  and new apache-mod_php:
+#  # Obsolete last version when apache module was in main package
+#  Obsoletes:  php < 4:5.0.4-8.1
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -23,7 +28,6 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
-%bcond_with	apache1		# build with apache1
 %bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
 %bcond_without	cpdf		# without cpdf extension module
 %bcond_without	curl		# without CURL extension module
@@ -50,24 +54,30 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
+%bcond_with		apache1		# enable building apache 1.3.x module (disables apache2)
+%bcond_without	apache2		# disable building apache 2.x module
 
-%define	_apache2	%{?with_apache1:0}%{!?with_apache1:1}
-%if %{_apache2}
-%define	apxs		/usr/sbin/apxs
-%else
-%define	apxs		/usr/sbin/apxs1
+%define apxs1		/usr/sbin/apxs1
+%define	apxs2		/usr/sbin/apxs
+
+%if %{with apache1}
+%undefine	with_apache2
 %endif
+
 # some problems with apache 2.x
-%if %{_apache2}
+%if %{with apache2}
 %undefine	with_mm
 %endif
+
 %ifnarch %{ix86} %{x8664} sparc sparcv9 alpha ppc
 %undefine	with_interbase
 %endif
+
 # x86-only lib
 %ifnarch %{ix86}
 %undefine	with_msession
 %endif
+
 %include	/usr/lib/rpm/macros.php
 Summary:	The PHP HTML-embedded scripting language for use with Apache
 Summary(fr):	Le langage de script embarque-HTML PHP pour Apache
@@ -77,7 +87,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-Release:	9%{?with_hardening:hardened}
+Release:	9.21%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -124,6 +134,7 @@ Patch27:	%{name}-install_gd_headers.patch
 Patch28:	%{name}-cpdf-fix.patch
 Patch29:	%{name}-gcc4.patch
 Patch30:	%{name}-hardening-fix.patch
+Patch31:	%{name}-both-apxs.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -180,7 +191,7 @@ BuildRequires:	%{__perl}
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-php-pearprov >= 4.0.2-100
-BuildRequires:	rpmbuild(macros) >= 1.213
+BuildRequires:	rpmbuild(macros) >= 1.230
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
@@ -188,32 +199,25 @@ BuildRequires:	t1lib-devel
 %{?with_odbc:BuildRequires:	unixODBC-devel}
 %{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel}
 BuildRequires:	zlib-devel >= 1.0.9
-# apache 1.3 vs apache 2.0
-%if %{_apache2}
+%if %{with apache1}
+BuildRequires:	apache1-devel
+PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+PreReq:		apache1(EAPI) >= 1.3.9
+Requires(post,preun):	%{apxs1}
+Requires(post,preun):	%{__perl}
+%endif
+%if %{with apache2}
 BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
+PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
 PreReq:		apache >= 2.0.52-2
 Requires:	apache(modules-api) = %{apache_modules_api}
-%else
-BuildRequires:	apache1-devel
-PreReq:		apache1(EAPI) >= 1.3.9
-Requires(post,preun):	%{apxs}
-Requires(post,preun):	%{__perl}
 %endif
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
-Obsoletes:	phpfi
-Obsoletes:	apache-mod_php
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/php
 %define		extensionsdir	%{_libdir}/php
-%define		httpdir		/home/services/httpd
-%if %{_apache2}
-%define		apachelib	%{_libdir}/apache
-%else
-%define		apachelib	%{_libdir}/apache1
-%endif
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -280,6 +284,48 @@ PHP - це мова написання скрипт╕в, що вбудовуються в HTML-код. PHP
 Цей пакет м╕стить самодостатню (CGI) верс╕ю ╕нтерпретатора мови. Ви
 ма╓те також встановити пакет %{name}-common. Якщо вам потр╕бен
 ╕нтерпретатор PHP в якост╕ модуля apache, встанов╕ть пакет apache-php.
+
+%package -n apache1-mod_php
+Summary:	PHP DSO module for apache 1.3.x
+Summary(pl):	ModuЁ DSO (Dynamic Shared Object) php dla apache 1.3.x
+Group:		Development/Languages/PHP
+PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires(post,preun):	%{apxs1}
+Requires(post,preun):	%{__perl}
+Requires:	apache1(EAPI) >= 1.3.33-2
+Requires:	apache1-mod_mime
+Provides:	%{name} = %{epoch}:%{version}-%{release}
+Provides:	php = %{epoch}:%{version}-%{release}
+Obsoletes:	phpfi
+Obsoletes:	apache-mod_php < 1:4.1.1
+# Obsolete last version when apache module was in main package
+Obsoletes:	php <= 4:5.0.4-9
+
+%description -n apache1-mod_php
+PHP as DSO module for apache 1.3.x.
+
+%description -n apache1-mod_php -l pl
+php jako moduЁ DSO (Dynamic Shared Object) dla apache 1.3.x.
+
+%package -n apache-mod_php
+Summary:	PHP DSO module for apache 2.x
+Summary(pl):	ModuЁ DSO (Dynamic Shared Object) php dla apache 2.x
+Group:		Development/Languages/PHP
+PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	apache >= 2.0.52-2
+Requires:	apache(modules-api) = %{apache_modules_api}
+Provides:	%{name} = %{epoch}:%{version}-%{release}
+Provides:	php = %{epoch}:%{version}-%{release}
+Obsoletes:	phpfi
+Obsoletes:	apache-mod_php < 1:4.1.1
+# Obsolete last version when apache module was in main package
+Obsoletes:	php <= 4:5.0.4-9
+
+%description -n apache-mod_php
+PHP as DSO module for apache 2.x.
+
+%description -n apache-mod_php -l pl
+php jako moduЁ DSO (Dynamic Shared Object) dla apache 2.x.
 
 %package fcgi
 Summary:	php as FastCGI program
@@ -1438,6 +1484,7 @@ cp php.ini-dist php.ini
 zcat %{SOURCE9} | patch -p1
 patch -p1 < %{PATCH30}
 %endif
+%patch31 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1451,29 +1498,59 @@ cd ..
 sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4
 
 %build
-%if %{_apache2}
-CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include `%{_bindir}/apr-1-config --includes` `%{_bindir}/apu-1-config --includes`"
-%else
 CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include"
+%if %{with apache2}
+# Apache2 CFLAGS. harmless for other SAPIs.
+CFLAGS="$CFLAGS $(%{_bindir}/apr-1-config --includes) $(%{_bindir}/apu-1-config --includes)"
 %endif
+
 EXTENSION_DIR="%{extensionsdir}"; export EXTENSION_DIR
-./buildconf --force
-%{__libtoolize}
-%{__aclocal}
-%{__autoconf}
+if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
+	./buildconf --force
+	%{__libtoolize}
+	%{__aclocal}
+	%{__autoconf}
+	touch _built-conf
+fi
 PROG_SENDMAIL="/usr/lib/sendmail"; export PROG_SENDMAIL
-for i in fcgi cgi cli apxs ; do
-%configure \
-	`[ $i = cgi ] && echo --enable-discard-path` \
-	`[ $i = cli ] && echo --disable-cgi` \
-	`[ $i = fcgi ] && echo --enable-fastcgi --with-fastcgi=/usr` \
-%if %{_apache2}
-	`[ $i = apxs ] && echo --with-apxs2=%{apxs}` \
-	--enable-maintainer-zts \
-%else
-	`[ $i = apxs ] && echo --with-apxs=%{apxs}` \
+
+sapis="
+fcgi cgi cli
+%if %{with apache1}
+apxs1
 %endif
+%if %{with apache2}
+apxs2
+%endif
+"
+for sapi in $sapis; do
+	[ -f Makefile.$sapi ] && continue # skip if already configured (for faster debugging purposes)
+
+	%configure \
+	`
+	case $sapi in
+	cgi)
+		echo --enable-discard-path
+	;;
+	cli)
+		echo --disable-cgi
+	;;
+	fcgi)
+		echo --enable-fastcgi --with-fastcgi=/usr
+	;;
+	apxs1)
+		ver=%(rpm -q --qf '%%{version}' apache1-apxs)
+		echo --with-apxs=%{apxs1} --with-apache-version=$ver
+	;;
+	apxs2)
+		ver=%(rpm -q --qf '%%{version}' apache-apxs)
+		echo --with-apxs2=%{apxs2} --with-apache-version=$ver --enable-maintainer-zts
+	;;
+	esac
+	` \
+	--cache-file=config.cache \
 	--with-config-file-path=%{_sysconfdir} \
+	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	--enable-memory-limit \
@@ -1570,25 +1647,38 @@ for i in fcgi cgi cli apxs ; do
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr
 
-cp -f Makefile Makefile.$i
-# left for debugging purposes
-cp -f main/php_config.h php_config.h.$i
+	cp -f Makefile Makefile.$sapi
+
+	# left for debugging purposes
+	cp -f main/php_config.h php_config.h.$sapi
 done
 
 # for now session_mm doesn't work with shared session module...
 # --enable-session=shared
 # %{!?with_mm:--with-mm=shared,no}%{?with_mm:--with-mm=shared}
 
-%{__make}
+%{__make} build-modules
 
+%{__make} libphp_common.la
 # fix install paths, avoid evil rpaths
-%{__perl} -pi -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
-%{__perl} -pi -e "s|^libdir=.*|libdir='%{apachelib}'|" libphp5.la
-%{__perl} -pi -e 's|^(relink_command=.* -rpath )[^ ]*/libs |$1%{apachelib} |' libphp5.la
+sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
 
 # for fcgi: -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0
 # -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1(die) -DHAVE_SYS_PARAM_H=1
 # -DPHP_FASTCGI=1 -DPHP_FCGI_STATIC=1 -DPHP_WRITE_STDOUT=1
+%if %{with apache1}
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
+sed -i -e "
+s|^libdir=.*|libdir='%{_libdir}/apache1'|;
+s|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache1 |" sapi/apache/libphp5.la
+%endif
+
+%if %{with apache2}
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
+sed -i -e "
+s|^libdir=.*|libdir='%{_libdir}/apache'|;
+s|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache |" sapi/apache2handler/libphp5.la
+%endif
 
 %{__make} sapi/cgi/php -f Makefile.fcgi \
 	CFLAGS_CLEAN="%{rpmcflags} -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0 -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1 -DHAVE_SYS_PARAM_H=1 -DPHP_FASTCGI=1 -DPHP_FCGI_STATIC=1 -DPHP_WRITE_STDOUT=1"
@@ -1602,49 +1692,170 @@ rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php -f Makefile.cgi \
 	CFLAGS_CLEAN="%{rpmcflags} -DDISCARD_PATH=1 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0 -DPHP_WRITE_STDOUT=1"
 
+# CLI
+%{__make} sapi/cli/php -f Makefile.cli
+
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_libdir}/php,%{apachelib},%{_sysconfdir}/{apache,cgi}} \
-	$RPM_BUILD_ROOT%{httpdir}/icons \
+install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi}} \
+	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/var/run/php \
-%if %{_apache2}
-	$RPM_BUILD_ROOT/etc/httpd/httpd.conf
-%else
-	$RPM_BUILD_ROOT/etc/apache/apache.conf
+	$RPM_BUILD_ROOT{/etc/apache/conf.d,/etc/httpd/httpd.conf} \
+	$RPM_BUILD_ROOT%{_mandir}/man1
+
+# install apache1 DSO module
+%if %{with apache1}
+# TODO: use libtool here
+install sapi/apache/.libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.so
 %endif
 
-%{__make} install \
-	INSTALL_ROOT=$RPM_BUILD_ROOT \
-	INSTALL_IT="\$(LIBTOOL) --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir} ; \$(LIBTOOL) --mode=install install libphp5.la $RPM_BUILD_ROOT%{apachelib}; \$(LIBTOOL) --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi ; \$(LIBTOOL) --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi" \
-	INSTALL_CLI="\$(LIBTOOL) --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli"
+# install apache2 DSO module
+%if %{with apache2}
+# TODO: use libtool here
+install sapi/apache2handler/.libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
+%endif
+
+libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+
+# install the apache modules' files
+make install-headers install-build install-modules install-programs \
+	INSTALL_ROOT=$RPM_BUILD_ROOT
+
+# install CGI
+libtool --silent --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi
+
+# install FCGI
+libtool --silent --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+
+# install CLI
+libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
+install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 
 # TODO:
 # Why make install doesn't install libphp5.so ?
-install libs/libphp5.so $RPM_BUILD_ROOT%{apachelib}
+#install libs/libphp5.so $RPM_BUILD_ROOT%{apachelib}
 
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 install php.ini	$RPM_BUILD_ROOT%{_sysconfdir}/php.ini
-install %{SOURCE5} %{SOURCE6} %{SOURCE7} %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}
-install %{SOURCE2} php.gif $RPM_BUILD_ROOT%{httpdir}/icons
+install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
+install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+
+install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
+install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
-%if %{_apache2}
+install %{SOURCE4} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
-mv $RPM_BUILD_ROOT%{_sysconfdir}/php-apache{,2handler}.ini
-%endif
 
 install %{SOURCE1} .
 
 cp -f Zend/LICENSE{,.Zend}
 
-rm -f $RPM_BUILD_ROOT%{apachelib}/libphp5.la
+# Generate stub .ini files for each subpackage
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
+for so in modules/*.so; do
+	mod=$(basename $so .so)
+	cat > $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/${mod}.ini <<EOF
+; Enable ${mod} extension module
+extension=${mod}.so
+EOF
+done
+
+# Not in all SAPI, so don't need the .ini fragments.
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/{ncurses,pcntl,readline}.ini
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%if %{_apache2}
+%if %{with apache1}
+%triggerpostun -- %{name} < 4:5.0.4-9.11
+%{apxs1} -e -A -n php5 %{_pkglibdir}/libphp5.so 1>&2
+%{__perl} -pi -e \
+	's|^AddType application/x-httpd-php \.php|#AddType application/x-httpd-php .php|' \
+	/etc/apache/apache.conf
+%service -q apache restart
+%endif
+
+%post
+if [ "$1" = "1" ]; then
+%if %{with apache1}
+	%service -q apache restart
+%endif
+%if %{with apache2}
+	%service -q httpd restart
+%endif
+fi
+
+%postun
+if [ "$1" = "0" ]; then
+%if %{with apache1}
+	%service -q apache restart
+%endif
+%if %{with apache2}
+	%service -q httpd restart
+%endif
+fi
+
+%post -n apache1-mod_php
+if [ "$1" = "1" ]; then
+	%service -q apache restart
+fi
+
+%postun -n apache1-mod_php
+if [ "$1" = "0" ]; then
+	%service -q apache restart
+fi
+
+%post -n apache-mod_php
+if [ "$1" = "1" ]; then
+	%service -q httpd restart
+fi
+
+%postun -n apache-mod_php
+if [ "$1" = "0" ]; then
+	%service -q httpd restart
+fi
+
+# so tired of typing... so decided to create macros
+# macro called at extension post scriptlet
+%define	extension_post \
+if [ "$1" = "1" ]; then \
+	[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart \
+	[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart \
+fi
+
+# macro called at extension postun scriptlet
+%define	extension_postun \
+if [ "$1" = "0" ]; then \
+	[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart \
+	[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart \
+fi
+
+%post	common -p /sbin/ldconfig
+%postun	common
+/sbin/ldconfig
+# extension_post here is all correct.
+%extension_post
+
+# compensate missing restart of earlier -common package.
+%triggerpostun common -- %{name}-common < 4:5.0.4-9.1
+[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
+[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
+
+%if %{with apache2}
 %triggerpostun -- php < 4:5.0.4-7.1
+# for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
+if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
+	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
+	mv -f %{_sysconfdir}/php-apache.ini.rpmsave %{_sysconfdir}/php-apache2handler.ini
+fi
+
+# extra trigger, if they did not upgrade to 4:5.0.4-7 but still had old php-apache.ini
+%triggerpostun -n apache-mod_php -- php < 4:5.0.4-7.1
 # for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
 if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
 	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
@@ -1652,594 +1863,632 @@ if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
 fi
 %endif
 
-%post
-%if ! %{_apache2}
-%{__perl} -pi -e 's|^#AddType application/x-httpd-php \.php|AddType application/x-httpd-php .php|' \
-	/etc/apache/apache.conf
-%{apxs} -e -a -n php5 %{_pkglibdir}/libphp5.so 1>&2
-if [ -f /var/lock/subsys/apache ]; then
-	/etc/rc.d/init.d/apache restart 1>&2
-fi
-%else
-if [ -f /var/lock/subsys/httpd ]; then
-	/etc/rc.d/init.d/httpd restart 1>&2
-fi
-%endif
-
-%if %{_apache2}
-%postun
-if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
-	fi
-fi
-%else
-%preun
-if [ "$1" = "0" ]; then
-	%{apxs} -e -A -n php5 %{_pkglibdir}/libphp5.so 1>&2
-	%{__perl} -pi -e \
-		's|^AddType application/x-httpd-php \.php|#AddType application/x-httpd-php .php|' \
-		/etc/apache/apache.conf
-	if [ -f /var/lock/subsys/apache ]; then
-		/etc/rc.d/init.d/apache restart 1>&2
-	fi
-fi
-%endif
-
-%post	common -p /sbin/ldconfig
-%postun	common -p /sbin/ldconfig
-
 %post bcmath
-%{_sbindir}/php-module-install install bcmath %{_sysconfdir}/php.ini
+%extension_post
 
-%preun bcmath
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove bcmath %{_sysconfdir}/php.ini
-fi
+%postun bcmath
+%extension_postun
 
 %post bzip2
-%{_sbindir}/php-module-install install bz2 %{_sysconfdir}/php.ini
+%extension_post
 
-%preun bzip2
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove bz2 %{_sysconfdir}/php.ini
-fi
+%postun bzip2
+%extension_postun
 
 %post calendar
-%{_sbindir}/php-module-install install calendar %{_sysconfdir}/php.ini
+%extension_post
 
-%preun calendar
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove calendar %{_sysconfdir}/php.ini
-fi
+%postun calendar
+%extension_postun
 
 %post cpdf
-%{_sbindir}/php-module-install install cpdf %{_sysconfdir}/php.ini
+%extension_post
 
-%preun cpdf
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove cpdf %{_sysconfdir}/php.ini
-fi
+%postun cpdf
+%extension_postun
 
 %post ctype
-%{_sbindir}/php-module-install install ctype %{_sysconfdir}/php.ini
+%extension_post
 
-%preun ctype
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove ctype %{_sysconfdir}/php.ini
-fi
+%postun ctype
+%extension_postun
 
 %post curl
-%{_sbindir}/php-module-install install curl %{_sysconfdir}/php.ini
+%extension_post
 
-%preun curl
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove curl %{_sysconfdir}/php.ini
-fi
+%postun curl
+%extension_postun
 
 %post dba
-%{_sbindir}/php-module-install install dba %{_sysconfdir}/php.ini
+%extension_post
 
-%preun dba
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove dba %{_sysconfdir}/php.ini
-fi
+%postun dba
+%extension_postun
 
 %post dbase
-%{_sbindir}/php-module-install install dbase %{_sysconfdir}/php.ini
+%extension_post
 
-%preun dbase
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove dbase %{_sysconfdir}/php.ini
-fi
+%postun dbase
+%extension_postun
 
 %post dbx
-%{_sbindir}/php-module-install install dbx %{_sysconfdir}/php.ini
+%extension_post
 
-%preun dbx
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove dbx %{_sysconfdir}/php.ini
-fi
+%postun dbx
+%extension_postun
 
 %post dio
-%{_sbindir}/php-module-install install dio %{_sysconfdir}/php.ini
+%extension_post
 
-%preun dio
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove dio %{_sysconfdir}/php.ini
-fi
+%postun dio
+%extension_postun
 
 %post dom
-%{_sbindir}/php-module-install install dom %{_sysconfdir}/php.ini
+%extension_post
 
-%preun dom
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove dom %{_sysconfdir}/php.ini
-fi
+%postun dom
+%extension_postun
 
 %post exif
-%{_sbindir}/php-module-install install exif %{_sysconfdir}/php.ini
+%extension_post
 
-%preun exif
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove exif %{_sysconfdir}/php.ini
-fi
+%postun exif
+%extension_postun
 
 %post fam
-%{_sbindir}/php-module-install install fam %{_sysconfdir}/php.ini
+%extension_post
 
-%preun fam
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove fam %{_sysconfdir}/php.ini
-fi
+%postun fam
+%extension_postun
 
 %post fdf
-%{_sbindir}/php-module-install install fdf %{_sysconfdir}/php.ini
+%extension_post
 
-%preun fdf
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove fdf %{_sysconfdir}/php.ini
-fi
+%postun fdf
+%extension_postun
 
 %post filepro
-%{_sbindir}/php-module-install install filepro %{_sysconfdir}/php.ini
+%extension_post
 
-%preun filepro
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove filepro %{_sysconfdir}/php.ini
-fi
+%postun filepro
+%extension_postun
 
 %post ftp
-%{_sbindir}/php-module-install install ftp %{_sysconfdir}/php.ini
+%extension_post
 
-%preun ftp
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove ftp %{_sysconfdir}/php.ini
-fi
+%postun ftp
+%extension_postun
 
 %post gd
-%{_sbindir}/php-module-install install gd %{_sysconfdir}/php.ini
+%extension_post
 
-%preun gd
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove gd %{_sysconfdir}/php.ini
-fi
+%postun gd
+%extension_postun
 
 %post gettext
-%{_sbindir}/php-module-install install gettext %{_sysconfdir}/php.ini
+%extension_post
 
-%preun gettext
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove gettext %{_sysconfdir}/php.ini
-fi
+%postun gettext
+%extension_postun
 
 %post gmp
-%{_sbindir}/php-module-install install gmp %{_sysconfdir}/php.ini
+%extension_post
 
-%preun gmp
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove gmp %{_sysconfdir}/php.ini
-fi
+%postun gmp
+%extension_postun
 
 %post hwapi
-%{_sbindir}/php-module-install install hwapi %{_sysconfdir}/php.ini
+%extension_post
 
-%preun hwapi
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove hwapi %{_sysconfdir}/php.ini
-fi
+%postun hwapi
+%extension_postun
 
 %post iconv
-%{_sbindir}/php-module-install install iconv %{_sysconfdir}/php.ini
+%extension_post
 
-%preun iconv
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove iconv %{_sysconfdir}/php.ini
-fi
+%postun iconv
+%extension_postun
 
 %post imap
-%{_sbindir}/php-module-install install imap %{_sysconfdir}/php.ini
+%extension_post
 
-%preun imap
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove imap %{_sysconfdir}/php.ini
-fi
+%postun imap
+%extension_postun
 
 %post interbase
-%{_sbindir}/php-module-install install interbase %{_sysconfdir}/php.ini
+%extension_post
 
-%preun interbase
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove interbase %{_sysconfdir}/php.ini
-fi
+%postun interbase
+%extension_postun
 
 %post ldap
-%{_sbindir}/php-module-install install ldap %{_sysconfdir}/php.ini
+%extension_post
 
-%preun ldap
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove ldap %{_sysconfdir}/php.ini
-fi
+%postun ldap
+%extension_postun
 
 %post mbstring
-%{_sbindir}/php-module-install install mbstring %{_sysconfdir}/php.ini
+%extension_post
 
-%preun mbstring
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mbstring %{_sysconfdir}/php.ini
-fi
+%postun mbstring
+%extension_postun
 
 %post mcrypt
-%{_sbindir}/php-module-install install mcrypt %{_sysconfdir}/php.ini
+%extension_post
 
-%preun mcrypt
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mcrypt %{_sysconfdir}/php.ini
-fi
+%postun mcrypt
+%extension_postun
 
 %post mhash
-%{_sbindir}/php-module-install install mhash %{_sysconfdir}/php.ini
+%extension_post
 
-%preun mhash
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mhash %{_sysconfdir}/php.ini
-fi
+%postun mhash
+%extension_postun
 
 %post mime_magic
-%{_sbindir}/php-module-install install mime_magic %{_sysconfdir}/php.ini
+%extension_post
 
-%preun mime_magic
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mime_magic %{_sysconfdir}/php.ini
-fi
+%postun mime_magic
+%extension_postun
 
 %post ming
-%{_sbindir}/php-module-install install ming %{_sysconfdir}/php.ini
+%extension_post
 
-%preun ming
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove ming %{_sysconfdir}/php.ini
-fi
+%postun ming
+%extension_postun
 
 %post mnogosearch
-%{_sbindir}/php-module-install install mnogosearch %{_sysconfdir}/php.ini
+%extension_post
 
-%preun mnogosearch
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mnogosearch %{_sysconfdir}/php.ini
-fi
+%postun mnogosearch
+%extension_postun
 
 %post msession
-%{_sbindir}/php-module-install install msession %{_sysconfdir}/php.ini
+%extension_post
 
-%preun msession
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove msession %{_sysconfdir}/php.ini
-fi
+%postun msession
+%extension_postun
 
 %post mssql
-%{_sbindir}/php-module-install install mssql %{_sysconfdir}/php.ini
+%extension_post
 
-%preun mssql
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mssql %{_sysconfdir}/php.ini
-fi
+%postun mssql
+%extension_postun
 
 %post mysql
-%{_sbindir}/php-module-install install mysql %{_sysconfdir}/php.ini
+%extension_post
 
-%preun mysql
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mysql %{_sysconfdir}/php.ini
-fi
+%postun mysql
+%extension_postun
 
 %post mysqli
-%{_sbindir}/php-module-install install mysqli %{_sysconfdir}/php.ini
+%extension_post
 
-%preun mysqli
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove mysqli %{_sysconfdir}/php.ini
-fi
+%postun mysqli
+%extension_postun
 
 %post ncurses
 if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-%{_sbindir}/php-module-install install ncurses %{_sysconfdir}/php-cgi.ini
+	%{_sbindir}/php-module-install install ncurses %{_sysconfdir}/php-cgi.ini
 fi
 if [ -f %{_sysconfdir}/php-cli.ini ]; then
-%{_sbindir}/php-module-install install ncurses %{_sysconfdir}/php-cli.ini
+	%{_sbindir}/php-module-install install ncurses %{_sysconfdir}/php-cli.ini
 fi
 
-%preun ncurses
+%postun ncurses
 if [ "$1" = "0" ]; then
 	if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-	%{_sbindir}/php-module-install remove ncurses %{_sysconfdir}/php-cgi.ini
+		%{_sbindir}/php-module-install remove ncurses %{_sysconfdir}/php-cgi.ini
 	fi
 	if [ -f %{_sysconfdir}/php-cli.ini ]; then
-	%{_sbindir}/php-module-install remove ncurses %{_sysconfdir}/php-cli.ini
+		%{_sbindir}/php-module-install remove ncurses %{_sysconfdir}/php-cli.ini
 	fi
 fi
 
 %post oci8
-%{_sbindir}/php-module-install install oci8 %{_sysconfdir}/php.ini
+%extension_post
 
-%preun oci8
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove oci8 %{_sysconfdir}/php.ini
-fi
+%postun oci8
+%extension_postun
 
 %post odbc
-%{_sbindir}/php-module-install install odbc %{_sysconfdir}/php.ini
+%extension_post
 
-%preun odbc
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove odbc %{_sysconfdir}/php.ini
-fi
+%postun odbc
+%extension_postun
 
 %post openssl
-%{_sbindir}/php-module-install install openssl %{_sysconfdir}/php.ini
+%extension_post
 
-%preun openssl
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove openssl %{_sysconfdir}/php.ini
-fi
+%postun openssl
+%extension_postun
 
 %post oracle
-%{_sbindir}/php-module-install install oracle %{_sysconfdir}/php.ini
+%extension_post
 
-%preun oracle
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove oracle %{_sysconfdir}/php.ini
-fi
+%postun oracle
+%extension_postun
 
 %post pcntl
 if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-%{_sbindir}/php-module-install install pcntl %{_sysconfdir}/php-cgi.ini
+	%{_sbindir}/php-module-install install pcntl %{_sysconfdir}/php-cgi.ini
 fi
 if [ -f %{_sysconfdir}/php-cli.ini ]; then
-%{_sbindir}/php-module-install install pcntl %{_sysconfdir}/php-cli.ini
+	%{_sbindir}/php-module-install install pcntl %{_sysconfdir}/php-cli.ini
 fi
 
-%preun pcntl
+%postun pcntl
 if [ "$1" = "0" ]; then
 	if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-	%{_sbindir}/php-module-install remove pcntl %{_sysconfdir}/php-cgi.ini
+		%{_sbindir}/php-module-install remove pcntl %{_sysconfdir}/php-cgi.ini
 	fi
 	if [ -f %{_sysconfdir}/php-cli.ini ]; then
-	%{_sbindir}/php-module-install remove pcntl %{_sysconfdir}/php-cli.ini
+		%{_sbindir}/php-module-install remove pcntl %{_sysconfdir}/php-cli.ini
 	fi
 fi
 
 %post pcre
-%{_sbindir}/php-module-install install pcre %{_sysconfdir}/php.ini
+%extension_post
 
-%preun pcre
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove pcre %{_sysconfdir}/php.ini
-fi
+%postun pcre
+%extension_postun
 
 %post pgsql
-%{_sbindir}/php-module-install install pgsql %{_sysconfdir}/php.ini
+%extension_post
 
-%preun pgsql
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove pgsql %{_sysconfdir}/php.ini
-fi
+%postun pgsql
+%extension_postun
 
 %post posix
-%{_sbindir}/php-module-install install posix %{_sysconfdir}/php.ini
+%extension_post
 
-%preun posix
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove posix %{_sysconfdir}/php.ini
-fi
+%postun posix
+%extension_postun
 
 %post pspell
-%{_sbindir}/php-module-install install pspell %{_sysconfdir}/php.ini
+%extension_post
 
-%preun pspell
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove pspell %{_sysconfdir}/php.ini
-fi
+%postun pspell
+%extension_postun
 
 %post readline
 if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-%{_sbindir}/php-module-install install readline %{_sysconfdir}/php-cgi.ini
+	%{_sbindir}/php-module-install install readline %{_sysconfdir}/php-cgi.ini
 fi
 if [ -f %{_sysconfdir}/php-cli.ini ]; then
-%{_sbindir}/php-module-install install readline %{_sysconfdir}/php-cli.ini
+	%{_sbindir}/php-module-install install readline %{_sysconfdir}/php-cli.ini
 fi
 
-%preun readline
+%postun readline
 if [ "$1" = "0" ]; then
 	if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-	%{_sbindir}/php-module-install remove readline %{_sysconfdir}/php-cgi.ini
+		%{_sbindir}/php-module-install remove readline %{_sysconfdir}/php-cgi.ini
 	fi
 	if [ -f %{_sysconfdir}/php-cli.ini ]; then
-	%{_sbindir}/php-module-install remove readline %{_sysconfdir}/php-cli.ini
+		%{_sbindir}/php-module-install remove readline %{_sysconfdir}/php-cli.ini
 	fi
 fi
 
 %post recode
-%{_sbindir}/php-module-install install recode %{_sysconfdir}/php.ini
+%extension_post
 
-%preun recode
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove recode %{_sysconfdir}/php.ini
-fi
+%postun recode
+%extension_postun
 
 %post session
-%{_sbindir}/php-module-install install session %{_sysconfdir}/php.ini
+%extension_post
 
-%preun session
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove session %{_sysconfdir}/php.ini
-fi
+%postun session
+%extension_postun
 
 %post shmop
-%{_sbindir}/php-module-install install shmop %{_sysconfdir}/php.ini
+%extension_post
 
-%preun shmop
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove shmop %{_sysconfdir}/php.ini
-fi
+%postun shmop
+%extension_postun
 
 %post snmp
-%{_sbindir}/php-module-install install snmp %{_sysconfdir}/php.ini
+%extension_post
 
-%preun snmp
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove snmp %{_sysconfdir}/php.ini
-fi
+%postun snmp
+%extension_postun
 
 %post soap
-%{_sbindir}/php-module-install install soap %{_sysconfdir}/php.ini
+%extension_post
 
-%preun soap
+%postun soap
+%extension_postun
 if [ "$1" = "0" ]; then
 	%{_sbindir}/php-module-install remove soap %{_sysconfdir}/php.ini
 fi
 
 %post sockets
-%{_sbindir}/php-module-install install sockets %{_sysconfdir}/php.ini
+%extension_post
 
-%preun sockets
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove sockets %{_sysconfdir}/php.ini
-fi
+%postun sockets
+%extension_postun
 
 %post sqlite
-%{_sbindir}/php-module-install install sqlite %{_sysconfdir}/php.ini
+%extension_post
 
-%preun sqlite
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove sqlite %{_sysconfdir}/php.ini
-fi
+%postun sqlite
+%extension_postun
 
 %post sybase
-%{_sbindir}/php-module-install install sybase %{_sysconfdir}/php.ini
+%extension_post
 
-%preun sybase
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove sybase %{_sysconfdir}/php.ini
-fi
+%postun sybase
+%extension_postun
 
 %post sybase-ct
-%{_sbindir}/php-module-install install sybase_ct %{_sysconfdir}/php.ini
+%extension_post
 
-%preun sybase-ct
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove sybase_ct %{_sysconfdir}/php.ini
-fi
+%postun sybase-ct
+%extension_postun
 
 %post sysvmsg
-%{_sbindir}/php-module-install install sysvmsg %{_sysconfdir}/php.ini
+%extension_post
 
-%preun sysvmsg
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove sysvmsg %{_sysconfdir}/php.ini
-fi
+%postun sysvmsg
+%extension_postun
 
 %post sysvsem
-%{_sbindir}/php-module-install install sysvsem %{_sysconfdir}/php.ini
+%extension_post
 
-%preun sysvsem
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove sysvsem %{_sysconfdir}/php.ini
-fi
+%postun sysvsem
+%extension_postun
 
 %post sysvshm
-%{_sbindir}/php-module-install install sysvshm %{_sysconfdir}/php.ini
+%extension_post
 
-%preun sysvshm
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove sysvshm %{_sysconfdir}/php.ini
-fi
+%postun sysvshm
+%extension_postun
 
 %post tidy
-%{_sbindir}/php-module-install install tidy %{_sysconfdir}/php.ini
+%extension_post
 
-%preun tidy
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove tidy %{_sysconfdir}/php.ini
-fi
+%postun tidy
+%extension_postun
 
 %post wddx
-%{_sbindir}/php-module-install install wddx %{_sysconfdir}/php.ini
+%extension_post
 
-%preun wddx
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove wddx %{_sysconfdir}/php.ini
-fi
+%postun wddx
+%extension_postun
 
 %post xml
-%{_sbindir}/php-module-install install xml %{_sysconfdir}/php.ini
+%extension_post
 
-%preun xml
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove xml %{_sysconfdir}/php.ini
-fi
+%postun xml
+%extension_postun
 
 %post xmlrpc
-%{_sbindir}/php-module-install install xmlrpc %{_sysconfdir}/php.ini
+%extension_post
 
-%preun xmlrpc
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove xmlrpc %{_sysconfdir}/php.ini
-fi
+%postun xmlrpc
+%extension_postun
 
 %post xsl
-%{_sbindir}/php-module-install install xsl %{_sysconfdir}/php.ini
+%extension_post
 
-%preun xsl
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove xsl %{_sysconfdir}/php.ini
-fi
+%postun xsl
+%extension_postun
 
 %post yp
-%{_sbindir}/php-module-install install yp %{_sysconfdir}/php.ini
+%extension_post
 
-%preun yp
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove yp %{_sysconfdir}/php.ini
-fi
+%postun yp
+%extension_postun
 
 %post zlib
-%{_sbindir}/php-module-install install zlib %{_sysconfdir}/php.ini
+%extension_post
 
-%preun zlib
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove zlib %{_sysconfdir}/php.ini
-fi
+%postun zlib
+%extension_postun
+
+%triggerun bcmath -- %{name}-bcmath < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove bcmath %{_sysconfdir}/php.ini
+
+%triggerun bzip2 -- %{name}-bzip2 < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove bzip2 %{_sysconfdir}/php.ini
+
+%triggerun calendar -- %{name}-calendar < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove calendar %{_sysconfdir}/php.ini
+
+%triggerun cpdf -- %{name}-cpdf < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove cpdf %{_sysconfdir}/php.ini
+
+%triggerun ctype -- %{name}-ctype < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ctype %{_sysconfdir}/php.ini
+
+%triggerun curl -- %{name}-curl < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove curl %{_sysconfdir}/php.ini
+
+%triggerun dba -- %{name}-dba < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dba %{_sysconfdir}/php.ini
+
+%triggerun dbase -- %{name}-dbase < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dbase %{_sysconfdir}/php.ini
+
+%triggerun dbx -- %{name}-dbx < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dbx %{_sysconfdir}/php.ini
+
+%triggerun dio -- %{name}-dio < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dio %{_sysconfdir}/php.ini
+
+%triggerun dom -- %{name}-dom < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dom %{_sysconfdir}/php.ini
+
+%triggerun exif -- %{name}-exif < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove exif %{_sysconfdir}/php.ini
+
+%triggerun fam -- %{name}-fam < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove fam %{_sysconfdir}/php.ini
+
+%triggerun fdf -- %{name}-fdf < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove fdf %{_sysconfdir}/php.ini
+
+%triggerun filepro -- %{name}-filepro < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove filepro %{_sysconfdir}/php.ini
+
+%triggerun ftp -- %{name}-ftp < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ftp %{_sysconfdir}/php.ini
+
+%triggerun gd -- %{name}-gd < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove gd %{_sysconfdir}/php.ini
+
+%triggerun gettext -- %{name}-gettext < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove gettext %{_sysconfdir}/php.ini
+
+%triggerun gmp -- %{name}-gmp < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove gmp %{_sysconfdir}/php.ini
+
+%triggerun hwapi -- %{name}-hwapi < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove hwapi %{_sysconfdir}/php.ini
+
+%triggerun iconv -- %{name}-iconv < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove iconv %{_sysconfdir}/php.ini
+
+%triggerun imap -- %{name}-imap < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove imap %{_sysconfdir}/php.ini
+
+%triggerun interbase -- %{name}-interbase < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove interbase %{_sysconfdir}/php.ini
+
+%triggerun ldap -- %{name}-ldap < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ldap %{_sysconfdir}/php.ini
+
+%triggerun mbstring -- %{name}-mbstring < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mbstring %{_sysconfdir}/php.ini
+
+%triggerun mcrypt -- %{name}-mcrypt < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mcrypt %{_sysconfdir}/php.ini
+
+%triggerun mhash -- %{name}-mhash < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mhash %{_sysconfdir}/php.ini
+
+%triggerun mime_magic -- %{name}-mime_magic < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mime_magic %{_sysconfdir}/php.ini
+
+%triggerun ming -- %{name}-ming < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ming %{_sysconfdir}/php.ini
+
+%triggerun mnogosearch -- %{name}-mnogosearch < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mnogosearch %{_sysconfdir}/php.ini
+
+%triggerun msession -- %{name}-msession < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove msession %{_sysconfdir}/php.ini
+
+%triggerun mssql -- %{name}-mssql < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mssql %{_sysconfdir}/php.ini
+
+%triggerun mysql -- %{name}-mysql < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mysql %{_sysconfdir}/php.ini
+
+%triggerun mysqli -- %{name}-mysqli < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mysqli %{_sysconfdir}/php.ini
+
+%triggerun oci8 -- %{name}-oci8 < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove oci8 %{_sysconfdir}/php.ini
+
+%triggerun odbc -- %{name}-odbc < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove odbc %{_sysconfdir}/php.ini
+
+%triggerun openssl -- %{name}-openssl < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove openssl %{_sysconfdir}/php.ini
+
+%triggerun oracle -- %{name}-oracle < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove oracle %{_sysconfdir}/php.ini
+
+%triggerun pcre -- %{name}-pcre < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove pcre %{_sysconfdir}/php.ini
+
+%triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove pgsql %{_sysconfdir}/php.ini
+
+%triggerun posix -- %{name}-posix < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove posix %{_sysconfdir}/php.ini
+
+%triggerun pspell -- %{name}-pspell < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove pspell %{_sysconfdir}/php.ini
+
+%triggerun recode -- %{name}-recode < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove recode %{_sysconfdir}/php.ini
+
+%triggerun session -- %{name}-session < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove session %{_sysconfdir}/php.ini
+
+%triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove shmop %{_sysconfdir}/php.ini
+
+%triggerun snmp -- %{name}-snmp < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove snmp %{_sysconfdir}/php.ini
+
+%triggerun soap -- %{name}-soap < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove soap %{_sysconfdir}/php.ini
+
+%triggerun sockets -- %{name}-sockets < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sockets %{_sysconfdir}/php.ini
+
+%triggerun sqlite -- %{name}-sqlite < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sqlite %{_sysconfdir}/php.ini
+
+%triggerun sybase -- %{name}-sybase < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sybase %{_sysconfdir}/php.ini
+
+%triggerun sybase-ct -- %{name}-sybase-ct < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sybase-ct %{_sysconfdir}/php.ini
+
+%triggerun sysvmsg -- %{name}-sysvmsg < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sysvmsg %{_sysconfdir}/php.ini
+
+%triggerun sysvsem -- %{name}-sysvsem < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sysvsem %{_sysconfdir}/php.ini
+
+%triggerun sysvshm -- %{name}-sysvshm < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sysvshm %{_sysconfdir}/php.ini
+
+%triggerun tidy -- %{name}-tidy < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove tidy %{_sysconfdir}/php.ini
+
+%triggerun wddx -- %{name}-wddx < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove wddx %{_sysconfdir}/php.ini
+
+%triggerun xml -- %{name}-xml < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove xml %{_sysconfdir}/php.ini
+
+%triggerun xmlrpc -- %{name}-xmlrpc < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove xmlrpc %{_sysconfdir}/php.ini
+
+%triggerun xsl -- %{name}-xsl < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove xsl %{_sysconfdir}/php.ini
+
+%triggerun yp -- %{name}-yp < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove yp %{_sysconfdir}/php.ini
+
+%triggerun zlib -- %{name}-zlib < 4:5.0.4-9.1
+[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove zlib %{_sysconfdir}/php.ini
 
 %files
+#%%defattr(644,root,root,755)
+
+%if %{with apache1}
+#%files -n apache1-mod_php
 %defattr(644,root,root,755)
-%if %{_apache2}
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/apache/conf.d/*_mod_php.conf
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
+%attr(755,root,root) %{_libdir}/apache1/libphp5.so
+/home/services/apache/icons/*
+%endif
+
+%if %{with apache2}
+#%files -n apache-mod_php
+%defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/httpd/httpd.conf/*_mod_php.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache2handler.ini
-%else
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
+%attr(755,root,root) %{_libdir}/apache/libphp5.so
+/home/services/httpd/icons/*
 %endif
-%attr(755,root,root) %{apachelib}/libphp5.so
 
 %files fcgi
 %defattr(644,root,root,755)
@@ -2266,10 +2515,10 @@ fi
 %doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
 
 %dir %{_sysconfdir}
+%dir %{_sysconfdir}/conf.d
 %attr(644,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php.ini
 %attr(770,root,http) %dir %verify(not group mode) /var/run/php
-%{httpdir}/icons/*
-%attr(755,root,root) %{_sbindir}/*
+%attr(755,root,root) %{_sbindir}/php-module-install
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}
 
@@ -2285,165 +2534,199 @@ fi
 
 %files bcmath
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/bcmath.ini
 %attr(755,root,root) %{extensionsdir}/bcmath.so
 
 %files bzip2
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/bz2.ini
 %attr(755,root,root) %{extensionsdir}/bz2.so
 
 %files calendar
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/calendar.ini
 %attr(755,root,root) %{extensionsdir}/calendar.so
 
 %if %{with cpdf}
 %files cpdf
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/cpdf.ini
 %attr(755,root,root) %{extensionsdir}/cpdf.so
 %endif
 
 %files ctype
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ctype.ini
 %attr(755,root,root) %{extensionsdir}/ctype.so
 
 %if %{with curl}
 %files curl
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/curl.ini
 %attr(755,root,root) %{extensionsdir}/curl.so
 %endif
 
 %files dba
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dba.ini
 %attr(755,root,root) %{extensionsdir}/dba.so
 
 %files dbase
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dbase.ini
 %attr(755,root,root) %{extensionsdir}/dbase.so
 
 %files dbx
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dbx.ini
 %attr(755,root,root) %{extensionsdir}/dbx.so
 
 %files dio
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dio.ini
 %attr(755,root,root) %{extensionsdir}/dio.so
 
 %files dom
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{extensionsdir}/dom.so
 
 %if %{with fam}
 %files fam
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/fam.ini
 %attr(755,root,root) %{extensionsdir}/fam.so
 %endif
 
 %if %{with fdf}
 %files fdf
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/fdf.ini
 %attr(755,root,root) %{extensionsdir}/fdf.so
 %endif
 
 %files exif
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/exif.ini
 %attr(755,root,root) %{extensionsdir}/exif.so
 
 %files filepro
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/filepro.ini
 %attr(755,root,root) %{extensionsdir}/filepro.so
 
 %files ftp
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ftp.ini
 %attr(755,root,root) %{extensionsdir}/ftp.so
 
 %files gd
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/gd.ini
 %attr(755,root,root) %{extensionsdir}/gd.so
 
 %files gettext
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/gettext.ini
 %attr(755,root,root) %{extensionsdir}/gettext.so
 
 %files gmp
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{extensionsdir}/gmp.so
 
 %if %{with hwapi}
 %files hwapi
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/hwapi.ini
 %attr(755,root,root) %{extensionsdir}/hwapi.so
 %endif
 
 %files iconv
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/iconv.ini
 %attr(755,root,root) %{extensionsdir}/iconv.so
 
 %if %{with imap}
 %files imap
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/imap.ini
 %attr(755,root,root) %{extensionsdir}/imap.so
 %endif
 
 %if %{with interbase}
 %files interbase
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/interbase.ini
 %attr(755,root,root) %{extensionsdir}/interbase.so
 %endif
 
 %if %{with ldap}
 %files ldap
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ldap.ini
 %attr(755,root,root) %{extensionsdir}/ldap.so
 %endif
 
 %files mbstring
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{extensionsdir}/mbstring.so
 
 %files mcrypt
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mcrypt.ini
 %attr(755,root,root) %{extensionsdir}/mcrypt.so
 
 %if %{with mhash}
 %files mhash
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mhash.ini
 %attr(755,root,root) %{extensionsdir}/mhash.so
 %endif
 
 %files mime_magic
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mime_magic.ini
 %attr(755,root,root) %{extensionsdir}/mime_magic.so
 
 %if %{with ming}
 %files ming
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ming.ini
 %attr(755,root,root) %{extensionsdir}/ming.so
 %endif
 
 %if %{with mnogosearch}
 %files mnogosearch
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mnogosearch.ini
 %attr(755,root,root) %{extensionsdir}/mnogosearch.so
 %endif
 
 %if %{with msession}
 %files msession
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/msession.ini
 %attr(755,root,root) %{extensionsdir}/msession.so
 %endif
 
 %if %{with mssql}
 %files mssql
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mssql.ini
 %attr(755,root,root) %{extensionsdir}/mssql.so
 %endif
 
 %files mysql
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mysql.ini
 %attr(755,root,root) %{extensionsdir}/mysql.so
 
 %if %{with mysqli}
 %files mysqli
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mysqli.ini
 %attr(755,root,root) %{extensionsdir}/mysqli.so
 %endif
 
@@ -2454,24 +2737,28 @@ fi
 %if %{with oci8}
 %files oci8
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/oci8.ini
 %attr(755,root,root) %{extensionsdir}/oci8.so
 %endif
 
 %if %{with odbc}
 %files odbc
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/odbc.ini
 %attr(755,root,root) %{extensionsdir}/odbc.so
 %endif
 
 %if %{with openssl}
 %files openssl
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/openssl.ini
 %attr(755,root,root) %{extensionsdir}/openssl.so
 %endif
 
 %if %{with oracle}
 %files oracle
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/oracle.ini
 %attr(755,root,root) %{extensionsdir}/oracle.so
 %endif
 
@@ -2482,22 +2769,26 @@ fi
 %if %{with pcre}
 %files pcre
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/pcre.ini
 %attr(755,root,root) %{extensionsdir}/pcre.so
 %endif
 
 %if %{with pgsql}
 %files pgsql
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/pgsql.ini
 %attr(755,root,root) %{extensionsdir}/pgsql.so
 %endif
 
 %files posix
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/posix.ini
 %attr(755,root,root) %{extensionsdir}/posix.so
 
 %if %{with pspell}
 %files pspell
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/pspell.ini
 %attr(755,root,root) %{extensionsdir}/pspell.so
 %endif
 
@@ -2508,6 +2799,7 @@ fi
 %if %{with recode}
 %files recode
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/recode.ini
 %attr(755,root,root) %{extensionsdir}/recode.so
 %endif
 
@@ -2518,82 +2810,99 @@ fi
 
 %files shmop
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/shmop.ini
 %attr(755,root,root) %{extensionsdir}/shmop.so
 
 %if %{with snmp}
 %files snmp
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/snmp.ini
 %attr(755,root,root) %{extensionsdir}/snmp.so
 %endif
 
 %files soap
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/soap.ini
 %attr(755,root,root) %{extensionsdir}/soap.so
 
 %files sockets
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sockets.ini
 %attr(755,root,root) %{extensionsdir}/sockets.so
 
 %if %{with sqlite}
 %files sqlite
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sqlite.ini
 %attr(755,root,root) %{extensionsdir}/sqlite.so
 %endif
 
 %if %{with sybase}
 %files sybase
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sybase.ini
 %attr(755,root,root) %{extensionsdir}/sybase.so
 %endif
 
 %if %{with sybase_ct}
 %files sybase-ct
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sybase_ct.ini
 %attr(755,root,root) %{extensionsdir}/sybase_ct.so
 %endif
 
 %files sysvmsg
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sysvmsg.ini
 %attr(755,root,root) %{extensionsdir}/sysvmsg.so
 
 %files sysvsem
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sysvsem.ini
 %attr(755,root,root) %{extensionsdir}/sysvsem.so
 
 %files sysvshm
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sysvshm.ini
 %attr(755,root,root) %{extensionsdir}/sysvshm.so
 
 %if %{with tidy}
 %files tidy
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/tidy.ini
 %attr(755,root,root) %{extensionsdir}/tidy.so
 %endif
 
 %if %{with wddx}
 %files wddx
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/wddx.ini
 %attr(755,root,root) %{extensionsdir}/wddx.so
 %endif
 
 %files xml
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xml.ini
 %attr(755,root,root) %{extensionsdir}/xml.so
 
 %if %{with xmlrpc}
 %files xmlrpc
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xmlrpc.ini
 %attr(755,root,root) %{extensionsdir}/xmlrpc.so
 %endif
 
 %files xsl
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xsl.ini
 %attr(755,root,root) %{extensionsdir}/xsl.so
 
 %files yp
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/yp.ini
 %attr(755,root,root) %{extensionsdir}/yp.so
 
 %files zlib
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/zlib.ini
 %attr(755,root,root) %{extensionsdir}/zlib.so

@@ -190,6 +190,7 @@ BuildRequires:	%{__perl}
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
+BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-php-pearprov >= 4.0.2-100
 BuildRequires:	rpmbuild(macros) >= 1.230
 %{?with_sqlite:BuildRequires:	sqlite-devel}

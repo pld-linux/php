@@ -1,0 +1,15 @@
+- Removed following extensions:
+    crack, db, domxml, fribidi, mcal, overload, qtdom, zip
+  They were either moved to PECL, or permanently removed.
+- Added following extensions
+    tidy, simplexml
+  They are build by default, but can be disabled by using bcond.
+- Hyperwave extension depends on proprietary libs, thus it is not being
+  built by default
+- Removed obsolete BuildRequires
+- Removed obsolete patches, sorted the rest
+- OpenSSL extensions is now build as a module (it was broken in 4.3.x)
+- /php 4/php 5/ in some of summaries
+- Added %{_pre} to Release
+- Some cosmetics in bcond descriptions
+- Almost done, sybase module still doesn't build.

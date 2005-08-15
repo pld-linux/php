@@ -87,7 +87,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-Release:	9.21%{?with_hardening:hardened}
+Release:	9.23%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -377,6 +377,8 @@ Requires:	glibc >= 6:2.3.5
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Obsoletes:	php-session < 3:4.2.1-2
+# for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
+Conflicts:	rpm < 4.4.2-0.2
 
 %description common
 Common files needed by both apache module and CGI.
@@ -1836,13 +1838,19 @@ if [ "$1" = "0" ]; then \
 fi
 
 %post	common -p /sbin/ldconfig
-%postun	common
-/sbin/ldconfig
-# extension_post here is all correct.
-%extension_post
+%postun	common -p /sbin/ldconfig
 
-# compensate missing restart of earlier -common package.
-%triggerpostun common -- %{name}-common < 4:5.0.4-9.1
+%posttrans common
+# minimizing apache restarts logics. we restart webserver:
+#
+# 1. at the end of transaction. (posttrans, feature from rpm 4.4.2)
+# 2. first install of extension (post: $1 = 1)
+# 2. uninstall of extension (postun: $1 == 0)
+#
+# the strict internal deps between extensions (and apache modules) and
+# common package are very important for all this to work.
+
+# restart webserver at the end of transaction
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
 [ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
 

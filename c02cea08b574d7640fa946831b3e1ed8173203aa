@@ -1,0 +1,5 @@
+- began work on php5
+- removed some extensions (few of them were moved to PECL)
+- builds (with --without interbase and --without sybase), but still fails
+  on %files
+- Not Finished Yet.

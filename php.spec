@@ -13,12 +13,6 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - ftp module needs to be linked with -lssl if openssl module is enabled
-# - finish apache1/apache2 package split. currently don't know how to resolve:
-#  apache1-mod_php4-4.4.0-4.44 obsoleted by apache-mod_php-5.0.4-8.3
-#  it's because apache1-mod_php4 Provides:   php = %{epoch}:%{version}-%{release}
-#  and new apache-mod_php:
-#  # Obsolete last version when apache module was in main package
-#  Obsoletes:  php < 4:5.0.4-8.1
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -54,15 +48,11 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-%bcond_with		apache1		# enable building apache 1.3.x module (disables apache2)
+%bcond_without	apache1		# disable building apache 1.3.x module
 %bcond_without	apache2		# disable building apache 2.x module
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
-
-%if %{with apache1}
-%undefine	with_apache2
-%endif
 
 # some problems with apache 2.x
 %if %{with apache2}
@@ -87,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-Release:	9.23%{?with_hardening:hardened}
+Release:	9.28%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -202,18 +192,11 @@ BuildRequires:	t1lib-devel
 BuildRequires:	zlib-devel >= 1.0.9
 %if %{with apache1}
 BuildRequires:	apache1-devel
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
-PreReq:		apache1(EAPI) >= 1.3.9
-Requires(post,preun):	%{apxs1}
-Requires(post,preun):	%{__perl}
 %endif
 %if %{with apache2}
 BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
-PreReq:		apache >= 2.0.52-2
-Requires:	apache(modules-api) = %{apache_modules_api}
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -299,8 +282,8 @@ Provides:	%{name} = %{epoch}:%{version}-%{release}
 Provides:	php = %{epoch}:%{version}-%{release}
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php < 1:4.1.1
-# Obsolete last version when apache module was in main package
-Obsoletes:	php <= 4:5.0.4-9
+# Obsolete all php5 packages, this is not to obsolete php4 companion
+Obsoletes:	php >= 4:5.0.0
 
 %description -n apache1-mod_php
 PHP as DSO module for apache 1.3.x.
@@ -319,8 +302,8 @@ Provides:	%{name} = %{epoch}:%{version}-%{release}
 Provides:	php = %{epoch}:%{version}-%{release}
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php < 1:4.1.1
-# Obsolete last version when apache module was in main package
-Obsoletes:	php <= 4:5.0.4-9
+# Obsolete all php5 packages, this is not to obsolete php4 companion
+Obsoletes:	php >= 4:5.0.0
 
 %description -n apache-mod_php
 PHP as DSO module for apache 2.x.
@@ -1744,17 +1727,21 @@ ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 install php.ini	$RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
-install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
-install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-
-install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
-install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
-
 install %{SOURCE1} .
+
+%if %{with apache1}
+install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
+install %{SOURCE4} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
+install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+%endif
+
+%if %{with apache2}
+install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
+install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
+install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+%endif
 
 cp -f Zend/LICENSE{,.Zend}
 
@@ -2478,11 +2465,10 @@ fi
 %triggerun zlib -- %{name}-zlib < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove zlib %{_sysconfdir}/php.ini
 
-%files
-#%%defattr(644,root,root,755)
+#%files
 
 %if %{with apache1}
-#%files -n apache1-mod_php
+%files -n apache1-mod_php
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/apache/conf.d/*_mod_php.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
@@ -2491,7 +2477,7 @@ fi
 %endif
 
 %if %{with apache2}
-#%files -n apache-mod_php
+%files -n apache-mod_php
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/httpd/httpd.conf/*_mod_php.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache2handler.ini

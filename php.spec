@@ -76,14 +76,13 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.1.0
-%define	_version %{version}RC1
-Release:	0.1%{?with_hardening:hardened}
+Version:	5.0.4
+Release:	9.28%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
-Source0:	http://www.php.net/distributions/%{name}-%{_version}.tar.bz2
-# Source0-md5:	c7aebeb915e6f898559365cf82493ad0
+Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+# Source0-md5:	fb1aac107870f897d26563a9cc5053c0
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -1430,7 +1429,7 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{_version}
+%setup -q
 # this patch is broken by design, breaks --enable-versioning for example
 %patch0 -p1
 %patch1 -p1
@@ -1441,23 +1440,23 @@ ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-#%patch9 -p1
+%patch9 -p1
 cp php.ini-dist php.ini
 %patch10 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
 %patch12 -p1
-#%patch13 -p1
+%patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
-#%patch20 -p1
-#%patch21 -p1
-#%patch28 -p1
+%patch20 -p1
+%patch21 -p1
+%patch28 -p1
 %if "%{_lib}" == "lib64"
 %patch22 -p1
 %endif
@@ -1465,8 +1464,8 @@ cp php.ini-dist php.ini
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
-#%patch27 -p1
-#%patch29 -p1
+%patch27 -p1
+%patch29 -p1
 
 %if %{with hardening}
 zcat %{SOURCE9} | patch -p1

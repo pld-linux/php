@@ -1596,7 +1596,7 @@ rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 # -DPHP_WRITE_STDOUT is used also for cli, but not set by its config.m4
 
 %{__make} sapi/cgi/php -f Makefile.cgi \
-	CFLAGS_CLEAN="%{rpmcflags} -DDISCARD_PATH=1 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0 -DPHP_WRITE_STDOUT=1"
+	CFLAGS_CLEAN="%{rpmcflags} -DDISCARD_PATH=1 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=1 -DPHP_WRITE_STDOUT=1"
 
 # CLI
 %{__make} sapi/cli/php -f Makefile.cli

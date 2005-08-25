@@ -110,6 +110,7 @@ Patch16:	%{name}-tsrmlsfetchgcc2.patch
 Patch17:	%{name}-no_pear_install.patch
 Patch18:	%{name}-zlib.patch
 Patch19:	%{name}-sybase-fix.patch
+Patch20:	%{name}-readline.patch
 Patch21:	%{name}-nohttpd.patch
 Patch22:	%{name}-lib64.patch
 Patch23:	%{name}-gd_imagerotate_enable.patch
@@ -1279,6 +1280,24 @@ Modu³ PHP umo¿liwiaj±cy parsowanie plików XML i obs³ugê zdarzeñ
 zwi±zanych z tymi plikami. Pozwala on tworzyæ analizatory XML-a i
 nastêpnie definiowaæ procedury obs³ugi dla ró¿nych zdarzeñ XML.
 
+%package xmlreader
+Summary:	XML Reader extension module for PHP
+Summary(pl):	Modu³ XML Reader dla PHP
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description xmlreader
+This is a dynamic shared object (DSO) for PHP that will add XML Reader
+support. The XMLReader extension is an XML Pull parser. The reader
+acts as a cursor going forward on the document stream and stopping
+at each node on the way.
+
+%description xmlreader -l pl
+Modu³ PHP umo¿liwiaj±cy parsowanie plików XML w trybie Pull. Czytnik
+dzia³a jako kursor przechodz±cy przez strumieñ dokumentu i zatrzymuj±cy
+siê naka¿dym wê¼le po drodze.
+
 %package xmlrpc
 Summary:	xmlrpc extension module for PHP
 Summary(pl):	Modu³ xmlrpc dla PHP
@@ -1359,10 +1378,9 @@ cp php.ini-dist php.ini
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
+%patch20 -p1
 %patch21 -p1
-%if "%{_lib}" == "lib64"
 %patch22 -p1
-%endif
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
@@ -1440,6 +1458,7 @@ for sapi in $sapis; do
 	esac
 	` \
 	--cache-file=config.cache \
+	--with-libdir=%{_lib} \
 	--with-config-file-path=%{_sysconfdir} \
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
@@ -1474,11 +1493,11 @@ for sapi in $sapis; do
 	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
-	--with-xmlreader \
+	--with-xmlreader=shared \
 	--with-bz2=shared \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	%{?with_db3:--with-db3}%{!?with_db3:--with-db4} \
-	--with-dbase=shared \
+	--enable-dbase=shared \
 %if %{with xmlrpc}
 	--with-expat-dir=shared,/usr \
 %else
@@ -1625,7 +1644,7 @@ install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
-install php.ini	$RPM_BUILD_ROOT%{_sysconfdir}/php.ini
+sed -e 's#/usr/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
@@ -2129,6 +2148,12 @@ fi
 %postun xml
 %extension_postun
 
+%post xmlreader
+%extension_post
+
+%postun xmlreader
+%extension_postun
+
 %post xmlrpc
 %extension_post
 
@@ -2366,13 +2391,14 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/phpextdist
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
 %{_libdir}/libphp_common.la
 %{_includedir}/php
 %{_libdir}/php/build
+%{_mandir}/man1/phpize*
+%{_mandir}/man1/php-config*
 
 %files bcmath
 %defattr(644,root,root,755)
@@ -2695,6 +2721,11 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xml.ini
 %attr(755,root,root) %{extensionsdir}/xml.so
+
+%files xmlreader
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xmlreader.ini
+%attr(755,root,root) %{extensionsdir}/xmlreader.so
 
 %if %{with xmlrpc}
 %files xmlrpc

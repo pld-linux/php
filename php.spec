@@ -4,7 +4,6 @@
 #    - mcve,
 #    - ovrimos,
 #    - pfpro,
-#    - ircg,
 #   These extensions BuildRequires proprietary libraries...
 # - deal with modules removed from php and not moved to PECL
 #   (existing only in php4):
@@ -23,16 +22,13 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
 %bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
-%bcond_without	cpdf		# without cpdf extension module
 %bcond_without	curl		# without CURL extension module
-%bcond_without	fam		# without FAM (File Alteration Monitor) extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_with	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	ming		# without ming extension module
 %bcond_without	mm		# without mm support for session storage
-%bcond_without	mnogosearch	# without mnogosearch extension module
 %bcond_without	msession	# without msession extension module
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_without	odbc		# without ODBC extension module
@@ -76,13 +72,14 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP ÷ÅÒÓÉÉ 5 - ÑÚÙË ÐÒÅÐÒÏÃÅÓÓÉÒÏ×ÁÎÉÑ HTML-ÆÁÊÌÏ×, ×ÙÐÏÌÎÑÅÍÙÊ ÎÁ ÓÅÒ×ÅÒÅ
 Summary(uk):	PHP ÷ÅÒÓ¦§ 5 - ÍÏ×Á ÐÒÅÐÒÏÃÅÓÕ×ÁÎÎÑ HTML-ÆÁÊÌ¦×, ×ÉËÏÎÕ×ÁÎÁ ÎÁ ÓÅÒ×ÅÒ¦
 Name:		php
-Version:	5.0.4
-Release:	10%{?with_hardening:hardened}
+Version:	5.1.0
+%define	_rc	RC1
+Release:	0.1%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
-Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	fb1aac107870f897d26563a9cc5053c0
+Source0:	http://www.php.net/distributions/%{name}-%{version}%{_rc}.tar.bz2
+# Source0-md5:	c7aebeb915e6f898559365cf82493ad0
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -113,7 +110,6 @@ Patch16:	%{name}-tsrmlsfetchgcc2.patch
 Patch17:	%{name}-no_pear_install.patch
 Patch18:	%{name}-zlib.patch
 Patch19:	%{name}-sybase-fix.patch
-Patch20:	%{name}-mnogosearch-fix.patch
 Patch21:	%{name}-nohttpd.patch
 Patch22:	%{name}-lib64.patch
 Patch23:	%{name}-gd_imagerotate_enable.patch
@@ -121,7 +117,6 @@ Patch24:	%{name}-uint32_t.patch
 Patch25:	%{name}-hwapi-link.patch
 Patch26:	%{name}-dba-link.patch
 Patch27:	%{name}-install_gd_headers.patch
-Patch28:	%{name}-cpdf-fix.patch
 Patch29:	%{name}-gcc4.patch
 Patch30:	%{name}-hardening-fix.patch
 Patch31:	%{name}-both-apxs.patch
@@ -141,7 +136,6 @@ BuildRequires:	elfutils-devel
 %if %{with xmlrpc}
 BuildRequires:	expat-devel
 %endif
-%{?with_fam:BuildRequires:	fam-devel}
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	fcgi-devel
 BuildRequires:	flex
@@ -153,7 +147,6 @@ BuildRequires:	gd-devel >= 2.0.28-4
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
-%{?with_cpdf:BuildRequires:	libcpdf-devel >= 2.02r1-2}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
@@ -165,7 +158,6 @@ BuildRequires:	libxslt-devel >= 1.0.18
 %{?with_mhash:BuildRequires:	mhash-devel}
 %{?with_ming:BuildRequires:	ming-devel >= 0.1.0}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
-%{?with_mnogosearch:BuildRequires:	mnogosearch-devel >= 3.2.6}
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
 BuildRequires:	ncurses-ext-devel
@@ -194,7 +186,7 @@ BuildRequires:	zlib-devel >= 1.0.9
 BuildRequires:	apache1-devel
 %endif
 %if %{with apache2}
-BuildRequires:	apache-devel >= 2.0.52-2
+BuildRequires:	apache-devel >= 2.0.44-1
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
 %endif
@@ -464,20 +456,6 @@ support.
 %description calendar -l pl
 Modu³ PHP dodaj±cy wsparcie dla kalendarza.
 
-%package cpdf
-Summary:	cpdf extension module for PHP
-Summary(pl):	Modu³ cpdf dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description cpdf
-This is a dynamic shared object (DSO) for PHP that will add PDF
-support through libcpdf library.
-
-%description cpdf -l pl
-Modu³ PHP dodaj±cy obs³ugê plików PDF poprzez bibliotekê libcpdf.
-
 %package ctype
 Summary:	ctype extension module for PHP
 Summary(pl):	Modu³ ctype dla PHP
@@ -535,36 +513,6 @@ support.
 %description dbase -l pl
 Modu³ PHP ze wsparciem dla DBase.
 
-%package dbx
-Summary:	DBX extension module for PHP
-Summary(pl):	Modu³ DBX dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description dbx
-This is a dynamic shared object (DSO) for PHP that will add DB
-abstraction layer. DBX supports odbc, mysql, pgsql, mssql, fbsql and
-more.
-
-%description dbx -l pl
-Modu³ PHP dodaj±cy warstwê abstrakcji do obs³ugi baz danych. DBX
-obs³uguje bazy odbc, mysql, pgsql, mssql, fbsql i inne.
-
-%package dio
-Summary:	Direct I/O extension module for PHP
-Summary(pl):	Modu³ Direct I/O dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description dio
-This is a dynamic shared object (DSO) for PHP that will add direct
-file I/O support.
-
-%description dio -l pl
-Modu³ PHP dodaj±cy obs³ugê bezpo¶rednich operacji I/O na plikach.
-
 %package dom
 Summary:	DOM extension module for PHP
 Summary(pl):	Modu³ DOM dla PHP
@@ -595,23 +543,6 @@ support in image files.
 
 %description exif -l pl
 Modu³ PHP dodaj±cy obs³ugê znaczników EXIF w plikach obrazków.
-
-%package fam
-Summary:	FAM (File Alteration Monitor) module for PHP
-Summary(pl):	Modu³ FAM (File Alteration Monitor) dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description fam
-This PHP module adds support for FAM (File Alteration Monitor).
-FAM monitors files and directories, notifying interested applications
-of changes.
-
-%description fam -l pl
-Modu³ PHP dodaj±cy obs³ugê dla FAM (File Alteration Monitor).
-FAM monitoruje pliki oraz katalogi, informuj±c zainteresowane aplikacje
-o zmianach.
 
 %package fdf
 Summary:	FDF extension module for PHP
@@ -854,21 +785,6 @@ This is a dynamic shared object (DSO) for PHP that will add ming
 %description ming -l pl
 Modu³ PHP dodaj±cy obs³ugê plików Flash (.swf) poprzez bibliotekê
 ming.
-
-%package mnogosearch
-Summary:	mnoGoSearch extension module for PHP
-Summary(pl):	Modu³ mnoGoSearch dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description mnogosearch
-This is a dynamic shared object (DSO) for PHP that will allow you to
-access mnoGoSearch free search engine.
-
-%description mnogosearch -l pl
-Modu³ PHP dodaj±cy pozwalaj±cy na dostêp do wolnodostêpnego silnika
-wyszukiwarki mnoGoSearch.
 
 %package msession
 Summary:	msession extension module for PHP
@@ -1400,20 +1316,6 @@ support (using libxslt).
 %description xsl -l pl
 Modu³ PHP dodaj±cy now± obs³ugê XSLT (przy u¿yciu libxslt).
 
-%package yp
-Summary:	NIS (yp) extension module for PHP
-Summary(pl):	Modu³ NIS (yp) dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description yp
-This is a dynamic shared object (DSO) for PHP that will add NIS
-(Yellow Pages) support.
-
-%description yp -l pl
-Modu³ PHP dodaj±cy wsparcie dla NIS (Yellow Pages).
-
 %package zlib
 Summary:	Zlib extension module for PHP
 Summary(pl):	Modu³ zlib dla PHP
@@ -1429,7 +1331,7 @@ compression support to PHP.
 Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{_rc}
 # this patch is broken by design, breaks --enable-versioning for example
 %patch0 -p1
 %patch1 -p1
@@ -1440,23 +1342,24 @@ Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
+# FIXME; it's still needed?
+# %patch9 -p1
 cp php.ini-dist php.ini
 %patch10 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
-%patch12 -p1
-%patch13 -p1
+# DROPME: not needed
+# %patch12 -p1
+# DROPME: seems not needed
+# %patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
-%patch20 -p1
 %patch21 -p1
-%patch28 -p1
 %if "%{_lib}" == "lib64"
 %patch22 -p1
 %endif
@@ -1464,8 +1367,9 @@ cp php.ini-dist php.ini
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
-%patch27 -p1
-%patch29 -p1
+# FIXME: ???
+# %patch27 -p1
+# %patch29 -p1
 
 %if %{with hardening}
 zcat %{SOURCE9} | patch -p1
@@ -1545,8 +1449,6 @@ for sapi in $sapis; do
 	--enable-calendar=shared \
 	--enable-ctype=shared \
 	--enable-dba=shared \
-	--enable-dbx=shared \
-	--enable-dio=shared \
 	--enable-dom=shared \
 	--enable-exif=shared \
 	--enable-filepro=shared \
@@ -1572,9 +1474,8 @@ for sapi in $sapis; do
 	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
-	--enable-yp=shared \
+	--with-xmlreader \
 	--with-bz2=shared \
-	%{?with_cpdf:--with-cpdflib=shared} \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	%{?with_db3:--with-db3}%{!?with_db3:--with-db4} \
 	--with-dbase=shared \
@@ -1585,7 +1486,6 @@ for sapi in $sapis; do
 %endif
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \
-	%{?with_fam:--with-fam=shared} \
 	--with-filepro=shared \
 	--with-freetype-dir=shared \
 	--with-gettext=shared \
@@ -1596,13 +1496,12 @@ for sapi in $sapis; do
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
 	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
 	--with-jpeg-dir=/usr \
-	%{?with_ldap:--with-ldap=shared} \
+	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
 	--with-mime-magic=shared,/usr/share/file/magic.mime \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
-	%{!?with_mnogosearch:--without-mnogosearch}%{?with_mnogosearch:--with-mnogosearch=shared,/usr} \
 	%{?with_msession:--with-msession=shared}%{!?with_msession:--without-msession} \
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
@@ -1611,6 +1510,7 @@ for sapi in $sapis; do
 	--with-ncurses=shared \
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
+	--with-kerberos \
 	%{?with_oracle:--with-oracle=shared} \
 	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared} \
 	--with-pear=%{php_pear_dir} \
@@ -1624,11 +1524,11 @@ for sapi in $sapis; do
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase:--with-sybase=shared,/usr} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
-	%{?with_sqlite:--with-sqlite=shared,/usr} \
+	%{?with_sqlite:--with-sqlite=shared,/usr --enable-sqlite-utf8} \
 	--with-t1lib=shared \
 	%{?with_tidy:--with-tidy=shared} \
 	--with-tiff-dir=/usr \
-	%{?with_odbc:--with-unixODBC=shared} \
+	%{?with_odbc:--with-unixODBC=shared,/usr} \
 	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
 	--with-xsl=shared \
 	--with-zlib=shared \
@@ -1878,12 +1778,6 @@ fi
 %postun calendar
 %extension_postun
 
-%post cpdf
-%extension_post
-
-%postun cpdf
-%extension_postun
-
 %post ctype
 %extension_post
 
@@ -1908,18 +1802,6 @@ fi
 %postun dbase
 %extension_postun
 
-%post dbx
-%extension_post
-
-%postun dbx
-%extension_postun
-
-%post dio
-%extension_post
-
-%postun dio
-%extension_postun
-
 %post dom
 %extension_post
 
@@ -1930,12 +1812,6 @@ fi
 %extension_post
 
 %postun exif
-%extension_postun
-
-%post fam
-%extension_post
-
-%postun fam
 %extension_postun
 
 %post fdf
@@ -2032,12 +1908,6 @@ fi
 %extension_post
 
 %postun ming
-%extension_postun
-
-%post mnogosearch
-%extension_post
-
-%postun mnogosearch
 %extension_postun
 
 %post msession
@@ -2271,12 +2141,6 @@ fi
 %postun xsl
 %extension_postun
 
-%post yp
-%extension_post
-
-%postun yp
-%extension_postun
-
 %post zlib
 %extension_post
 
@@ -2292,9 +2156,6 @@ fi
 %triggerun calendar -- %{name}-calendar < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove calendar %{_sysconfdir}/php.ini
 
-%triggerun cpdf -- %{name}-cpdf < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove cpdf %{_sysconfdir}/php.ini
-
 %triggerun ctype -- %{name}-ctype < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ctype %{_sysconfdir}/php.ini
 
@@ -2307,20 +2168,11 @@ fi
 %triggerun dbase -- %{name}-dbase < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dbase %{_sysconfdir}/php.ini
 
-%triggerun dbx -- %{name}-dbx < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dbx %{_sysconfdir}/php.ini
-
-%triggerun dio -- %{name}-dio < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dio %{_sysconfdir}/php.ini
-
 %triggerun dom -- %{name}-dom < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dom %{_sysconfdir}/php.ini
 
 %triggerun exif -- %{name}-exif < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove exif %{_sysconfdir}/php.ini
-
-%triggerun fam -- %{name}-fam < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove fam %{_sysconfdir}/php.ini
 
 %triggerun fdf -- %{name}-fdf < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove fdf %{_sysconfdir}/php.ini
@@ -2369,9 +2221,6 @@ fi
 
 %triggerun ming -- %{name}-ming < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ming %{_sysconfdir}/php.ini
-
-%triggerun mnogosearch -- %{name}-mnogosearch < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mnogosearch %{_sysconfdir}/php.ini
 
 %triggerun msession -- %{name}-msession < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove msession %{_sysconfdir}/php.ini
@@ -2460,9 +2309,6 @@ fi
 %triggerun xsl -- %{name}-xsl < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove xsl %{_sysconfdir}/php.ini
 
-%triggerun yp -- %{name}-yp < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove yp %{_sysconfdir}/php.ini
-
 %triggerun zlib -- %{name}-zlib < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove zlib %{_sysconfdir}/php.ini
 
@@ -2543,13 +2389,6 @@ fi
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/calendar.ini
 %attr(755,root,root) %{extensionsdir}/calendar.so
 
-%if %{with cpdf}
-%files cpdf
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/cpdf.ini
-%attr(755,root,root) %{extensionsdir}/cpdf.so
-%endif
-
 %files ctype
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ctype.ini
@@ -2572,27 +2411,10 @@ fi
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dbase.ini
 %attr(755,root,root) %{extensionsdir}/dbase.so
 
-%files dbx
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dbx.ini
-%attr(755,root,root) %{extensionsdir}/dbx.so
-
-%files dio
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dio.ini
-%attr(755,root,root) %{extensionsdir}/dio.so
-
 %files dom
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{extensionsdir}/dom.so
-
-%if %{with fam}
-%files fam
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/fam.ini
-%attr(755,root,root) %{extensionsdir}/fam.so
-%endif
 
 %if %{with fdf}
 %files fdf
@@ -2691,13 +2513,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ming.ini
 %attr(755,root,root) %{extensionsdir}/ming.so
-%endif
-
-%if %{with mnogosearch}
-%files mnogosearch
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mnogosearch.ini
-%attr(755,root,root) %{extensionsdir}/mnogosearch.so
 %endif
 
 %if %{with msession}
@@ -2892,11 +2707,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xsl.ini
 %attr(755,root,root) %{extensionsdir}/xsl.so
-
-%files yp
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/yp.ini
-%attr(755,root,root) %{extensionsdir}/yp.so
 
 %files zlib
 %defattr(644,root,root,755)

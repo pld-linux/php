@@ -74,7 +74,7 @@ Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на серв
 Name:		php
 Version:	5.1.0
 %define	_rc	RC1
-Release:	0.1%{?with_hardening:hardened}
+Release:	0.%{_rc}.1%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -1423,6 +1423,7 @@ if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 fi
 PROG_SENDMAIL="/usr/lib/sendmail"; export PROG_SENDMAIL
 
+# Apache SAPIs should be last one listed here
 sapis="
 fcgi cgi cli
 %if %{with apache1}
@@ -1439,13 +1440,13 @@ for sapi in $sapis; do
 	`
 	case $sapi in
 	cgi)
-		echo --enable-discard-path
+		echo --enable-discard-path --enable-force-cgi-redirect
 	;;
 	cli)
 		echo --disable-cgi
 	;;
 	fcgi)
-		echo --enable-fastcgi --with-fastcgi=/usr
+		echo --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect
 	;;
 	apxs1)
 		ver=%(rpm -q --qf '%%{version}' apache1-apxs)
@@ -1453,7 +1454,7 @@ for sapi in $sapis; do
 	;;
 	apxs2)
 		ver=%(rpm -q --qf '%%{version}' apache-apxs)
-		echo --with-apxs2=%{apxs2} --with-apache-version=$ver --enable-maintainer-zts
+		echo --with-apxs2=%{apxs2} --with-apache-version=$ver
 	;;
 	esac
 	` \
@@ -1463,6 +1464,7 @@ for sapi in $sapis; do
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
+	--enable-maintainer-zts \
 	--enable-memory-limit \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
@@ -1569,9 +1571,6 @@ done
 # fix install paths, avoid evil rpaths
 sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
 
-# for fcgi: -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0
-# -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1(die) -DHAVE_SYS_PARAM_H=1
-# -DPHP_FASTCGI=1 -DPHP_FCGI_STATIC=1 -DPHP_WRITE_STDOUT=1
 %if %{with apache1}
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
 sed -i -e "
@@ -1586,19 +1585,18 @@ s|^libdir=.*|libdir='%{_libdir}/apache'|;
 s|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache |" sapi/apache2handler/libphp5.la
 %endif
 
-%{__make} sapi/cgi/php -f Makefile.fcgi \
-	CFLAGS_CLEAN="%{rpmcflags} -DDISCARD_PATH=0 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=0 -DHAVE_FILENO_PROTO=1 -DHAVE_FPOS=1 -DHAVE_LIBNSL=1 -DHAVE_SYS_PARAM_H=1 -DPHP_FASTCGI=1 -DPHP_FCGI_STATIC=1 -DPHP_WRITE_STDOUT=1"
+# FCGI
+cp -af php_config.h.fcgi main/php_config.h
+%{__make} sapi/cgi/php -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 
-# notes:
-# -DENABLE_CHROOT_FUNC=1 (cgi,fcgi) is used in ext/standard/dir.c (libphp_common)
-# -DPHP_WRITE_STDOUT is used also for cli, but not set by its config.m4
-
-%{__make} sapi/cgi/php -f Makefile.cgi \
-	CFLAGS_CLEAN="%{rpmcflags} -DDISCARD_PATH=1 -DENABLE_PATHINFO_CHECK=1 -DFORCE_CGI_REDIRECT=1 -DPHP_WRITE_STDOUT=1"
+# CGI
+cp -af php_config.h.cgi main/php_config.h
+%{__make} sapi/cgi/php -f Makefile.cgi
 
 # CLI
+cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
 
 %install

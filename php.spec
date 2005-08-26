@@ -12,15 +12,16 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - ftp module needs to be linked with -lssl if openssl module is enabled
+# - shared pdo base
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
-%bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
+%bcond_with	fdf		# with FDF (PDF forms) module		(BR:proprietary lib)
 %bcond_with	hardening	# build with hardening patch applied (http://www.hardened-php.net/)
-%bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
-%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
-%bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
-%bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
+%bcond_with	hwapi		# with Hw API support			(BR:proprietary libs)
+%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR:proprietary libs)
+%bcond_with	oci8		# with Oracle oci8 extension module	(BR:proprietary libs)
+%bcond_with	oracle		# with oracle extension module		(BR:proprietary libs)
 %bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module
@@ -266,7 +267,7 @@ PHP - ÃÅ ÍÏ×Á ÎÁÐÉÓÁÎÎÑ ÓËÒÉÐÔ¦×, ÝÏ ×ÂÕÄÏ×ÕÀÔØÓÑ × HTML-ËÏÄ. PHP
 Summary:	PHP DSO module for apache 1.3.x
 Summary(pl):	Modu³ DSO (Dynamic Shared Object) php dla apache 1.3.x
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires(post,preun):	%{apxs1}
 Requires(post,preun):	%{__perl}
 Requires:	apache1(EAPI) >= 1.3.33-2
@@ -288,7 +289,7 @@ php jako modu³ DSO (Dynamic Shared Object) dla apache 1.3.x.
 Summary:	PHP DSO module for apache 2.x
 Summary(pl):	Modu³ DSO (Dynamic Shared Object) php dla apache 2.x
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache >= 2.0.52-2
 Requires:	apache(modules-api) = %{apache_modules_api}
 Provides:	%{name} = %{epoch}:%{version}-%{release}
@@ -308,7 +309,7 @@ php jako modu³ DSO (Dynamic Shared Object) dla apache 2.x.
 Summary:	php as FastCGI program
 Summary(pl):	php jako program FastCGI
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description fcgi
@@ -321,7 +322,7 @@ php jako program FastCGI.
 Summary:	php as CGI program
 Summary(pl):	php jako program CGI
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description cgi
@@ -334,7 +335,7 @@ php jako program CGI.
 Summary:	php as CLI interpreter
 Summary(pl):	php jako interpreter dzia³aj±cy z linii poleceñ
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description cli
@@ -975,6 +976,81 @@ Compatible Regular Expression support.
 Modu³ PHP umo¿liwiaj±cy korzystanie z perlowych wyra¿eñ regularnych
 (Perl Compatible Regular Expressions)
 
+%package pdo-dblib
+Summary:	PHP Data Objects (PDO) FreeTDS support
+Summary(pl):	Modu³ PHP Data Objects (PDO) z wsparciem do FreeTDS
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description pdo-dblib
+This is a dynamic shared object (DSO) for PHP that will add PDO
+FreeTDS support.
+
+%description pdo-dblib -l pl
+Modu³ dla PHP dodaj±cy obs³ugê dla baz danych FreeTDS za po¶rednictwem
+interfejsu PDO.
+
+%package pdo-mysql
+Summary:	PHP Data Objects (PDO) MySQL support
+Summary(pl):	Modu³ PHP Data Objects (PDO) z wsparciem do MySQL
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description pdo-mysql
+This is a dynamic shared object (DSO) for PHP that will add PDO MySQL
+support.
+
+%description pdo-mysql -l pl
+Modu³ dla PHP dodaj±cy obs³ugê dla baz danych MySQL za po¶rednictwem
+interfejsu PDO.
+
+%package pdo-odbc
+Summary:	PHP Data Objects (PDO) ODBC support
+Summary(pl):	Modu³ PHP Data Objects (PDO) z wsparciem do ODBC
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description pdo-odbc
+This is a dynamic shared object (DSO) for PHP that will add PDO ODBC
+support.
+
+%description pdo-odbc -l pl
+Modu³ dla PHP dodaj±cy obs³ugê dla baz danych ODBC za po¶rednictwem
+interfejsu PDO.
+
+%package pdo-pgsql
+Summary:	PHP Data Objects (PDO) PostgreSQL support
+Summary(pl):	Modu³ PHP Data Objects (PDO) z wsparciem do PostgreSQL
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description pdo-pgsql
+This is a dynamic shared object (DSO) for PHP that will add PDO
+PostgreSQL support.
+
+%description pdo-pgsql -l pl
+Modu³ dla PHP dodaj±cy obs³ugê dla baz danych PostgreSQL za
+po¶rednictwem interfejsu PDO.
+
+%package pdo-sqlite
+Summary:	PHP Data Objects (PDO) SQLite support
+Summary(pl):	Modu³ PHP Data Objects (PDO) z wsparciem do SQLite
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description pdo-sqlite
+This is a dynamic shared object (DSO) for PHP that will add PDO SQLite
+support.
+
+%description pdo-sqlite -l pl
+Modu³ dla PHP dodaj±cy obs³ugê dla baz danych SQLite za po¶rednictwem
+interfejsu PDO.
+
 %package pgsql
 Summary:	PostgreSQL database module for PHP
 Summary(pl):	Modu³ bazy danych PostgreSQL dla PHP
@@ -1139,22 +1215,24 @@ Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description sqlite
-SQLite is a C library that implements an embeddable SQL database engine.
-Programs that link with the SQLite library can have SQL database access
-without running a separate RDBMS process.
+SQLite is a C library that implements an embeddable SQL database
+engine. Programs that link with the SQLite library can have SQL
+database access without running a separate RDBMS process.
 
-SQLite is not a client library used to connect to a big database server.
-SQLite is the server. The SQLite library reads and writes directly to
-and from the database files on disk.
+SQLite is not a client library used to connect to a big database
+server. SQLite is the server. The SQLite library reads and writes
+directly to and from the database files on disk.
 
 %description sqlite -l pl
 SQLite jest napisan± w C bibliotek± implementuj±c± osadzalny silnik
 bazodanowy SQL. Program linkuj±cy siê z bibliotek± SQLite mo¿e mieæ
-dostêp do bazy SQL bez potrzeby uruchamiania dodatkowego procesu RDBMS.
+dostêp do bazy SQL bez potrzeby uruchamiania dodatkowego procesu
+RDBMS.
 
 SQLite to nie klient baz danych - biblioteka nie ³±czy siê z serwerami
-baz danych. SQLite sam jest serwerem. Biblioteka SQLite czyta i zapisuje
-dane bezpo¶rednio z/do plików baz danych znajduj±cych siê na dysku.
+baz danych. SQLite sam jest serwerem. Biblioteka SQLite czyta i
+zapisuje dane bezpo¶rednio z/do plików baz danych znajduj±cych siê na
+dysku.
 
 %package sybase
 Summary:	Sybase DB extension module for PHP
@@ -1166,8 +1244,9 @@ Obsoletes:	php-sybase-ct
 
 %description sybase
 This is a dynamic shared object (DSO) for PHP that will add Sybase and
-MS SQL databases support through SYBDB library. Currently Sybase module
-is not maintained. Using Sybase-CT module is recommended instead.
+MS SQL databases support through SYBDB library. Currently Sybase
+module is not maintained. Using Sybase-CT module is recommended
+instead.
 
 %description sybase -l pl
 Modu³ PHP dodaj±cy obs³ugê baz danych Sybase oraz MS SQL poprzez
@@ -1251,8 +1330,8 @@ Modu³ PHP umo¿liwiaj±cy korzystanie z tidy.
 Summary:	wddx extension module for PHP
 Summary(pl):	Modu³ wddx dla PHP
 Group:		Libraries
-PreReq:		%{name}-session = %{epoch}:%{version}-%{release}
-PreReq:		%{name}-xml = %{epoch}:%{version}-%{release}
+Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
@@ -1290,13 +1369,13 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %description xmlreader
 This is a dynamic shared object (DSO) for PHP that will add XML Reader
 support. The XMLReader extension is an XML Pull parser. The reader
-acts as a cursor going forward on the document stream and stopping
-at each node on the way.
+acts as a cursor going forward on the document stream and stopping at
+each node on the way.
 
 %description xmlreader -l pl
 Modu³ PHP umo¿liwiaj±cy parsowanie plików XML w trybie Pull. Czytnik
-dzia³a jako kursor przechodz±cy przez strumieñ dokumentu i zatrzymuj±cy
-siê naka¿dym wê¼le po drodze.
+dzia³a jako kursor przechodz±cy przez strumieñ dokumentu i
+zatrzymuj±cy siê naka¿dym wê¼le po drodze.
 
 %package xmlrpc
 Summary:	xmlrpc extension module for PHP
@@ -1464,12 +1543,15 @@ for sapi in $sapis; do
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
+	--enable-zend-multibyte \
 	--enable-maintainer-zts \
 	--enable-memory-limit \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
 	--enable-ctype=shared \
 	--enable-dba=shared \
+	--with-inifile \
+	--with-flatfile \
 	--enable-dom=shared \
 	--enable-exif=shared \
 	--enable-filepro=shared \
@@ -1480,6 +1562,18 @@ for sapi in $sapis; do
 	--enable-mbstring=shared,all \
 	--enable-mbregex \
 	--enable-pcntl=shared \
+	--enable-pdo \
+%if %{with mssql} || %{with sybase} || %{with sybase_ct}
+	--with-pdo-dblib=shared \
+%endif
+%if %{with interbase} && %{without interbase_inst}
+	--with-pdo-firebird=shared \
+%endif
+	--with-pdo-mysql=shared \
+	%{?with_oracle:--with-pdo-oci=shared} \
+	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
+	%{?with_pgsql:--with-pdo-pgsql=shared} \
+	%{?with_sqlite:--with-pdo-sqlite=shared} \
 	--enable-posix=shared \
 	--enable-session \
 	--enable-shared \
@@ -1623,7 +1717,7 @@ install sapi/apache2handler/.libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache/li
 libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
 
 # install the apache modules' files
-make install-headers install-build install-modules install-programs \
+%{__make} install-headers install-build install-modules install-programs \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
 # install CGI
@@ -2017,6 +2111,36 @@ fi
 %postun pcre
 %extension_postun
 
+%post pdo-dblib
+%extension_post
+
+%postun pdo-dblib
+%extension_postun
+
+%post pdo-mysql
+%extension_post
+
+%postun pdo-mysql
+%extension_postun
+
+%post pdo-odbc
+%extension_post
+
+%postun pdo-odbc
+%extension_postun
+
+%post pdo-pgsql
+%extension_post
+
+%postun pdo-pgsql
+%extension_postun
+
+%post pdo-sqlite
+%extension_post
+
+%postun pdo-sqlite
+%extension_postun
+
 %post pgsql
 %extension_post
 
@@ -2340,8 +2464,8 @@ fi
 %if %{with apache1}
 %files -n apache1-mod_php
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/apache/conf.d/*_mod_php.conf
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache.ini
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
 %attr(755,root,root) %{_libdir}/apache1/libphp5.so
 /home/services/apache/icons/*
 %endif
@@ -2349,8 +2473,8 @@ fi
 %if %{with apache2}
 %files -n apache-mod_php
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/httpd/httpd.conf/*_mod_php.conf
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-apache2handler.ini
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/httpd.conf/*_mod_php.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
 /home/services/httpd/icons/*
 %endif
@@ -2358,18 +2482,18 @@ fi
 %files fcgi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.fcgi
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-cgi-fcgi.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 
 %files cgi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.cgi
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-cgi.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi.ini
 
 %files cli
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.cli
 %attr(755,root,root) %{_bindir}/php
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-cli.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
 %{_mandir}/man1/php.1*
 
 %files common
@@ -2381,7 +2505,7 @@ fi
 
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
-%attr(644,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php.ini
+%attr(644,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
 %attr(770,root,http) %dir %verify(not group mode) /var/run/php
 %attr(755,root,root) %{_sbindir}/php-module-install
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
@@ -2400,168 +2524,168 @@ fi
 
 %files bcmath
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/bcmath.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/bcmath.ini
 %attr(755,root,root) %{extensionsdir}/bcmath.so
 
 %files bzip2
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/bz2.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/bz2.ini
 %attr(755,root,root) %{extensionsdir}/bz2.so
 
 %files calendar
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/calendar.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/calendar.ini
 %attr(755,root,root) %{extensionsdir}/calendar.so
 
 %files ctype
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ctype.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ctype.ini
 %attr(755,root,root) %{extensionsdir}/ctype.so
 
 %if %{with curl}
 %files curl
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/curl.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/curl.ini
 %attr(755,root,root) %{extensionsdir}/curl.so
 %endif
 
 %files dba
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dba.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dba.ini
 %attr(755,root,root) %{extensionsdir}/dba.so
 
 %files dbase
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dbase.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dbase.ini
 %attr(755,root,root) %{extensionsdir}/dbase.so
 
 %files dom
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/dom.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{extensionsdir}/dom.so
 
 %if %{with fdf}
 %files fdf
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/fdf.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/fdf.ini
 %attr(755,root,root) %{extensionsdir}/fdf.so
 %endif
 
 %files exif
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/exif.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
 %attr(755,root,root) %{extensionsdir}/exif.so
 
 %files filepro
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/filepro.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filepro.ini
 %attr(755,root,root) %{extensionsdir}/filepro.so
 
 %files ftp
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ftp.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ftp.ini
 %attr(755,root,root) %{extensionsdir}/ftp.so
 
 %files gd
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/gd.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gd.ini
 %attr(755,root,root) %{extensionsdir}/gd.so
 
 %files gettext
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/gettext.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gettext.ini
 %attr(755,root,root) %{extensionsdir}/gettext.so
 
 %files gmp
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/gmp.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{extensionsdir}/gmp.so
 
 %if %{with hwapi}
 %files hwapi
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/hwapi.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/hwapi.ini
 %attr(755,root,root) %{extensionsdir}/hwapi.so
 %endif
 
 %files iconv
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/iconv.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/iconv.ini
 %attr(755,root,root) %{extensionsdir}/iconv.so
 
 %if %{with imap}
 %files imap
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/imap.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/imap.ini
 %attr(755,root,root) %{extensionsdir}/imap.so
 %endif
 
 %if %{with interbase}
 %files interbase
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/interbase.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/interbase.ini
 %attr(755,root,root) %{extensionsdir}/interbase.so
 %endif
 
 %if %{with ldap}
 %files ldap
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ldap.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ldap.ini
 %attr(755,root,root) %{extensionsdir}/ldap.so
 %endif
 
 %files mbstring
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mbstring.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{extensionsdir}/mbstring.so
 
 %files mcrypt
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mcrypt.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mcrypt.ini
 %attr(755,root,root) %{extensionsdir}/mcrypt.so
 
 %if %{with mhash}
 %files mhash
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mhash.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mhash.ini
 %attr(755,root,root) %{extensionsdir}/mhash.so
 %endif
 
 %files mime_magic
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mime_magic.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mime_magic.ini
 %attr(755,root,root) %{extensionsdir}/mime_magic.so
 
 %if %{with ming}
 %files ming
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/ming.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ming.ini
 %attr(755,root,root) %{extensionsdir}/ming.so
 %endif
 
 %if %{with msession}
 %files msession
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/msession.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/msession.ini
 %attr(755,root,root) %{extensionsdir}/msession.so
 %endif
 
 %if %{with mssql}
 %files mssql
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mssql.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mssql.ini
 %attr(755,root,root) %{extensionsdir}/mssql.so
 %endif
 
 %files mysql
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mysql.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysql.ini
 %attr(755,root,root) %{extensionsdir}/mysql.so
 
 %if %{with mysqli}
 %files mysqli
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/mysqli.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysqli.ini
 %attr(755,root,root) %{extensionsdir}/mysqli.so
 %endif
 
@@ -2572,28 +2696,28 @@ fi
 %if %{with oci8}
 %files oci8
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/oci8.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/oci8.ini
 %attr(755,root,root) %{extensionsdir}/oci8.so
 %endif
 
 %if %{with odbc}
 %files odbc
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/odbc.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/odbc.ini
 %attr(755,root,root) %{extensionsdir}/odbc.so
 %endif
 
 %if %{with openssl}
 %files openssl
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/openssl.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/openssl.ini
 %attr(755,root,root) %{extensionsdir}/openssl.so
 %endif
 
 %if %{with oracle}
 %files oracle
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/oracle.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/oracle.ini
 %attr(755,root,root) %{extensionsdir}/oracle.so
 %endif
 
@@ -2604,26 +2728,66 @@ fi
 %if %{with pcre}
 %files pcre
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/pcre.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcre.ini
 %attr(755,root,root) %{extensionsdir}/pcre.so
+%endif
+
+%if %{with mssql} || %{with sybase} || %{with sybase_ct}
+%files pdo-dblib
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_dblib.ini
+%attr(755,root,root) %{extensionsdir}/pdo_dblib.so
+%endif
+
+%files pdo-mysql
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_mysql.ini
+%attr(755,root,root) %{extensionsdir}/pdo_mysql.so
+
+%if %{with oracle}
+%files pdo-oracle
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_oracle.ini
+%attr(755,root,root) %{extensionsdir}/pdo_oracle.so
+%endif
+
+%if %{with odbc}
+%files pdo-odbc
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_odbc.ini
+%attr(755,root,root) %{extensionsdir}/pdo_odbc.so
+%endif
+
+%if %{with pgsql}
+%files pdo-pgsql
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_pgsql.ini
+%attr(755,root,root) %{extensionsdir}/pdo_pgsql.so
+%endif
+
+%if %{with sqlite}
+%files pdo-sqlite
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_sqlite.ini
+%attr(755,root,root) %{extensionsdir}/pdo_sqlite.so
 %endif
 
 %if %{with pgsql}
 %files pgsql
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/pgsql.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pgsql.ini
 %attr(755,root,root) %{extensionsdir}/pgsql.so
 %endif
 
 %files posix
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/posix.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/posix.ini
 %attr(755,root,root) %{extensionsdir}/posix.so
 
 %if %{with pspell}
 %files pspell
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/pspell.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pspell.ini
 %attr(755,root,root) %{extensionsdir}/pspell.so
 %endif
 
@@ -2634,7 +2798,7 @@ fi
 %if %{with recode}
 %files recode
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/recode.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/recode.ini
 %attr(755,root,root) %{extensionsdir}/recode.so
 %endif
 
@@ -2645,99 +2809,99 @@ fi
 
 %files shmop
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/shmop.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/shmop.ini
 %attr(755,root,root) %{extensionsdir}/shmop.so
 
 %if %{with snmp}
 %files snmp
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/snmp.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/snmp.ini
 %attr(755,root,root) %{extensionsdir}/snmp.so
 %endif
 
 %files soap
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/soap.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/soap.ini
 %attr(755,root,root) %{extensionsdir}/soap.so
 
 %files sockets
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sockets.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sockets.ini
 %attr(755,root,root) %{extensionsdir}/sockets.so
 
 %if %{with sqlite}
 %files sqlite
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sqlite.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sqlite.ini
 %attr(755,root,root) %{extensionsdir}/sqlite.so
 %endif
 
 %if %{with sybase}
 %files sybase
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sybase.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sybase.ini
 %attr(755,root,root) %{extensionsdir}/sybase.so
 %endif
 
 %if %{with sybase_ct}
 %files sybase-ct
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sybase_ct.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sybase_ct.ini
 %attr(755,root,root) %{extensionsdir}/sybase_ct.so
 %endif
 
 %files sysvmsg
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sysvmsg.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sysvmsg.ini
 %attr(755,root,root) %{extensionsdir}/sysvmsg.so
 
 %files sysvsem
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sysvsem.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sysvsem.ini
 %attr(755,root,root) %{extensionsdir}/sysvsem.so
 
 %files sysvshm
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/sysvshm.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sysvshm.ini
 %attr(755,root,root) %{extensionsdir}/sysvshm.so
 
 %if %{with tidy}
 %files tidy
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/tidy.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tidy.ini
 %attr(755,root,root) %{extensionsdir}/tidy.so
 %endif
 
 %if %{with wddx}
 %files wddx
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/wddx.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/wddx.ini
 %attr(755,root,root) %{extensionsdir}/wddx.so
 %endif
 
 %files xml
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xml.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xml.ini
 %attr(755,root,root) %{extensionsdir}/xml.so
 
 %files xmlreader
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xmlreader.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlreader.ini
 %attr(755,root,root) %{extensionsdir}/xmlreader.so
 
 %if %{with xmlrpc}
 %files xmlrpc
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xmlrpc.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlrpc.ini
 %attr(755,root,root) %{extensionsdir}/xmlrpc.so
 %endif
 
 %files xsl
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/xsl.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xsl.ini
 %attr(755,root,root) %{extensionsdir}/xsl.so
 
 %files zlib
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/zlib.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zlib.ini
 %attr(755,root,root) %{extensionsdir}/zlib.so

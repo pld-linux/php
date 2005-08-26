@@ -75,7 +75,7 @@ Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на серв
 Name:		php
 Version:	5.1.0
 %define	_rc	RC1
-Release:	0.%{_rc}.1%{?with_hardening:hardened}
+Release:	0.%{_rc}.2%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -1704,14 +1704,12 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 
 # install apache1 DSO module
 %if %{with apache1}
-# TODO: use libtool here
-install sapi/apache/.libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.so
+libtool --silent --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1/
 %endif
 
 # install apache2 DSO module
 %if %{with apache2}
-# TODO: use libtool here
-install sapi/apache2handler/.libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
+libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache/
 %endif
 
 libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}

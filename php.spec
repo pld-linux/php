@@ -75,7 +75,7 @@ Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на серв
 Name:		php
 Version:	5.1.0
 %define	_rc	RC1
-Release:	0.%{_rc}.2%{?with_hardening:hardened}
+Release:	0.%{_rc}.3%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -1627,7 +1627,7 @@ for sapi in $sapis; do
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
 	%{?with_oracle:--with-oracle=shared} \
-	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared} \
+	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared,/usr} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
 	--with-png-dir=/usr \

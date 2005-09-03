@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.4
-Release:	10%{?with_hardening:hardened}
+Release:	10.1%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -173,6 +173,7 @@ BuildRequires:	ncurses-ext-devel
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
+%{?with_pcre:BuildRequires:	pcre-devel}
 BuildRequires:	pam-devel
 BuildRequires:	%{__perl}
 %{?with_msession:BuildRequires:	phoenix-devel}
@@ -1612,7 +1613,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_oracle:--with-oracle=shared} \
-	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared} \
+	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared,/usr} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
 	--with-png-dir=/usr \

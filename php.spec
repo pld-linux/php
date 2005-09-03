@@ -168,6 +168,7 @@ BuildRequires:	ncurses-ext-devel
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 BuildRequires:	pam-devel
+%{?with_pcre:BuildRequires:	pcre-devel}
 BuildRequires:	%{__perl}
 %{?with_msession:BuildRequires:	phoenix-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}

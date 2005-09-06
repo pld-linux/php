@@ -76,13 +76,13 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.0.4
-Release:	10.1%{?with_hardening:hardened}
+Version:	5.0.5
+Release:	0.1%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	fb1aac107870f897d26563a9cc5053c0
+# Source0-md5:	b5d4ca75bbb11ee5b830fa67213d9f7f
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -1708,7 +1708,11 @@ libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdi
 
 # install the apache modules' files
 make install-headers install-build install-modules install-programs \
-	INSTALL_ROOT=$RPM_BUILD_ROOT
+	INSTALL_ROOT=$RPM_BUILD_ROOT \
+	phpbuilddir=%{_libdir}/php/build
+
+# as of 5.0.5, phpextdist isn't installed by default
+install scripts/dev/phpextdist $RPM_BUILD_ROOT%{_bindir}
 
 # install CGI
 libtool --silent --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi
@@ -2528,6 +2532,7 @@ fi
 %{_libdir}/libphp_common.la
 %{_includedir}/php
 %{_libdir}/php/build
+%{_mandir}/man1/*
 
 %files bcmath
 %defattr(644,root,root,755)

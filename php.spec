@@ -122,6 +122,7 @@ Patch27:	%{name}-install_gd_headers.patch
 Patch29:	%{name}-gcc4.patch
 Patch30:	%{name}-hardening-fix.patch
 Patch31:	%{name}-both-apxs.patch
+Patch32:	%{name}-builddir.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1474,14 +1475,10 @@ zcat %{SOURCE9} | patch -p1
 patch -p1 < %{PATCH30}
 %endif
 %patch31 -p1
+%patch32 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
-
-# fix lib path in phpize
-cd scripts/
-sed -i -e 's,lib/php,%{_lib}/php,' phpize.in
-cd ..
 
 # new apr
 sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4

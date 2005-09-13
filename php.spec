@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	3%{?with_hardening:hardened}
+Release:	3.1%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -205,6 +205,12 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir	/etc/php
 %define		_phpsharedir	%{_datadir}/php
 %define		extensionsdir	%{_libdir}/php
+
+# redefine to use versions from current source
+%define		php_sourcedir %{_builddir}/%{name}-%{version}
+%define		php_api_version %(awk '/#define PHP_API_VERSION/{print $3}' %{php_sourcedir}/main/php.h)
+%define		zend_module_api %(awk '/#define ZEND_MODULE_API_NO/{print $3}' %{php_sourcedir}/Zend/zend_modules.h)
+%define		zend_extension_api %(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' %{php_sourcedir}/Zend/zend_extensions.h)
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -364,6 +370,9 @@ Requires:	glibc >= 6:2.3.5
 Requires:	sed >= 4.0
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	php-common(apache-modules-api) = %{apache_modules_api}
+Provides:	php(modules_api) = %{php_api_version}
+Provides:	php(zend_module_api) = %{zend_module_api}
+Provides:	php(zend_extension_api) = %{zend_extension_api}
 Obsoletes:	php-session < 3:4.2.1-2
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
@@ -1432,8 +1441,10 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
+# IMPORTANT: if you change '%setup', you should change %php_sourcedir macro earlier in this file
 %setup -q
 # this patch is broken by design, breaks --enable-versioning for example
+# update: --enable-version is broken by itself, it disables dynamic modules.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1

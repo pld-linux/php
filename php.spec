@@ -178,7 +178,7 @@ BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-php-pearprov >= 4.0.2-100
-BuildRequires:	rpmbuild(macros) >= 1.230
+BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
@@ -197,7 +197,11 @@ BuildRequires:	apr-util-devel >= 1:1.0.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/php
+%define		_phpsharedir	%{_datadir}/php
 %define		extensionsdir	%{_libdir}/php
+
+# redefine to use versions from current source
+%define		__php_includedir %{_builddir}/%{name}-%{version}
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -356,7 +360,11 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	sed >= 4.0
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
+# FIXME: apache2 specific Provides
 Provides:	php-common(apache-modules-api) = %{apache_modules_api}
+Provides:	php(modules_api) = %{php_api_version}
+Provides:	php(zend_module_api) = %{zend_module_api}
+Provides:	php(zend_extension_api) = %{zend_extension_api}
 Obsoletes:	php-session < 3:4.2.1-2
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
@@ -1431,8 +1439,10 @@ compression support to PHP.
 Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 
 %prep
+# IMPORTANT: if you change '%setup', you should change %__php_includedir macro earlier in this file
 %setup -q -n %{name}-%{version}%{_rc}
 # this patch is broken by design, breaks --enable-versioning for example
+# update: --enable-version is broken by itself, it disables dynamic modules.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1693,7 +1703,7 @@ cp -af php_config.h.cli main/php_config.h
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi}} \
+install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi},%{_phpsharedir}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/var/run/php \
@@ -2506,6 +2516,7 @@ fi
 %attr(755,root,root) %{_sbindir}/php-module-install
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}
+%dir %{_phpsharedir}
 
 %files devel
 %defattr(644,root,root,755)

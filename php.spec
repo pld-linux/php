@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	3.1%{?with_hardening:hardened}
+Release:	3.2%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -207,10 +207,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		extensionsdir	%{_libdir}/php
 
 # redefine to use versions from current source
-%define		php_sourcedir %{_builddir}/%{name}-%{version}
-%define		php_api_version %(awk '/#define PHP_API_VERSION/{print $3}' %{php_sourcedir}/main/php.h)
-%define		zend_module_api %(awk '/#define ZEND_MODULE_API_NO/{print $3}' %{php_sourcedir}/Zend/zend_modules.h)
-%define		zend_extension_api %(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' %{php_sourcedir}/Zend/zend_extensions.h)
+%define		__php_includedir %{_builddir}/%{name}-%{version}
+# these will be moved to rpm.macros later on.
+%define		php_api_version %(awk '/#define PHP_API_VERSION/{print $3}' %{__php_includedir}/main/php.h 2>/dev/null || echo ERROR)
+%define		zend_module_api %(awk '/#define ZEND_MODULE_API_NO/{print $3}' %{__php_includedir}/Zend/zend_modules.h 2>/dev/null || echo ERROR)
+%define		zend_extension_api %(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' %{__php_includedir}/Zend/zend_extensions.h 2>/dev/null || echo ERROR)
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -1441,7 +1442,7 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
-# IMPORTANT: if you change '%setup', you should change %php_sourcedir macro earlier in this file
+# IMPORTANT: if you change '%setup', you should change %__php_includedir macro earlier in this file
 %setup -q
 # this patch is broken by design, breaks --enable-versioning for example
 # update: --enable-version is broken by itself, it disables dynamic modules.

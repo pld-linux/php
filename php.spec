@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	3.2%{?with_hardening:hardened}
+Release:	4%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -184,7 +184,7 @@ BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-php-pearprov >= 4.0.2-100
-BuildRequires:	rpmbuild(macros) >= 1.230
+BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
@@ -208,10 +208,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # redefine to use versions from current source
 %define		__php_includedir %{_builddir}/%{name}-%{version}
-# these will be moved to rpm.macros later on.
-%define		php_api_version %(awk '/#define PHP_API_VERSION/{print $3}' %{__php_includedir}/main/php.h 2>/dev/null || echo ERROR)
-%define		zend_module_api %(awk '/#define ZEND_MODULE_API_NO/{print $3}' %{__php_includedir}/Zend/zend_modules.h 2>/dev/null || echo ERROR)
-%define		zend_extension_api %(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' %{__php_includedir}/Zend/zend_extensions.h 2>/dev/null || echo ERROR)
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -370,6 +366,7 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	sed >= 4.0
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
+# FIXME: apache2 specific Provides
 Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(zend_module_api) = %{zend_module_api}

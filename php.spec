@@ -91,8 +91,8 @@ Source5:	%{name}-cgi-fcgi.ini
 Source6:	%{name}-cgi.ini
 Source7:	%{name}-apache.ini
 Source8:	%{name}-cli.ini
-Source9:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
-# Source9-md5:	47a742fa9fab2826ad10c13a2376111a
+Source9:	http://www.hardened-php.net/hardening-patch-5.0.5-0.4.3.patch.gz
+# Source9-md5:	6af27b59251bb9ce4741b17e2e5358f7
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -1482,7 +1482,7 @@ cp php.ini-dist php.ini
 
 %if %{with hardening}
 zcat %{SOURCE9} | patch -p1
-patch -p1 < %{PATCH30}
+#patch -p1 < %{PATCH30}
 %endif
 %patch31 -p1
 %patch32 -p1

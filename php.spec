@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	5%{?with_hardening:hardened}
+Release:	6%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -1493,6 +1493,9 @@ rm -f ext/recode/config9.m4
 sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4
 
 %build
+echo "Provides:	php(modules_api) = %{php_api_version}"
+echo "Provides:	php(zend_module_api) = %{zend_module_api}"
+echo "Provides:	php(zend_extension_api) = %{zend_extension_api}"
 CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include"
 %if %{with apache2}
 # Apache2 CFLAGS. harmless for other SAPIs.
@@ -2517,6 +2520,12 @@ fi
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
 %doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
 
+%if "%{php_api_version}" == "ERROR" || "%{zend_module_api}" == "ERROR" || "%{zend_extension_api}" == "ERROR"
+INTERNAL ERROR: API versions broken:
+	php(modules_api) = %{php_api_version}
+	php(zend_module_api) = %{zend_module_api}
+	php(zend_extension_api) = %{zend_extension_api}
+%endif
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %attr(644,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php.ini

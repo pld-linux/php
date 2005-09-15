@@ -209,6 +209,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # redefine to use versions from current source
 %define		__php_includedir %{_builddir}/%{name}-%{version}
 
+# temporarily
+%define	php_api_version		%(awk '/#define PHP_API_VERSION/{print $3}' %{__php_includedir}/main/php.h || echo ERROR)
+%define	zend_module_api		%(awk '/#define ZEND_MODULE_API_NO/{print $3}' %{__php_includedir}/Zend/zend_modules.h || echo ERROR)
+%define	zend_extension_api		%(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' %{__php_includedir}/Zend/zend_extensions.h || echo ERROR)
+
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
 easy for developers to write dynamically generated web pages. PHP also
@@ -1691,6 +1696,19 @@ cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
 
 %install
+# sanity check
+cat >&2 <<EOF
+
+	MODULES_API = %{php_api_version}
+	ZEND_MODULE_API = %{zend_module_api}
+	ZEND_EXTENSION_API = %{zend_extension_api}
+
+EOF
+%if "%{php_api_version}" == "ERROR" || "%{zend_module_api}" == "ERROR" || "%{zend_extension_api}" == "ERROR"
+	echo "INTERNAL ERROR: API versions broken!"
+	exit 1
+%endif
+
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi},%{_phpsharedir}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
@@ -2476,8 +2494,6 @@ fi
 %triggerun zlib -- %{name}-zlib < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove zlib %{_sysconfdir}/php.ini
 
-#%files
-
 %if %{with apache1}
 %files -n apache1-mod_php
 %defattr(644,root,root,755)
@@ -2520,12 +2536,6 @@ fi
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
 %doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
 
-%if "%{php_api_version}" == "ERROR" || "%{zend_module_api}" == "ERROR" || "%{zend_extension_api}" == "ERROR"
-INTERNAL ERROR: API versions broken:
-	php(modules_api) = %{php_api_version}
-	php(zend_module_api) = %{zend_module_api}
-	php(zend_extension_api) = %{zend_extension_api}
-%endif
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %attr(644,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php.ini

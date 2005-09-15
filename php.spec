@@ -75,7 +75,8 @@ Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на серв
 Name:		php
 Version:	5.1.0
 %define	_rc	RC1
-Release:	0.%{_rc}.3%{?with_hardening:hardened}
+%define	_rel 3
+Release:	0.%{_rc}.%{rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP

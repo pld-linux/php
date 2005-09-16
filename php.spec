@@ -1759,12 +1759,14 @@ install %{SOURCE1} .
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
 cp -f Zend/LICENSE{,.Zend}

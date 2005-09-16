@@ -206,13 +206,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_phpsharedir	%{_datadir}/php
 %define		extensionsdir	%{_libdir}/php
 
-# redefine to use versions from current source
-%define		__php_includedir %{_builddir}/%{name}-%{version}
-
-# temporarily
-%define	php_api_version		%(awk '/#define PHP_API_VERSION/{print $3}' %{__php_includedir}/main/php.h || echo ERROR)
-%define	zend_module_api		%(awk '/#define ZEND_MODULE_API_NO/{print $3}' %{__php_includedir}/Zend/zend_modules.h || echo ERROR)
-%define	zend_extension_api		%(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' %{__php_includedir}/Zend/zend_extensions.h || echo ERROR)
+# must be in sync with source. extra check ensuring that it is so is done in %%build
+%define		php_api_version		20031224
+%define		zend_module_api		20041030
+%define		zend_extension_api	220040412
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -1444,7 +1441,6 @@ compression support to PHP.
 Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 
 %prep
-# IMPORTANT: if you change '%setup', you should change %__php_includedir macro earlier in this file
 %setup -q
 # this patch is broken by design, breaks --enable-versioning for example
 # update: --enable-version is broken by itself, it disables dynamic modules.
@@ -1498,9 +1494,21 @@ rm -f ext/recode/config9.m4
 sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4
 
 %build
-echo "Provides:	php(modules_api) = %{php_api_version}"
-echo "Provides:	php(zend_module_api) = %{zend_module_api}"
-echo "Provides:	php(zend_extension_api) = %{zend_extension_api}"
+if API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h) && [ $API != %{php_api_version} ]; then
+	echo "Set %%define php_api_version to $API and rerun."
+	exit 1
+fi
+
+if API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h) && [ $API != %{zend_module_api} ]; then
+	echo "Set %%define zend_module_api to $API and rerun."
+	exit 1
+fi
+
+if API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h) && [ $API != %{zend_extension_api} ]; then
+	echo "Set %%define zend_module_api to $API and rerun."
+	exit 1
+fi
+
 CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include"
 %if %{with apache2}
 # Apache2 CFLAGS. harmless for other SAPIs.
@@ -1696,19 +1704,6 @@ cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
 
 %install
-# sanity check
-cat >&2 <<EOF
-
-	MODULES_API = %{php_api_version}
-	ZEND_MODULE_API = %{zend_module_api}
-	ZEND_EXTENSION_API = %{zend_extension_api}
-
-EOF
-%if "%{php_api_version}" == "ERROR" || "%{zend_module_api}" == "ERROR" || "%{zend_extension_api}" == "ERROR"
-	echo "INTERNAL ERROR: API versions broken!"
-	exit 1
-%endif
-
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi},%{_phpsharedir}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \

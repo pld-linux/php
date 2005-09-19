@@ -77,7 +77,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	7%{?with_hardening:hardened}
+Release:	8%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -126,6 +126,7 @@ Patch29:	%{name}-gcc4.patch
 Patch30:	%{name}-both-apxs.patch
 Patch31:	%{name}-builddir.patch
 Patch32:	%{name}_bug34435.patch
+Patch33:	%{name}-ftp-ssllibs.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1486,6 +1487,7 @@ zcat %{SOURCE9} | patch -p1
 %patch30 -p1
 %patch31 -p1
 %patch32 -p0
+%patch33 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1517,6 +1519,7 @@ CFLAGS="$CFLAGS $(%{_bindir}/apr-1-config --includes) $(%{_bindir}/apu-1-config 
 
 EXTENSION_DIR="%{extensionsdir}"; export EXTENSION_DIR
 if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
+	rm -f Makefile.{fcgi,cgi,cli,apxs{1,2}} # now remove Makefile copies
 	./buildconf --force
 	%{__libtoolize}
 	%{__aclocal}

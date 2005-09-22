@@ -1531,6 +1531,7 @@ PROG_SENDMAIL="/usr/lib/sendmail"; export PROG_SENDMAIL
 
 sapis="
 %if %{with fcgi}
+fcgi
 %endif
 cgi cli
 %if %{with apache1}

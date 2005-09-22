@@ -50,6 +50,7 @@
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	apache1		# disable building apache 1.3.x module
 %bcond_without	apache2		# disable building apache 2.x module
+%bcond_without	fcgi		# disable building FCGI SAPI
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -77,7 +78,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	8%{?with_hardening:hardened}
+Release:	8.1%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -145,7 +146,7 @@ BuildRequires:	expat-devel
 %endif
 %{?with_fam:BuildRequires:	fam-devel}
 %{?with_fdf:BuildRequires:	fdftk-devel}
-BuildRequires:	fcgi-devel
+%{?with_fcgi:BuildRequires:	fcgi-devel}
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 BuildRequires:	freetds-devel
@@ -1529,7 +1530,9 @@ fi
 PROG_SENDMAIL="/usr/lib/sendmail"; export PROG_SENDMAIL
 
 sapis="
-fcgi cgi cli
+%if %{with fcgi}
+%endif
+cgi cli
 %if %{with apache1}
 apxs1
 %endif
@@ -1693,10 +1696,12 @@ s|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache |" sapi/apache2han
 %endif
 
 # FCGI
+%if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
 %{__make} sapi/cgi/php -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
+%endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
@@ -1739,7 +1744,9 @@ install scripts/dev/phpextdist $RPM_BUILD_ROOT%{_bindir}
 libtool --silent --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi
 
 # install FCGI
+%if %{with fcgi}
 libtool --silent --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+%endif
 
 # install CLI
 libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
@@ -1752,7 +1759,9 @@ install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 install php.ini	$RPM_BUILD_ROOT%{_sysconfdir}/php.ini
+%if %{with fcgi}
 install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+%endif
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
@@ -2512,10 +2521,12 @@ fi
 /home/services/httpd/icons/*
 %endif
 
+%if %{with fcgi}
 %files fcgi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.fcgi
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/php-cgi-fcgi.ini
+%endif
 
 %files cgi
 %defattr(644,root,root,755)

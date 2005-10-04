@@ -78,7 +78,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	8.1%{?with_hardening:hardened}
+Release:	8.4%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -1344,6 +1344,16 @@ support.
 %description tidy -l pl
 ModuЁ PHP umo©liwiaj╠cy korzystanie z tidy.
 
+%package tokenizer
+Summary:	tokenizer extension module for PHP
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description tokenizer
+This is a dynamic shared object (DSO) for PHP that will add tokenizer
+support.
+
 %package wddx
 Summary:	wddx extension module for PHP
 Summary(pl):	ModuЁ wddx dla PHP
@@ -1601,6 +1611,7 @@ for sapi in $sapis; do
 	--enable-safe-mode \
 	--enable-soap=shared \
 	--enable-sockets=shared \
+	--enable-tokenizer=shared \
 	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
@@ -2285,6 +2296,12 @@ fi
 %postun tidy
 %extension_postun
 
+%post tokenizer
+%extension_post
+
+%postun tokenizer
+%extension_postun
+
 %post wddx
 %extension_post
 
@@ -2908,6 +2925,11 @@ fi
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/tidy.ini
 %attr(755,root,root) %{extensionsdir}/tidy.so
 %endif
+
+%files tokenizer
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/tokenizer.ini
+%attr(755,root,root) %{extensionsdir}/tokenizer.so
 
 %if %{with wddx}
 %files wddx

@@ -78,7 +78,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	8.4%{?with_hardening:hardened}
+Release:	8.5%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -2561,9 +2561,8 @@ fi
 %files common
 %defattr(644,root,root,755)
 %doc php.ini-*
-%doc CODING_STANDARDS CREDITS Zend/ZEND_CHANGES
+%doc CREDITS Zend/ZEND_CHANGES
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
-%doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
 
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
@@ -2576,6 +2575,9 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
+%doc README.UNIX-BUILD-SYSTEM
+%doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
+%doc CODING_STANDARDS
 %attr(755,root,root) %{_bindir}/phpextdist
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config

@@ -13,6 +13,7 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - ftp module needs to be linked with -lssl if openssl module is enabled
+# - modularize libxml, session, SimpleXML, SPL, standard (output from pure php -m)?
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support

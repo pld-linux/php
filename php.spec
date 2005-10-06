@@ -1346,6 +1346,7 @@ Modu³ PHP umo¿liwiaj±cy korzystanie z tidy.
 
 %package tokenizer
 Summary:	tokenizer extension module for PHP
+Summary(pl):	Modu³ rozszerzenia tokenizer dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1353,6 +1354,9 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %description tokenizer
 This is a dynamic shared object (DSO) for PHP that will add tokenizer
 support.
+
+%description tokenizer -l pl
+Modu³ PHP dodaj±cy obs³ugê tokenizera do PHP.
 
 %package wddx
 Summary:	wddx extension module for PHP

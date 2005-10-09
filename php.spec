@@ -2933,7 +2933,7 @@ fi
 
 %files tokenizer
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/tokenizer.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tokenizer.ini
 %attr(755,root,root) %{extensionsdir}/tokenizer.so
 
 %if %{with wddx}

@@ -12,6 +12,7 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - ftp module needs to be linked with -lssl if openssl module is enabled
+# - modularize libxml, session, SimpleXML, SPL, standard (output from pure php -m)?
 # - shared pdo base
 #
 # Conditional build:
@@ -47,6 +48,7 @@
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	apache1		# disable building apache 1.3.x module
 %bcond_without	apache2		# disable building apache 2.x module
+%bcond_without	fcgi		# disable building FCGI SAPI
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -65,7 +67,6 @@
 %undefine	with_msession
 %endif
 
-%include	/usr/lib/rpm/macros.php
 Summary:	The PHP HTML-embedded scripting language for use with Apache
 Summary(fr):	Le langage de script embarque-HTML PHP pour Apache
 Summary(pl):	Jêzyk skryptowy PHP - u¿ywany wraz z serwerem Apache
@@ -75,8 +76,8 @@ Summary(uk):	PHP ÷ÅÒÓ¦§ 5 - ÍÏ×Á ÐÒÅÐÒÏÃÅÓÕ×ÁÎÎÑ HTML-ÆÁÊÌ¦×, ×ÉËÏÎÕ×ÁÎÁ ÎÁ ÓÅÒ×
 Name:		php
 Version:	5.1.0
 %define	_rc	RC1
-%define	_rel 3
-Release:	0.%{_rc}.%{rel}%{?with_hardening:hardened}
+%define	_rel 3.1
+Release:	0.%{_rc}.%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -141,7 +142,7 @@ BuildRequires:	elfutils-devel
 BuildRequires:	expat-devel
 %endif
 %{?with_fdf:BuildRequires:	fdftk-devel}
-BuildRequires:	fcgi-devel
+%{?with_fcgi:BuildRequires:	fcgi-devel}
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 BuildRequires:	freetds-devel
@@ -178,7 +179,6 @@ BuildRequires:	%{__perl}
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-build >= 4.4.0
-BuildRequires:	rpm-php-pearprov >= 4.0.2-100
 BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 BuildRequires:	t1lib-devel
@@ -201,8 +201,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_phpsharedir	%{_datadir}/php
 %define		extensionsdir	%{_libdir}/php
 
-# redefine to use versions from current source
-%define		__php_includedir %{_builddir}/%{name}-%{version}
+# must be in sync with source. extra check ensuring that it is so is done in %%build
+%define		php_api_version		20041225
+%define		zend_module_api		20050617
+%define		zend_extension_api	220050617
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -1337,6 +1339,20 @@ support.
 %description tidy -l pl
 Modu³ PHP umo¿liwiaj±cy korzystanie z tidy.
 
+%package tokenizer
+Summary:	tokenizer extension module for PHP
+Summary(pl):	Modu³ rozszerzenia tokenizer dla PHP
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description tokenizer
+This is a dynamic shared object (DSO) for PHP that will add tokenizer
+support.
+
+%description tokenizer -l pl
+Modu³ PHP dodaj±cy obs³ugê tokenizera do PHP.
+
 %package wddx
 Summary:	wddx extension module for PHP
 Summary(pl):	Modu³ wddx dla PHP
@@ -1440,7 +1456,6 @@ compression support to PHP.
 Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 
 %prep
-# IMPORTANT: if you change '%setup', you should change %__php_includedir macro earlier in this file
 %setup -q -n %{name}-%{version}%{_rc}
 # this patch is broken by design, breaks --enable-versioning for example
 # update: --enable-version is broken by itself, it disables dynamic modules.
@@ -1495,6 +1510,21 @@ rm -f ext/recode/config9.m4
 sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4
 
 %build
+if API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h) && [ $API != %{php_api_version} ]; then
+	echo "Set %%define php_api_version to $API and rerun."
+	exit 1
+fi
+
+if API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h) && [ $API != %{zend_module_api} ]; then
+	echo "Set %%define zend_module_api to $API and rerun."
+	exit 1
+fi
+
+if API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h) && [ $API != %{zend_extension_api} ]; then
+	echo "Set %%define zend_module_api to $API and rerun."
+	exit 1
+fi
+
 CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include"
 %if %{with apache2}
 # Apache2 CFLAGS. harmless for other SAPIs.
@@ -1503,6 +1533,7 @@ CFLAGS="$CFLAGS $(%{_bindir}/apr-1-config --includes) $(%{_bindir}/apu-1-config 
 
 EXTENSION_DIR="%{extensionsdir}"; export EXTENSION_DIR
 if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
+	rm -f Makefile.{fcgi,cgi,cli,apxs{1,2}} # now remove Makefile copies
 	./buildconf --force
 	%{__libtoolize}
 	%{__aclocal}
@@ -1513,7 +1544,10 @@ PROG_SENDMAIL="/usr/lib/sendmail"; export PROG_SENDMAIL
 
 # Apache SAPIs should be last one listed here
 sapis="
-fcgi cgi cli
+%if %{with fcgi}
+fcgi
+%endif
+cgi cli
 %if %{with apache1}
 apxs1
 %endif
@@ -1595,6 +1629,7 @@ for sapi in $sapis; do
 	--enable-safe-mode \
 	--enable-soap=shared \
 	--enable-sockets=shared \
+	--enable-tokenizer=shared \
 	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
@@ -1689,10 +1724,12 @@ s|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache |" sapi/apache2han
 %endif
 
 # FCGI
+%if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
 %{__make} sapi/cgi/php -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
+%endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
@@ -1731,7 +1768,9 @@ libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdi
 libtool --silent --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi
 
 # install FCGI
+%if %{with fcgi}
 libtool --silent --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+%endif
 
 # install CLI
 libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
@@ -1744,7 +1783,9 @@ install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#/usr/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
+%if %{with fcgi}
 install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+%endif
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
@@ -1754,12 +1795,14 @@ install %{SOURCE1} .
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
 cp -f Zend/LICENSE{,.Zend}
@@ -2265,6 +2308,12 @@ fi
 %postun tidy
 %extension_postun
 
+%post tokenizer
+%extension_post
+
+%postun tokenizer
+%extension_postun
+
 %post wddx
 %extension_post
 
@@ -2466,8 +2515,6 @@ fi
 %triggerun zlib -- %{name}-zlib < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove zlib %{_sysconfdir}/php.ini
 
-#%files
-
 %if %{with apache1}
 %files -n apache1-mod_php
 %defattr(644,root,root,755)
@@ -2486,10 +2533,12 @@ fi
 /home/services/httpd/icons/*
 %endif
 
+%if %{with fcgi}
 %files fcgi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.fcgi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
+%endif
 
 %files cgi
 %defattr(644,root,root,755)
@@ -2506,9 +2555,8 @@ fi
 %files common
 %defattr(644,root,root,755)
 %doc php.ini-*
-%doc CODING_STANDARDS CREDITS Zend/ZEND_CHANGES
+%doc CREDITS Zend/ZEND_CHANGES
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
-%doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
 
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
@@ -2521,6 +2569,9 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
+%doc README.UNIX-BUILD-SYSTEM
+%doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
+%doc CODING_STANDARDS
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
@@ -2879,6 +2930,11 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tidy.ini
 %attr(755,root,root) %{extensionsdir}/tidy.so
 %endif
+
+%files tokenizer
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/conf.d/tokenizer.ini
+%attr(755,root,root) %{extensionsdir}/tokenizer.so
 
 %if %{with wddx}
 %files wddx

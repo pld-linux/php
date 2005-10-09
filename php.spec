@@ -1676,7 +1676,7 @@ for sapi in $sapis; do
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase:--with-sybase=shared,/usr} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
-	%{?with_sqlite:--with-sqlite=shared,/usr} \
+	%{!?with_sqlite:--without-sqlite}%{?with_sqlite:--with-sqlite=shared,/usr} \
 	--with-t1lib=shared \
 	%{?with_tidy:--with-tidy=shared} \
 	--with-tiff-dir=/usr \

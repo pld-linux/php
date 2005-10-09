@@ -64,6 +64,10 @@
 %undefine	with_interbase
 %endif
 
+%if %{without apache1} && %{without apache2}
+ERROR: You need to select at least one Apache SAPI to build shared modules.
+%endif
+
 # x86-only lib
 %ifnarch %{ix86}
 %undefine	with_msession
@@ -1661,7 +1665,7 @@ for sapi in $sapis; do
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_oracle:--with-oracle=shared} \
 	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared,/usr} \
-	--with-pear=%{php_pear_dir} \
+	--without-pear \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
 	--with-png-dir=/usr \
 	%{?with_pspell:--with-pspell=shared} \

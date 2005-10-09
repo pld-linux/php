@@ -11,9 +11,9 @@
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
-# - ftp module needs to be linked with -lssl if openssl module is enabled
 # - modularize session, standard (output from pure php -m)?
 # - shared pdo base
+# - having pcre module loaded cli crashes
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -1357,9 +1357,9 @@ Modu³ PHP dodaj±cy obs³ugê tokenizera do PHP.
 Summary:	wddx extension module for PHP
 Summary(pl):	Modu³ wddx dla PHP
 Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description wddx

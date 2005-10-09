@@ -12,7 +12,7 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - ftp module needs to be linked with -lssl if openssl module is enabled
-# - modularize libxml, session, SimpleXML, SPL, standard (output from pure php -m)?
+# - modularize session, standard (output from pure php -m)?
 # - shared pdo base
 #
 # Conditional build:

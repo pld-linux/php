@@ -70,7 +70,6 @@
 %undefine	with_msession
 %endif
 
-%include	/usr/lib/rpm/macros.php
 Summary:	The PHP HTML-embedded scripting language for use with Apache
 Summary(fr):	Le langage de script embarque-HTML PHP pour Apache
 Summary(pl):	Jêzyk skryptowy PHP - u¿ywany wraz z serwerem Apache
@@ -186,7 +185,6 @@ BuildRequires:	%{__perl}
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-build >= 4.4.0
-BuildRequires:	rpm-php-pearprov >= 4.0.2-100
 BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 BuildRequires:	t1lib-devel
@@ -284,7 +282,7 @@ PHP - ÃÅ ÍÏ×Á ÎÁÐÉÓÁÎÎÑ ÓËÒÉÐÔ¦×, ÝÏ ×ÂÕÄÏ×ÕÀÔØÓÑ × HTML-ËÏÄ. PHP
 Summary:	PHP DSO module for apache 1.3.x
 Summary(pl):	Modu³ DSO (Dynamic Shared Object) php dla apache 1.3.x
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires(post,preun):	%{apxs1}
 Requires(post,preun):	%{__perl}
 Requires:	apache1(EAPI) >= 1.3.33-2
@@ -306,7 +304,7 @@ php jako modu³ DSO (Dynamic Shared Object) dla apache 1.3.x.
 Summary:	PHP DSO module for apache 2.x
 Summary(pl):	Modu³ DSO (Dynamic Shared Object) php dla apache 2.x
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache >= 2.0.52-2
 Requires:	apache(modules-api) = %{apache_modules_api}
 Provides:	%{name} = %{epoch}:%{version}-%{release}
@@ -326,7 +324,7 @@ php jako modu³ DSO (Dynamic Shared Object) dla apache 2.x.
 Summary:	php as FastCGI program
 Summary(pl):	php jako program FastCGI
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description fcgi
@@ -339,7 +337,7 @@ php jako program FastCGI.
 Summary:	php as CGI program
 Summary(pl):	php jako program CGI
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description cgi
@@ -352,7 +350,7 @@ php jako program CGI.
 Summary:	php as CLI interpreter
 Summary(pl):	php jako interpreter dzia³aj±cy z linii poleceñ
 Group:		Development/Languages/PHP
-PreReq:		%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description cli
@@ -1363,9 +1361,9 @@ Modu³ PHP dodaj±cy obs³ugê tokenizera do PHP.
 Summary:	wddx extension module for PHP
 Summary(pl):	Modu³ wddx dla PHP
 Group:		Libraries
-PreReq:		%{name}-session = %{epoch}:%{version}-%{release}
-PreReq:		%{name}-xml = %{epoch}:%{version}-%{release}
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description wddx

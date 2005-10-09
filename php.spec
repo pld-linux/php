@@ -17,12 +17,12 @@
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
-%bcond_with	fdf		# with FDF (PDF forms) module		(BR:proprietary lib)
+%bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	hardening	# build with hardening patch applied (http://www.hardened-php.net/)
-%bcond_with	hwapi		# with Hw API support			(BR:proprietary libs)
-%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR:proprietary libs)
-%bcond_with	oci8		# with Oracle oci8 extension module	(BR:proprietary libs)
-%bcond_with	oracle		# with oracle extension module		(BR:proprietary libs)
+%bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
+%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
+%bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
+%bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
 %bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module

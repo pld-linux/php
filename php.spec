@@ -176,8 +176,8 @@ BuildRequires:	ncurses-ext-devel
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
-%{?with_pcre:BuildRequires:	pcre-devel}
 BuildRequires:	pam-devel
+%{?with_pcre:BuildRequires:	pcre-devel}
 BuildRequires:	%{__perl}
 %{?with_msession:BuildRequires:	phoenix-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}

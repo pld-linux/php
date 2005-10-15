@@ -81,7 +81,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	9%{?with_hardening:hardened}
+Release:	10%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -371,7 +371,11 @@ Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	sed >= 4.0
+Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
+Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
+Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
+Provides:	%{name}-standard = %{epoch}:%{version}-%{release}
 # FIXME: apache2 specific Provides
 Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Provides:	php(modules_api) = %{php_api_version}

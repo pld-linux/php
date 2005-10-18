@@ -75,14 +75,15 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.0
-%define	_rc	RC1
-%define	_rel 3.1
+%define	_rc	RC3
+%define	_rel 0.1
 Release:	0.%{_rc}.%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
-Source0:	http://www.php.net/distributions/%{name}-%{version}%{_rc}.tar.bz2
-# Source0-md5:	c7aebeb915e6f898559365cf82493ad0
+# Source0:	http://www.php.net/distributions/%{name}-%{version}%{_rc}.tar.bz2
+Source0:	http://downloads.php.net/ilia/%{name}-%{version}%{_rc}.tar.bz2
+# Source0-md5:	6f48ee0b43f54dff8f9e683d337885c1
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -115,7 +116,6 @@ Patch18:	%{name}-zlib.patch
 Patch19:	%{name}-sybase-fix.patch
 Patch20:	%{name}-readline.patch
 Patch21:	%{name}-nohttpd.patch
-Patch22:	%{name}-lib64.patch
 Patch23:	%{name}-gd_imagerotate_enable.patch
 Patch24:	%{name}-uint32_t.patch
 Patch25:	%{name}-hwapi-link.patch
@@ -203,7 +203,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
-%define		zend_module_api		20050617
+%define		zend_module_api		20050922
 %define		zend_extension_api	220050617
 
 %description
@@ -1487,7 +1487,6 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%patch22 -p1
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1

@@ -75,7 +75,7 @@ Summary(uk):	PHP ˜≈“”¶ß 5 - Õœ◊¡ –“≈–“œ√≈”’◊¡ŒŒ— HTML-∆¡ Ã¶◊, ◊…ÀœŒ’◊¡Œ¡ Œ¡ ”≈“◊
 Name:		php
 Version:	5.1.0
 %define	_rc	RC3
-%define	_rel 0.2
+%define	_rel 0.4
 Release:	0.%{_rc}.%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
@@ -1187,6 +1187,16 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z pamiÍci dzielonej.
 
 Uwaga: to jest modu≥ eksperymentalny.
 
+%package simplexml
+Summary:	Simple XML extension module for PHP
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description simplexml
+This is a dynamic shared object (DSO) for PHP that will add Simple XML
+support.
+
 %package snmp
 Summary:	SNMP extension module for PHP
 Summary(pl):	Modu≥ SNMP dla PHP
@@ -1614,6 +1624,7 @@ for sapi in $sapis; do
 	--enable-ftp=shared \
 	--enable-gd-native-ttf \
 	--enable-gd-jus-conf \
+	--enable-libxml \
 	--enable-magic-quotes \
 	--enable-mbstring=shared,all \
 	--enable-mbregex \
@@ -1634,6 +1645,7 @@ for sapi in $sapis; do
 	--enable-session \
 	--enable-shared \
 	--enable-shmop=shared \
+	--enable-simplexml \
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
@@ -2883,6 +2895,14 @@ fi
 #%files session
 #%defattr(644,root,root,755)
 #%attr(755,root,root) %{extensionsdir}/session.so
+
+%if 0
+# simplexml is needed by spl, and spl can't be built shared as of now (5.1.0RC3)
+%files simplexml
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
+%attr(755,root,root) %{extensionsdir}/simplexml.so
+%endif
 
 %files shmop
 %defattr(644,root,root,755)

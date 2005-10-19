@@ -12,7 +12,6 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
-# - shared pdo base
 # - having pcre module loaded cli crashes
 #
 # Conditional build:
@@ -76,7 +75,7 @@ Summary(uk):	PHP ˜≈“”¶ß 5 - Õœ◊¡ –“≈–“œ√≈”’◊¡ŒŒ— HTML-∆¡ Ã¶◊, ◊…ÀœŒ’◊¡Œ¡ Œ¡ ”≈“◊
 Name:		php
 Version:	5.1.0
 %define	_rc	RC3
-%define	_rel 0.1
+%define	_rel 0.2
 Release:	0.%{_rc}.%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
@@ -989,12 +988,23 @@ Compatible Regular Expression support.
 Modu≥ PHP umoøliwiaj±cy korzystanie z perlowych wyraøeÒ regularnych
 (Perl Compatible Regular Expressions)
 
+%package pdo
+Summary:	PHP Data Objects (PDO)
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description pdo
+This is a dynamic shared object (DSO) for PHP that will add PDO
+support.
+
 %package pdo-dblib
 Summary:	PHP Data Objects (PDO) FreeTDS support
 Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do FreeTDS
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 
 %description pdo-dblib
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1010,6 +1020,7 @@ Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do MySQL
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 
 %description pdo-mysql
 This is a dynamic shared object (DSO) for PHP that will add PDO MySQL
@@ -1025,6 +1036,7 @@ Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do ODBC
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 
 %description pdo-odbc
 This is a dynamic shared object (DSO) for PHP that will add PDO ODBC
@@ -1040,6 +1052,7 @@ Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do PostgreSQL
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 
 %description pdo-pgsql
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1055,6 +1068,7 @@ Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do SQLite
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 
 %description pdo-sqlite
 This is a dynamic shared object (DSO) for PHP that will add PDO SQLite
@@ -1604,7 +1618,7 @@ for sapi in $sapis; do
 	--enable-mbstring=shared,all \
 	--enable-mbregex \
 	--enable-pcntl=shared \
-	--enable-pdo \
+	--enable-pdo=shared \
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 	--with-pdo-dblib=shared \
 %endif
@@ -2789,6 +2803,11 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcre.ini
 %attr(755,root,root) %{extensionsdir}/pcre.so
 %endif
+
+%files pdo
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
+%attr(755,root,root) %{extensionsdir}/pdo.so
 
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 %files pdo-dblib

@@ -2555,6 +2555,7 @@ fi
 %if %{with fcgi}
 %files fcgi
 %defattr(644,root,root,755)
+%doc sapi/cgi/README.FastCGI
 %attr(755,root,root) %{_bindir}/php.fcgi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 %endif

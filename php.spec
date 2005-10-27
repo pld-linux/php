@@ -81,7 +81,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	11%{?with_hardening:hardened}
+Release:	12%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -214,6 +214,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		php_api_version		20031224
 %define		zend_module_api		20041030
 %define		zend_extension_api	220040412
+%define		zend_zts			1
+%define		php_debug			%{!?debug:0}%{?debug:1}
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -381,6 +383,8 @@ Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php(zend_extension_api) = %{zend_extension_api}
+Provides:	php(debug) = %{php_debug}
+Provides:	php(thread-safety) = %{zend_zts}
 Obsoletes:	php-session < 3:4.2.1-2
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2

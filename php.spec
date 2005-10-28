@@ -35,6 +35,7 @@
 %bcond_without	mnogosearch	# without mnogosearch extension module
 %bcond_without	msession	# without msession extension module
 %bcond_without	mssql		# without MS SQL extension module
+%bcond_without	mime_magic		# without mime-magic module
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
@@ -51,6 +52,7 @@
 %bcond_without	apache1		# disable building apache 1.3.x module
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
+%bcond_without	zts		# disable experimental-zts
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -81,10 +83,13 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-Release:	12%{?with_hardening:hardened}
+#define	_snap 200510281645
+%define	_rel 12
+Release:	%{?_snap:12.11.%{_snap}.}%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
+#Source0:	http://snaps.php.net/%{name}5-STABLE-%{_snap}.tar.bz2
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	b5d4ca75bbb11ee5b830fa67213d9f7f
 Source1:	FAQ.%{name}
@@ -214,7 +219,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		php_api_version		20031224
 %define		zend_module_api		20041030
 %define		zend_extension_api	220040412
-%define		zend_zts			1
+%define		zend_zts			%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug			%{!?debug:0}%{?debug:1}
 
 %description
@@ -383,8 +388,8 @@ Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php(zend_extension_api) = %{zend_extension_api}
-Provides:	php(debug) = %{php_debug}
-Provides:	php(thread-safety) = %{zend_zts}
+Provides:	php(debug:5) = %{php_debug}
+Provides:	php(thread-safety:5) = %{zend_zts}
 Obsoletes:	php-session < 3:4.2.1-2
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
@@ -1470,7 +1475,7 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q %{?_snap:-n php5-STABLE-%{_snap}}
 # this patch is broken by design, breaks --enable-versioning for example
 # update: --enable-version is broken by itself, it disables dynamic modules.
 %patch0 -p1
@@ -1514,7 +1519,7 @@ zcat %{SOURCE9} | patch -p1
 %endif
 %patch30 -p1
 %patch31 -p1
-%patch32 -p0
+%{!?_snap:%patch32 -p0}
 %patch33 -p1
 
 # conflict seems to be resolved by recode patches
@@ -1598,7 +1603,7 @@ for sapi in $sapis; do
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
-	--enable-maintainer-zts \
+	%{?with_zts:--enable-maintainer-zts} \
 	--enable-memory-limit \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
@@ -1659,7 +1664,7 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
-	--with-mime-magic=shared,/usr/share/file/magic.mime \
+	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic.mime}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{!?with_mnogosearch:--without-mnogosearch}%{?with_mnogosearch:--with-mnogosearch=shared,/usr} \
@@ -2758,10 +2763,12 @@ fi
 %attr(755,root,root) %{extensionsdir}/mhash.so
 %endif
 
+%if %{with mime_magic}
 %files mime_magic
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mime_magic.ini
 %attr(755,root,root) %{extensionsdir}/mime_magic.so
+%endif
 
 %if %{with ming}
 %files ming

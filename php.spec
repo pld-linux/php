@@ -84,7 +84,7 @@ Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на серв
 Name:		php
 Version:	5.0.5
 #define	_snap 200510281645
-%define	_rel 12
+%define	_rel 13
 Release:	%{?_snap:12.11.%{_snap}.}%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
@@ -388,8 +388,8 @@ Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php(zend_extension_api) = %{zend_extension_api}
-Provides:	php(debug:5) = %{php_debug}
-Provides:	php(thread-safety:5) = %{zend_zts}
+Provides:	php5(debug) = %{php_debug}
+Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-session < 3:4.2.1-2
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2

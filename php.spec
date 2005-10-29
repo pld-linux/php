@@ -74,7 +74,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.0
-%define	_rc	RC3
+%define	_rc	RC4
 %define	_rel 0.4
 Release:	0.%{_rc}.%{_rel}%{?with_hardening:hardened}
 Epoch:		4
@@ -82,7 +82,7 @@ Group:		Libraries
 License:	PHP
 # Source0:	http://www.php.net/distributions/%{name}-%{version}%{_rc}.tar.bz2
 Source0:	http://downloads.php.net/ilia/%{name}-%{version}%{_rc}.tar.bz2
-# Source0-md5:	6f48ee0b43f54dff8f9e683d337885c1
+# Source0-md5:	4afd68f8e4fe532cea83f30bd2ff26f5
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -203,7 +203,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
 %define		zend_module_api		20050922
-%define		zend_extension_api	220050617
+%define		zend_extension_api	220051025
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -1544,7 +1544,7 @@ if API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h) && [ 
 fi
 
 if API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h) && [ $API != %{zend_extension_api} ]; then
-	echo "Set %%define zend_module_api to $API and rerun."
+	echo "Set %%define zend_extension_api to $API and rerun."
 	exit 1
 fi
 

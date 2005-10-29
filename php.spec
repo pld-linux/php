@@ -48,6 +48,7 @@
 %bcond_without	apache1		# disable building apache 1.3.x module
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
+%bcond_without	zts		# disable experimental-zts
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -59,6 +60,10 @@
 
 %ifnarch %{ix86} %{x8664} sparc sparcv9 alpha ppc
 %undefine	with_interbase
+%endif
+
+%if %{without apache1} && %{without apache2}
+ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 # x86-only lib
@@ -190,7 +195,7 @@ BuildRequires:	zlib-devel >= 1.0.9
 BuildRequires:	apache1-devel
 %endif
 %if %{with apache2}
-BuildRequires:	apache-devel >= 2.0.44-1
+BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
 %endif
@@ -204,6 +209,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		php_api_version		20041225
 %define		zend_module_api		20050922
 %define		zend_extension_api	220051025
+%define		zend_zts			%{!?with_zts:0}%{?with_zts:1}
+%define		php_debug			%{!?debug:0}%{?debug:1}
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -318,7 +325,6 @@ Summary:	php as FastCGI program
 Summary(pl):	php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description fcgi
 php as FastCGI program.
@@ -331,7 +337,6 @@ Summary:	php as CGI program
 Summary(pl):	php jako program CGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description cgi
 php as CGI program.
@@ -344,13 +349,22 @@ Summary:	php as CLI interpreter
 Summary(pl):	php jako interpreter dzia³aj±cy z linii poleceñ
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description cli
 php as CLI interpreter.
 
 %description cli -l pl
 php jako interpreter dzia³aj±cy z linii poleceñ.
+
+%package program
+Summary:	/usr/bin/php symlink
+Group:		Development/Languages/PHP
+Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
+Provides:	php(program)
+Obsoletes:	php(program)
+
+%description program
+Package providing /usr/bin/php symlink to PHP CLI.
 
 %package common
 Summary:	Common files needed by both apache module and CGI
@@ -361,12 +375,18 @@ Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	sed >= 4.0
+Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
+Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
+Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
+Provides:	%{name}-standard = %{epoch}:%{version}-%{release}
 # FIXME: apache2 specific Provides
 Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php(zend_extension_api) = %{zend_extension_api}
+Provides:	php5(debug) = %{php_debug}
+Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-session < 3:4.2.1-2
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
@@ -1565,7 +1585,6 @@ if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 fi
 PROG_SENDMAIL="/usr/lib/sendmail"; export PROG_SENDMAIL
 
-# Apache SAPIs should be last one listed here
 sapis="
 %if %{with fcgi}
 fcgi
@@ -1610,7 +1629,7 @@ for sapi in $sapis; do
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	--enable-zend-multibyte \
-	--enable-maintainer-zts \
+	%{?with_zts:--enable-maintainer-zts} \
 	--enable-memory-limit \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
@@ -1788,6 +1807,9 @@ libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdi
 # install the apache modules' files
 %{__make} install-headers install-build install-modules install-programs \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
+
+# as of 5.0.5, phpextdist isn't installed by default
+install scripts/dev/phpextdist $RPM_BUILD_ROOT%{_bindir}
 
 # install CGI
 libtool --silent --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi
@@ -2561,6 +2583,7 @@ fi
 %if %{with fcgi}
 %files fcgi
 %defattr(644,root,root,755)
+%doc sapi/cgi/README.FastCGI
 %attr(755,root,root) %{_bindir}/php.fcgi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 %endif
@@ -2573,9 +2596,12 @@ fi
 %files cli
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.cli
-%attr(755,root,root) %{_bindir}/php
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
 %{_mandir}/man1/php.1*
+
+%files program
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/php
 
 %files common
 %defattr(644,root,root,755)
@@ -2597,14 +2623,14 @@ fi
 %doc README.UNIX-BUILD-SYSTEM
 %doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
 %doc CODING_STANDARDS
+%attr(755,root,root) %{_bindir}/phpextdist
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
 %{_libdir}/libphp_common.la
 %{_includedir}/php
 %{_libdir}/php/build
-%{_mandir}/man1/phpize*
-%{_mandir}/man1/php-config*
+%{_mandir}/man1/*
 
 %files bcmath
 %defattr(644,root,root,755)

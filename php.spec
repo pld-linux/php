@@ -84,7 +84,7 @@ Summary(uk):	PHP ˜≈“”¶ß 5 - Õœ◊¡ –“≈–“œ√≈”’◊¡ŒŒ— HTML-∆¡ Ã¶◊, ◊…ÀœŒ’◊¡Œ¡ Œ¡ ”≈“◊
 Name:		php
 Version:	5.0.5
 #define	_snap 200510281645
-%define	_rel 13
+%define	_rel 14
 Release:	%{?_snap:12.11.%{_snap}.}%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
@@ -335,7 +335,6 @@ Summary:	php as FastCGI program
 Summary(pl):	php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description fcgi
 php as FastCGI program.
@@ -348,7 +347,6 @@ Summary:	php as CGI program
 Summary(pl):	php jako program CGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description cgi
 php as CGI program.
@@ -361,13 +359,22 @@ Summary:	php as CLI interpreter
 Summary(pl):	php jako interpreter dzia≥aj±cy z linii poleceÒ
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php-program = %{epoch}:%{version}-%{release}
 
 %description cli
 php as CLI interpreter.
 
 %description cli -l pl
 php jako interpreter dzia≥aj±cy z linii poleceÒ.
+
+%package program
+Summary:	/usr/bin/php symlink
+Group:		Development/Languages/PHP
+Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
+Provides:	php(program)
+Obsoletes:	php(program)
+
+%description program
+Package providing /usr/bin/php symlink to PHP CLI.
 
 %package common
 Summary:	Common files needed by both apache module and CGI
@@ -2577,9 +2584,12 @@ fi
 %files cli
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php.cli
-%attr(755,root,root) %{_bindir}/php
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
 %{_mandir}/man1/php.1*
+
+%files program
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/php
 
 %files common
 %defattr(644,root,root,755)

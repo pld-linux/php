@@ -428,6 +428,8 @@ Summary(uk):	Пакет розробки для побудови розширень PHP
 Group:		Development/Languages/PHP
 Requires:	autoconf
 Requires:	automake
+Requires:	libtool
+Requires:	shtool
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel
@@ -1840,6 +1842,12 @@ done
 
 # Not in all SAPI, so don't need the .ini fragments.
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/{ncurses,pcntl,readline}.ini
+
+# use system automake and {lib,sh}tool
+ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
 %clean
 rm -rf $RPM_BUILD_ROOT

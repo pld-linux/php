@@ -83,8 +83,8 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-#define	_snap 200510281645
-%define	_rel 14
+#define	_snap	200510281645
+%define	_rel	15
 Release:	%{?_snap:12.11.%{_snap}.}%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
@@ -1798,6 +1798,7 @@ libtool --silent --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/
 # install CLI
 libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
 install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
+echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 
 # TODO:
 # Why make install doesn't install libphp5.so ?
@@ -2598,6 +2599,7 @@ fi
 %attr(755,root,root) %{_bindir}/php.cli
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
 %{_mandir}/man1/php.1*
+%{_mandir}/man1/php.cli.1*
 
 %files program
 %defattr(644,root,root,755)

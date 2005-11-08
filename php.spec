@@ -84,7 +84,7 @@ Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на серв
 Name:		php
 Version:	5.0.5
 #define	_snap	200510281645
-%define	_rel	15
+%define	_rel	16
 Release:	%{?_snap:12.11.%{_snap}.}%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
@@ -136,6 +136,7 @@ Patch30:	%{name}-both-apxs.patch
 Patch31:	%{name}-builddir.patch
 Patch32:	%{name}_bug34435.patch
 Patch33:	%{name}-ftp-ssllibs.patch
+Patch34:	%{name}-bug-35009.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1534,6 +1535,7 @@ zcat %{SOURCE9} | patch -p1
 %patch31 -p1
 %{!?_snap:%patch32 -p0}
 %patch33 -p1
+%patch34 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

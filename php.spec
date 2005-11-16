@@ -83,13 +83,11 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-#define	_snap	200510281645
-%define	_rel	16
-Release:	%{?_snap:12.11.%{_snap}.}%{_rel}%{?with_hardening:hardened}
+%define	_rel	17
+Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
-#Source0:	http://snaps.php.net/%{name}5-STABLE-%{_snap}.tar.bz2
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	b5d4ca75bbb11ee5b830fa67213d9f7f
 Source1:	FAQ.%{name}
@@ -137,6 +135,7 @@ Patch31:	%{name}-builddir.patch
 Patch32:	%{name}_bug34435.patch
 Patch33:	%{name}-ftp-ssllibs.patch
 Patch34:	%{name}-bug-35009.patch
+Patch35:	%{name}-bug-33720.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1489,7 +1488,7 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
-%setup -q %{?_snap:-n php5-STABLE-%{_snap}}
+%setup -q
 # this patch is broken by design, breaks --enable-versioning for example
 # update: --enable-version is broken by itself, it disables dynamic modules.
 %patch0 -p1
@@ -1533,9 +1532,10 @@ zcat %{SOURCE9} | patch -p1
 %endif
 %patch30 -p1
 %patch31 -p1
-%{!?_snap:%patch32 -p0}
+%patch32 -p0
 %patch33 -p1
 %patch34 -p1
+%patch35 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

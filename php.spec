@@ -162,6 +162,7 @@ BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libtiff-devel
 BuildRequires:	libtool >= 1.4.3
+BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.0.18
 %{?with_mhash:BuildRequires:	mhash-devel}

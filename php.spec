@@ -32,6 +32,7 @@
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	msession	# without msession extension module
 %bcond_without	mssql		# without MS SQL extension module
+%bcond_without	mime_magic	# without mime-magic module
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
@@ -79,15 +80,12 @@ Summary(ru):	PHP ÷ÅÒÓÉÉ 5 - ÑÚÙË ÐÒÅÐÒÏÃÅÓÓÉÒÏ×ÁÎÉÑ HTML-ÆÁÊÌÏ×, ×ÙÐÏÌÎÑÅÍÙÊ ÎÁ 
 Summary(uk):	PHP ÷ÅÒÓ¦§ 5 - ÍÏ×Á ÐÒÅÐÒÏÃÅÓÕ×ÁÎÎÑ HTML-ÆÁÊÌ¦×, ×ÉËÏÎÕ×ÁÎÁ ÎÁ ÓÅÒ×ÅÒ¦
 Name:		php
 Version:	5.1.0
-%define	_rc	RC4
-%define	_rel 0.4
-Release:	0.%{_rc}.%{_rel}%{?with_hardening:hardened}
+Release:	0.1%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
-# Source0:	http://www.php.net/distributions/%{name}-%{version}%{_rc}.tar.bz2
-Source0:	http://downloads.php.net/ilia/%{name}-%{version}%{_rc}.tar.bz2
-# Source0-md5:	4afd68f8e4fe532cea83f30bd2ff26f5
+Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+# Source0-md5:	4b9caa2f201f6b1f6a24de6c435cd4b1
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -359,6 +357,7 @@ php jako interpreter dzia³aj±cy z linii poleceñ.
 
 %package program
 Summary:	/usr/bin/php symlink
+Summary(pl):	Dowizanie symboliczne /usr/bin/php
 Group:		Development/Languages/PHP
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Provides:	php(program)
@@ -366,6 +365,9 @@ Obsoletes:	php(program)
 
 %description program
 Package providing /usr/bin/php symlink to PHP CLI.
+
+%description program -l pl
+Pakiet dostarczajcy dowizanie symboliczne /usr/bin/php do PHP CLI.
 
 %package common
 Summary:	Common files needed by both apache module and CGI
@@ -415,6 +417,8 @@ Summary(uk):	ðÁËÅÔ ÒÏÚÒÏÂËÉ ÄÌÑ ÐÏÂÕÄÏ×É ÒÏÚÛÉÒÅÎØ PHP
 Group:		Development/Languages/PHP
 Requires:	autoconf
 Requires:	automake
+Requires:	libtool
+Requires:	shtool
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel
@@ -1501,7 +1505,7 @@ compression support to PHP.
 Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{version}%{_rc}
+%setup -q
 # this patch is broken by design, breaks --enable-versioning for example
 # update: --enable-version is broken by itself, it disables dynamic modules.
 %patch0 -p1
@@ -1703,7 +1707,7 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
-	--with-mime-magic=shared,/usr/share/file/magic.mime \
+	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic.mime}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_msession:--with-msession=shared}%{!?with_msession:--without-msession} \
@@ -1859,7 +1863,10 @@ cp -f Zend/LICENSE{,.Zend}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 for so in modules/*.so; do
 	mod=$(basename $so .so)
-	cat > $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/${mod}.ini <<EOF
+	conf="%{_sysconfdir}/conf.d/${mod}.ini"
+	# xml needs to be loaded before wddx
+	[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_${mod}.ini"
+	cat > $RPM_BUILD_ROOT${conf} <<EOF
 ; Enable ${mod} extension module
 extension=${mod}.so
 EOF
@@ -1867,6 +1874,12 @@ done
 
 # Not in all SAPI, so don't need the .ini fragments.
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/{ncurses,pcntl,readline}.ini
+
+# use system automake and {lib,sh}tool
+ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -2762,10 +2775,12 @@ fi
 %attr(755,root,root) %{extensionsdir}/mhash.so
 %endif
 
+%if %{with mime_magic}
 %files mime_magic
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mime_magic.ini
 %attr(755,root,root) %{extensionsdir}/mime_magic.so
+%endif
 
 %if %{with ming}
 %files ming
@@ -3004,7 +3019,7 @@ fi
 %if %{with wddx}
 %files wddx
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/wddx.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*wddx.ini
 %attr(755,root,root) %{extensionsdir}/wddx.so
 %endif
 

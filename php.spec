@@ -83,7 +83,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.0.5
-%define	_rel	17
+%define	_rel	18
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
@@ -297,12 +297,9 @@ Requires(post,preun):	%{apxs1}
 Requires(post,preun):	%{__perl}
 Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime
-Provides:	%{name} = %{epoch}:%{version}-%{release}
 Provides:	php = %{epoch}:%{version}-%{release}
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php < 1:4.1.1
-# Obsolete all php5 packages, this is not to obsolete php4 companion
-Obsoletes:	php >= 4:5.0.0
 
 %description -n apache1-mod_php
 PHP as DSO module for apache 1.3.x.
@@ -317,12 +314,9 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache >= 2.0.52-2
 Requires:	apache(modules-api) = %{apache_modules_api}
-Provides:	%{name} = %{epoch}:%{version}-%{release}
 Provides:	php = %{epoch}:%{version}-%{release}
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php < 1:4.1.1
-# Obsolete all php5 packages, this is not to obsolete php4 companion
-Obsoletes:	php >= 4:5.0.0
 
 %description -n apache-mod_php
 PHP as DSO module for apache 2.x.
@@ -335,6 +329,7 @@ Summary:	php as FastCGI program
 Summary(pl):	php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php = %{epoch}:%{version}-%{release}
 
 %description fcgi
 php as FastCGI program.

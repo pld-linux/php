@@ -62,13 +62,13 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 4 -- язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 4 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	4.4.0
+Version:	4.4.1
 Release:	1
 Epoch:		3
 Group:		Libraries
 License:	PHP
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	e85b606fe48198bfcd785e5a5b1c9613
+# Source0-md5:	6b5726471189f8a1f26dd7cc5e19b442
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -111,7 +111,10 @@ Patch30:	%{name}-mnogosearch-fix.patch
 Patch31:	%{name}-gd_imagerotate_enable.patch
 Patch32:	%{name}-uint32_t.patch
 Patch33:	%{name}-va_copy.patch
-Patch34:	%{name}-pgsql-fix.patch
+Patch34:	%{name}-install_gd_headers.patch
+Patch35:	%{name}-bug-35009.patch
+Patch36:	%{name}-bug-35056.patch
+Patch37:	%{name}-bug-35067.patch
 Icon:		php4.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1563,6 +1566,9 @@ cp php.ini-dist php.ini
 %patch33 -p1
 %endif
 %patch34 -p1
+%patch35 -p1
+%patch36 -p1
+%patch37 -p1
 
 %build
 CFLAGS="%{rpmcflags} -DEAPI=1 -I%{_prefix}/X11R6/include"

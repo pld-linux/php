@@ -147,15 +147,15 @@ BuildRequires:	bison
 BuildRequires:	bzip2-devel
 %{?with_curl:BuildRequires:	curl-devel >= 7.12.0}
 BuildRequires:	cyrus-sasl-devel
-%{?with_db3:BuildRequires:	db3-devel >= 3.1}
 %{!?with_db3:BuildRequires:	db-devel >= 4.0}
+%{?with_db3:BuildRequires:	db3-devel >= 3.1}
 BuildRequires:	elfutils-devel
 %if %{with xmlrpc}
 BuildRequires:	expat-devel
 %endif
 %{?with_fam:BuildRequires:	fam-devel}
-%{?with_fdf:BuildRequires:	fdftk-devel}
 %{?with_fcgi:BuildRequires:	fcgi-devel}
+%{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 BuildRequires:	freetds-devel
@@ -185,12 +185,13 @@ BuildRequires:	ncurses-ext-devel
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
+BuildRequires:	%{__perl}
+%{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel}
-BuildRequires:	%{__perl}
 %{?with_msession:BuildRequires:	phoenix-devel}
-%{?with_pgsql:BuildRequires:	postgresql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
+%{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-build >= 4.4.0
@@ -198,7 +199,6 @@ BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
-%{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
 %{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel}
 BuildRequires:	zlib-devel >= 1.0.9
@@ -293,9 +293,9 @@ PHP - це мова написання скрипт╕в, що вбудовуються в HTML-код. PHP
 Summary:	PHP DSO module for apache 1.3.x
 Summary(pl):	ModuЁ DSO (Dynamic Shared Object) php dla apache 1.3.x
 Group:		Development/Languages/PHP
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires(post,preun):	%{apxs1}
 Requires(post,preun):	%{__perl}
+Requires(post,preun):	%{apxs1}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime
 Provides:	php = %{epoch}:%{version}-%{release}
@@ -313,8 +313,8 @@ Summary:	PHP DSO module for apache 2.x
 Summary(pl):	ModuЁ DSO (Dynamic Shared Object) php dla apache 2.x
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	apache >= 2.0.52-2
 Requires:	apache(modules-api) = %{apache_modules_api}
+Requires:	apache >= 2.0.52-2
 Provides:	php = %{epoch}:%{version}-%{release}
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php < 1:4.1.1
@@ -422,11 +422,11 @@ Summary(pt_BR):	Arquivos de desenvolvimento para PHP
 Summary(ru):	Пакет разработки для построения расширений PHP
 Summary(uk):	Пакет розробки для побудови розширень PHP
 Group:		Development/Languages/PHP
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf
 Requires:	automake
 Requires:	libtool
 Requires:	shtool
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel
 
@@ -1390,9 +1390,9 @@ Summary:	wddx extension module for PHP
 Summary(pl):	ModuЁ wddx dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description wddx
 This is a dynamic shared object (DSO) for PHP that will add wddx

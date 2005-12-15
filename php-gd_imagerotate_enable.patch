@@ -1,5 +1,6 @@
---- ./ext/gd/gd.c.org	2004-08-17 01:08:56.000000000 +0200
-+++ ./ext/gd/gd.c	2004-10-18 14:24:15.797275104 +0200
+diff -urbB php-5.1.0RC1.org/ext/gd/gd.c php-5.1.0RC1/ext/gd/gd.c
+--- php-5.1.0RC1.org/ext/gd/gd.c	2005-08-25 15:26:22.317049000 +0200
++++ php-5.1.0RC1/ext/gd/gd.c	2005-08-25 15:27:37.644598376 +0200
 @@ -209,8 +209,8 @@
  	PHP_FE(imagecopyresampled,						NULL)
  #endif
@@ -10,7 +11,7 @@
  	PHP_FE(imageantialias,							NULL)
  #endif
  
-@@ -416,11 +416,11 @@
+@@ -429,11 +429,11 @@
  #ifdef GD2_FMT_COMPRESSED
  	REGISTER_LONG_CONSTANT("IMG_GD2_COMPRESSED", GD2_FMT_COMPRESSED, CONST_CS | CONST_PERSISTENT);
  #endif
@@ -23,7 +24,7 @@
  	REGISTER_LONG_CONSTANT("GD_BUNDLED", 1, CONST_CS | CONST_PERSISTENT);
  	/* Section Filters */
  	REGISTER_LONG_CONSTANT("IMG_FILTER_NEGATE", IMAGE_FILTER_NEGATE, CONST_CS | CONST_PERSISTENT);
-@@ -1191,7 +1191,6 @@
+@@ -1204,7 +1204,6 @@
  /* }}} */
  #endif
  
@@ -31,7 +32,16 @@
  /* {{{ proto resource imagerotate(resource src_im, float angle, int bgdcolor)
     Rotate an image using a custom angle */
  PHP_FUNCTION(imagerotate)
-@@ -1221,7 +1220,6 @@
+@@ -1221,7 +1220,7 @@
+ 
+ 	ZEND_FETCH_RESOURCE(im_src, gdImagePtr, &SIM, -1, "Image", le_gd);
+ 
+-	im_dst = gdImageRotate(im_src, degrees, color, ignoretransparent);
++	im_dst = gdImageRotate(im_src, degrees, color);
+ 
+ 	if (im_dst != NULL) {
+ 		ZEND_REGISTER_RESOURCE(return_value, im_dst, le_gd);
+@@ -1230,7 +1229,6 @@
  	}
  }
  /* }}} */
@@ -39,8 +49,9 @@
  
  #if HAVE_GD_IMAGESETTILE
  /* {{{ proto bool imagesettile(resource image, resource tile)
---- ./ext/gd/php_gd.h.org	2004-01-08 18:32:08.000000000 +0100
-+++ ./ext/gd/php_gd.h	2004-10-18 14:24:34.372451248 +0200
+diff -urbB php-5.1.0RC1.org/ext/gd/php_gd.h php-5.1.0RC1/ext/gd/php_gd.h
+--- php-5.1.0RC1.org/ext/gd/php_gd.h	2005-08-25 15:26:22.366042000 +0200
++++ php-5.1.0RC1/ext/gd/php_gd.h	2005-08-25 15:27:37.645598224 +0200
 @@ -103,8 +103,8 @@
  PHP_FUNCTION(imagecopyresampled);
  #endif

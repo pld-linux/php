@@ -286,12 +286,9 @@ Requires(post,preun):	%{apxs1}
 Requires(post,preun):	%{__perl}
 Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime
-Provides:	%{name} = %{epoch}:%{version}-%{release}
 Provides:	php = %{epoch}:%{version}-%{release}
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php < 1:4.1.1
-# Obsolete all php5 packages, this is not to obsolete php4 companion
-Obsoletes:	php >= 4:5.0.0
 
 %description -n apache1-mod_php
 PHP as DSO module for apache 1.3.x.
@@ -306,12 +303,9 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache >= 2.0.52-2
 Requires:	apache(modules-api) = %{apache_modules_api}
-Provides:	%{name} = %{epoch}:%{version}-%{release}
 Provides:	php = %{epoch}:%{version}-%{release}
 Obsoletes:	phpfi
 Obsoletes:	apache-mod_php < 1:4.1.1
-# Obsolete all php5 packages, this is not to obsolete php4 companion
-Obsoletes:	php >= 4:5.0.0
 
 %description -n apache-mod_php
 PHP as DSO module for apache 2.x.
@@ -1828,6 +1822,7 @@ libtool --silent --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/
 # install CLI
 libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
 install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
+echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 
 # TODO:
 # Why make install doesn't install libphp5.so ?
@@ -2613,6 +2608,7 @@ fi
 %attr(755,root,root) %{_bindir}/php.cli
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
 %{_mandir}/man1/php.1*
+%{_mandir}/man1/php.cli.1*
 
 %files program
 %defattr(644,root,root,755)

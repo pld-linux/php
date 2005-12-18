@@ -80,7 +80,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.1
-Release:	0.1%{?with_hardening:hardened}
+Release:	0.2%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
 License:	PHP
@@ -1577,10 +1577,9 @@ CFLAGS="$CFLAGS $(%{_bindir}/apr-1-config --includes) $(%{_bindir}/apu-1-config 
 EXTENSION_DIR="%{extensionsdir}"; export EXTENSION_DIR
 if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 	rm -f Makefile.{fcgi,cgi,cli,apxs{1,2}} # now remove Makefile copies
-	./buildconf --force
 	%{__libtoolize}
 	%{__aclocal}
-	%{__autoconf}
+	./buildconf --force
 	touch _built-conf
 fi
 PROG_SENDMAIL="/usr/lib/sendmail"; export PROG_SENDMAIL

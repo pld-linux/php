@@ -119,7 +119,6 @@ Patch23:	%{name}-gd_imagerotate_enable.patch
 Patch24:	%{name}-uint32_t.patch
 Patch25:	%{name}-hwapi-link.patch
 Patch26:	%{name}-dba-link.patch
-Patch27:	%{name}-install_gd_headers.patch
 Patch30:	%{name}-hardening-fix.patch
 Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
@@ -1525,12 +1524,10 @@ cp php.ini-dist php.ini
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
-# FIXME: ???
-# %patch27 -p1
 
 %if %{with hardening}
-zcat %{SOURCE9} | patch -p1
-patch -p1 < %{PATCH30}
+zcat %{SOURCE9} | patch -p1 || exit 1
+patch -p1 < %{PATCH30} || exit 1
 %endif
 %patch31 -p1
 %patch32 -p1

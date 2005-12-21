@@ -373,8 +373,6 @@ Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-standard = %{epoch}:%{version}-%{release}
-# FIXME: apache2 specific Provides
-Provides:	php-common(apache-modules-api) = %{apache_modules_api}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php(zend_extension_api) = %{zend_extension_api}

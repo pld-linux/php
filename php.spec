@@ -8,6 +8,9 @@
 # - deal with modules removed from php and not moved to PECL
 #   (existing only in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
+#   and removed from php 5.1:
+#   cpdf, dio, dbx, mnogosearch, yp
+#   what about interbase? it's still present, but disabled???
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?

@@ -418,28 +418,32 @@ Included here is the source for the PHP extensions. Instead of
 recompiling the whole php binary to add support for, say, oracle,
 install this package and use the new self-contained extensions
 support. For more information, read the file
-SELF-CONTAINED-EXTENSIONS.
+README.SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l pl
-Pliki potrzebne do kompilacji moduЁСw PHP.
+Ten pakiet zawiera pliki potrzebne do kompilacji moduЁСw PHP. Zamiast
+rekompilowaФ caЁe php aby dodaФ obsЁugЙ np. oracle, mo©na przy u©yciu
+tego pakietu skompilowaФ samodzielne rozszerzenie. WiЙcej informacji o
+samodzielnych rozszerzeniach mo©na znale╪Ф w pliku
+README.SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l pt_BR
 Este pacote contИm arquivos usados no desenvolvimento de programas ou
 mСdulos PHP.
-
-%description devel -l uk
-Пакет php-devel да╓ можлив╕сть комп╕лювати динам╕чн╕ розширення PHP.
-До пакету включено вих╕дний код для розширень. Зам╕сть повторно╖
-комп╕ляц╕╖ б╕нарного файлу php для додання, наприклад, п╕дтримки
-oracle, встанов╕ть цей пакет для комп╕ляц╕╖ окремих розширень.
-Детальн╕ша ╕нформац╕я - в файл╕ SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l ru
 Пакет php-devel дает возможность компилировать динамические расширения
 PHP. Пакет включает исходный код этих расширений. Вместо повторной
 компиляции бинарного файла php для добавления, например, поддержки
 oracle, установите этот пакет для компилирования отдельных расширений.
-Подробности - в файле SELF-CONTAINED-EXTENSIONS.
+Подробности - в файле README.SELF-CONTAINED-EXTENSIONS.
+
+%description devel -l uk
+Пакет php-devel да╓ можлив╕сть комп╕лювати динам╕чн╕ розширення PHP.
+До пакету включено вих╕дний код для розширень. Зам╕сть повторно╖
+комп╕ляц╕╖ б╕нарного файлу php для додання, наприклад, п╕дтримки
+oracle, встанов╕ть цей пакет для комп╕ляц╕╖ окремих розширень.
+Детальн╕ша ╕нформац╕я - в файл╕ README.SELF-CONTAINED-EXTENSIONS.
 
 %package bcmath
 Summary:	bcmath extension module for PHP
@@ -868,6 +872,7 @@ Um mСdulo para aplicaГУes PHP que usam bancos de dados MySQL.
 
 %package mysqli
 Summary:	MySQLi module for PHP
+Summary(pl):	ModuЁ MySQLi dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -881,7 +886,7 @@ is that it provides access to functionality of MySQL 4.1 and above.
 %description mysqli -l pl
 ModuЁ PHP umo©liwiaj╠cy udoskonalony dostЙp do bazy danych MySQL.
 RС©nic╠ miЙdzy nim a moduЁem mysql jest dostЙp do funkcjonalno╤ci
-MySQL 4.1 i wy©ej.
+MySQL w wersji 4.1 i nowszych.
 
 %package ncurses
 Summary:	ncurses module for PHP
@@ -1004,6 +1009,7 @@ ModuЁ PHP umo©liwiaj╠cy korzystanie z perlowych wyra©eЯ regularnych
 
 %package pdo
 Summary:	PHP Data Objects (PDO)
+Summary(pl):	ObsЁuga PHP Data Objects (PDO)
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1011,6 +1017,9 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %description pdo
 This is a dynamic shared object (DSO) for PHP that will add PDO
 support.
+
+%description pdo -l pl
+ModuЁ PHP dodaj╠cy obsЁugЙ PDO (PHP Data Objects).
 
 %package pdo-dblib
 Summary:	PHP Data Objects (PDO) FreeTDS support
@@ -1025,7 +1034,7 @@ This is a dynamic shared object (DSO) for PHP that will add PDO
 FreeTDS support.
 
 %description pdo-dblib -l pl
-ModuЁ dla PHP dodaj╠cy obsЁugЙ dla baz danych FreeTDS za po╤rednictwem
+ModuЁ dla PHP dodaj╠cy obsЁugЙ baz danych FreeTDS za po╤rednictwem
 interfejsu PDO.
 
 %package pdo-mysql
@@ -1041,7 +1050,7 @@ This is a dynamic shared object (DSO) for PHP that will add PDO MySQL
 support.
 
 %description pdo-mysql -l pl
-ModuЁ dla PHP dodaj╠cy obsЁugЙ dla baz danych MySQL za po╤rednictwem
+ModuЁ dla PHP dodaj╠cy obsЁugЙ baz danych MySQL za po╤rednictwem
 interfejsu PDO.
 
 %package pdo-odbc
@@ -1057,7 +1066,7 @@ This is a dynamic shared object (DSO) for PHP that will add PDO ODBC
 support.
 
 %description pdo-odbc -l pl
-ModuЁ dla PHP dodaj╠cy obsЁugЙ dla baz danych ODBC za po╤rednictwem
+ModuЁ dla PHP dodaj╠cy obsЁugЙ baz danych ODBC za po╤rednictwem
 interfejsu PDO.
 
 %package pdo-pgsql
@@ -1073,8 +1082,8 @@ This is a dynamic shared object (DSO) for PHP that will add PDO
 PostgreSQL support.
 
 %description pdo-pgsql -l pl
-ModuЁ dla PHP dodaj╠cy obsЁugЙ dla baz danych PostgreSQL za
-po╤rednictwem interfejsu PDO.
+ModuЁ dla PHP dodaj╠cy obsЁugЙ baz danych PostgreSQL za po╤rednictwem
+interfejsu PDO.
 
 %package pdo-sqlite
 Summary:	PHP Data Objects (PDO) SQLite support
@@ -1089,7 +1098,7 @@ This is a dynamic shared object (DSO) for PHP that will add PDO SQLite
 support.
 
 %description pdo-sqlite -l pl
-ModuЁ dla PHP dodaj╠cy obsЁugЙ dla baz danych SQLite za po╤rednictwem
+ModuЁ dla PHP dodaj╠cy obsЁugЙ baz danych SQLite za po╤rednictwem
 interfejsu PDO.
 
 %package pgsql
@@ -1203,6 +1212,7 @@ Uwaga: to jest moduЁ eksperymentalny.
 
 %package simplexml
 Summary:	Simple XML extension module for PHP
+Summary(pl):	ModuЁ prostego rozszerzenia XML dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1210,6 +1220,9 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %description simplexml
 This is a dynamic shared object (DSO) for PHP that will add Simple XML
 support.
+
+%description simplexml -l pl
+ModuЁ PHP dodaj╠cy obsЁugЙ prostego XML-a.
 
 %package snmp
 Summary:	SNMP extension module for PHP

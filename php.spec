@@ -9,8 +9,7 @@
 #   (existing only in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
 #   and removed from php 5.1:
-#   cpdf, dio, dbx, fam, mnogosearch, yp
-#   what about interbase? it's still present, but disabled???
+#   cpdf, dio, dbx, fam, mnogosearch, yp, oracle
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
@@ -24,10 +23,9 @@
 %bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
-%bcond_with	oracle		# with oracle extension module		(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_with	interbase	# with InterBase extension module
+%bcond_without	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	ming		# without ming extension module
@@ -83,7 +81,7 @@ Summary(ru):	PHP ˜≈“”…… 5 - —⁄ŸÀ –“≈–“œ√≈””…“œ◊¡Œ…— HTML-∆¡ Ãœ◊, ◊Ÿ–œÃŒ—≈ÕŸ  Œ¡ 
 Summary(uk):	PHP ˜≈“”¶ß 5 - Õœ◊¡ –“≈–“œ√≈”’◊¡ŒŒ— HTML-∆¡ Ã¶◊, ◊…ÀœŒ’◊¡Œ¡ Œ¡ ”≈“◊≈“¶
 Name:		php
 Version:	5.1.1
-%define	_rel 3
+%define	_rel 4
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
@@ -906,19 +904,19 @@ cgi SAPIs).
 Modu≥ PHP dodaj±cy obs≥ugÍ funkcji ncurses (tylko do SAPI cli i cgi).
 
 %package oci8
-Summary:	Oracle 8 database module for PHP
-Summary(pl):	Modu≥ bazy danych Oracle 8 dla PHP
+Summary:	Oracle 8+ database module for PHP
+Summary(pl):	Modu≥ bazy danych Oracle 8+ dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Autoreq:	false
 
 %description oci8
-This is a dynamic shared object (DSO) for PHP that will add Oracle 7
-and Oracle 8 database support through Oracle8 Call-Interface (OCI8).
+This is a dynamic shared object (DSO) for PHP that will add Oracle 7,
+8, 9 and 10 database support through Oracle8 Call-Interface (OCI8).
 
 %description oci8 -l pl
-Modu≥ PHP umoøliwiaj±cy dostÍp do bazy danych Oracle 7 i Oracle 8
+Modu≥ PHP umoøliwiaj±cy dostÍp do bazy danych Oracle 7, 8, 9 i 10
 poprzez interfejs Oracle8 Call-Interface (OCI8).
 
 %package odbc
@@ -957,21 +955,6 @@ Warning: this is an experimental module.
 Modu≥ PHP umoøliwiaj±cy korzystanie z biblioteki OpenSSL.
 
 Uwaga: to jest modu≥ eksperymentalny.
-
-%package oracle
-Summary:	Oracle 7 database module for PHP
-Summary(pl):	Modu≥ bazy danych Oracle 7 dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Autoreq:	false
-
-%description oracle
-This is a dynamic shared object (DSO) for PHP that will add Oracle 7
-database support.
-
-%description oracle -l pl
-Modu≥ PHP umoøliwiaj±cy dostÍp do bazy danych Oracle 7.
 
 %package pcntl
 Summary:	Process Control extension module for PHP
@@ -1026,7 +1009,7 @@ Modu≥ PHP dodaj±cy obs≥ugÍ PDO (PHP Data Objects).
 
 %package pdo-dblib
 Summary:	PHP Data Objects (PDO) FreeTDS support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do FreeTDS
+Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± FreeTDS
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1042,7 +1025,7 @@ interfejsu PDO.
 
 %package pdo-mysql
 Summary:	PHP Data Objects (PDO) MySQL support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do MySQL
+Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± MySQL-a
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1056,9 +1039,25 @@ support.
 Modu≥ dla PHP dodaj±cy obs≥ugÍ baz danych MySQL za po∂rednictwem
 interfejsu PDO.
 
+%package pdo-oci
+Summary:	PHP Data Objects (PDO) Oracle support
+Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± Oracle'a
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+
+%description pdo-oci
+This is a dynamic shared object (DSO) for PHP that will add PDO Oracle
+support.
+
+%description pdo-oci -l pl
+Modu≥ dla PHP dodaj±cy obs≥ugÍ baz danych Oracle za po∂rednictwem
+interfejsu PDO.
+
 %package pdo-odbc
 Summary:	PHP Data Objects (PDO) ODBC support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do ODBC
+Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± ODBC
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1074,7 +1073,7 @@ interfejsu PDO.
 
 %package pdo-pgsql
 Summary:	PHP Data Objects (PDO) PostgreSQL support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do PostgreSQL
+Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± PostgreSQL-a
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1090,7 +1089,7 @@ interfejsu PDO.
 
 %package pdo-sqlite
 Summary:	PHP Data Objects (PDO) SQLite support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z wsparciem do SQLite
+Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± SQLite
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1656,7 +1655,7 @@ for sapi in $sapis; do
 	--with-pdo-firebird=shared \
 %endif
 	--with-pdo-mysql=shared \
-	%{?with_oracle:--with-pdo-oci=shared} \
+	%{?with_oci8:--with-pdo-oci=shared} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_sqlite:--with-pdo-sqlite=shared} \
@@ -1714,7 +1713,6 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
-	%{?with_oracle:--with-oracle=shared} \
 	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared,/usr} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
@@ -2188,12 +2186,6 @@ fi
 %postun openssl
 %extension_postun
 
-%post oracle
-%extension_post
-
-%postun oracle
-%extension_postun
-
 %post pcntl
 if [ -f %{_sysconfdir}/php-cgi.ini ]; then
 	%{_sbindir}/php-module-install install pcntl %{_sysconfdir}/php-cgi.ini
@@ -2502,9 +2494,6 @@ fi
 
 %triggerun openssl -- %{name}-openssl < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove openssl %{_sysconfdir}/php.ini
-
-%triggerun oracle -- %{name}-oracle < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove oracle %{_sysconfdir}/php.ini
 
 %triggerun pcre -- %{name}-pcre < 4:5.0.4-9.1
 [ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove pcre %{_sysconfdir}/php.ini
@@ -2837,13 +2826,6 @@ fi
 %attr(755,root,root) %{extensionsdir}/openssl.so
 %endif
 
-%if %{with oracle}
-%files oracle
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/oracle.ini
-%attr(755,root,root) %{extensionsdir}/oracle.so
-%endif
-
 %files pcntl
 %defattr(644,root,root,755)
 %attr(755,root,root) %{extensionsdir}/pcntl.so
@@ -2872,11 +2854,11 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_mysql.ini
 %attr(755,root,root) %{extensionsdir}/pdo_mysql.so
 
-%if %{with oracle}
-%files pdo-oracle
+%if %{with oci8}
+%files pdo-oci
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_oracle.ini
-%attr(755,root,root) %{extensionsdir}/pdo_oracle.so
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_oci.ini
+%attr(755,root,root) %{extensionsdir}/pdo_oci.so
 %endif
 
 %if %{with odbc}

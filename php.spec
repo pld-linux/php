@@ -9,7 +9,7 @@
 #   (existing only in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
 #   and removed from php 5.1:
-#   cpdf, dio, dbx, fam, mnogosearch, yp, oracle
+#   cpdf, dio, dbx, fam, yp, oracle
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?

@@ -282,8 +282,8 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime
 Provides:	php = %{epoch}:%{version}-%{release}
-Obsoletes:	phpfi
 Obsoletes:	apache-mod_php < 1:4.1.1
+Obsoletes:	phpfi
 
 %description -n apache1-mod_php
 PHP as DSO module for apache 1.3.x.
@@ -296,11 +296,10 @@ Summary:	PHP DSO module for apache 2.x
 Summary(pl):	Modu³ DSO (Dynamic Shared Object) php dla apache 2.x
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	apache(modules-api) = %{apache_modules_api}
 Requires:	apache >= 2.2.0
+Requires:	apache(modules-api) = %{apache_modules_api}
 Provides:	php = %{epoch}:%{version}-%{release}
 Obsoletes:	phpfi
-Obsoletes:	apache-mod_php < 1:4.1.1
 
 %description -n apache-mod_php
 PHP as DSO module for apache 2.x.
@@ -374,8 +373,8 @@ Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-standard = %{epoch}:%{version}-%{release}
 Provides:	php(modules_api) = %{php_api_version}
-Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php(zend_extension_api) = %{zend_extension_api}
+Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pecl-domxml

@@ -79,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.1
-%define	_rel 5
+%define	_rel 6
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 Group:		Libraries
@@ -1625,7 +1625,6 @@ for sapi in $sapis; do
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
-	--enable-zend-multibyte \
 	%{?with_zts:--enable-maintainer-zts} \
 	--enable-memory-limit \
 	--enable-bcmath=shared \

@@ -13,6 +13,10 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
+# - package for pdo-firebird?
+# warning: Installed (but unpackaged) file(s) found:
+#   /etc/php/conf.d/pdo_firebird.ini
+#   /usr/lib/php/pdo_firebird.so
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support

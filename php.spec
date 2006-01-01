@@ -1281,6 +1281,7 @@ Summary(pl):	Modu³ SQLite dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 
 %description sqlite
 SQLite is a C library that implements an embeddable SQL database

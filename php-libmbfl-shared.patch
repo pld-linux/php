@@ -1,0 +1,24 @@
+diff -u php-5.1.1/ext/mbstring/mbstring.c php-5.1.1-shared/ext/mbstring/mbstring.c
+--- php-5.1.1/ext/mbstring/mbstring.c	2005-11-25 23:55:25.000000000 +0200
++++ php-5.1.1-shared/ext/mbstring/mbstring.c	2006-01-02 01:01:39.000000000 +0200
+@@ -61,7 +61,7 @@
+ #include "main/php_output.h"
+ #include "ext/standard/info.h"
+ 
+-#include "libmbfl/mbfl/mbfl_allocators.h"
++#include <mbfl/mbfl_allocators.h>
+ 
+ #include "php_variables.h"
+ #include "php_globals.h"
+diff -u php-5.1.1/ext/mbstring/mbstring.h php-5.1.1-shared/ext/mbstring/mbstring.h
+--- php-5.1.1/ext/mbstring/mbstring.h	2005-08-03 17:07:24.000000000 +0300
++++ php-5.1.1-shared/ext/mbstring/mbstring.h	2006-01-02 01:01:19.000000000 +0200
+@@ -68,7 +68,7 @@
+ 
+ #if HAVE_MBSTRING
+ 
+-#include "libmbfl/mbfl/mbfilter.h"
++#include <mbfl/mbfilter.h>
+ #include "SAPI.h"
+ 
+ #define PHP_MBSTRING_API 20021024

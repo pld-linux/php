@@ -13,10 +13,6 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
-# - package for pdo-firebird?
-# warning: Installed (but unpackaged) file(s) found:
-#   /etc/php/conf.d/pdo_firebird.ini
-#   /usr/lib/php/pdo_firebird.so
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -83,11 +79,11 @@ Summary(ru):	PHP ÷ÅÒÓÉÉ 5 - ÑÚÙË ÐÒÅÐÒÏÃÅÓÓÉÒÏ×ÁÎÉÑ HTML-ÆÁÊÌÏ×, ×ÙÐÏÌÎÑÅÍÙÊ ÎÁ 
 Summary(uk):	PHP ÷ÅÒÓ¦§ 5 - ÍÏ×Á ÐÒÅÐÒÏÃÅÓÕ×ÁÎÎÑ HTML-ÆÁÊÌ¦×, ×ÉËÏÎÕ×ÁÎÁ ÎÁ ÓÅÒ×ÅÒ¦
 Name:		php
 Version:	5.1.1
-%define	_rel 6
+%define	_rel 6.3
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
-Group:		Libraries
 License:	PHP
+Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	70a7c90de182d1a1901c390b844153c7
 Source1:	FAQ.%{name}
@@ -126,6 +122,7 @@ Patch26:	%{name}-dba-link.patch
 Patch30:	%{name}-hardening-fix.patch
 Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
+Patch33:	%{name}-libmbfl-shared.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -155,6 +152,7 @@ BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
+BuildRequires:	libmbfl-devel
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libtiff-devel
@@ -1025,6 +1023,17 @@ FreeTDS support.
 Modu³ dla PHP dodaj±cy obs³ugê baz danych FreeTDS za po¶rednictwem
 interfejsu PDO.
 
+%package pdo-firebird
+Summary:	PHP Data Objects (PDO) Firebird support
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+
+%description pdo-firebird
+This is a dynamic shared object (DSO) for PHP that will add PDO
+Firebird support.
+
 %package pdo-mysql
 Summary:	PHP Data Objects (PDO) MySQL support
 Summary(pl):	Modu³ PHP Data Objects (PDO) z obs³ug± MySQL-a
@@ -1548,12 +1557,28 @@ patch -p1 < %{PATCH30} || exit 1
 %endif
 %patch31 -p1
 %patch32 -p1
+%patch33 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
 
 # new apr
 sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4
+
+# remove all bundled libraries not to link with them accidentally
+#rm -rf ext/sqlite/libsqlite
+#rm -rf ext/bcmath/libbcmath
+#rm -rf ext/date/lib
+#rm -rf ext/dba/libcdb
+#rm -rf ext/dba/libflatfile
+#rm -rf ext/dba/libinifile
+#rm -rf ext/gd/libgd
+rm -rf ext/mbstring/libmbfl
+#rm -rf ext/mbstring/oniguruma
+rm -rf ext/pcre/pcrelib
+rm -rf ext/pdo_sqlite/sqlite
+#rm -rf ext/soap/interop
+rm -rf ext/xmlrpc/libxmlrpc
 
 %build
 if API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h) && [ $API != %{php_api_version} ]; then
@@ -1646,7 +1671,7 @@ for sapi in $sapis; do
 	--enable-gd-jus-conf \
 	--enable-libxml \
 	--enable-magic-quotes \
-	--enable-mbstring=shared,all \
+	--enable-mbstring=shared,all --with-libmbfl=%{_prefix} \
 	--enable-mbregex \
 	--enable-pcntl=shared \
 	--enable-pdo=shared \
@@ -1660,7 +1685,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-pdo-oci=shared} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
-	%{?with_sqlite:--with-pdo-sqlite=shared} \
+	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--enable-posix=shared \
 	--enable-session \
 	--enable-shared \
@@ -2216,6 +2241,12 @@ fi
 %extension_post
 
 %postun pdo-dblib
+%extension_postun
+
+%post pdo-firebird
+%extension_post
+
+%postun pdo-firebird
 %extension_postun
 
 %post pdo-mysql
@@ -2849,6 +2880,13 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_dblib.ini
 %attr(755,root,root) %{extensionsdir}/pdo_dblib.so
+%endif
+
+%if %{with interbase} && %{without interbase_inst}
+%files pdo-firebird
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_firebird.ini
+%attr(755,root,root) %{extensionsdir}/pdo_firebird.so
 %endif
 
 %files pdo-mysql

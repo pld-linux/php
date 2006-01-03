@@ -13,6 +13,7 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
+# - fix reflection module to build it statically
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -78,14 +79,15 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.1.1
-%define	_rel 6.3
+Version:	5.1.2
+%define	_rel 0.1
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	70a7c90de182d1a1901c390b844153c7
+# Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+Source0:	http://snaps.php.net/php5.1-200601031130.tar.bz2
+# Source0-md5:	f47e4528c30fb9865bebdd2ebbf66c8f
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -122,7 +124,6 @@ Patch26:	%{name}-dba-link.patch
 Patch30:	%{name}-hardening-fix.patch
 Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
-Patch33:	%{name}-libmbfl-shared.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1521,7 +1522,7 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q -n php5.1-200601031130
 # this patch is broken by design, breaks --enable-versioning for example
 # update: --enable-version is broken by itself, it disables dynamic modules.
 %patch0 -p1
@@ -1557,7 +1558,6 @@ patch -p1 < %{PATCH30} || exit 1
 %endif
 %patch31 -p1
 %patch32 -p1
-%patch33 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1573,7 +1573,7 @@ sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4
 #rm -rf ext/dba/libflatfile
 #rm -rf ext/dba/libinifile
 #rm -rf ext/gd/libgd
-rm -rf ext/mbstring/libmbfl
+#rm -rf ext/mbstring/libmbfl
 #rm -rf ext/mbstring/oniguruma
 rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
@@ -1671,7 +1671,7 @@ for sapi in $sapis; do
 	--enable-gd-jus-conf \
 	--enable-libxml \
 	--enable-magic-quotes \
-	--enable-mbstring=shared,all --with-libmbfl=%{_prefix} \
+	--enable-mbstring=shared,all \
 	--enable-mbregex \
 	--enable-pcntl=shared \
 	--enable-pdo=shared \
@@ -1687,6 +1687,7 @@ for sapi in $sapis; do
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--enable-posix=shared \
+	--disable-reflection \
 	--enable-session \
 	--enable-shared \
 	--enable-shmop=shared \
@@ -1703,7 +1704,7 @@ for sapi in $sapis; do
 	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
-	--with-xmlreader=shared \
+	--enable-xmlreader=shared \
 	--with-bz2=shared \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	%{?with_db3:--with-db3}%{!?with_db3:--with-db4} \

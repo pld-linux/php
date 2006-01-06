@@ -124,6 +124,7 @@ Patch26:	%{name}-dba-link.patch
 Patch30:	%{name}-hardening-fix.patch
 Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
+Patch33:	%{name}-zlib-for-getimagesize.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -183,6 +184,7 @@ BuildRequires:	readline-devel
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
+%{?with_sqlite:BuildRequires:	sqlite3-devel}
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
@@ -1558,6 +1560,7 @@ patch -p1 < %{PATCH30} || exit 1
 %endif
 %patch31 -p1
 %patch32 -p1
+%patch33 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

@@ -301,7 +301,6 @@ Summary:	PHP DSO module for apache 2.x
 Summary(pl):	Modu³ DSO (Dynamic Shared Object) php dla apache 2.x
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	apache >= 2.2.0
 Requires:	apache(modules-api) = %{apache_modules_api}
 Provides:	php = %{epoch}:%{version}-%{release}
 Obsoletes:	phpfi

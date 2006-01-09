@@ -31,7 +31,7 @@
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	msession	# without msession extension module
 %bcond_without	mssql		# without MS SQL extension module
-%bcond_without	mime_magic		# without mime-magic module
+%bcond_without	mime_magic	# without mime-magic module
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
@@ -1027,6 +1027,7 @@ interfejsu PDO.
 
 %package pdo-firebird
 Summary:	PHP Data Objects (PDO) Firebird support
+Summary(pl):	Modu³ PHP Data Objects (PDO) z obs³ug± Firebirda
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1035,6 +1036,10 @@ Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 %description pdo-firebird
 This is a dynamic shared object (DSO) for PHP that will add PDO
 Firebird support.
+
+%description pdo-firebird -l pl
+Modu³ dla PHP dodaj±cy obs³ugê baz danych Firebird za po¶rednictwem
+interfejsu PDO.
 
 %package pdo-mysql
 Summary:	PHP Data Objects (PDO) MySQL support

@@ -279,8 +279,7 @@ PHP - це мова написання скрипт╕в, що вбудовуються в HTML-код. PHP
 Summary:	PHP DSO module for apache 1.3.x
 Summary(pl):	ModuЁ DSO (Dynamic Shared Object) php dla apache 1.3.x
 Group:		Development/Languages/PHP
-Requires(post,preun):	%{__perl}
-Requires(post,preun):	%{apxs1}
+Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime
@@ -1661,6 +1660,7 @@ for sapi in $sapis; do
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
+	--enable-inline-optimization \
 	--enable-memory-limit \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
@@ -1911,15 +1911,6 @@ ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%if %{with apache1}
-%triggerpostun -- %{name} < 4:5.0.4-9.11
-%{apxs1} -e -A -n php5 %{_pkglibdir}/libphp5.so 1>&2
-%{__perl} -pi -e \
-	's|^AddType application/x-httpd-php \.php|#AddType application/x-httpd-php .php|' \
-	/etc/apache/apache.conf
-%service -q apache restart
-%endif
-
 %post
 if [ "$1" = "1" ]; then
 %if %{with apache1}
@@ -1992,16 +1983,17 @@ fi
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
 [ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
 
-%if %{with apache2}
-%triggerpostun -- php < 4:5.0.4-7.1
-# for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
-if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
-	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
-	mv -f %{_sysconfdir}/php-apache.ini.rpmsave %{_sysconfdir}/php-apache2handler.ini
-fi
+%if %{with apache1}
+%triggerpostun -n apache1-mod_php -- php < 4:5.0.4-9.11
+sed -i -e '
+	/^AddType application\/x-httpd-php \.php/s,^,#,
+	/^\(Add\|Load\)Module.*php5\.\(so\|c\)/d
+' /etc/apache/apache.conf
+%service -q apache restart
+%endif
 
-# extra trigger, if they did not upgrade to 4:5.0.4-7 but still had old php-apache.ini
-%triggerpostun -n apache-mod_php -- php < 4:5.0.4-7.1
+%if %{with apache2}
+%triggerpostun -n apache-mod_php -- php < 4:5.0.4-7.1, php < 4:5.0.4-7.1
 # for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
 if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
 	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}

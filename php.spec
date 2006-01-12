@@ -80,14 +80,13 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 0.1
+%define	_rel 1
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-# Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://snaps.php.net/php5.1-200601031130.tar.bz2
-# Source0-md5:	f47e4528c30fb9865bebdd2ebbf66c8f
+Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+# Source0-md5:	79cee17e9db85be878000a2a4198378e
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-module-install
@@ -154,7 +153,6 @@ BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
-BuildRequires:	libmbfl-devel
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libtiff-devel
@@ -1528,7 +1526,7 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
-%setup -q -n php5.1-200601031130
+%setup -q
 # this patch is broken by design, breaks --enable-versioning for example
 # update: --enable-version is broken by itself, it disables dynamic modules.
 %patch0 -p1

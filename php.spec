@@ -1498,8 +1498,6 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
-# Maybe it would be nice to add it here?
-#Provides:	php-xslt
 # actually not true, functionality is similar, but API differs
 Obsoletes:	php-xslt <= 3:4.3.8-1
 

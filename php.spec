@@ -13,7 +13,6 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
-# - fix reflection module to build it statically
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -80,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 1
+%define	_rel 2
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -106,6 +105,7 @@ Patch5:		%{name}-msession-shared-lib.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
+Patch9:		%{name}-reflection.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
 Patch14:	%{name}-allow-db31.patch
@@ -1535,6 +1535,7 @@ ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 cp php.ini-dist php.ini
 %patch10 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
@@ -1690,7 +1691,7 @@ for sapi in $sapis; do
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--enable-posix=shared \
-	--disable-reflection \
+	--enable-reflection \
 	--enable-session \
 	--enable-shared \
 	--enable-shmop=shared \

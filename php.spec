@@ -79,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 3
+%define	_rel 4
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -124,6 +124,7 @@ Patch30:	%{name}-hardening-fix.patch
 Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
 Patch33:	%{name}-zlib-for-getimagesize.patch
+Patch34:	%{name}-ini-search-path.patch
 Icon:		php.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1561,6 +1562,7 @@ patch -p1 < %{PATCH30} || exit 1
 %patch31 -p1
 %patch32 -p1
 %patch33 -p1
+%patch34 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

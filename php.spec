@@ -79,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 2
+%define	_rel 3
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -166,7 +166,7 @@ BuildRequires:	libxslt-devel >= 1.0.18
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
 BuildRequires:	ncurses-ext-devel
-%{?with_ldap:BuildRequires:	openldap-devel >= 2.0}
+%{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif

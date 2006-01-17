@@ -1768,8 +1768,6 @@ for sapi in $sapis; do
 	--with-zlib-dir=shared,/usr
 
 	cp -f Makefile Makefile.$sapi
-
-	# left for debugging purposes
 	cp -f main/php_config.h php_config.h.$sapi
 done
 
@@ -2648,6 +2646,12 @@ fi
 %dir %{extensionsdir}
 %dir %{_phpsharedir}
 
+# session_mm doesn't work with shared session
+#%files session
+#%defattr(644,root,root,755)
+#%attr(755,root,root) %{extensionsdir}/session.so
+%doc ext/session/mod_files.sh
+
 %files devel
 %defattr(644,root,root,755)
 %doc README.UNIX-BUILD-SYSTEM
@@ -2948,11 +2952,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/recode.ini
 %attr(755,root,root) %{extensionsdir}/recode.so
 %endif
-
-# session_mm doesn't work with shared session
-#%files session
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{extensionsdir}/session.so
 
 %if 0
 # simplexml is needed by spl, and spl can't be built shared as of now (5.1.0RC3)

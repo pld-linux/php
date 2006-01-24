@@ -71,7 +71,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_msession
 %endif
 
-Summary:	The PHP HTML-embedded scripting language for use with Apache
+Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP pour Apache
 Summary(pl):	Jêzyk skryptowy PHP - u¿ywany wraz z serwerem Apache
 Summary(pt_BR):	A linguagem de script PHP

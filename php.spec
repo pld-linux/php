@@ -72,8 +72,8 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 Summary:	PHP: Hypertext Preprocessor
-Summary(fr):	Le langage de script embarque-HTML PHP pour Apache
-Summary(pl):	JЙzyk skryptowy PHP - u©ywany wraz z serwerem Apache
+Summary(fr):	Le langage de script embarque-HTML PHP
+Summary(pl):	JЙzyk skryptowy PHP
 Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕

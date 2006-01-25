@@ -79,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 5
+%define	_rel 6
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -125,6 +125,10 @@ Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
 Patch33:	%{name}-zlib-for-getimagesize.patch
 Patch34:	%{name}-ini-search-path.patch
+# Very big hack that is sane only with non-thread MPMs.
+# The case with threaded MPMs is lost even without this hack.
+# http://bugs.php.net/bug.php?id=36152
+Patch35:	%{name}-openssl-huge-hack.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1563,6 +1567,7 @@ patch -p1 < %{PATCH30} || exit 1
 %patch32 -p1
 %patch33 -p1
 %patch34 -p1
+%patch35 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

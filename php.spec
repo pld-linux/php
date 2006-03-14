@@ -1464,6 +1464,7 @@ nastêpnie definiowaæ procedury obs³ugi dla ró¿nych zdarzeñ XML.
 Summary:	XML Reader extension module for PHP
 Summary(pl):	Modu³ XML Reader dla PHP
 Group:		Libraries
+Requires:	php-dom
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 

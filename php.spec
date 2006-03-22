@@ -1823,10 +1823,10 @@ cp -af php_config.h.cli main/php_config.h
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi},%{_phpsharedir}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
-	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
+	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}}
 	$RPM_BUILD_ROOT/var/run/php \
-	$RPM_BUILD_ROOT{/etc/apache/conf.d,/etc/httpd/httpd.conf} \
-	$RPM_BUILD_ROOT%{_mandir}/man1
+	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf,tmpwatch} \
+	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
 # install apache1 DSO module
 %if %{with apache1}
@@ -1903,6 +1903,8 @@ for so in modules/*.so; do
 extension=${mod}.so
 EOF
 done
+
+echo "/var/run/php 720" > $RPM_BUILD_ROOT/etc/tmpwatch/php.conf
 
 # Not in all SAPI, so don't need the .ini fragments.
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/{ncurses,pcntl,readline}.ini
@@ -2648,6 +2650,7 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %attr(644,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
+%attr(644,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/tmpwatch/php.conf
 %attr(770,root,http) %dir %verify(not group mode) /var/run/php
 %attr(755,root,root) %{_sbindir}/php-module-install
 %attr(755,root,root) %{_libdir}/libphp_common-*.so

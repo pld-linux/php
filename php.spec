@@ -1823,7 +1823,7 @@ cp -af php_config.h.cli main/php_config.h
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi},%{_phpsharedir}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
-	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}}
+	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/var/run/php \
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf,tmpwatch} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \

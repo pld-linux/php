@@ -21,7 +21,6 @@
 %bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
-%bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
@@ -48,6 +47,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
+%bcond_without	curl		# without CURL extension module
 %bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
 
 %define apxs1		/usr/sbin/apxs1
@@ -79,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 6
+%define	_rel 7
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -372,6 +372,7 @@ Summary(uk):	Б╕бл╕отеки сп╕льного використання для php
 Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
+Requires:	php-dirs
 Requires:	sed >= 4.0
 Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
@@ -1464,9 +1465,9 @@ nastЙpnie definiowaФ procedury obsЁugi dla rС©nych zdarzeЯ XML.
 Summary:	XML Reader extension module for PHP
 Summary(pl):	ModuЁ XML Reader dla PHP
 Group:		Libraries
-Requires:	php-dom
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	php-dom
 
 %description xmlreader
 This is a dynamic shared object (DSO) for PHP that will add XML Reader
@@ -1824,8 +1825,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi},%{_phpsharedir}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
-	$RPM_BUILD_ROOT/var/run/php \
-	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf,tmpwatch} \
+	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
 # install apache1 DSO module
@@ -1903,8 +1903,6 @@ for so in modules/*.so; do
 extension=${mod}.so
 EOF
 done
-
-echo "/var/run/php 720" > $RPM_BUILD_ROOT/etc/tmpwatch/php.conf
 
 # Not in all SAPI, so don't need the .ini fragments.
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/{ncurses,pcntl,readline}.ini
@@ -2650,8 +2648,6 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %attr(644,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
-%attr(644,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/tmpwatch/php.conf
-%attr(770,root,http) %dir %verify(not group mode) /var/run/php
 %attr(755,root,root) %{_sbindir}/php-module-install
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}

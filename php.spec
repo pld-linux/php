@@ -21,6 +21,7 @@
 %bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
+%bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
@@ -29,6 +30,7 @@
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	msession	# without msession extension module
 %bcond_without	mssql		# without MS SQL extension module
+%bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	mime_magic	# without mime-magic module
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
@@ -47,8 +49,6 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
-%bcond_without	curl		# without CURL extension module
-%bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -1467,7 +1467,7 @@ Summary(pl):	Modu³ XML Reader dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	php-dom
+Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
 
 %description xmlreader
 This is a dynamic shared object (DSO) for PHP that will add XML Reader

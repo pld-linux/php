@@ -79,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 7
+%define	_rel 8
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -1003,6 +1003,7 @@ Summary(pl):	ObsЁuga PHP Data Objects (PDO)
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO
 
 %description pdo
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1034,6 +1035,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_FIREBIRD
 
 %description pdo-firebird
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1050,6 +1052,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_MYSQL
 
 %description pdo-mysql
 This is a dynamic shared object (DSO) for PHP that will add PDO MySQL
@@ -1066,6 +1069,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_OCI
 
 %description pdo-oci
 This is a dynamic shared object (DSO) for PHP that will add PDO Oracle
@@ -1082,6 +1086,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_ODBC
 
 %description pdo-odbc
 This is a dynamic shared object (DSO) for PHP that will add PDO ODBC
@@ -1098,6 +1103,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_PGSQL
 
 %description pdo-pgsql
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1114,6 +1120,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_SQLITE
 
 %description pdo-sqlite
 This is a dynamic shared object (DSO) for PHP that will add PDO SQLite

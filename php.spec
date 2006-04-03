@@ -30,6 +30,7 @@
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	msession	# without msession extension module
 %bcond_without	mssql		# without MS SQL extension module
+%bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	mime_magic	# without mime-magic module
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
@@ -48,7 +49,6 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
-%bcond_without	mysqli		# with mysqli support (Requires mysql > 4.1)
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -79,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 6
+%define	_rel 9
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -174,7 +174,6 @@ BuildRequires:	ncurses-ext-devel
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
-BuildRequires:	%{__perl}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel}
@@ -372,6 +371,7 @@ Summary(uk):	Б╕бл╕отеки сп╕льного використання для php
 Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
+Requires:	php-dirs
 Requires:	sed >= 4.0
 Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
@@ -1003,6 +1003,7 @@ Summary(pl):	ObsЁuga PHP Data Objects (PDO)
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO
 
 %description pdo
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1034,6 +1035,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_FIREBIRD
 
 %description pdo-firebird
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1050,6 +1052,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_MYSQL
 
 %description pdo-mysql
 This is a dynamic shared object (DSO) for PHP that will add PDO MySQL
@@ -1066,6 +1069,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_OCI
 
 %description pdo-oci
 This is a dynamic shared object (DSO) for PHP that will add PDO Oracle
@@ -1082,6 +1086,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_ODBC
 
 %description pdo-odbc
 This is a dynamic shared object (DSO) for PHP that will add PDO ODBC
@@ -1098,6 +1103,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_PGSQL
 
 %description pdo-pgsql
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1114,6 +1120,7 @@ Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Obsoletes:	php-pecl-PDO_SQLITE
 
 %description pdo-sqlite
 This is a dynamic shared object (DSO) for PHP that will add PDO SQLite
@@ -1466,6 +1473,7 @@ Summary(pl):	ModuЁ XML Reader dla PHP
 Group:		Libraries
 Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
 
 %description xmlreader
 This is a dynamic shared object (DSO) for PHP that will add XML Reader
@@ -1823,9 +1831,8 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi},%{_phpsharedir}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
-	$RPM_BUILD_ROOT/var/run/php \
-	$RPM_BUILD_ROOT{/etc/apache/conf.d,/etc/httpd/httpd.conf} \
-	$RPM_BUILD_ROOT%{_mandir}/man1
+	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf} \
+	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
 # install apache1 DSO module
 %if %{with apache1}
@@ -2647,7 +2654,6 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %attr(644,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
-%attr(770,root,http) %dir %verify(not group mode) /var/run/php
 %attr(755,root,root) %{_sbindir}/php-module-install
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}

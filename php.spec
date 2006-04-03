@@ -23,7 +23,7 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_with	interbase	# with InterBase extension module
+%bcond_without	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	ming		# without ming extension module
@@ -79,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 8
+%define	_rel 9
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP

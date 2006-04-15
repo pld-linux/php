@@ -49,6 +49,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
+%bcond_with		versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -79,7 +80,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 8
+%define	_rel 8.4
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -129,6 +130,8 @@ Patch34:	%{name}-ini-search-path.patch
 # The case with threaded MPMs is lost even without this hack.
 # http://bugs.php.net/bug.php?id=36152
 Patch35:	%{name}-openssl-huge-hack.patch
+Patch36:	%{name}-versioning.patch
+Patch37:	%{name}-linkflags-clean.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1537,8 +1540,7 @@ ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
 %setup -q
-# this patch is broken by design, breaks --enable-versioning for example
-# update: --enable-version is broken by itself, it disables dynamic modules.
+%patch37 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1576,6 +1578,7 @@ patch -p1 < %{PATCH30} || exit 1
 %patch33 -p1
 %patch34 -p1
 %patch35 -p1
+%{?with_versioning:%patch36 -p1}
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

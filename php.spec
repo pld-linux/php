@@ -72,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_msession
 %endif
 
-%define	_rel 9.3
+%define	_rel 9.5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -89,7 +89,7 @@ Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	79cee17e9db85be878000a2a4198378e
 Source1:	FAQ.%{name}
 Source2:	zend.gif
-Source3:	%{name}-module-install
+
 Source4:	%{name}-mod_%{name}.conf
 Source5:	%{name}-cgi-fcgi.ini
 Source6:	%{name}-cgi.ini
@@ -374,7 +374,6 @@ Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
-Requires:	sed >= 4.0
 Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
@@ -1880,7 +1879,6 @@ install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE1} .
 
 %if %{with apache1}
@@ -1912,8 +1910,11 @@ extension=${mod}.so
 EOF
 done
 
-# Not in all SAPI, so don't need the .ini fragments.
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/{ncurses,pcntl,readline}.ini
+# per SAPI ini directories
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
+
+# for CLI SAPI only
+mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{ncurses,pcntl,readline}.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
@@ -2188,24 +2189,6 @@ fi
 %postun mysqli
 %extension_postun
 
-%post ncurses
-if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-	%{_sbindir}/php-module-install install ncurses %{_sysconfdir}/php-cgi.ini
-fi
-if [ -f %{_sysconfdir}/php-cli.ini ]; then
-	%{_sbindir}/php-module-install install ncurses %{_sysconfdir}/php-cli.ini
-fi
-
-%postun ncurses
-if [ "$1" = "0" ]; then
-	if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-		%{_sbindir}/php-module-install remove ncurses %{_sysconfdir}/php-cgi.ini
-	fi
-	if [ -f %{_sysconfdir}/php-cli.ini ]; then
-		%{_sbindir}/php-module-install remove ncurses %{_sysconfdir}/php-cli.ini
-	fi
-fi
-
 %post oci8
 %extension_post
 
@@ -2223,24 +2206,6 @@ fi
 
 %postun openssl
 %extension_postun
-
-%post pcntl
-if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-	%{_sbindir}/php-module-install install pcntl %{_sysconfdir}/php-cgi.ini
-fi
-if [ -f %{_sysconfdir}/php-cli.ini ]; then
-	%{_sbindir}/php-module-install install pcntl %{_sysconfdir}/php-cli.ini
-fi
-
-%postun pcntl
-if [ "$1" = "0" ]; then
-	if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-		%{_sbindir}/php-module-install remove pcntl %{_sysconfdir}/php-cgi.ini
-	fi
-	if [ -f %{_sysconfdir}/php-cli.ini ]; then
-		%{_sbindir}/php-module-install remove pcntl %{_sysconfdir}/php-cli.ini
-	fi
-fi
 
 %post pcre
 %extension_post
@@ -2302,24 +2267,6 @@ fi
 %postun pspell
 %extension_postun
 
-%post readline
-if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-	%{_sbindir}/php-module-install install readline %{_sysconfdir}/php-cgi.ini
-fi
-if [ -f %{_sysconfdir}/php-cli.ini ]; then
-	%{_sbindir}/php-module-install install readline %{_sysconfdir}/php-cli.ini
-fi
-
-%postun readline
-if [ "$1" = "0" ]; then
-	if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-		%{_sbindir}/php-module-install remove readline %{_sysconfdir}/php-cgi.ini
-	fi
-	if [ -f %{_sysconfdir}/php-cli.ini ]; then
-		%{_sbindir}/php-module-install remove readline %{_sysconfdir}/php-cli.ini
-	fi
-fi
-
 %post recode
 %extension_post
 
@@ -2349,9 +2296,6 @@ fi
 
 %postun soap
 %extension_postun
-if [ "$1" = "0" ]; then
-	%{_sbindir}/php-module-install remove soap %{_sysconfdir}/php.ini
-fi
 
 %post sockets
 %extension_post
@@ -2444,171 +2388,196 @@ fi
 %extension_postun
 
 %triggerun bcmath -- %{name}-bcmath < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove bcmath %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bcmath\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun bzip2 -- %{name}-bzip2 < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove bzip2 %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bzip2\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun calendar -- %{name}-calendar < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove calendar %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*calendar\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ctype -- %{name}-ctype < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ctype %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ctype\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun curl -- %{name}-curl < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove curl %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*curl\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dba -- %{name}-dba < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dba %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dba\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dbase -- %{name}-dbase < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dbase %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dbase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dom -- %{name}-dom < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove dom %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dom\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun exif -- %{name}-exif < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove exif %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*exif\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun fdf -- %{name}-fdf < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove fdf %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*fdf\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun filepro -- %{name}-filepro < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove filepro %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*filepro\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ftp -- %{name}-ftp < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ftp %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ftp\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun gd -- %{name}-gd < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove gd %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gd\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun gettext -- %{name}-gettext < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove gettext %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gettext\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun gmp -- %{name}-gmp < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove gmp %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gmp\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun hwapi -- %{name}-hwapi < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove hwapi %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*hwapi\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun iconv -- %{name}-iconv < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove iconv %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*iconv\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun imap -- %{name}-imap < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove imap %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*imap\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun interbase -- %{name}-interbase < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove interbase %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*interbase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ldap -- %{name}-ldap < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ldap %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ldap\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mbstring -- %{name}-mbstring < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mbstring %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mbstring\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mcrypt -- %{name}-mcrypt < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mcrypt %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mcrypt\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mhash -- %{name}-mhash < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mhash %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mime_magic -- %{name}-mime_magic < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mime_magic %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mime_magic\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ming -- %{name}-ming < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove ming %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun msession -- %{name}-msession < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove msession %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*msession\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mssql -- %{name}-mssql < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mssql %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mssql\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mysql -- %{name}-mysql < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mysql %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysql\.so/d' %{_sysconfdir}/php.ini
+
+%triggerun ncurses -- %{name}-ncurses < 4:5.1.2-9.5
+if [ -f %{_sysconfdir}/php-cgi.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cgi.ini
+fi
+if [ -f %{_sysconfdir}/php-cli.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cli.ini
+fi
 
 %triggerun mysqli -- %{name}-mysqli < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove mysqli %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysqli\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun oci8 -- %{name}-oci8 < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove oci8 %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*oci8\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun odbc -- %{name}-odbc < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove odbc %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*odbc\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun openssl -- %{name}-openssl < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove openssl %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*openssl\.so/d' %{_sysconfdir}/php.ini
+
+%triggerun pcntl -- %{name}-pcntl < 4:5.1.2-9.5
+if [ -f %{_sysconfdir}/php-cgi.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cgi.ini
+fi
+if [ -f %{_sysconfdir}/php-cli.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cli.ini
+fi
 
 %triggerun pcre -- %{name}-pcre < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove pcre %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcre\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove pgsql %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun posix -- %{name}-posix < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove posix %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*posix\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun pspell -- %{name}-pspell < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove pspell %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pspell\.so/d' %{_sysconfdir}/php.ini
+
+%triggerun readline -- %{name}-readline < 4:5.1.2-9.5
+if [ -f %{_sysconfdir}/php-cgi.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{_sysconfdir}/php-cgi.ini
+fi
+if [ -f %{_sysconfdir}/php-cli.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{_sysconfdir}/php-cli.ini
+fi
 
 %triggerun recode -- %{name}-recode < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove recode %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun session -- %{name}-session < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove session %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*session\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove shmop %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun snmp -- %{name}-snmp < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove snmp %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*snmp\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun soap -- %{name}-soap < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove soap %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*soap\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sockets -- %{name}-sockets < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sockets %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sockets\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sqlite -- %{name}-sqlite < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sqlite %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sqlite\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sybase -- %{name}-sybase < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sybase %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sybase-ct -- %{name}-sybase-ct < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sybase-ct %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase-ct\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sysvmsg -- %{name}-sysvmsg < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sysvmsg %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvmsg\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sysvsem -- %{name}-sysvsem < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sysvsem %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvsem\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sysvshm -- %{name}-sysvshm < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove sysvshm %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvshm\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun tidy -- %{name}-tidy < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove tidy %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*tidy\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun wddx -- %{name}-wddx < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove wddx %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*wddx\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun xml -- %{name}-xml < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove xml %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xml\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun xmlrpc -- %{name}-xmlrpc < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove xmlrpc %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xmlrpc\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun xsl -- %{name}-xsl < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove xsl %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xsl\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun zlib -- %{name}-zlib < 4:5.0.4-9.1
-[ ! -x %{_sbindir}/php-module-install ] || %{_sbindir}/php-module-install remove zlib %{_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*zlib\.so/d' %{_sysconfdir}/php.ini
 
 %if %{with apache1}
 %files -n apache1-mod_php
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
+%dir %{_sysconfdir}/apache.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
 %attr(755,root,root) %{_libdir}/apache1/libphp5.so
 /home/services/apache/icons/*
@@ -2618,6 +2587,7 @@ fi
 %files -n apache-mod_php
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/httpd.conf/*_mod_php.conf
+%dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
 /home/services/httpd/icons/*
@@ -2627,19 +2597,22 @@ fi
 %files fcgi
 %defattr(644,root,root,755)
 %doc sapi/cgi/README.FastCGI
-%attr(755,root,root) %{_bindir}/php.fcgi
+%dir %{_sysconfdir}/cgi-fcgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
+%attr(755,root,root) %{_bindir}/php.fcgi
 %endif
 
 %files cgi
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/php.cgi
+%dir %{_sysconfdir}/cgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi.ini
+%attr(755,root,root) %{_bindir}/php.cgi
 
 %files cli
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/php.cli
+%dir %{_sysconfdir}/cli.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
+%attr(755,root,root) %{_bindir}/php.cli
 %{_mandir}/man1/php.1*
 %{_mandir}/man1/php.cli.1*
 
@@ -2656,7 +2629,6 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %attr(644,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
-%attr(755,root,root) %{_sbindir}/php-module-install
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}
 %dir %{_phpsharedir}
@@ -2852,6 +2824,7 @@ fi
 
 %files ncurses
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/ncurses.ini
 %attr(755,root,root) %{extensionsdir}/ncurses.so
 
 %if %{with oci8}
@@ -2877,6 +2850,7 @@ fi
 
 %files pcntl
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/pcntl.ini
 %attr(755,root,root) %{extensionsdir}/pcntl.so
 
 %if %{with pcre}
@@ -2959,6 +2933,7 @@ fi
 
 %files readline
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/readline.ini
 %attr(755,root,root) %{extensionsdir}/readline.so
 
 %if %{with recode}

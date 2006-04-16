@@ -89,14 +89,13 @@ Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	79cee17e9db85be878000a2a4198378e
 Source1:	FAQ.%{name}
 Source2:	zend.gif
-
-Source4:	%{name}-mod_%{name}.conf
-Source5:	%{name}-cgi-fcgi.ini
-Source6:	%{name}-cgi.ini
-Source7:	%{name}-apache.ini
-Source8:	%{name}-cli.ini
-Source9:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
-# Source9-md5:	47a742fa9fab2826ad10c13a2376111a
+Source3:	%{name}-mod_%{name}.conf
+Source4:	%{name}-cgi-fcgi.ini
+Source5:	%{name}-cgi.ini
+Source6:	%{name}-apache.ini
+Source7:	%{name}-cli.ini
+Source8:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
+# Source8-md5:	47a742fa9fab2826ad10c13a2376111a
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -1568,7 +1567,7 @@ cp php.ini-dist php.ini
 %patch26 -p1
 
 %if %{with hardening}
-zcat %{SOURCE9} | patch -p1 || exit 1
+zcat %{SOURCE8} | patch -p1 || exit 1
 patch -p1 < %{PATCH30} || exit 1
 %endif
 %patch31 -p1
@@ -1875,23 +1874,23 @@ ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 %if %{with fcgi}
-install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
-install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
-install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
+install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 install %{SOURCE1} .
 
 %if %{with apache1}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
+install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
-install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
+install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 

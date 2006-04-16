@@ -72,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_msession
 %endif
 
-%define	_rel 9.5
+%define	_rel 9.6
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -1580,9 +1580,6 @@ patch -p1 < %{PATCH30} || exit 1
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
 
-# new apr
-sed -i -e 's#apr-config#apr-1-config#g' sapi/apache*/*.m4
-
 # remove all bundled libraries not to link with them accidentally
 #rm -rf ext/sqlite/libsqlite
 #rm -rf ext/bcmath/libbcmath
@@ -1613,12 +1610,6 @@ if API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h)
 	echo "Set %%define zend_extension_api to $API and rerun."
 	exit 1
 fi
-
-CFLAGS="%{rpmcflags} -DEAPI=1 -I/usr/X11R6/include"
-%if %{with apache2}
-# Apache2 CFLAGS. harmless for other SAPIs.
-CFLAGS="$CFLAGS $(%{_bindir}/apr-1-config --includes) $(%{_bindir}/apu-1-config --includes)"
-%endif
 
 EXTENSION_DIR="%{extensionsdir}"; export EXTENSION_DIR
 if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
@@ -1667,7 +1658,9 @@ for sapi in $sapis; do
 	;;
 	esac
 	` \
+%if "%{!?configure_cache:0}%{?configure_cache}" == "0"
 	--cache-file=config.cache \
+%endif
 	--with-libdir=%{_lib} \
 	--with-config-file-path=%{_sysconfdir} \
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \

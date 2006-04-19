@@ -131,6 +131,8 @@ Patch34:	%{name}-ini-search-path.patch
 Patch35:	%{name}-openssl-huge-hack.patch
 Patch36:	%{name}-versioning.patch
 Patch37:	%{name}-linkflags-clean.patch
+Patch38:	%{name}-CVE-2006-0996.patch
+Patch39:	%{name}-CVE-2006-1490.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1576,6 +1578,8 @@ patch -p1 < %{PATCH30} || exit 1
 %patch34 -p1
 %patch35 -p1
 %{?with_versioning:%patch36 -p1}
+%patch38 -p1
+%patch39 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

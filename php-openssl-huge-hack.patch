@@ -1,0 +1,50 @@
+diff -urN php-5.1.2.org/ext/curl/interface.c php-5.1.2/ext/curl/interface.c
+--- php-5.1.2.org/ext/curl/interface.c	2006-01-05 19:07:55.000000000 +0100
++++ php-5.1.2/ext/curl/interface.c	2006-01-25 14:42:08.980963000 +0100
+@@ -476,6 +476,8 @@
+ }
+ /* }}} */
+ 
++static void php_restore_callbacks(void);
++
+ /* {{{ PHP_MSHUTDOWN_FUNCTION
+  */
+ PHP_MSHUTDOWN_FUNCTION(curl)
+@@ -486,6 +488,7 @@
+ 	php_unregister_url_stream_wrapper("ftp" TSRMLS_CC);
+ 	php_unregister_url_stream_wrapper("ldap" TSRMLS_CC);
+ #endif
++	php_restore_callbacks();
+ 	curl_global_cleanup();
+ #ifdef PHP_CURL_NEED_SSL_TSL
+ 	php_curl_ssl_cleanup();
+@@ -1621,9 +1624,8 @@
+ 	for (i = 0; i < c; ++i) {
+ 		php_curl_openssl_tsl[i] = tsrm_mutex_alloc();
+ 	}
+-	
+-	CRYPTO_set_id_callback(php_curl_ssl_id);
+-	CRYPTO_set_locking_callback(php_curl_ssl_lock);
++
++	php_restore_callbacks();	
+ }
+ 
+ static inline void php_curl_ssl_cleanup(void)
+@@ -1645,6 +1647,17 @@
+ #endif /* PHP_CURL_NEED_OPENSSL_TSL */
+ /* }}} */
+ 
++static void php_restore_callbacks(void) {
++#ifdef PHP_CURL_NEED_OPENSSL_TSL
++	CRYPTO_set_id_callback(php_curl_ssl_id);
++	CRYPTO_set_locking_callback(php_curl_ssl_lock);
++#else
++	CRYPTO_set_id_callback(NULL);
++	CRYPTO_set_locking_callback(NULL);
++#endif
++}
++	
++
+ #ifdef PHP_CURL_NEED_GNUTLS_TSL
+ /* {{{ */
+ static int php_curl_ssl_mutex_create(void **m)

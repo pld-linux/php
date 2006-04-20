@@ -79,7 +79,7 @@ Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на 
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	5.1.2
-%define	_rel 9
+%define	_rel 10
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -108,27 +108,29 @@ Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-reflection.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
-Patch14:	%{name}-allow-db31.patch
-Patch15:	%{name}-threads-acfix.patch
-Patch16:	%{name}-tsrmlsfetchgcc2.patch
-Patch17:	%{name}-no_pear_install.patch
-Patch18:	%{name}-zlib.patch
-Patch19:	%{name}-sybase-fix.patch
-Patch20:	%{name}-readline.patch
-Patch21:	%{name}-nohttpd.patch
-Patch23:	%{name}-gd_imagerotate_enable.patch
-Patch24:	%{name}-uint32_t.patch
-Patch25:	%{name}-hwapi-link.patch
-Patch26:	%{name}-dba-link.patch
-Patch30:	%{name}-hardening-fix.patch
-Patch31:	%{name}-both-apxs.patch
-Patch32:	%{name}-builddir.patch
-Patch33:	%{name}-zlib-for-getimagesize.patch
-Patch34:	%{name}-ini-search-path.patch
+Patch12:	%{name}-allow-db31.patch
+Patch13:	%{name}-threads-acfix.patch
+Patch14:	%{name}-tsrmlsfetchgcc2.patch
+Patch15:	%{name}-no_pear_install.patch
+Patch16:	%{name}-zlib.patch
+Patch17:	%{name}-sybase-fix.patch
+Patch18:	%{name}-readline.patch
+Patch19:	%{name}-nohttpd.patch
+Patch20:	%{name}-gd_imagerotate_enable.patch
+Patch21:	%{name}-uint32_t.patch
+Patch22:	%{name}-hwapi-link.patch
+Patch23:	%{name}-dba-link.patch
+Patch24:	%{name}-both-apxs.patch
+Patch25:	%{name}-builddir.patch
+Patch26:	%{name}-zlib-for-getimagesize.patch
+Patch27:	%{name}-ini-search-path.patch
 # Very big hack that is sane only with non-thread MPMs.
 # The case with threaded MPMs is lost even without this hack.
 # http://bugs.php.net/bug.php?id=36152
-Patch35:	%{name}-openssl-huge-hack.patch
+Patch28:	%{name}-openssl-huge-hack.patch
+Patch29:	%{name}-CVE-2006-0996.patch
+Patch30:	%{name}-CVE-2006-1490.patch
+Patch31:	%{name}-hardening-fix.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1554,6 +1556,8 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
+%patch12 -p1
+%patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
@@ -1562,20 +1566,20 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
+%patch27 -p1
+%patch28 -p1
+%patch29 -p1
+%patch30 -p1
 
 %if %{with hardening}
 zcat %{SOURCE9} | patch -p1 || exit 1
-patch -p1 < %{PATCH30} || exit 1
+patch -p1 < %{PATCH31} || exit 1
 %endif
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
-%patch34 -p1
-%patch35 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

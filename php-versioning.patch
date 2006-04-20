@@ -30,7 +30,7 @@
  
  libphp_common.la: $(PHP_GLOBAL_OBJS)
 -	$(LIBTOOL) --mode=link $(CC) -rpath $(phptempdir) -avoid-version $(LDFLAGS) $(PHP_RPATHS) $(PHP_GLOBAL_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@ -release $(PHP_VERSION)
-+	$(LIBTOOL) --mode=link $(CC) -rpath $(phptempdir) -avoid-version $(LDFLAGS) $(LD_VERSION_SCRIPT) $(PHP_RPATHS) $(PHP_GLOBAL_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@ -release $(PHP_VERSION)
++	$(LIBTOOL) --mode=link $(CC) -rpath $(phptempdir) -avoid-version $(LDFLAGS) $(LD_VERSION_SCRIPT) $(PHP_RPATHS) $(PHP_GLOBAL_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@ -release $(MAJOR_VERSION)
  	-@$(LIBTOOL) --silent --mode=install cp libphp_common.la $(phptempdir)/libphp_common.la >/dev/null 2>&1
  
  libphp5.la: libphp_common.la $(PHP_SAPI_OBJS)
@@ -44,6 +44,41 @@
  	-@$(LIBTOOL) --silent --mode=install cp libphp5.la $(phptempdir)/libphp5.la >/dev/null 2>&1
  
  libtool-sapi: $(LIBTOOL_SAPI)
+--- php-5.1.2/scripts/Makefile.frag~	2006-04-20 23:23:53.928072405 +0300
++++ php-5.1.2/scripts/Makefile.frag	2006-04-20 23:24:40.239103291 +0300
+@@ -14,7 +14,8 @@
+ 	Makefile.global \
+ 	acinclude.m4 \
+ 	ltmain.sh \
+-	run-tests.php
++	run-tests.php \
++	php.ver
+ 
+ BUILD_FILES_EXEC = \
+ 	build/shtool \
+--- php-5.1.2/scripts/phpize.in~	2006-04-20 23:23:53.928072405 +0300
++++ php-5.1.2/scripts/phpize.in	2006-04-20 23:25:15.129879978 +0300
+@@ -8,7 +8,7 @@
+ builddir="`pwd`"
+ 
+ FILES_BUILD="mkdep.awk scan_makefile_in.awk shtool libtool.m4"
+-FILES="acinclude.m4 Makefile.global config.sub config.guess ltmain.sh run-tests*.php"
++FILES="acinclude.m4 Makefile.global config.sub config.guess ltmain.sh php.ver run-tests*.php"
+ CLEAN_FILES="$FILES *.o *.lo *.la .deps .libs/ build/ include/ modules/ install-sh \
+ 	mkinstalldirs missing config.nice config.sub config.guess configure configure.in \
+ 	aclocal.m4 config.h config.h.in conftest* ltmain.sh libtool config.cache autom4te.cache/ \
+--- php-5.1.2/configure.in~	2006-04-20 23:23:53.928072405 +0300
++++ php-5.1.2/configure.in	2006-04-20 23:25:45.300551605 +0300
+@@ -1190,6 +1190,9 @@
+ PHP_SUBST(PHP_RPATHS)
+ PHP_SUBST(PHP_SAPI)
+ PHP_SUBST_OLD(PHP_VERSION)
++PHP_SUBST_OLD(MAJOR_VERSION)
++PHP_SUBST_OLD(MINOR_VERSION)
++PHP_SUBST_OLD(RELEASE_VERSION)
+ PHP_SUBST(SHELL)
+ PHP_SUBST(SHARED_LIBTOOL)
+ PHP_SUBST(WARNING_LEVEL)
 --- php-5.1.2/sapi/apache/mod_php5.c~	2006-01-06 20:06:38.000000000 +0200
 +++ php-5.1.2/sapi/apache/mod_php5.c	2006-04-04 02:12:59.462271322 +0300
 @@ -930,7 +930,9 @@

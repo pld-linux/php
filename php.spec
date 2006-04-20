@@ -72,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_msession
 %endif
 
-%define	_rel 9.6
+%define	_rel 9.11
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -1783,28 +1783,20 @@ for sapi in $sapis; do
 	cp -f main/php_config.h php_config.h.$sapi
 done
 
-# for now session_mm doesn't work with shared session module...
-# --enable-session=shared
-# %{!?with_mm:--with-mm=shared,no}%{?with_mm:--with-mm=shared}
+# must make this first, so modules can link against it.
+%{__make} libphp_common.la
 
 %{__make} build-modules
 
-%{__make} libphp_common.la
 # fix install paths, avoid evil rpaths
-sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
+#sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
 
 %if %{with apache1}
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
-sed -i -e "
-s|^libdir=.*|libdir='%{_libdir}/apache1'|;
-s|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache1 |" sapi/apache/libphp5.la
 %endif
 
 %if %{with apache2}
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
-sed -i -e "
-s|^libdir=.*|libdir='%{_libdir}/apache'|;
-s|^(relink_command=.* -rpath )[^ ]*/libs |$1%{_libdir}/apache |" sapi/apache2handler/libphp5.la
 %endif
 
 # FCGI
@@ -1831,24 +1823,21 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
-# install apache1 DSO module
-%if %{with apache1}
-libtool --silent --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1/
-%endif
-
-# install apache2 DSO module
-%if %{with apache2}
-libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache/
-%endif
-
-libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
-
 # install the apache modules' files
 %{__make} install-headers install-build install-modules install-programs \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
-# as of 5.0.5, phpextdist isn't installed by default
-install scripts/dev/phpextdist $RPM_BUILD_ROOT%{_bindir}
+# install apache1 DSO module
+%if %{with apache1}
+libtool --silent --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
+%endif
+
+# install apache2 DSO module
+%if %{with apache2}
+libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
+%endif
+
+libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
 
 # install CGI
 libtool --silent --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi
@@ -1863,9 +1852,8 @@ libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/p
 install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 
-# TODO:
-# Why make install doesn't install libphp5.so ?
-#install libs/libphp5.so $RPM_BUILD_ROOT%{apachelib}
+# as of 5.0.5, phpextdist isn't installed by default
+install scripts/dev/phpextdist $RPM_BUILD_ROOT%{_bindir}
 
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 

@@ -19,7 +19,7 @@
      *[)]
        suffix=la
 -      link_cmd='$(LIBTOOL) --mode=link ifelse($4,,[$(CC)],[$(CXX)]) $(LDFLAGS) -o [$]@ -export-dynamic -avoid-version -prefer-pic -module -rpath $(phplibdir) $(EXTRA_LDFLAGS) $($2) $(translit($1,a-z_-,A-Z__)_SHARED_LIBADD)'
-+      link_cmd='$(LIBTOOL) --mode=link ifelse($4,,[$(CC)],[$(CXX)]) $(LDFLAGS) -o [$]@ -export-dynamic -avoid-version -prefer-pic -module -rpath $(phplibdir) $(EXTRA_LDFLAGS) $(LD_VERSION_SCRIPT) $($2) $(translit($1,a-z_-,A-Z__)_SHARED_LIBADD)'
++      link_cmd='$(LIBTOOL) --mode=link ifelse($4,,[$(CC)],[$(CXX)]) $(LDFLAGS) -o [$]@ -export-dynamic -avoid-version -prefer-pic -module -rpath $(phplibdir) libphp_common.la $(EXTRA_LDFLAGS) $(LD_VERSION_SCRIPT) $($2) $(translit($1,a-z_-,A-Z__)_SHARED_LIBADD)'
        ;;
    esac
  

@@ -72,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_msession
 %endif
 
-%define	_rel 9.11
+%define	_rel 9.14
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -1838,6 +1838,10 @@ libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUIL
 %endif
 
 libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+# fix install paths, avoid evil rpaths
+sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
+# better solution?
+sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
 # install CGI
 libtool --silent --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi

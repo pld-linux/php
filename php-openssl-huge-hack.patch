@@ -1,7 +1,7 @@
-diff -urN php-5.1.2.org/ext/curl/interface.c php-5.1.2/ext/curl/interface.c
---- php-5.1.2.org/ext/curl/interface.c	2006-01-05 19:07:55.000000000 +0100
-+++ php-5.1.2/ext/curl/interface.c	2006-01-25 14:42:08.980963000 +0100
-@@ -476,6 +476,8 @@
+diff -urN php-4.4.2.org/ext/curl/curl.c php-4.4.2/ext/curl/curl.c
+--- php-4.4.2.org/ext/curl/curl.c	2006-01-05 19:03:18.000000000 +0100
++++ php-4.4.2/ext/curl/curl.c	2006-01-25 22:23:03.429339500 +0100
+@@ -427,6 +427,8 @@
  }
  /* }}} */
  
@@ -10,7 +10,7 @@ diff -urN php-5.1.2.org/ext/curl/interface.c php-5.1.2/ext/curl/interface.c
  /* {{{ PHP_MSHUTDOWN_FUNCTION
   */
  PHP_MSHUTDOWN_FUNCTION(curl)
-@@ -486,6 +488,7 @@
+@@ -437,6 +439,7 @@
  	php_unregister_url_stream_wrapper("ftp" TSRMLS_CC);
  	php_unregister_url_stream_wrapper("ldap" TSRMLS_CC);
  #endif
@@ -18,7 +18,7 @@ diff -urN php-5.1.2.org/ext/curl/interface.c php-5.1.2/ext/curl/interface.c
  	curl_global_cleanup();
  #ifdef PHP_CURL_NEED_SSL_TSL
  	php_curl_ssl_cleanup();
-@@ -1621,9 +1624,8 @@
+@@ -1465,9 +1468,8 @@
  	for (i = 0; i < c; ++i) {
  		php_curl_openssl_tsl[i] = tsrm_mutex_alloc();
  	}
@@ -30,7 +30,7 @@ diff -urN php-5.1.2.org/ext/curl/interface.c php-5.1.2/ext/curl/interface.c
  }
  
  static inline void php_curl_ssl_cleanup(void)
-@@ -1645,6 +1647,17 @@
+@@ -1489,6 +1491,17 @@
  #endif /* PHP_CURL_NEED_OPENSSL_TSL */
  /* }}} */
  

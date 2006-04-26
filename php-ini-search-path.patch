@@ -1,32 +1,32 @@
 see also http://bugs.php.net/bug.php?id=34793
---- php-5.1.2/main/php_ini.c~	2006-01-12 23:46:12.000000000 +0200
-+++ php-5.1.2/main/php_ini.c	2006-01-17 17:01:16.000000000 +0200
-@@ -330,6 +330,7 @@
- 			strcat(php_ini_search_path, env_location);
- 		}
+--- php-4.4.2/main/php_ini.c~	2006-01-17 19:02:09.000000000 +0200
++++ php-4.4.2/main/php_ini.c	2006-01-17 19:26:46.000000000 +0200
+@@ -19,7 +19,7 @@
+ /* $Id$ */
  
-+#ifdef PHP_WIN32
- 		/* Add cwd (only with CLI) */
- 		if (strcmp(sapi_module.name, "cli") == 0) {
- 			if (*php_ini_search_path) {
-@@ -339,7 +340,6 @@
- 		}
+ /* Check CWD for php.ini */
+-#define INI_CHECK_CWD
++#undef	INI_CHECK_CWD
  
- 		/* Add binary directory */
--#ifdef PHP_WIN32
- 		binary_location = (char *) emalloc(MAXPATHLEN);
- 		if (GetModuleFileName(0, binary_location, MAXPATHLEN) == 0) {
+ #include "php.h"
+ #include "ext/standard/info.h"
+@@ -328,13 +327,13 @@
  			efree(binary_location);
-@@ -356,6 +356,8 @@
  			binary_location = NULL;
  		}
- #endif
+-#else
 +
-+#ifdef PHP_WIN32
+ 		if (sapi_module.executable_location) {
+ 			binary_location = estrdup(sapi_module.executable_location);
+ 		} else {
+ 			binary_location = NULL;
+ 		}
+-#endif
++
  		if (binary_location) {
  			char *separator_location = strrchr(binary_location, DEFAULT_SLASH);
  			
-@@ -370,7 +372,6 @@
+@@ -349,7 +348,6 @@
  		}
  
  		/* Add default location */

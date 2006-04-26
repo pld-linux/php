@@ -63,7 +63,7 @@ Summary(ru):	PHP Версии 4 -- язык препроцессирования HTML-файлов, выполняемый на
 Summary(uk):	PHP Верс╕╖ 4 -- мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
 Version:	4.4.2
-Release:	1
+Release:	1.1
 Epoch:		3
 Group:		Libraries
 License:	PHP
@@ -112,6 +112,13 @@ Patch31:	%{name}-gd_imagerotate_enable.patch
 Patch32:	%{name}-uint32_t.patch
 Patch33:	%{name}-va_copy.patch
 Patch34:	%{name}-install_gd_headers.patch
+Patch35:	php-dextension.patch
+Patch36:	%{name}-zlib-for-getimagesize.patch
+Patch37:	%{name}-ini-search-path.patch
+Patch38:	%{name}-bug-36017-and-session-chars.patch
+Patch39:	%{name}-openssl-huge-hack.patch
+Patch40:	%{name}-CVE-2006-0996.patch
+Patch41:	%{name}-CVE-2006-1490.patch
 Icon:		php4.gif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1563,6 +1570,13 @@ cp php.ini-dist php.ini
 %patch33 -p1
 %endif
 %patch34 -p1
+%patch35 -p1
+%patch36 -p1
+%patch37 -p1
+%patch38 -p1
+%patch39 -p1
+%patch40 -p1
+%patch41 -p1
 
 %build
 CFLAGS="%{rpmcflags} -DEAPI=1 -I%{_prefix}/X11R6/include"

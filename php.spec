@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 0.1
+%define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -119,10 +119,7 @@ Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
 Patch33:	%{name}-zlib-for-getimagesize.patch
 Patch34:	%{name}-ini-search-path.patch
-# Very big hack that is sane only with non-thread MPMs.
-# The case with threaded MPMs is lost even without this hack.
-# http://bugs.php.net/bug.php?id=36152
-Patch35:	%{name}-openssl-huge-hack.patch
+
 Patch36:	%{name}-versioning.patch
 Patch37:	%{name}-linkflags-clean.patch
 URL:		http://www.php.net/
@@ -1548,7 +1545,6 @@ patch -p1 < %{PATCH30} || exit 1
 %patch32 -p1
 %patch33 -p1
 %patch34 -p1
-#%patch35 -p1 CHECK THIS
 %{?with_versioning:%patch36 -p1}
 
 # conflict seems to be resolved by recode patches

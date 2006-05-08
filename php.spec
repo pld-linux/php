@@ -23,12 +23,11 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_with	interbase	# with InterBase extension module
+%bcond_without	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	ming		# without ming extension module
 %bcond_without	mm		# without mm support for session storage
-%bcond_without	msession	# without msession extension module
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	mime_magic	# without mime-magic module
@@ -67,12 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-# x86-only lib
-%ifnarch %{ix86}
-%undefine	with_msession
-%endif
-
-%define	_rel 11
+%define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -80,13 +74,13 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP ÷ÅÒÓÉÉ 5 - ÑÚÙË ÐÒÅÐÒÏÃÅÓÓÉÒÏ×ÁÎÉÑ HTML-ÆÁÊÌÏ×, ×ÙÐÏÌÎÑÅÍÙÊ ÎÁ ÓÅÒ×ÅÒÅ
 Summary(uk):	PHP ÷ÅÒÓ¦§ 5 - ÍÏ×Á ÐÒÅÐÒÏÃÅÓÕ×ÁÎÎÑ HTML-ÆÁÊÌ¦×, ×ÉËÏÎÕ×ÁÎÁ ÎÁ ÓÅÒ×ÅÒ¦
 Name:		php
-Version:	5.1.2
+Version:	5.1.4
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	79cee17e9db85be878000a2a4198378e
+# Source0-md5:	b55e633bdc80ab30da7c92f760fc4b58
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
@@ -101,7 +95,7 @@ Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
 Patch3:		%{name}-link-libs.patch
 Patch4:		%{name}-libpq_fs_h_path.patch
-Patch5:		%{name}-msession-shared-lib.patch
+
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
@@ -125,14 +119,9 @@ Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
 Patch33:	%{name}-zlib-for-getimagesize.patch
 Patch34:	%{name}-ini-search-path.patch
-# Very big hack that is sane only with non-thread MPMs.
-# The case with threaded MPMs is lost even without this hack.
-# http://bugs.php.net/bug.php?id=36152
-Patch35:	%{name}-openssl-huge-hack.patch
+
 Patch36:	%{name}-versioning.patch
 Patch37:	%{name}-linkflags-clean.patch
-Patch38:	%{name}-CVE-2006-0996.patch
-Patch39:	%{name}-CVE-2006-1490.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -181,7 +170,6 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel}
-%{?with_msession:BuildRequires:	phoenix-devel}
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -824,25 +812,6 @@ This is a dynamic shared object (DSO) for PHP that will add ming
 %description ming -l pl
 Modu³ PHP dodaj±cy obs³ugê plików Flash (.swf) poprzez bibliotekê
 ming.
-
-%package msession
-Summary:	msession extension module for PHP
-Summary(pl):	Modu³ msession dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description msession
-This is a dynamic shared object (DSO) for PHP that will allow you to
-use msession. msession is a high speed session daemon which can run
-either locally or remotely. It is designed to provide consistent
-session management for a PHP web farm.
-
-%description msession -l pl
-Modu³ PHP dodaj±cy umo¿liwiaj±cy korzystanie z demona msession. Jest
-to demon szybkiej obs³ugi sesji, który mo¿e dzia³aæ lokalnie lub na
-innej maszynie. S³u¿y do zapewniania spójnej obs³ugi sesji dla farmy
-serwerów.
 
 %package mssql
 Summary:	MS SQL extension module for PHP
@@ -1545,7 +1514,7 @@ Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
+
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
@@ -1576,10 +1545,7 @@ patch -p1 < %{PATCH30} || exit 1
 %patch32 -p1
 %patch33 -p1
 %patch34 -p1
-%patch35 -p1
 %{?with_versioning:%patch36 -p1}
-%patch38 -p1
-%patch39 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1748,7 +1714,6 @@ for sapi in $sapis; do
 	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic.mime}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
-	%{?with_msession:--with-msession=shared}%{!?with_msession:--without-msession} \
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
@@ -2153,12 +2118,6 @@ fi
 %postun ming
 %extension_postun
 
-%post msession
-%extension_post
-
-%postun msession
-%extension_postun
-
 %post mssql
 %extension_post
 
@@ -2449,9 +2408,6 @@ fi
 
 %triggerun ming -- %{name}-ming < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun msession -- %{name}-msession < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*msession\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mssql -- %{name}-mssql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mssql\.so/d' %{_sysconfdir}/php.ini
@@ -2782,13 +2738,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ming.ini
 %attr(755,root,root) %{extensionsdir}/ming.so
-%endif
-
-%if %{with msession}
-%files msession
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/msession.ini
-%attr(755,root,root) %{extensionsdir}/msession.so
 %endif
 
 %if %{with mssql}

@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 1
+%define	_rel 2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -95,7 +95,6 @@ Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
 Patch3:		%{name}-link-libs.patch
 Patch4:		%{name}-libpq_fs_h_path.patch
-
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
@@ -119,9 +118,9 @@ Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
 Patch33:	%{name}-zlib-for-getimagesize.patch
 Patch34:	%{name}-ini-search-path.patch
-
-Patch36:	%{name}-versioning.patch
-Patch37:	%{name}-linkflags-clean.patch
+Patch35:	%{name}-versioning.patch
+Patch36:	%{name}-linkflags-clean.patch
+Patch37:	%{name}-cli-segv-fixes.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1508,7 +1507,7 @@ Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 
 %prep
 %setup -q
-%patch37 -p1
+%patch36 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1545,7 +1544,8 @@ patch -p1 < %{PATCH30} || exit 1
 %patch32 -p1
 %patch33 -p1
 %patch34 -p1
-%{?with_versioning:%patch36 -p1}
+%{?with_versioning:%patch35 -p1}
+%patch37 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

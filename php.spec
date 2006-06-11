@@ -66,7 +66,8 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 2
+%define	_rel 0.1
+%define	_snap	200606102030
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	JЙzyk skryptowy PHP
@@ -74,13 +75,14 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.1.4
+Version:	5.2
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	b55e633bdc80ab30da7c92f760fc4b58
+#Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
+# Source0-md5:	6477c4e4cb937dce844bc6d55adda379
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
@@ -199,7 +201,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
 %define		zend_module_api		20050922
-%define		zend_extension_api	220051025
+%define		zend_extension_api	220060519
 %define		zend_zts			%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug			%{!?debug:0}%{?debug:1}
 
@@ -1506,7 +1508,7 @@ compression support to PHP.
 ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q -n %{name}%{version}-%{_snap}
 %patch36 -p1
 %patch0 -p1
 %patch1 -p1
@@ -1545,7 +1547,7 @@ patch -p1 < %{PATCH30} || exit 1
 %patch33 -p1
 %patch34 -p1
 %{?with_versioning:%patch35 -p1}
-%patch37 -p1
+#%patch37 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

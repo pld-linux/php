@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 2
+%define	_rel 3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -193,7 +193,6 @@ BuildRequires:	apr-util-devel >= 1:1.0.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/php
-%define		_phpsharedir	%{_datadir}/php
 %define		extensionsdir	%{_libdir}/php
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
@@ -1782,7 +1781,7 @@ cp -af php_config.h.cli main/php_config.h
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi},%{_phpsharedir}} \
+install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf} \
@@ -2575,7 +2574,6 @@ fi
 %attr(644,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}
-%dir %{_phpsharedir}
 
 # session_mm doesn't work with shared session
 #%files session

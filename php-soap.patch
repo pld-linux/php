@@ -1,0 +1,221 @@
+diff -urN php-5.1.4.org/ext/soap/php_encoding.c php-5.1.4/ext/soap/php_encoding.c
+--- php-5.1.4.org/ext/soap/php_encoding.c	2006-03-03 10:20:33.000000000 +0100
++++ php-5.1.4/ext/soap/php_encoding.c	2006-06-21 13:47:15.992015843 +0200
+@@ -88,6 +88,10 @@
+ 
+ static xmlNodePtr check_and_resolve_href(xmlNodePtr data);
+ 
++static void set_ns_prop(xmlNodePtr node, char *ns, char *name, char *val);
++static void set_xsi_nil(xmlNodePtr node);
++static void set_xsi_type(xmlNodePtr node, char *type);
++
+ static void get_type_str(xmlNodePtr node, const char* ns, const char* type, smart_str* ret);
+ static void set_ns_and_type_ex(xmlNodePtr node, char *ns, char *type);
+ 
+@@ -113,7 +117,7 @@
+ { \
+ 	if (!zval || Z_TYPE_P(zval) == IS_NULL) { \
+ 	  if (style == SOAP_ENCODED) {\
+-			xmlSetProp(xml, "xsi:nil", "true"); \
++			set_xsi_nil(xml); \
+ 		} \
+ 		return xml; \
+ 	} \
+@@ -304,9 +308,6 @@
+ 
+ 		if (style == SOAP_ENCODED || (SOAP_GLOBAL(sdl) && encode != enc)) {
+ 			if (zend_hash_find(ht, "enc_stype", sizeof("enc_stype"), (void **)&zstype) == SUCCESS) {
+-				if (style == SOAP_LITERAL) {
+-					encode_add_ns(node, XSI_NAMESPACE);
+-				}
+ 				if (zend_hash_find(ht, "enc_ns", sizeof("enc_ns"), (void **)&zns) == SUCCESS) {
+ 					set_ns_and_type_ex(node, Z_STRVAL_PP(zns), Z_STRVAL_PP(zstype));
+ 				} else {
+@@ -1012,7 +1013,7 @@
+ 	ret = xmlNewNode(NULL,"BOGUS");
+ 	xmlAddChild(parent, ret);
+ 	if (style == SOAP_ENCODED) {
+-		xmlSetProp(ret, "xsi:nil", "true");
++		set_xsi_nil(ret);
+ 	}
+ 	return ret;
+ }
+@@ -1423,12 +1424,7 @@
+ 						if (Z_TYPE_PP(val) == IS_NULL && model->u.element->nillable) {
+ 							property = xmlNewNode(NULL,"BOGUS");
+ 							xmlAddChild(node, property);
+-							if (style == SOAP_ENCODED) {
+-								xmlSetProp(property, "xsi:nil", "true");
+-							} else {
+-							  xmlNsPtr xsi = encode_add_ns(property,XSI_NAMESPACE);
+-								xmlSetNsProp(property, xsi, "nil", "true");
+-							}
++							set_xsi_nil(property);
+ 						} else {
+ 							property = master_to_xml(enc, *val, style, node);
+ 							if (property->children && property->children->content &&
+@@ -1449,12 +1445,7 @@
+ 					if (Z_TYPE_P(data) == IS_NULL && model->u.element->nillable) {
+ 						property = xmlNewNode(NULL,"BOGUS");
+ 						xmlAddChild(node, property);
+-						if (style == SOAP_ENCODED) {
+-							xmlSetProp(property, "xsi:nil", "true");
+-						} else {
+-						  xmlNsPtr xsi = encode_add_ns(property,XSI_NAMESPACE);
+-							xmlSetNsProp(property, xsi, "nil", "true");
+-						}
++						set_xsi_nil(property);
+ 					} else {
+ 						property = master_to_xml(enc, data, style, node);
+ 						if (property->children && property->children->content &&
+@@ -1474,12 +1465,7 @@
+ 			} else if (strict && model->u.element->nillable && model->min_occurs > 0) {
+ 				property = xmlNewNode(NULL,model->u.element->name);
+ 				xmlAddChild(node, property);
+-				if (style == SOAP_ENCODED) {
+-					xmlSetProp(property, "xsi:nil", "true");
+-				} else {
+-					xmlNsPtr xsi = encode_add_ns(property,XSI_NAMESPACE);
+-					xmlSetNsProp(property, xsi, "nil", "true");
+-				}
++				set_xsi_nil(property);
+ 				if (style == SOAP_LITERAL &&
+ 				    model->u.element->namens &&
+ 				    model->u.element->form == XSD_FORM_QUALIFIED) {
+@@ -1614,7 +1600,7 @@
+ 		xmlParam = xmlNewNode(NULL,"BOGUS");
+ 		xmlAddChild(parent, xmlParam);
+ 		if (style == SOAP_ENCODED) {
+-			xmlSetProp(xmlParam, "xsi:nil", "true");
++			set_xsi_nil(xmlParam);
+ 		}
+ 		return xmlParam;
+ 	}
+@@ -1694,12 +1680,7 @@
+ 					if (Z_TYPE_PP(val) == IS_NULL && array_el->nillable) {
+ 						property = xmlNewNode(NULL,"BOGUS");
+ 						xmlAddChild(xmlParam, property);
+-						if (style == SOAP_ENCODED) {
+-							xmlSetProp(property, "xsi:nil", "true");
+-						} else {
+-						  xmlNsPtr xsi = encode_add_ns(property,XSI_NAMESPACE);
+-							xmlSetNsProp(property, xsi, "nil", "true");
+-						}
++						set_xsi_nil(property);
+ 					} else {
+ 						property = master_to_xml(array_el->encode, *val, style, xmlParam);
+ 					}
+@@ -2160,7 +2141,7 @@
+ 				smart_str_append(&array_type, &array_size);
+ 				smart_str_appendc(&array_type, ']');
+ 				smart_str_0(&array_type);
+-				xmlSetProp(xmlParam, SOAP_1_1_ENC_NS_PREFIX":arrayType", array_type.c);
++				set_ns_prop(xmlParam, SOAP_1_1_ENC_NAMESPACE, "arrayType", array_type.c);
+ 			} else {
+ 				int i = 0;
+ 				while (i < array_size.len) {
+@@ -2169,8 +2150,8 @@
+ 				}
+ 				smart_str_0(&array_type);
+ 				smart_str_0(&array_size);
+-				xmlSetProp(xmlParam, SOAP_1_2_ENC_NS_PREFIX":itemType", array_type.c);
+-				xmlSetProp(xmlParam, SOAP_1_2_ENC_NS_PREFIX":arraySize", array_size.c);
++				set_ns_prop(xmlParam, SOAP_1_2_ENC_NAMESPACE, "itemType", array_type.c);
++				set_ns_prop(xmlParam, SOAP_1_2_ENC_NAMESPACE, "arraySize", array_size.c);
+ 			}
+ 		}
+ 		smart_str_free(&array_type);
+@@ -2426,7 +2407,7 @@
+ 				xmlAddChild(item,key);
+ 				if (zend_hash_get_current_key(data->value.ht, &key_val, (long *)&int_val, FALSE) == HASH_KEY_IS_STRING) {
+ 					if (style == SOAP_ENCODED) {
+-						xmlSetProp(key, "xsi:type", "xsd:string");
++						set_xsi_type(key, "xsd:string");
+ 					}
+ 					xmlNodeSetContent(key, key_val);
+ 				} else {
+@@ -2435,7 +2416,7 @@
+ 					smart_str_0(&tmp);
+ 
+ 					if (style == SOAP_ENCODED) {
+-						xmlSetProp(key, "xsi:type", "xsd:int");
++						set_xsi_type(key, "xsd:int");
+ 					}
+ 					xmlNodeSetContentLen(key, tmp.c, tmp.len);
+ 
+@@ -2513,7 +2494,6 @@
+ 	ret = master_to_xml(enc, data, style, parent);
+ /*
+ 	if (style == SOAP_LITERAL && SOAP_GLOBAL(sdl)) {
+-		encode_add_ns(node, XSI_NAMESPACE);
+ 		set_ns_and_type(ret, &enc->details);
+ 	}
+ */
+@@ -3045,7 +3025,7 @@
+ {
+ 	smart_str nstype = {0};
+ 	get_type_str(node, ns, type, &nstype);
+-	xmlSetProp(node, "xsi:type", nstype.c);
++	set_xsi_type(node, nstype.c);
+ 	smart_str_free(&nstype);
+ }
+ 
+@@ -3078,6 +3058,21 @@
+ 	return xmlns;
+ }
+ 
++static void set_ns_prop(xmlNodePtr node, char *ns, char *name, char *val)
++{
++	xmlSetNsProp(node, encode_add_ns(node, ns), name, val);
++}
++
++static void set_xsi_nil(xmlNodePtr node)
++{
++	set_ns_prop(node, XSI_NAMESPACE, "nil", "true");
++}
++
++static void set_xsi_type(xmlNodePtr node, char *type)
++{
++	set_ns_prop(node, XSI_NAMESPACE, "type", type);
++}
++
+ void encode_reset_ns()
+ {
+ 	TSRMLS_FETCH();
+@@ -3137,7 +3132,7 @@
+ 	char *prev_stype = NULL, *cur_stype = NULL, *prev_ns = NULL, *cur_ns = NULL;
+ 
+ 	if (!array || Z_TYPE_P(array) != IS_ARRAY) {
+-		smart_str_appendl(type, "xsd:anyType", 11);
++		smart_str_appendl(type, "xsd:anyType", sizeof("xsd:anyType")-1);
+ 		return get_conversion(XSD_ANYTYPE);
+ 	}
+ 
+@@ -3199,7 +3194,7 @@
+ 	}
+ 
+ 	if (different || count == 0) {
+-		smart_str_appendl(type, "xsd:anyType", 11);
++		smart_str_appendl(type, "xsd:anyType", sizeof("xsd:anyType")-1);
+ 		return get_conversion(XSD_ANYTYPE);
+ 	} else {
+ 		encodePtr enc;
+diff -urN php-5.1.4.org/ext/soap/soap.c php-5.1.4/ext/soap/soap.c
+--- php-5.1.4.org/ext/soap/soap.c	2006-03-24 09:45:54.000000000 +0100
++++ php-5.1.4/ext/soap/soap.c	2006-06-21 13:47:25.346782905 +0200
+@@ -3853,7 +3853,6 @@
+ 
+ 	if (use == SOAP_ENCODED) {
+ 		xmlNewNs(envelope, XSD_NAMESPACE, XSD_NS_PREFIX);
+-		xmlNewNs(envelope, XSI_NAMESPACE, XSI_NS_PREFIX);
+ 		if (version == SOAP_1_1) {
+ 			xmlNewNs(envelope, SOAP_1_1_ENC_NAMESPACE, SOAP_1_1_ENC_NS_PREFIX);
+ 			xmlSetNsProp(envelope, envelope->ns, "encodingStyle", SOAP_1_1_ENC_NAMESPACE);
+@@ -4065,7 +4064,6 @@
+ 
+ 	if (use == SOAP_ENCODED) {
+ 		xmlNewNs(envelope, XSD_NAMESPACE, XSD_NS_PREFIX);
+-		xmlNewNs(envelope, XSI_NAMESPACE, XSI_NS_PREFIX);
+ 		if (version == SOAP_1_1) {
+ 			xmlNewNs(envelope, SOAP_1_1_ENC_NAMESPACE, SOAP_1_1_ENC_NS_PREFIX);
+ 			xmlSetNsProp(envelope, envelope->ns, "encodingStyle", SOAP_1_1_ENC_NAMESPACE);

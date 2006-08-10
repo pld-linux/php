@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 4
+%define	_rel 5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -160,7 +160,7 @@ BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.0.18
 %{?with_mhash:BuildRequires:	mhash-devel}
-%{?with_ming:BuildRequires:	ming-devel >= 0.1.0}
+%{?with_ming:BuildRequires:	ming-devel >= 0.2a-11}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}

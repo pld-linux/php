@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 5
+%define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	JЙzyk skryptowy PHP
@@ -74,7 +74,7 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.1.4
+Version:	5.1.5
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
@@ -123,7 +123,6 @@ Patch36:	%{name}-linkflags-clean.patch
 Patch37:	%{name}-cli-segv-fixes.patch
 Patch38:	%{name}-amd64.patch
 Patch39:	%{name}-soap.patch
-Patch40:	%{name}-substr_compare.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1552,7 +1551,6 @@ patch -p1 < %{PATCH30} || exit 1
 %patch38 -p1
 %endif
 %patch39 -p1
-%patch40 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 5
+%define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	JЙzyk skryptowy PHP
@@ -74,13 +74,13 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.1.4
+Version:	5.1.5
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	b55e633bdc80ab30da7c92f760fc4b58
+# Source0-md5:	fb4edd5ed9c536a04a241b52ea62a6c1
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
@@ -122,7 +122,6 @@ Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
 Patch37:	%{name}-cli-segv-fixes.patch
 Patch38:	%{name}-soap.patch
-Patch39:	%{name}-substr_compare.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1548,7 +1547,6 @@ patch -p1 < %{PATCH30} || exit 1
 %{?with_versioning:%patch35 -p1}
 %patch37 -p1
 %patch38 -p1
-%patch39 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

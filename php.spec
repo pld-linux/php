@@ -95,6 +95,7 @@ Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
 Patch3:		%{name}-link-libs.patch
 Patch4:		%{name}-libpq_fs_h_path.patch
+Patch5:		%{name}-apr-apu.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
@@ -1513,7 +1514,7 @@ Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-
+%patch5 -p1
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1

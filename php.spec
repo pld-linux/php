@@ -23,7 +23,7 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_with	interbase	# with InterBase extension module
+%bcond_without	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	ming		# without ming extension module
@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 3
+%define	_rel 2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	JЙzyk skryptowy PHP
@@ -74,13 +74,13 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.1.4
+Version:	5.1.5
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	b55e633bdc80ab30da7c92f760fc4b58
+# Source0-md5:	fb4edd5ed9c536a04a241b52ea62a6c1
 Source1:	FAQ.%{name}
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
@@ -95,6 +95,7 @@ Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
 Patch3:		%{name}-link-libs.patch
 Patch4:		%{name}-libpq_fs_h_path.patch
+Patch5:		%{name}-apr-apu.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
@@ -121,7 +122,7 @@ Patch34:	%{name}-ini-search-path.patch
 Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
 Patch37:	%{name}-cli-segv-fixes.patch
-Patch38:	%{name}-amd64.patch
+Patch38:	%{name}-soap.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1513,7 +1514,7 @@ ModuЁ PHP umo©liwiaj╠cy u©ywanie kompresji zlib.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-
+%patch5 -p1
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
@@ -1546,9 +1547,7 @@ patch -p1 < %{PATCH30} || exit 1
 %patch34 -p1
 %{?with_versioning:%patch35 -p1}
 %patch37 -p1
-%if "%{_lib}" = "lib64"
 %patch38 -p1
-%endif
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1877,6 +1876,11 @@ ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/bui
 ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
+
+# as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h
+# isn't installed by install-headers make target, we do it manually here.
+# this header file is required by e.g. filter PECL extension
+install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pcre.h
 
 %clean
 rm -rf $RPM_BUILD_ROOT

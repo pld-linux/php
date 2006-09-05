@@ -1879,6 +1879,11 @@ ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
+# as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h
+# isn't installed by install-headers make target, we do it manually here.
+# this header file is required by e.g. filter PECL extension
+install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pcre.h
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 

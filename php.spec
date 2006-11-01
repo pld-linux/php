@@ -23,7 +23,7 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_with	interbase	# with InterBase extension module
+%bcond_without	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	ming		# without ming extension module
@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 3
+%define	_rel 2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	JЙzyk skryptowy PHP
@@ -74,14 +74,14 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.1.4
+Version:	5.1.6
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	b55e633bdc80ab30da7c92f760fc4b58
-Source1:	FAQ.%{name}
+# Source0-md5:	08e423aa314369d4392a36b3f7246afc
+
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -122,6 +122,7 @@ Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
 Patch37:	%{name}-cli-segv-fixes.patch
 Patch38:	%{name}-amd64.patch
+Patch39:	%{name}-soap.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -158,7 +159,7 @@ BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.0.18
 %{?with_mhash:BuildRequires:	mhash-devel}
-%{?with_ming:BuildRequires:	ming-devel >= 0.1.0}
+%{?with_ming:BuildRequires:	ming-devel >= 0.2a-11}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
@@ -363,6 +364,7 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
+Provides:	%{name}-overload = %{epoch}:%{version}-%{release}
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
@@ -1546,9 +1548,10 @@ patch -p1 < %{PATCH30} || exit 1
 %patch34 -p1
 %{?with_versioning:%patch35 -p1}
 %patch37 -p1
-%if "%{_lib}" = "lib64"
+%if "%{_lib}" == "lib64"
 %patch38 -p1
 %endif
+%patch39 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1835,7 +1838,6 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
 install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-install %{SOURCE1} .
 
 %if %{with apache1}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
@@ -1877,6 +1879,11 @@ ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/bui
 ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
+
+# as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h
+# isn't installed by install-headers make target, we do it manually here.
+# this header file is required by e.g. filter PECL extension
+install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pcre.h
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -2575,7 +2582,7 @@ fi
 
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
-%attr(644,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}
 

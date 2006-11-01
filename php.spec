@@ -364,6 +364,7 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
+Provides:	%{name}-overload = %{epoch}:%{version}-%{release}
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-spl = %{epoch}:%{version}-%{release}

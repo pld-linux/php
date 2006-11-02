@@ -1,11 +1,11 @@
---- php-5.1.4/php.ini~	2006-06-20 15:47:05.186965387 +0300
-+++ php-5.1.4/php.ini	2006-06-20 15:48:05.188306604 +0300
-@@ -320,7 +320,7 @@
+--- php-5.2.0/php.ini~	2006-11-03 01:30:58.000000000 +0200
++++ php-5.2.0/php.ini	2006-11-03 01:32:07.000000000 +0200
+@@ -321,7 +321,7 @@
  
  max_execution_time = 30     ; Maximum execution time of each script, in seconds
  max_input_time = 60	; Maximum amount of time each script may spend parsing request data
--memory_limit = 8M      ; Maximum amount of memory a script may consume (8MB)
-+memory_limit = 16M      ; Maximum amount of memory a script may consume (16MB)
+-memory_limit = 16M      ; Maximum amount of memory a script may consume (16MB)
++memory_limit = 32M      ; Maximum amount of memory a script may consume (32MB)
  
  
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

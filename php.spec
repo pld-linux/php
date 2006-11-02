@@ -65,7 +65,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 0.1
+%define	_rel 0.2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -115,7 +115,6 @@ Patch30:	%{name}-hardening-fix.patch
 Patch31:	%{name}-both-apxs.patch
 Patch32:	%{name}-builddir.patch
 Patch33:	%{name}-zlib-for-getimagesize.patch
-Patch34:	%{name}-ini-search-path.patch
 Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
 Patch38:	%{name}-amd64.patch
@@ -365,7 +364,7 @@ Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-standard = %{epoch}:%{version}-%{release}
-Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}
+%{?with_pcre:Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
@@ -373,6 +372,7 @@ Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-session < 3:4.2.1-2
+Obsoletes:	php-pcre < 4:5.2.0
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
 
@@ -1497,7 +1497,6 @@ patch -p1 < %{PATCH30} || exit 1
 %patch31 -p1
 %patch32 -p1
 %patch33 -p1
-#%patch34 -p1 # UPDATE
 %{?with_versioning:%patch35 -p1}
 %if "%{_lib}" == "lib64"
 %patch38 -p1

@@ -18,7 +18,6 @@
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	hardening	# build with hardening patch applied (http://www.hardened-php.net/)
-%bcond_with	hwapi		# with Hw API support			(BR: proprietary libs)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
@@ -111,7 +110,6 @@ Patch20:	%{name}-readline.patch
 Patch21:	%{name}-nohttpd.patch
 Patch23:	%{name}-gd_imagerotate_enable.patch
 Patch24:	%{name}-uint32_t.patch
-Patch25:	%{name}-hwapi-link.patch
 Patch26:	%{name}-dba-link.patch
 Patch30:	%{name}-hardening-fix.patch
 Patch31:	%{name}-both-apxs.patch
@@ -120,9 +118,7 @@ Patch33:	%{name}-zlib-for-getimagesize.patch
 Patch34:	%{name}-ini-search-path.patch
 Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
-Patch37:	%{name}-cli-segv-fixes.patch
 Patch38:	%{name}-amd64.patch
-Patch39:	%{name}-soap.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -157,7 +153,7 @@ BuildRequires:	libtiff-devel
 BuildRequires:	libtool >= 1.4.3
 BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
-BuildRequires:	libxslt-devel >= 1.0.18
+BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mhash:BuildRequires:	mhash-devel}
 %{?with_ming:BuildRequires:	ming-devel >= 0.2a-11}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
@@ -170,7 +166,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 BuildRequires:	pam-devel
-%{?with_pcre:BuildRequires:	pcre-devel}
+%{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -199,8 +195,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
-%define		zend_module_api		20050922
-%define		zend_extension_api	220051025
+%define		zend_module_api		20060613
+%define		zend_extension_api	220060519
 %define		zend_zts			%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug			%{!?debug:0}%{?debug:1}
 
@@ -369,6 +365,7 @@ Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-standard = %{epoch}:%{version}-%{release}
+Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
@@ -587,21 +584,6 @@ library.
 Modu³ PHP dodaj±cy obs³ugê formularzy PDF poprzez bibliotekê Adobe
 FDFTK.
 
-%package filepro
-Summary:	filePro extension module for PHP
-Summary(pl):	Modu³ filePro dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description filepro
-This is a dynamic shared object (DSO) for PHP that will add support
-for read-only access to filePro databases.
-
-%description filepro -l pl
-Modu³ PHP dodaj±cy mo¿liwo¶æ dostêpu (tylko do odczytu) do baz danych
-filePro.
-
 %package ftp
 Summary:	FTP extension module for PHP
 Summary(pl):	Modu³ FTP dla PHP
@@ -661,20 +643,6 @@ length number support with GNU MP library.
 %description gmp -l pl
 Modu³ PHP umo¿liwiaj±cy korzystanie z biblioteki gmp do obliczeñ na
 liczbach o dowolnej d³ugo¶ci.
-
-%package hwapi
-Summary:	Hyperwave API extension module for PHP
-Summary(pl):	Modu³ API Hyperwave dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description hwapi
-This is a dynamic shared object (DSO) for PHP that will add official
-Hyperwave API support.
-
-%description hwapi -l pl
-Modu³ PHP dodaj±cy obs³ugê Hyperwave.
 
 %package iconv
 Summary:	iconv extension module for PHP
@@ -953,21 +921,6 @@ Obs³uguje funkcje takie jak fork(), waitpid(), signal() i podobne.
 
 Uwaga: to jest modu³ eksperymentalny. Ponadto nie jest przeznaczony do
 u¿ywania z serwerem WWW - nie próbuj tego!
-
-%package pcre
-Summary:	PCRE extension module for PHP
-Summary(pl):	Modu³ PCRE dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description pcre
-This is a dynamic shared object (DSO) for PHP that will add Perl
-Compatible Regular Expression support.
-
-%description pcre -l pl
-Modu³ PHP umo¿liwiaj±cy korzystanie z perlowych wyra¿eñ regularnych
-(Perl Compatible Regular Expressions)
 
 %package pdo
 Summary:	PHP Data Objects (PDO)
@@ -1519,7 +1472,7 @@ Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
+#%patch9 -p1 # TEST OR UPGRADE
 cp php.ini-dist php.ini
 %patch10 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
@@ -1533,9 +1486,8 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%patch23 -p1
+#%patch23 -p1 # UPDATE?
 %patch24 -p1
-%patch25 -p1
 %patch26 -p1
 
 %if %{with hardening}
@@ -1545,13 +1497,11 @@ patch -p1 < %{PATCH30} || exit 1
 %patch31 -p1
 %patch32 -p1
 %patch33 -p1
-%patch34 -p1
+#%patch34 -p1 # UPDATE
 %{?with_versioning:%patch35 -p1}
-%patch37 -p1
 %if "%{_lib}" == "lib64"
 %patch38 -p1
 %endif
-%patch39 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1653,7 +1603,6 @@ for sapi in $sapis; do
 	--with-flatfile \
 	--enable-dom=shared \
 	--enable-exif=shared \
-	--enable-filepro=shared \
 	--enable-ftp=shared \
 	--enable-gd-native-ttf \
 	--enable-gd-jus-conf \
@@ -1704,13 +1653,11 @@ for sapi in $sapis; do
 %endif
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \
-	--with-filepro=shared \
 	--with-freetype-dir=shared \
 	--with-gettext=shared \
 	--with-gd=shared,/usr \
 	--with-gdbm \
 	--with-gmp=shared \
-	%{?with_hwapi:--with-hwapi=shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
 	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
 	--with-jpeg-dir=/usr \
@@ -1728,7 +1675,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
-	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared,/usr} \
+	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=/usr} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
 	--with-png-dir=/usr \
@@ -2038,12 +1985,6 @@ fi
 %postun fdf
 %extension_postun
 
-%post filepro
-%extension_post
-
-%postun filepro
-%extension_postun
-
 %post ftp
 %extension_post
 
@@ -2066,12 +2007,6 @@ fi
 %extension_post
 
 %postun gmp
-%extension_postun
-
-%post hwapi
-%extension_post
-
-%postun hwapi
 %extension_postun
 
 %post iconv
@@ -2162,12 +2097,6 @@ fi
 %extension_post
 
 %postun openssl
-%extension_postun
-
-%post pcre
-%extension_post
-
-%postun pcre
 %extension_postun
 
 %post pdo-dblib
@@ -2374,9 +2303,6 @@ fi
 %triggerun fdf -- %{name}-fdf < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*fdf\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun filepro -- %{name}-filepro < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*filepro\.so/d' %{_sysconfdir}/php.ini
-
 %triggerun ftp -- %{name}-ftp < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ftp\.so/d' %{_sysconfdir}/php.ini
 
@@ -2388,9 +2314,6 @@ fi
 
 %triggerun gmp -- %{name}-gmp < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gmp\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun hwapi -- %{name}-hwapi < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*hwapi\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun iconv -- %{name}-iconv < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*iconv\.so/d' %{_sysconfdir}/php.ini
@@ -2452,9 +2375,6 @@ fi
 if [ -f %{_sysconfdir}/php-cli.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cli.ini
 fi
-
-%triggerun pcre -- %{name}-pcre < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcre\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{_sysconfdir}/php.ini
@@ -2660,11 +2580,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
 %attr(755,root,root) %{extensionsdir}/exif.so
 
-%files filepro
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filepro.ini
-%attr(755,root,root) %{extensionsdir}/filepro.so
-
 %files ftp
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ftp.ini
@@ -2684,13 +2599,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{extensionsdir}/gmp.so
-
-%if %{with hwapi}
-%files hwapi
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/hwapi.ini
-%attr(755,root,root) %{extensionsdir}/hwapi.so
-%endif
 
 %files iconv
 %defattr(644,root,root,755)
@@ -2798,13 +2706,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/pcntl.ini
 %attr(755,root,root) %{extensionsdir}/pcntl.so
-
-%if %{with pcre}
-%files pcre
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcre.ini
-%attr(755,root,root) %{extensionsdir}/pcre.so
-%endif
 
 %files pdo
 %defattr(644,root,root,755)

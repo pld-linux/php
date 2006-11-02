@@ -1,0 +1,25 @@
+--- php-5.2.0/configure.in~	2006-11-03 01:38:33.246428054 +0200
++++ php-5.2.0/configure.in	2006-11-03 01:46:52.697656608 +0200
+@@ -955,14 +955,14 @@
+   dnl
+   dnl PEAR dependancies
+   dnl
+-  if test "$PHP_PCRE_REGEX" = "no"; then
+-    pear_error_msg="$pear_error_msg 
+-                    PEAR requires PCRE to be enabled.    Add --with-pcre-regex to the configure line. (or --without-pear)"
+-  fi
+-  if test "$PHP_XML" = "no"; then
+-    pear_error_msg="$pear_error_msg 
+-                    PEAR requires XML to be enabled.     Add --enable-xml to the configure line. (or --without-pear)"
+-  fi
++dnl  if test "$PHP_PCRE_REGEX" = "no"; then
++dnl    pear_error_msg="$pear_error_msg 
++dnl                    PEAR requires PCRE to be enabled.    Add --with-pcre-regex to the configure line. (or --without-pear)"
++dnl  fi
++dnl  if test "$PHP_XML" = "no"; then
++dnl    pear_error_msg="$pear_error_msg 
++dnl                    PEAR requires XML to be enabled.     Add --enable-xml to the configure line. (or --without-pear)"
++dnl  fi
+ 
+ dnl
+ dnl  if test "$PHP_XMLRPC" = "no"; then

@@ -374,7 +374,7 @@ Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-session < 3:4.2.1-2
-Obsoletes:	php-pcre < 4:5.2.0
+#Obsoletes:	php-pcre < 4:5.2.0
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
 

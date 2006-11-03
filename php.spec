@@ -67,7 +67,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 0.2
+%define	_rel 0.3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -82,7 +82,6 @@ License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	e6029fafcee029edcfa2ceed7a005333
-
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -1449,6 +1448,20 @@ support (using libxslt).
 %description xsl -l pl
 Modu³ PHP dodaj±cy now± obs³ugê XSLT (przy u¿yciu libxslt).
 
+%package zip
+Summary:	Zip management extension
+Summary(pl):	Zarz±dzanie archiwami zip
+Group:		Libraries
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description zip
+Zip is an extension to create, modify and read zip files.
+
+%description zip -l pl
+Zip jest rozszerzeniem umo¿liwiaj±cym tworzenie, modyfikacjê oraz
+odczyt archiwów zip.
+
 %package zlib
 Summary:	Zlib extension module for PHP
 Summary(pl):	Modu³ zlib dla PHP
@@ -2264,6 +2277,12 @@ fi
 %postun xsl
 %extension_postun
 
+%post zip
+%extension_post
+
+%postun zip
+%extension_postun
+
 %post zlib
 %extension_post
 
@@ -2888,6 +2907,11 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xsl.ini
 %attr(755,root,root) %{extensionsdir}/xsl.so
+
+%files zip
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zip.ini
+%attr(755,root,root) %{extensionsdir}/zip.so
 
 %files zlib
 %defattr(644,root,root,755)

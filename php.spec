@@ -9,6 +9,8 @@
 #   db, hyperwave, java, mcal, overload, qtdom
 #   and removed from php 5.1:
 #   cpdf, fam, yp, oracle
+#   and removed from php 5.2:
+#   filepro, hw
 # - mime_magic can't handle new "string/*" entries in magic.mime
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
@@ -118,6 +120,7 @@ Patch33:	%{name}-zlib-for-getimagesize.patch
 Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
 Patch38:	%{name}-amd64.patch
+Patch39:	%{name}-pear.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1501,6 +1504,7 @@ patch -p1 < %{PATCH30} || exit 1
 %if "%{_lib}" == "lib64"
 %patch38 -p1
 %endif
+%patch39 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1674,7 +1678,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
-	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=/usr} \
+	%{!?with_pcre:--without-pcre-regex --disable-filter}%{?with_pcre:--with-pcre-regex=/usr} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
 	--with-png-dir=/usr \
@@ -1694,7 +1698,8 @@ for sapi in $sapis; do
 	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
 	--with-xsl=shared \
 	--with-zlib=shared \
-	--with-zlib-dir=shared,/usr
+	--with-zlib-dir=shared,/usr \
+	--enable-zip=shared,/usr \
 
 	cp -f Makefile Makefile.$sapi
 	cp -f main/php_config.h php_config.h.$sapi
@@ -1702,11 +1707,7 @@ done
 
 # must make this first, so modules can link against it.
 %{__make} libphp_common.la
-
 %{__make} build-modules
-
-# fix install paths, avoid evil rpaths
-#sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
 
 %if %{with apache1}
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
@@ -1772,9 +1773,6 @@ libtool --silent --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/
 libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
 install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
-
-# as of 5.0.5, phpextdist isn't installed by default
-install scripts/dev/phpextdist $RPM_BUILD_ROOT%{_bindir}
 
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
@@ -2505,10 +2503,6 @@ fi
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}
 
-# session_mm doesn't work with shared session
-#%files session
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{extensionsdir}/session.so
 %doc ext/session/mod_files.sh
 
 %files devel
@@ -2516,7 +2510,6 @@ fi
 %doc README.UNIX-BUILD-SYSTEM
 %doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
 %doc CODING_STANDARDS
-%attr(755,root,root) %{_bindir}/phpextdist
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so

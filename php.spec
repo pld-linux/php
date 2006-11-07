@@ -12,6 +12,7 @@
 #   and removed from php 5.2:
 #   filepro, hw
 # - mime_magic can't handle new "string/*" entries in magic.mime
+#   thus doesn't work with system magic.mime databse
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?

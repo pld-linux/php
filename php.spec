@@ -68,7 +68,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 0.3
+%define	_rel 0.5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -99,7 +99,7 @@ Patch4:		%{name}-libpq_fs_h_path.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
-Patch9:		%{name}-reflection.patch
+
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
 Patch14:	%{name}-allow-db31.patch
@@ -363,19 +363,19 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-overload = %{epoch}:%{version}-%{release}
+%{?with_pcre:Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}}
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-standard = %{epoch}:%{version}-%{release}
-%{?with_pcre:Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
+#Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-session < 3:4.2.1-2
-#Obsoletes:	php-pcre < 4:5.2.0
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
 
@@ -840,7 +840,7 @@ MySQL w wersji 4.1 i nowszych.
 Summary:	ncurses module for PHP
 Summary(pl):	Modu³ ncurses dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-cli = %{epoch}:%{version}-%{release}
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 
 %description ncurses
@@ -907,8 +907,8 @@ Uwaga: to jest modu³ eksperymentalny.
 Summary:	Process Control extension module for PHP
 Summary(pl):	Modu³ Process Control dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-program = %{epoch}:%{version}-%{release}
-Requires:	%{name}-program = %{epoch}:%{version}-%{release}
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 
 %description pcntl
 This is a dynamic shared object (DSO) for PHP that will add process
@@ -1109,7 +1109,7 @@ sprawdzanie pisowni s³owa i sugerowanie poprawek.
 Summary:	readline extension module for PHP
 Summary(pl):	Modu³ readline dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-cli = %{epoch}:%{version}-%{release}
+Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 
 %description readline
@@ -1489,7 +1489,7 @@ Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-#%patch9 -p1 # TEST OR UPGRADE
+
 cp php.ini-dist php.ini
 %patch10 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked

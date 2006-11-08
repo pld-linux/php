@@ -68,7 +68,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 0.5
+%define	_rel 0.6
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -596,7 +596,6 @@ Summary(pl):	Modu³ GD dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	gd >= 2.0.28-4
-Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}
 
 %description gd
 This is a dynamic shared object (DSO) for PHP that will add GD

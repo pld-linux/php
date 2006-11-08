@@ -1090,19 +1090,6 @@ support.
 Modu³ PHP dodaj±cy mo¿liwo¶æ konwersji kodowania plików (poprzez
 bibliotekê recode).
 
-%package session
-Summary:	session extension module for PHP
-Summary(pl):	Modu³ session dla PHP
-Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description session
-This is a dynamic shared object (DSO) for PHP that will add session
-support.
-
-%description session -l pl
-Modu³ PHP dodaj±cy obs³ugê sesji.
-
 %package shmop
 Summary:	Shared Memory Operations extension module for PHP
 Summary(pl):	Modu³ shmop dla PHP
@@ -1308,7 +1295,7 @@ Summary:	wddx extension module for PHP
 Summary(pl):	Modu³ wddx dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 
 %description wddx
@@ -2346,9 +2333,6 @@ fi
 
 %triggerun recode -- %{name}-recode < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun session -- %{name}-session < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*session\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{_sysconfdir}/php.ini

@@ -595,6 +595,7 @@ Summary:	GD extension module for PHP
 Summary(pl):	Modu³ GD dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	gd(gif)
 Requires:	gd >= 2.0.28-4
 
 %description gd

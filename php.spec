@@ -1877,26 +1877,6 @@ install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pc
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
-if [ "$1" = "1" ]; then
-%if %{with apache1}
-	%service -q apache restart
-%endif
-%if %{with apache2}
-	%service -q httpd restart
-%endif
-fi
-
-%postun
-if [ "$1" = "0" ]; then
-%if %{with apache1}
-	%service -q apache restart
-%endif
-%if %{with apache2}
-	%service -q httpd restart
-%endif
-fi
-
 %post -n apache1-mod_php
 if [ "$1" = "1" ]; then
 	%service -q apache restart

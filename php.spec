@@ -64,7 +64,7 @@
 %undefine	with_interbase
 %endif
 
-%if %{without apache1} && %{without apache2}
+%if !%{with apache1} && !%{with apache2}
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
@@ -1629,7 +1629,7 @@ for sapi in $sapis; do
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 	--with-pdo-dblib=shared \
 %endif
-%if %{with interbase} && %{without interbase_inst}
+%if %{with interbase} && !%{with interbase_inst}
 	--with-pdo-firebird=shared \
 %endif
 	--with-pdo-mysql=shared \
@@ -2699,7 +2699,7 @@ fi
 %attr(755,root,root) %{extensionsdir}/pdo_dblib.so
 %endif
 
-%if %{with interbase} && %{without interbase_inst}
+%if %{with interbase} && !%{with interbase_inst}
 %files pdo-firebird
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_firebird.ini

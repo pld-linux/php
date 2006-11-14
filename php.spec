@@ -68,7 +68,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 0.11
+%define	_rel 0.12
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -91,6 +91,8 @@ Source6:	%{name}-apache.ini
 Source7:	%{name}-cli.ini
 Source8:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
 # Source8-md5:	47a742fa9fab2826ad10c13a2376111a
+# Taken from: http://browsers.garykeith.com/downloads.asp
+Source9:	%{name}_browscap.ini
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -1793,6 +1795,7 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
 install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}
 
 %if %{with apache1}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
@@ -2488,6 +2491,7 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php_browscap.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}
 

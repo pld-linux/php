@@ -1916,21 +1916,6 @@ if [ "$1" = "0" ]; then
 	%service -q httpd restart
 fi
 
-# so tired of typing... so decided to create macros
-# macro called at extension post scriptlet
-%define	extension_post \
-if [ "$1" = "1" ]; then \
-	[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart \
-	[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart \
-fi
-
-# macro called at extension postun scriptlet
-%define	extension_postun \
-if [ "$1" = "0" ]; then \
-	[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart \
-	[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart \
-fi
-
 %post	common -p /sbin/ldconfig
 %postun	common -p /sbin/ldconfig
 
@@ -1966,353 +1951,89 @@ if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
 fi
 %endif
 
-%post bcmath
-%extension_post
+# macro called at extension post scriptlet
+%define	extension_post \
+if [ "$1" = "1" ]; then \
+	[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart \
+	[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart \
+fi
 
-%postun bcmath
+# macro called at extension postun scriptlet
+%define	extension_postun \
+if [ "$1" = "0" ]; then \
+	[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart \
+	[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart \
+fi
+
+%define	extension_scripts() \
+%post %1 \
+%extension_post \
+\
+%postun %1 \
 %extension_postun
 
-%post bzip2
-%extension_post
-
-%postun bzip2
-%extension_postun
-
-%post calendar
-%extension_post
-
-%postun calendar
-%extension_postun
-
-%post ctype
-%extension_post
-
-%postun ctype
-%extension_postun
-
-%post curl
-%extension_post
-
-%postun curl
-%extension_postun
-
-%post dba
-%extension_post
-
-%postun dba
-%extension_postun
-
-%post dbase
-%extension_post
-
-%postun dbase
-%extension_postun
-
-%post dom
-%extension_post
-
-%postun dom
-%extension_postun
-
-%post exif
-%extension_post
-
-%postun exif
-%extension_postun
-
-%post fdf
-%extension_post
-
-%postun fdf
-%extension_postun
-
-%post ftp
-%extension_post
-
-%postun ftp
-%extension_postun
-
-%post gd
-%extension_post
-
-%postun gd
-%extension_postun
-
-%post gettext
-%extension_post
-
-%postun gettext
-%extension_postun
-
-%post gmp
-%extension_post
-
-%postun gmp
-%extension_postun
-
-%post iconv
-%extension_post
-
-%postun iconv
-%extension_postun
-
-%post imap
-%extension_post
-
-%postun imap
-%extension_postun
-
-%post interbase
-%extension_post
-
-%postun interbase
-%extension_postun
-
-%post ldap
-%extension_post
-
-%postun ldap
-%extension_postun
-
-%post mbstring
-%extension_post
-
-%postun mbstring
-%extension_postun
-
-%post mcrypt
-%extension_post
-
-%postun mcrypt
-%extension_postun
-
-%post mhash
-%extension_post
-
-%postun mhash
-%extension_postun
-
-%post mime_magic
-%extension_post
-
-%postun mime_magic
-%extension_postun
-
-%post ming
-%extension_post
-
-%postun ming
-%extension_postun
-
-%post mssql
-%extension_post
-
-%postun mssql
-%extension_postun
-
-%post mysql
-%extension_post
-
-%postun mysql
-%extension_postun
-
-%post mysqli
-%extension_post
-
-%postun mysqli
-%extension_postun
-
-%post oci8
-%extension_post
-
-%postun oci8
-%extension_postun
-
-%post odbc
-%extension_post
-
-%postun odbc
-%extension_postun
-
-%post openssl
-%extension_post
-
-%postun openssl
-%extension_postun
-
-%post pdo-dblib
-%extension_post
-
-%postun pdo-dblib
-%extension_postun
-
-%post pdo-firebird
-%extension_post
-
-%postun pdo-firebird
-%extension_postun
-
-%post pdo-mysql
-%extension_post
-
-%postun pdo-mysql
-%extension_postun
-
-%post pdo-odbc
-%extension_post
-
-%postun pdo-odbc
-%extension_postun
-
-%post pdo-pgsql
-%extension_post
-
-%postun pdo-pgsql
-%extension_postun
-
-%post pdo-sqlite
-%extension_post
-
-%postun pdo-sqlite
-%extension_postun
-
-%post pgsql
-%extension_post
-
-%postun pgsql
-%extension_postun
-
-%post posix
-%extension_post
-
-%postun posix
-%extension_postun
-
-%post pspell
-%extension_post
-
-%postun pspell
-%extension_postun
-
-%post recode
-%extension_post
-
-%postun recode
-%extension_postun
-
-%post shmop
-%extension_post
-
-%postun shmop
-%extension_postun
-
-%post snmp
-%extension_post
-
-%postun snmp
-%extension_postun
-
-%post soap
-%extension_post
-
-%postun soap
-%extension_postun
-
-%post sockets
-%extension_post
-
-%postun sockets
-%extension_postun
-
-%post sqlite
-%extension_post
-
-%postun sqlite
-%extension_postun
-
-%post sybase
-%extension_post
-
-%postun sybase
-%extension_postun
-
-%post sybase-ct
-%extension_post
-
-%postun sybase-ct
-%extension_postun
-
-%post sysvmsg
-%extension_post
-
-%postun sysvmsg
-%extension_postun
-
-%post sysvsem
-%extension_post
-
-%postun sysvsem
-%extension_postun
-
-%post sysvshm
-%extension_post
-
-%postun sysvshm
-%extension_postun
-
-%post tidy
-%extension_post
-
-%postun tidy
-%extension_postun
-
-%post tokenizer
-%extension_post
-
-%postun tokenizer
-%extension_postun
-
-%post wddx
-%extension_post
-
-%postun wddx
-%extension_postun
-
-%post xml
-%extension_post
-
-%postun xml
-%extension_postun
-
-%post xmlreader
-%extension_post
-
-%postun xmlreader
-%extension_postun
-
-%post xmlrpc
-%extension_post
-
-%postun xmlrpc
-%extension_postun
-
-%post xsl
-%extension_post
-
-%postun xsl
-%extension_postun
-
-%post zip
-%extension_post
-
-%postun zip
-%extension_postun
-
-%post zlib
-%extension_post
-
-%postun zlib
-%extension_postun
+# extension scripts defines
+%extension_scripts bcmath
+%extension_scripts bzip2
+%extension_scripts calendar
+%extension_scripts ctype
+%extension_scripts curl
+%extension_scripts dba
+%extension_scripts dbase
+%extension_scripts dom
+%extension_scripts exif
+%extension_scripts fdf
+%extension_scripts ftp
+%extension_scripts gd
+%extension_scripts gettext
+%extension_scripts gmp
+%extension_scripts hash
+%extension_scripts iconv
+%extension_scripts imap
+%extension_scripts interbase
+%extension_scripts json
+%extension_scripts ldap
+%extension_scripts mbstring
+%extension_scripts mcrypt
+%extension_scripts mhash
+%extension_scripts mime_magic
+%extension_scripts ming
+%extension_scripts mssql
+%extension_scripts mysql
+%extension_scripts mysqli
+%extension_scripts oci8
+%extension_scripts odbc
+%extension_scripts openssl
+%extension_scripts pdo-dblib
+%extension_scripts pdo-firebird
+%extension_scripts pdo-mysql
+%extension_scripts pdo-odbc
+%extension_scripts pdo-pgsql
+%extension_scripts pdo-sqlite
+%extension_scripts pgsql
+%extension_scripts posix
+%extension_scripts pspell
+%extension_scripts recode
+%extension_scripts shmop
+%extension_scripts snmp
+%extension_scripts soap
+%extension_scripts sockets
+%extension_scripts sqlite
+%extension_scripts sybase
+%extension_scripts sybase-ct
+%extension_scripts sysvmsg
+%extension_scripts sysvsem
+%extension_scripts sysvshm
+%extension_scripts tidy
+%extension_scripts tokenizer
+%extension_scripts wddx
+%extension_scripts xml
+%extension_scripts xmlreader
+%extension_scripts xmlrpc
+%extension_scripts xmlwriter
+%extension_scripts xsl
+%extension_scripts zip
+%extension_scripts zlib
 
 %triggerun bcmath -- %{name}-bcmath < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bcmath\.so/d' %{_sysconfdir}/php.ini

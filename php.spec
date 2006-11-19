@@ -9,6 +9,8 @@
 #   db, hyperwave, java, mcal, overload, qtdom
 #   and removed from php 5.1:
 #   cpdf, fam, yp, oracle
+#   and removed from php 5.1.3:
+#   msession
 #   and removed from php 5.2:
 #   filepro, hw
 # - mime_magic can't handle new "string/*" entries in magic.mime

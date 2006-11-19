@@ -16,7 +16,6 @@
 # - make additional headers added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
-# - modular json
 #
 # Conditional build:
 %bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
@@ -69,7 +68,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 0.12
+%define	_rel 0.14
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -661,6 +660,21 @@ length number support with GNU MP library.
 Modu³ PHP umo¿liwiaj±cy korzystanie z biblioteki gmp do obliczeñ na
 liczbach o dowolnej d³ugo¶ci.
 
+%package hash
+Summary:	HASH Message Digest Framework
+Summary(pl):	szkielet do obliczania skrótów wiadomo¶ci
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(hash)
+
+%description hash
+Native implementations of common message digest algorithms using a
+generic factory method.
+
+%description hash -l pl
+Natywne implementacje popularnych algorytmów obliczania skrótów
+wiadomo¶ci przy u¿yciu wspólnego interfejsu.
+
 %package iconv
 Summary:	iconv extension module for PHP
 Summary(pl):	Modu³ iconv dla PHP
@@ -707,6 +721,21 @@ and Firebird database support.
 
 %description interbase -l pl
 Modu³ PHP umo¿liwiaj±cy dostêp do baz danych InterBase i Firebird.
+
+%package json
+Summary:	PHP C extension for JSON serialization
+Summary(pl):	rozszerzenie C PHP dla serializacji JSON
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(json)
+
+%description json
+php-json is an extremely fast PHP C extension for JSON (JavaScript
+Object Notation) serialisation.
+
+%description json -l pl
+php-json to bardzo szybkie rozszerzenie C PHP dla serializacji JSON
+(JavaScript Object Notation).
 
 %package ldap
 Summary:	LDAP extension module for PHP
@@ -1432,6 +1461,23 @@ Modu³ PHP dodaj±cy obs³ugê XMLRPC.
 
 Uwaga: to jest modu³ eksperymentalny.
 
+%package xmlwriter
+Summary:	provides fast, non-cached, forward-only means to write XML data
+Summary(pl):	szybka, nie cachowana metoda zapisu danych w formacie XML
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(xmlwriter)
+
+%description xmlwriter
+This extension wraps the libxml xmlWriter API. Represents a writer
+that provides a non-cached, forward-only means of generating streams
+or files containing XML data.
+
+%description xmlwriter -l pl
+To rozszerzenie obudowuje API xmlWriter z libxml. Reprezentuje obs³ugê
+zapisu dostarczaj±c± nie cachowanych metod generowania strumieni lub
+plików zawieraj±cych dane XML.
+
 %package xsl
 Summary:	xsl extension module for PHP
 Summary(pl):	Modu³ xsl dla PHP
@@ -1629,6 +1675,9 @@ for sapi in $sapis; do
 	--enable-mbregex \
 	--enable-pcntl=shared \
 	--enable-pdo=shared \
+	--enable-json=shared \
+	--enable-hash=shared \
+	--enable-xmlwriter=shared \
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 	--with-pdo-dblib=shared \
 %endif
@@ -2585,6 +2634,11 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{extensionsdir}/gmp.so
 
+%files hash
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/hash.ini
+%attr(755,root,root) %{extensionsdir}/hash.so
+
 %files iconv
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/iconv.ini
@@ -2603,6 +2657,11 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/interbase.ini
 %attr(755,root,root) %{extensionsdir}/interbase.so
 %endif
+
+%files json
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/json.ini
+%attr(755,root,root) %{extensionsdir}/json.so
 
 %if %{with ldap}
 %files ldap
@@ -2876,6 +2935,11 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlrpc.ini
 %attr(755,root,root) %{extensionsdir}/xmlrpc.so
 %endif
+
+%files xmlwriter
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlwriter.ini
+%attr(755,root,root) %{extensionsdir}/xmlwriter.so
 
 %files xsl
 %defattr(644,root,root,755)

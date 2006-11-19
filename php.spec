@@ -68,7 +68,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 0.14
+%define	_rel 0.20
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -98,6 +98,7 @@ Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
 Patch3:		%{name}-link-libs.patch
 Patch4:		%{name}-libpq_fs_h_path.patch
+Patch5:		%{name}-filter-shared.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
@@ -599,6 +600,27 @@ library.
 %description fdf -l pl
 Modu³ PHP dodaj±cy obs³ugê formularzy PDF poprzez bibliotekê Adobe
 FDFTK.
+
+%package filter
+Summary:	extension for safely dealing with input parameters
+Summary(pl):	rozszerzenie do bezpiecznej obs³ugi danych wej¶ciowych
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(filter)
+
+%description filter
+We all know that you should always check input variables, but PHP does
+not offer really good functionality for doing this in a safe way. The
+Input Filter extension is meant to address this issue by implementing
+a set of filters and mechanisms that users can use to safely access
+their input data.
+
+%description filter -l pl
+Wiadomo, ¿e trzeba zawsze sprawdzaæ zmienne wej¶ciowe, ale PHP nie
+oferuje naprawdê dobrej funkcjonalno¶ci do robienia tego w sposób
+bezpieczny. Rozszerzenie Input Filter ma rozwi±zaæ ten problem poprzez
+zaimplementowanie zestawu filtrów i mechanizmów, których u¿ytkownicy
+mog± bezpiecznie u¿ywaæ do dostêpu do danych.
 
 %package ftp
 Summary:	FTP extension module for PHP
@@ -1531,7 +1553,7 @@ Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-
+%patch5 -p1
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
@@ -1741,7 +1763,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
-	%{!?with_pcre:--without-pcre-regex --disable-filter}%{?with_pcre:--with-pcre-regex=/usr} \
+	%{!?with_pcre:--without-pcre-regex --disable-filter}%{?with_pcre:--with-pcre-regex=/usr --enable-filter=shared} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
 	--with-png-dir=/usr \
@@ -1983,6 +2005,7 @@ fi
 %extension_scripts dom
 %extension_scripts exif
 %extension_scripts fdf
+%extension_scripts filter
 %extension_scripts ftp
 %extension_scripts gd
 %extension_scripts gettext
@@ -2330,6 +2353,11 @@ fi
 %attr(755,root,root) %{extensionsdir}/fdf.so
 %endif
 
+%files filter
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
+%attr(755,root,root) %{extensionsdir}/filter.so
+
 %files exif
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
@@ -2556,7 +2584,9 @@ fi
 %endif
 
 %if 0
-# simplexml is needed by spl, and spl can't be built shared as of now (5.1.0RC3)
+# simplexml is needed by spl, and spl can't be built shared as of now (5.2.0)
+# simplexml can be built shared, but SPL startup fails
+# we could add R: -simplexml to -common...
 %files simplexml
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini

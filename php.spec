@@ -102,6 +102,7 @@ Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-reflection.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
+Patch12:	%{name}-sh.patch
 Patch14:	%{name}-allow-db31.patch
 Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
@@ -1522,6 +1523,7 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
+%patch12 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1

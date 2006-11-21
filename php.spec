@@ -104,9 +104,10 @@ Patch5:		%{name}-filter-shared.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
-
+Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
+Patch12:	%{name}-curl.patch
 Patch14:	%{name}-allow-db31.patch
 Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
@@ -126,6 +127,7 @@ Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
 Patch38:	%{name}-amd64.patch
 Patch39:	%{name}-pear.patch
+Patch40:	%{name}-db4.5.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1559,12 +1561,14 @@ Modu³ PHP umo¿liwiaj±cy u¿ywanie kompresji zlib.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 
 cp php.ini-dist php.ini
 %patch10 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
+%patch12 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
@@ -1589,6 +1593,7 @@ patch -p1 < %{PATCH30} || exit 1
 %patch38 -p1
 %endif
 %patch39 -p1
+%patch40 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

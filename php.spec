@@ -685,7 +685,7 @@ liczbach o dowolnej d³ugo¶ci.
 
 %package hash
 Summary:	HASH Message Digest Framework
-Summary(pl):	szkielet do obliczania skrótów wiadomo¶ci
+Summary(pl):	Szkielet do obliczania skrótów wiadomo¶ci
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(hash)

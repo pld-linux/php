@@ -30,11 +30,11 @@
 %bcond_with	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
+%bcond_without	mime_magic	# without mime-magic module
 %bcond_without	ming		# without ming extension module
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
-%bcond_without	mime_magic	# without mime-magic module
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module

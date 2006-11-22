@@ -603,8 +603,8 @@ Modu³ PHP dodaj±cy obs³ugê formularzy PDF poprzez bibliotekê Adobe
 FDFTK.
 
 %package filter
-Summary:	extension for safely dealing with input parameters
-Summary(pl):	rozszerzenie do bezpiecznej obs³ugi danych wej¶ciowych
+Summary:	Extension for safely dealing with input parameters
+Summary(pl):	Rozszerzenie do bezpiecznej obs³ugi danych wej¶ciowych
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(filter)

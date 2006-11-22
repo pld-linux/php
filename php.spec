@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 3
+%define	_rel 4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -557,8 +557,8 @@ Summary:	DOM extension module for PHP
 Summary(pl):	Modu³ DOM dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-# it has some compatibility functions
 Provides:	php(dom)
+# it has some compatibility functions
 Provides:	php(domxml)
 Provides:	php-domxml = %{epoch}:%{version}-%{release}
 Obsoletes:	php-domxml <= 3:4.3.8-1
@@ -603,8 +603,8 @@ FDFTK.
 Summary:	filePro extension module for PHP
 Summary(pl):	Modu³ filePro dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(fdf)
 
 %description filepro
 This is a dynamic shared object (DSO) for PHP that will add support
@@ -678,8 +678,8 @@ liczbach o dowolnej d³ugo¶ci.
 Summary:	Hyperwave API extension module for PHP
 Summary(pl):	Modu³ API Hyperwave dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(hwapi)
 
 %description hwapi
 This is a dynamic shared object (DSO) for PHP that will add official
@@ -970,8 +970,8 @@ u¿ywania z serwerem WWW - nie próbuj tego!
 Summary:	PCRE extension module for PHP
 Summary(pl):	Modu³ PCRE dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(pcre)
 
 %description pcre
 This is a dynamic shared object (DSO) for PHP that will add Perl
@@ -1480,8 +1480,8 @@ Summary(pl):	Modu³ xsl dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
-# actually not true, functionality is similar, but API differs
 Provides:	php(xsl)
+# actually not true, functionality is similar, but API differs
 Obsoletes:	php-xslt <= 3:4.3.8-1
 
 %description xsl

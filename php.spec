@@ -26,6 +26,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
+%bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_with	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
@@ -68,6 +69,11 @@
 
 %if !%{with apache1} && !%{with apache2}
 ERROR: You need to select at least one Apache SAPI to build shared modules.
+%endif
+
+# filter depends on pcre
+%if %{without pcre}
+%undefine	with_filter
 %endif
 
 %define	_rel 0.20
@@ -1767,7 +1773,8 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
-	%{!?with_pcre:--without-pcre-regex --disable-filter}%{?with_pcre:--with-pcre-regex=/usr --enable-filter=shared} \
+	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=/usr} \
+	%{!?with_filter:--disable-filter}%{?with_filter:--enable-filter=shared} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
 	--with-png-dir=/usr \
@@ -2357,10 +2364,12 @@ fi
 %attr(755,root,root) %{extensionsdir}/fdf.so
 %endif
 
+%if %{with filter}
 %files filter
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
 %attr(755,root,root) %{extensionsdir}/filter.so
+%endif
 
 %files exif
 %defattr(644,root,root,755)

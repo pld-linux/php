@@ -23,7 +23,7 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_with	interbase	# with InterBase extension module
+%bcond_without	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	ming		# without ming extension module
@@ -66,7 +66,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel 2
+%define	_rel 5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	JÍzyk skryptowy PHP
@@ -95,12 +95,14 @@ Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
 Patch3:		%{name}-link-libs.patch
 Patch4:		%{name}-libpq_fs_h_path.patch
+Patch5:		%{name}-apr-apu.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-reflection.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
+Patch12:	%{name}-sh.patch
 Patch14:	%{name}-allow-db31.patch
 Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
@@ -279,6 +281,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime
 Provides:	php = %{epoch}:%{version}-%{release}
+Provides:	webserver(php) = %{version}
 Obsoletes:	apache-mod_php < 1:4.1.1
 Obsoletes:	phpfi
 
@@ -296,6 +299,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache(modules-api) = %{apache_modules_api}
 Requires:	apache-mod_mime
 Provides:	php = %{epoch}:%{version}-%{release}
+Provides:	webserver(php) = %{version}
 Obsoletes:	phpfi
 
 %description -n apache-mod_php
@@ -310,6 +314,7 @@ Summary(pl):	php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php = %{epoch}:%{version}-%{release}
+Provides:	webserver(php) = %{version}
 
 %description fcgi
 php as FastCGI program.
@@ -364,11 +369,18 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
+Provides:	%{name}-overload = %{epoch}:%{version}-%{release}
 Provides:	%{name}-session = %{epoch}:%{version}-%{release}
 Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-standard = %{epoch}:%{version}-%{release}
+Provides:	php(libxml)
 Provides:	php(modules_api) = %{php_api_version}
+Provides:	php(overload)
+Provides:	php(session)
+Provides:	php(simplexml)
+Provides:	php(spl)
+Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php5(debug) = %{php_debug}
@@ -444,8 +456,8 @@ oracle, ◊”‘¡Œœ◊¶‘ÿ √≈  –¡À≈‘ ƒÃ— ÀœÕ–¶Ã—√¶ß œÀ“≈Õ…» “œ⁄€…“≈Œÿ.
 Summary:	bcmath extension module for PHP
 Summary(pl):	Modu≥ bcmath dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(bcmath)
 
 %description bcmath
 This is a dynamic shared object (DSO) for PHP that will add bc style
@@ -459,8 +471,8 @@ matematycznych takich jak w programie bc.
 Summary:	Bzip2 extension module for PHP
 Summary(pl):	Modu≥ bzip2 dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(bzip2)
 
 %description bzip2
 This is a dynamic shared object (DSO) for PHP that will add bzip2
@@ -473,8 +485,8 @@ Modu≥ PHP umoøliwiaj±cy uøywanie kompresji bzip2.
 Summary:	Calendar extension module for PHP
 Summary(pl):	Modu≥ funkcji kalendarza dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(calendar)
 
 %description calendar
 This is a dynamic shared object (DSO) for PHP that will add calendar
@@ -487,8 +499,8 @@ Modu≥ PHP dodaj±cy wsparcie dla kalendarza.
 Summary:	ctype extension module for PHP
 Summary(pl):	Modu≥ ctype dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(ctype)
 
 %description ctype
 This is a dynamic shared object (DSO) for PHP that will add ctype
@@ -501,8 +513,8 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z funkcji ctype.
 Summary:	curl extension module for PHP
 Summary(pl):	Modu≥ curl dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(curl)
 
 %description curl
 This is a dynamic shared object (DSO) for PHP that will add curl
@@ -515,8 +527,8 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z biblioteki curl.
 Summary:	DBA extension module for PHP
 Summary(pl):	Modu≥ DBA dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(dba)
 
 %description dba
 This is a dynamic shared object (DSO) for PHP that will add flat-file
@@ -530,8 +542,8 @@ Modu≥ dla PHP dodaj±cy obs≥ugÍ dla baz danych opartych na plikach
 Summary:	DBase extension module for PHP
 Summary(pl):	Modu≥ DBase dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(dbase)
 
 %description dbase
 This is a dynamic shared object (DSO) for PHP that will add DBase
@@ -544,9 +556,10 @@ Modu≥ PHP ze wsparciem dla DBase.
 Summary:	DOM extension module for PHP
 Summary(pl):	Modu≥ DOM dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(dom)
 # it has some compatibility functions
+Provides:	php(domxml)
 Provides:	php-domxml = %{epoch}:%{version}-%{release}
 Obsoletes:	php-domxml <= 3:4.3.8-1
 
@@ -561,8 +574,8 @@ Modu≥ PHP dodaj±cy now± obs≥ugÍ DOM.
 Summary:	exif extension module for PHP
 Summary(pl):	Modu≥ exif dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(exif)
 
 %description exif
 This is a dynamic shared object (DSO) for PHP that will add EXIF tags
@@ -575,8 +588,8 @@ Modu≥ PHP dodaj±cy obs≥ugÍ znacznikÛw EXIF w plikach obrazkÛw.
 Summary:	FDF extension module for PHP
 Summary(pl):	Modu≥ FDF dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(fdf)
 
 %description fdf
 This PHP module adds support for PDF Forms through Adobe FDFTK
@@ -590,8 +603,8 @@ FDFTK.
 Summary:	filePro extension module for PHP
 Summary(pl):	Modu≥ filePro dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(fdf)
 
 %description filepro
 This is a dynamic shared object (DSO) for PHP that will add support
@@ -605,8 +618,8 @@ filePro.
 Summary:	FTP extension module for PHP
 Summary(pl):	Modu≥ FTP dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(ftp)
 
 %description ftp
 This is a dynamic shared object (DSO) for PHP that will add FTP
@@ -619,10 +632,10 @@ Modu≥ PHP dodaj±cy obs≥ugÍ protoko≥u FTP.
 Summary:	GD extension module for PHP
 Summary(pl):	Modu≥ GD dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	gd >= 2.0.28-4
-Provides:	%{name}-gd(gif) = %{epoch}:%{version}-%{release}
+Requires:	gd(gif)
+Provides:	php(gd)
 
 %description gd
 This is a dynamic shared object (DSO) for PHP that will add GD
@@ -636,8 +649,8 @@ tworzenie i obrÛbkÍ obrazkÛw.
 Summary:	gettext extension module for PHP
 Summary(pl):	Modu≥ gettext dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(gettext)
 
 %description gettext
 This is a dynamic shared object (DSO) for PHP that will add gettext
@@ -650,8 +663,8 @@ Modu≥ PHP dodaj±cy obs≥ugÍ lokalizacji przez gettext.
 Summary:	gmp extension module for PHP
 Summary(pl):	Modu≥ gmp dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(gmp)
 
 %description gmp
 This is a dynamic shared object (DSO) for PHP that will add arbitrary
@@ -665,8 +678,8 @@ liczbach o dowolnej d≥ugo∂ci.
 Summary:	Hyperwave API extension module for PHP
 Summary(pl):	Modu≥ API Hyperwave dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(hwapi)
 
 %description hwapi
 This is a dynamic shared object (DSO) for PHP that will add official
@@ -679,8 +692,8 @@ Modu≥ PHP dodaj±cy obs≥ugÍ Hyperwave.
 Summary:	iconv extension module for PHP
 Summary(pl):	Modu≥ iconv dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(iconv)
 
 %description iconv
 This is a dynamic shared object (DSO) for PHP that will add iconv
@@ -694,8 +707,8 @@ Summary:	IMAP extension module for PHP
 Summary(pl):	Modu≥ IMAP dla PHP
 Summary(pt_BR):	Um mÛdulo para aplicaÁıes PHP que usam IMAP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(imap)
 
 %description imap
 This is a dynamic shared object (DSO) for PHP that will add IMAP
@@ -711,8 +724,8 @@ Um mÛdulo para aplicaÁıes PHP que usam IMAP.
 Summary:	InterBase/Firebird database module for PHP
 Summary(pl):	Modu≥ bazy danych InterBase/Firebird dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(interbase)
 %{?with_interbase_inst:Autoreq:	false}
 
 %description interbase
@@ -727,8 +740,8 @@ Summary:	LDAP extension module for PHP
 Summary(pl):	Modu≥ LDAP dla PHP
 Summary(pt_BR):	Um mÛdulo para aplicaÁıes PHP que usam LDAP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(ldap)
 
 %description ldap
 This is a dynamic shared object (DSO) for PHP that will add LDAP
@@ -744,8 +757,8 @@ Um mÛdulo para aplicaÁıes PHP que usam LDAP.
 Summary:	mbstring extension module for PHP
 Summary(pl):	Modu≥ mbstring dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(mbstring)
 
 %description mbstring
 This is a dynamic shared object (DSO) for PHP that will add multibyte
@@ -758,8 +771,8 @@ Modu≥ PHP dodaj±cy obs≥ugÍ ci±gÛw znakÛw wielobajtowych.
 Summary:	mcrypt extension module for PHP
 Summary(pl):	Modu≥ mcrypt dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(mcrypt)
 
 %description mcrypt
 This is a dynamic shared object (DSO) for PHP that will add mcrypt
@@ -772,8 +785,8 @@ Modu≥ PHP dodaj±cy moøliwo∂Ê szyfrowania poprzez bibliotekÍ mcrypt.
 Summary:	mhash extension module for PHP
 Summary(pl):	Modu≥ mhash dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(mhash)
 
 %description mhash
 This is a dynamic shared object (DSO) for PHP that will add mhash
@@ -786,9 +799,9 @@ Modu≥ PHP udostÍpniaj±cy funkcje mieszaj±ce z biblioteki mhash.
 Summary:	mime_magic extension module for PHP
 Summary(pl):	Modu≥ mime_magic dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	/usr/share/file/magic.mime
+Provides:	php(mime_magic)
 
 %description mime_magic
 This PHP module adds support for MIME type lookup via file magic
@@ -802,8 +815,8 @@ znacznikÛw plikÛw z uøyciem bazy danych magic.mime.
 Summary:	ming extension module for PHP
 Summary(pl):	Modu≥ ming dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(ming)
 
 %description ming
 This is a dynamic shared object (DSO) for PHP that will add ming
@@ -817,8 +830,8 @@ ming.
 Summary:	MS SQL extension module for PHP
 Summary(pl):	Modu≥ MS SQL dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(mssql)
 
 %description mssql
 This is a dynamic shared object (DSO) for PHP that will add MS SQL
@@ -833,8 +846,8 @@ Summary:	MySQL database module for PHP
 Summary(pl):	Modu≥ bazy danych MySQL dla PHP
 Summary(pt_BR):	Um mÛdulo para aplicaÁıes PHP que usam bancos de dados MySQL
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(mysql)
 
 %description mysql
 This is a dynamic shared object (DSO) for PHP that will add MySQL
@@ -850,9 +863,9 @@ Um mÛdulo para aplicaÁıes PHP que usam bancos de dados MySQL.
 Summary:	MySQLi module for PHP
 Summary(pl):	Modu≥ MySQLi dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	mysql-libs >= 4.1.0
+Provides:	php(mysqli)
 
 %description mysqli
 This is a dynamic shared object (DSO) for PHP that will add MySQLi
@@ -868,8 +881,8 @@ MySQL w wersji 4.1 i nowszych.
 Summary:	ncurses module for PHP
 Summary(pl):	Modu≥ ncurses dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-cli = %{epoch}:%{version}-%{release}
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
+Provides:	php(ncurses)
 
 %description ncurses
 This PHP module adds support for ncurses functions (only for cli and
@@ -882,8 +895,8 @@ Modu≥ PHP dodaj±cy obs≥ugÍ funkcji ncurses (tylko do SAPI cli i cgi).
 Summary:	Oracle 8+ database module for PHP
 Summary(pl):	Modu≥ bazy danych Oracle 8+ dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(oci8)
 Autoreq:	false
 
 %description oci8
@@ -899,9 +912,9 @@ Summary:	ODBC extension module for PHP
 Summary(pl):	Modu≥ ODBC dla PHP
 Summary(pt_BR):	Um mÛdulo para aplicaÁıes PHP que usam bases de dados ODBC
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	unixODBC >= 2.1.1-3
+Provides:	php(odbc)
 
 %description odbc
 This is a dynamic shared object (DSO) for PHP that will add ODBC
@@ -917,8 +930,8 @@ Um mÛdulo para aplicaÁıes PHP que usam ODBC.
 Summary:	OpenSSL extension module for PHP
 Summary(pl):	Modu≥ OpenSSL dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(openssl)
 
 %description openssl
 This is a dynamic shared object (DSO) for PHP that will add OpenSSL
@@ -935,8 +948,8 @@ Uwaga: to jest modu≥ eksperymentalny.
 Summary:	Process Control extension module for PHP
 Summary(pl):	Modu≥ Process Control dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-program = %{epoch}:%{version}-%{release}
-Requires:	%{name}-program = %{epoch}:%{version}-%{release}
+Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
+Provides:	php(pcntl)
 
 %description pcntl
 This is a dynamic shared object (DSO) for PHP that will add process
@@ -957,8 +970,8 @@ uøywania z serwerem WWW - nie prÛbuj tego!
 Summary:	PCRE extension module for PHP
 Summary(pl):	Modu≥ PCRE dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(pcre)
 
 %description pcre
 This is a dynamic shared object (DSO) for PHP that will add Perl
@@ -972,8 +985,8 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z perlowych wyraøeÒ regularnych
 Summary:	PHP Data Objects (PDO)
 Summary(pl):	Obs≥uga PHP Data Objects (PDO)
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(pdo)
 Obsoletes:	php-pecl-PDO
 
 %description pdo
@@ -987,9 +1000,9 @@ Modu≥ PHP dodaj±cy obs≥ugÍ PDO (PHP Data Objects).
 Summary:	PHP Data Objects (PDO) FreeTDS support
 Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± FreeTDS
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Provides:	php(dblib)
 
 %description pdo-dblib
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1003,9 +1016,9 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) Firebird support
 Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± Firebirda
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Provides:	php(pdo-firebird)
 Obsoletes:	php-pecl-PDO_FIREBIRD
 
 %description pdo-firebird
@@ -1020,9 +1033,9 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) MySQL support
 Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± MySQL-a
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Provides:	php(pdo-mysql)
 Obsoletes:	php-pecl-PDO_MYSQL
 
 %description pdo-mysql
@@ -1037,9 +1050,9 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) Oracle support
 Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± Oracle'a
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Provides:	php(pdo-oci)
 Obsoletes:	php-pecl-PDO_OCI
 
 %description pdo-oci
@@ -1054,9 +1067,9 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) ODBC support
 Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± ODBC
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Provides:	php(pdo-odbc)
 Obsoletes:	php-pecl-PDO_ODBC
 
 %description pdo-odbc
@@ -1071,9 +1084,9 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) PostgreSQL support
 Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± PostgreSQL-a
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Provides:	php(pdo-pgsql)
 Obsoletes:	php-pecl-PDO_PGSQL
 
 %description pdo-pgsql
@@ -1088,9 +1101,9 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) SQLite support
 Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± SQLite
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Provides:	php(pdo-sqlite)
 Obsoletes:	php-pecl-PDO_SQLITE
 
 %description pdo-sqlite
@@ -1105,8 +1118,8 @@ interfejsu PDO.
 Summary:	PostgreSQL database module for PHP
 Summary(pl):	Modu≥ bazy danych PostgreSQL dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(pgsql)
 
 %description pgsql
 This is a dynamic shared object (DSO) for PHP that will add PostgreSQL
@@ -1122,8 +1135,8 @@ Um mÛdulo para aplicaÁıes PHP que usam bancos de dados postgresql.
 Summary:	POSIX extension module for PHP
 Summary(pl):	Modu≥ POSIX dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(posix)
 
 %description posix
 This is a dynamic shared object (DSO) for PHP that will add POSIX
@@ -1136,8 +1149,8 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z funkcji POSIX.
 Summary:	pspell extension module for PHP
 Summary(pl):	Modu≥ pspell dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(pspell)
 
 %description pspell
 This is a dynamic shared object (DSO) for PHP that will add pspell
@@ -1152,8 +1165,8 @@ sprawdzanie pisowni s≥owa i sugerowanie poprawek.
 Summary:	readline extension module for PHP
 Summary(pl):	Modu≥ readline dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-cli = %{epoch}:%{version}-%{release}
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
+Provides:	php(readline)
 
 %description readline
 This PHP module adds support for readline functions (only for cli and
@@ -1166,9 +1179,9 @@ Modu≥ PHP dodaj±cy obs≥ugÍ funkcji readline (tylko do SAPI cli i cgi).
 Summary:	recode extension module for PHP
 Summary(pl):	Modu≥ recode dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	recode >= 3.5d-3
+Provides:	php(recode)
 
 %description recode
 This is a dynamic shared object (DSO) for PHP that will add recode
@@ -1178,26 +1191,12 @@ support.
 Modu≥ PHP dodaj±cy moøliwo∂Ê konwersji kodowania plikÛw (poprzez
 bibliotekÍ recode).
 
-%package session
-Summary:	session extension module for PHP
-Summary(pl):	Modu≥ session dla PHP
-Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-
-%description session
-This is a dynamic shared object (DSO) for PHP that will add session
-support.
-
-%description session -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ sesji.
-
 %package shmop
 Summary:	Shared Memory Operations extension module for PHP
 Summary(pl):	Modu≥ shmop dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(shmop)
 
 %description shmop
 This is a dynamic shared object (DSO) for PHP that will add Shared
@@ -1214,8 +1213,8 @@ Uwaga: to jest modu≥ eksperymentalny.
 Summary:	Simple XML extension module for PHP
 Summary(pl):	Modu≥ prostego rozszerzenia XML dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(simplexml)
 
 %description simplexml
 This is a dynamic shared object (DSO) for PHP that will add Simple XML
@@ -1228,9 +1227,9 @@ Modu≥ PHP dodaj±cy obs≥ugÍ prostego XML-a.
 Summary:	SNMP extension module for PHP
 Summary(pl):	Modu≥ SNMP dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-sockets = %{epoch}:%{version}-%{release}
+Provides:	php(snmp)
 
 %description snmp
 This is a dynamic shared object (DSO) for PHP that will add SNMP
@@ -1243,8 +1242,8 @@ Modu≥ PHP dodaj±cy obs≥ugÍ SNMP.
 Summary:	soap extension module for PHP
 Summary(pl):	Modu≥ soap dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(soap)
 
 %description soap
 This is a dynamic shared object (DSO) for PHP that will add SOAP/WSDL
@@ -1257,8 +1256,8 @@ Modu≥ PHP dodaj±cy obs≥ugÍ SOAP/WSDL.
 Summary:	sockets extension module for PHP
 Summary(pl):	Modu≥ socket dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(sockets)
 
 %description sockets
 This is a dynamic shared object (DSO) for PHP that will add sockets
@@ -1275,9 +1274,9 @@ Uwaga: to jest modu≥ eksperymentalny.
 Summary:	SQLite extension module for PHP
 Summary(pl):	Modu≥ SQLite dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Provides:	php(sqlite)
 
 %description sqlite
 SQLite is a C library that implements an embeddable SQL database
@@ -1303,8 +1302,8 @@ dysku.
 Summary:	Sybase DB extension module for PHP
 Summary(pl):	Modu≥ Sybase DB dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(sybase)
 Obsoletes:	php-sybase-ct
 
 %description sybase
@@ -1322,8 +1321,8 @@ Zaleca siÍ uøywanie modu≥u Sybase-CT.
 Summary:	Sybase-CT extension module for PHP
 Summary(pl):	Modu≥ Sybase-CT dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(sybase-ct)
 Obsoletes:	php-sybase
 
 %description sybase-ct
@@ -1338,8 +1337,8 @@ CT-lib.
 Summary:	SysV msg extension module for PHP
 Summary(pl):	Modu≥ SysV msg dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(sysvmsg)
 
 %description sysvmsg
 This is a dynamic shared object (DSO) for PHP that will add SysV
@@ -1352,8 +1351,8 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z kolejek komunikatÛw SysV.
 Summary:	SysV sem extension module for PHP
 Summary(pl):	Modu≥ SysV sem dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(sysvsem)
 
 %description sysvsem
 This is a dynamic shared object (DSO) for PHP that will add SysV
@@ -1366,8 +1365,8 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z semaforÛw SysV.
 Summary:	SysV shm extension module for PHP
 Summary(pl):	Modu≥ SysV shm dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(sysvshm)
 
 %description sysvshm
 This is a dynamic shared object (DSO) for PHP that will add SysV
@@ -1380,9 +1379,9 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z pamiÍci dzielonej SysV.
 Summary:	Tidy extension module for PHP
 Summary(pl):	Modu≥ Tidy dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	tidy
+Provides:	php(tidy)
 
 %description tidy
 This is a dynamic shared object (DSO) for PHP that will add Tidy
@@ -1395,8 +1394,8 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z tidy.
 Summary:	tokenizer extension module for PHP
 Summary(pl):	Modu≥ rozszerzenia tokenizer dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(tokenizer)
 
 %description tokenizer
 This is a dynamic shared object (DSO) for PHP that will add tokenizer
@@ -1409,10 +1408,10 @@ Modu≥ PHP dodaj±cy obs≥ugÍ tokenizera do PHP.
 Summary:	wddx extension module for PHP
 Summary(pl):	Modu≥ wddx dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
+Provides:	php(wddx)
 
 %description wddx
 This is a dynamic shared object (DSO) for PHP that will add wddx
@@ -1425,8 +1424,8 @@ Modu≥ PHP umoøliwiaj±cy korzystanie z wddx.
 Summary:	XML extension module for PHP
 Summary(pl):	Modu≥ XML dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(xml)
 
 %description xml
 This is a dynamic shared object (DSO) for PHP that will add XML
@@ -1442,9 +1441,9 @@ nastÍpnie definiowaÊ procedury obs≥ugi dla rÛønych zdarzeÒ XML.
 Summary:	XML Reader extension module for PHP
 Summary(pl):	Modu≥ XML Reader dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
+Provides:	php(xmlreader)
 
 %description xmlreader
 This is a dynamic shared object (DSO) for PHP that will add XML Reader
@@ -1461,8 +1460,8 @@ zatrzymuj±cy siÍ nakaødym wÍºle po drodze.
 Summary:	xmlrpc extension module for PHP
 Summary(pl):	Modu≥ xmlrpc dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(xmlrpc)
 
 %description xmlrpc
 This is a dynamic shared object (DSO) for PHP that will add XMLRPC
@@ -1479,9 +1478,9 @@ Uwaga: to jest modu≥ eksperymentalny.
 Summary:	xsl extension module for PHP
 Summary(pl):	Modu≥ xsl dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
+Provides:	php(xsl)
 # actually not true, functionality is similar, but API differs
 Obsoletes:	php-xslt <= 3:4.3.8-1
 
@@ -1496,8 +1495,8 @@ Modu≥ PHP dodaj±cy now± obs≥ugÍ XSLT (przy uøyciu libxslt).
 Summary:	Zlib extension module for PHP
 Summary(pl):	Modu≥ zlib dla PHP
 Group:		Libraries
-Requires(post,preun):	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(zlib)
 
 %description zlib
 This is a dynamic shared object (DSO) for PHP that will add zlib
@@ -1514,7 +1513,7 @@ Modu≥ PHP umoøliwiaj±cy uøywanie kompresji zlib.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-
+%patch5 -p1
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
@@ -1524,6 +1523,7 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
+%patch12 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
@@ -1755,11 +1755,7 @@ done
 
 # must make this first, so modules can link against it.
 %{__make} libphp_common.la
-
 %{__make} build-modules
-
-# fix install paths, avoid evil rpaths
-#sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" libphp_common.la
 
 %if %{with apache1}
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
@@ -1826,9 +1822,6 @@ libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/p
 install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 
-# as of 5.0.5, phpextdist isn't installed by default
-install scripts/dev/phpextdist $RPM_BUILD_ROOT%{_bindir}
-
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
@@ -1886,26 +1879,6 @@ install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
-%post
-if [ "$1" = "1" ]; then
-%if %{with apache1}
-	%service -q apache restart
-%endif
-%if %{with apache2}
-	%service -q httpd restart
-%endif
-fi
-
-%postun
-if [ "$1" = "0" ]; then
-%if %{with apache1}
-	%service -q apache restart
-%endif
-%if %{with apache2}
-	%service -q httpd restart
-%endif
-fi
 
 %post -n apache1-mod_php
 if [ "$1" = "1" ]; then
@@ -2229,12 +2202,6 @@ fi
 %postun recode
 %extension_postun
 
-%post session
-%extension_post
-
-%postun session
-%extension_postun
-
 %post shmop
 %extension_post
 
@@ -2475,9 +2442,6 @@ fi
 %triggerun recode -- %{name}-recode < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun session -- %{name}-session < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*session\.so/d' %{_sysconfdir}/php.ini
-
 %triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{_sysconfdir}/php.ini
 
@@ -2585,10 +2549,6 @@ fi
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{extensionsdir}
 
-# session_mm doesn't work with shared session
-#%files session
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{extensionsdir}/session.so
 %doc ext/session/mod_files.sh
 
 %files devel
@@ -2596,7 +2556,6 @@ fi
 %doc README.UNIX-BUILD-SYSTEM
 %doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
 %doc CODING_STANDARDS
-%attr(755,root,root) %{_bindir}/phpextdist
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so

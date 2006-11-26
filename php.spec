@@ -215,11 +215,7 @@ database-enabled web page with PHP is fairly simple. The most common
 use of PHP coding is probably as a replacement for CGI scripts. The
 mod_php module enables the Apache web server to understand and process
 the embedded PHP language in web pages. This package contains php
-version %{version}. If you use applications which specifically rely on
-PHP/FI (PHP v2 and earlier), you should instead install the PHP/FI
-module contained in the phpfi package. If you're just starting with
-PHP, you should install this package. You'll also need to install the
-Apache web server.
+version %{version}.
 
 %description -l fr
 PHP est un langage de script embarque dans le HTM. PHP essaye de
@@ -231,18 +227,18 @@ des bases de donnees. L'utilisation la plus commune de PHP est
 probablement en remplacement de scripts CGI. Le module mod_php permet
 au serveur web apache de comprendre et de traiter le langage PHP
 integre dans des pages web. Ce package contient php version
-%{version}. Si vous utilisez des applications qui utilisent
-specifiquement PHP/FI, vous devrez installer le module PHP/FI inclus
-dans le package mod_php. Si vous debutez avec PHP, vous devriez
-installer ce package. Vous aurez egalement besoin dinstaller le
-serveur web Apache.
+%{version}.
 
 %description -l pl
 PHP jest jЙzykiem skryptowym, ktСrego polecenia umieszcza siЙ w
-plikach HTML. Pakiet ten zawiera moduЁ przeznaczony dla serwera HTTP
-(jak np. Apache), ktСry interpretuje te polecenia. Umo©liwia to
-tworzenie dynamicznie stron WWW. Spora czЙ╤Ф skЁadni PHP zapo©yczona
-zostaЁa z jЙzykСw: C, Java i Perl.
+plikach HTML. Jest prСb╠ uЁatwienia programistom pisania dynamicznie
+generowanych stron WWW. Oferuje tak©e wbudowan╠ integracjЙ z bazami
+danych dla kilku komercyjnych i niekomercyjnych systemСw baz danych,
+co czyni tworzenie stron korzystaj╠cych z baz danych w miarЙ Ёatwym.
+NajczЙ╤ciej PHP jest u©ywany prawdopodobnie jako zamiennik skryptСw
+CGI. ModuЁ mod_php pozwala serwerowi WWW Apache rozumieФ i przetwarzaФ
+jЙzyk PHP osadzony w stronach. Ten pakiet zawiera php w wersji
+%{version}.
 
 %description -l pt_BR
 PHP: Preprocessador de Hipertexto versЦo 4 И uma linguagem script
@@ -260,7 +256,7 @@ PHP - это язык написания скриптов, встраиваемых в HTML-код. PHP
 Этот пакет содержит самодостаточную (CGI) версию интерпретатора языка.
 Вы должны также установить пакет %{name}-common. Если вам нужен
 интерпретатор PHP в качестве модуля apache, установите пакет
-apache-php.
+apache-mod_php.
 
 %description -l uk
 PHP - це мова написання скрипт╕в, що вбудовуються в HTML-код. PHP
@@ -270,7 +266,8 @@ PHP - це мова написання скрипт╕в, що вбудовуються в HTML-код. PHP
 
 Цей пакет м╕стить самодостатню (CGI) верс╕ю ╕нтерпретатора мови. Ви
 ма╓те також встановити пакет %{name}-common. Якщо вам потр╕бен
-╕нтерпретатор PHP в якост╕ модуля apache, встанов╕ть пакет apache-php.
+╕нтерпретатор PHP в якост╕ модуля apache, встанов╕ть пакет
+apache-mod_php.
 
 %package -n apache1-mod_php
 Summary:	PHP DSO module for apache 1.3.x

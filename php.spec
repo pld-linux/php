@@ -388,7 +388,7 @@ Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-session < 3:4.2.1-2
-Conflicts:	php4-common < 3:4.4.4-7
+Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 
 %description common

@@ -1443,9 +1443,9 @@ acts as a cursor going forward on the document stream and stopping at
 each node on the way.
 
 %description xmlreader -l pl
-Modu³ PHP umo¿liwiaj±cy parsowanie plików XML w trybie Pull. Czytnik
+Modu³ PHP umo¿liwiaj±cy analizê plików XML w trybie Pull. Czytnik
 dzia³a jako kursor przechodz±cy przez strumieñ dokumentu i
-zatrzymuj±cy siê naka¿dym wê¼le po drodze.
+zatrzymuj±cy siê na ka¿dym wê¼le po drodze.
 
 %package xmlrpc
 Summary:	xmlrpc extension module for PHP

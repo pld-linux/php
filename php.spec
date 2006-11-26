@@ -76,7 +76,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 0.20
+%define	_rel 0.21
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -286,7 +286,6 @@ Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime
-Provides:	php = %{epoch}:%{version}-%{release}
 Provides:	webserver(php) = %{version}
 Obsoletes:	apache-mod_php < 1:4.1.1
 Obsoletes:	phpfi
@@ -304,7 +303,6 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache(modules-api) = %{apache_modules_api}
 Requires:	apache-mod_mime
-Provides:	php = %{epoch}:%{version}-%{release}
 Provides:	webserver(php) = %{version}
 Obsoletes:	phpfi
 
@@ -319,7 +317,6 @@ Summary:	php as FastCGI program
 Summary(pl):	php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php = %{epoch}:%{version}-%{release}
 Provides:	webserver(php) = %{version}
 
 %description fcgi
@@ -374,17 +371,12 @@ Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
-Provides:	%{name}-libxml = %{epoch}:%{version}-%{release}
-Provides:	%{name}-overload = %{epoch}:%{version}-%{release}
-%{?with_pcre:Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}}
-Provides:	%{name}-session = %{epoch}:%{version}-%{release}
-Provides:	%{name}-simplexml = %{epoch}:%{version}-%{release}
-Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
-Provides:	%{name}-standard = %{epoch}:%{version}-%{release}
+Provides:	php(date)
 Provides:	php(libxml)
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
 %{?with_pcre:Provides:	php(pcre)}
+Provides:	php(reflection)
 Provides:	php(session)
 Provides:	php(simplexml)
 Provides:	php(spl)
@@ -393,7 +385,7 @@ Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
-#Obsoletes:	php-pcre < 4:5.2.0
+Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-session < 3:4.2.1-2
 # for the posttrans scriptlet, conflicts because in vserver enviroinment rpm package is not installed.
@@ -566,10 +558,9 @@ Summary:	DOM extension module for PHP
 Summary(pl):	Modu³ DOM dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-# it has some compatibility functions
 Provides:	php(dom)
+# it has some compatibility functions
 Provides:	php(domxml)
-Provides:	php-domxml = %{epoch}:%{version}-%{release}
 Obsoletes:	php-domxml <= 3:4.3.8-1
 
 %description dom

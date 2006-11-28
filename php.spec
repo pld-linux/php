@@ -131,7 +131,7 @@ Patch32:	%{name}-builddir.patch
 Patch33:	%{name}-zlib-for-getimagesize.patch
 Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
-Patch38:	%{name}-amd64.patch
+Patch38:	%{name}-memory-limit.patch
 Patch39:	%{name}-pear.patch
 Patch40:	%{name}-db4.5.patch
 URL:		http://www.php.net/
@@ -1583,7 +1583,7 @@ patch -p1 < %{PATCH30} || exit 1
 %patch32 -p1
 %patch33 -p1
 %{?with_versioning:%patch35 -p1}
-%if "%{_lib}" == "lib64"
+%ifarch %{x8664} alpha
 %patch38 -p1
 %endif
 %patch39 -p1

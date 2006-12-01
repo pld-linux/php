@@ -1,0 +1,13 @@
+--- php-5.1.6/acinclude.m4.orig	2006-11-21 10:43:13.179505000 +0100
++++ php-5.1.6/acinclude.m4	2006-11-21 10:55:32.479505000 +0100
+@@ -68,8 +68,8 @@
+     changequote({,})
+     ep_dir="`echo $1|$SED 's%/*[^/][^/]*/*$%%'`"
+     changequote([,])
+-    ep_realdir="`(cd \"$ep_dir\" && pwd)`"
+-    $2="$ep_realdir/`basename \"$1\"`"
++    ep_realdir="$(cd "$ep_dir" && pwd)"
++    $2="$ep_realdir/$(basename "$1")"
+   fi
+ ])
+ 

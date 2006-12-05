@@ -5,13 +5,7 @@
 #    - pfpro,
 #   These extensions BuildRequires proprietary libraries...
 # - deal with modules removed from php and not moved to PECL
-#   (existing only in php4):
-#   db, hyperwave, java, mcal, overload, qtdom
-#   and removed from php 5.1:
-#   cpdf, fam, yp, oracle
-#   and removed from php 5.1.3:
-#   msession
-#   and removed from php 5.2:
+#   removed from php 5.2:
 #   filepro, hw
 # - mime_magic can't handle new "string/*" entries in magic.mime
 #   thus doesn't work with system magic.mime database

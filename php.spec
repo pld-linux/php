@@ -743,6 +743,7 @@ Summary(pl):	Rozszerzenie C PHP dla serializacji JSON
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(json)
+Obsoletes:	php-pecl-json
 
 %description json
 php-json is an extremely fast PHP C extension for JSON (JavaScript

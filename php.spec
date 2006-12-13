@@ -1484,6 +1484,7 @@ Summary(pl):	Szybka, nie cachowana metoda zapisu danych w formacie XML
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xmlwriter)
+Obsoletes:	php-pecl-xmlwriter
 
 %description xmlwriter
 This extension wraps the libxml xmlWriter API. Represents a writer

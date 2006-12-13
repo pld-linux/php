@@ -4,7 +4,7 @@
  
  prefix="@prefix@"
  exec_prefix="@exec_prefix@"
-+config_dir='@sysconfdir@'
++sysconfdir='@sysconfdir@'
  version="@PHP_VERSION@"
  version_id="@PHP_VERSION_ID@"
  includedir="@includedir@/php"
@@ -12,8 +12,8 @@
  	echo $libs;;
  --extension-dir)
  	echo $extension_dir;;
-+--config-dir)
-+	echo $config_dir;;
++--sysconfdir)
++	echo $sysconfdir;;
  --include-dir)
  	echo $includedir;;
  --php-binary)
@@ -22,7 +22,7 @@
  	echo $version_id;;
  *)
 -	echo "Usage: $0 [--prefix|--includes|--ldflags|--libs|--extension-dir|--include-dir|--php-binary|--version|--vernum]"
-+	echo "Usage: $0 [--prefix|--includes|--ldflags|--libs|--extension-dir|--config-dir|--include-dir|--php-binary|--version|--vernum]"
++	echo "Usage: $0 [--prefix|--includes|--ldflags|--libs|--extension-dir|--sysconfdir|--include-dir|--php-binary|--version|--vernum]"
  	exit 1;;
  esac
  

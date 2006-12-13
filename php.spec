@@ -5,13 +5,7 @@
 #    - pfpro,
 #   These extensions BuildRequires proprietary libraries...
 # - deal with modules removed from php and not moved to PECL
-#   (existing only in php4):
-#   db, hyperwave, java, mcal, overload, qtdom
-#   and removed from php 5.1:
-#   cpdf, fam, yp, oracle
-#   and removed from php 5.1.3:
-#   msession
-#   and removed from php 5.2:
+#   removed from php 5.2:
 #   filepro, hw
 # - mime_magic can't handle new "string/*" entries in magic.mime
 #   thus doesn't work with system magic.mime database
@@ -28,7 +22,7 @@
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_with	interbase	# with InterBase extension module
+%bcond_without	interbase	# with InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	mime_magic	# without mime-magic module
@@ -76,7 +70,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 0.23
+%define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP

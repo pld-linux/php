@@ -599,6 +599,7 @@ Summary(pl):	Rozszerzenie do bezpiecznej obs³ugi danych wej¶ciowych
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(filter)
+Obsoletes:	php-pecl-filter
 
 %description filter
 We all know that you should always check input variables, but PHP does

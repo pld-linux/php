@@ -70,7 +70,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 1
+%define	_rel 3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -128,6 +128,7 @@ Patch36:	%{name}-linkflags-clean.patch
 Patch38:	%{name}-memory-limit.patch
 Patch39:	%{name}-pear.patch
 Patch40:	%{name}-db4.5.patch
+Patch41:	%{name}-config-dir.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -599,6 +600,7 @@ Summary(pl):	Rozszerzenie do bezpiecznej obs³ugi danych wej¶ciowych
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(filter)
+Obsoletes:	php-pecl-filter
 
 %description filter
 We all know that you should always check input variables, but PHP does
@@ -742,6 +744,7 @@ Summary(pl):	Rozszerzenie C PHP dla serializacji JSON
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(json)
+Obsoletes:	php-pecl-json
 
 %description json
 php-json is an extremely fast PHP C extension for JSON (JavaScript
@@ -1481,6 +1484,7 @@ Summary(pl):	Szybka, nie cachowana metoda zapisu danych w formacie XML
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xmlwriter)
+Obsoletes:	php-pecl-xmlwriter
 
 %description xmlwriter
 This extension wraps the libxml xmlWriter API. Represents a writer
@@ -1515,6 +1519,7 @@ Summary(pl):	Zarz±dzanie archiwami zip
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zip)
+Obsoletes:	php-pecl-zip
 
 %description zip
 Zip is an extension to create, modify and read zip files.
@@ -1582,6 +1587,7 @@ patch -p1 < %{PATCH30} || exit 1
 %endif
 %patch39 -p1
 %patch40 -p1
+%patch41 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

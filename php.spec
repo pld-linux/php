@@ -1519,6 +1519,7 @@ Summary(pl):	Zarz±dzanie archiwami zip
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zip)
+Obsoletes:	php-pecl-zip
 
 %description zip
 Zip is an extension to create, modify and read zip files.

@@ -2283,6 +2283,8 @@ fi
 %doc php.ini-*
 %doc CREDITS Zend/ZEND_CHANGES
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
+%doc README.PHP4-TO-PHP5-THIN-CHANGES README.UPDATE_5_2
+%doc README.input_filter
 
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
@@ -2297,7 +2299,8 @@ fi
 %defattr(644,root,root,755)
 %doc README.UNIX-BUILD-SYSTEM
 %doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
-%doc CODING_STANDARDS
+%doc CODING_STANDARDS README.EXTENSIONS README.PARAMETER_PARSING_API README.STREAMS
+%doc README.SUBMITTING_PATCH README.TESTING README.TESTING2
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so

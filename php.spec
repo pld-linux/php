@@ -1705,7 +1705,7 @@ for sapi in $sapis; do
 	--with-pdo-dblib=shared \
 %endif
 %if %{with interbase} && !%{with interbase_inst}
-	--with-pdo-firebird=shared \
+	--with-pdo-firebird=shared,/usr \
 %endif
 	--with-pdo-mysql=shared \
 	%{?with_oci8:--with-pdo-oci=shared} \

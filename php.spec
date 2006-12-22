@@ -9,7 +9,6 @@
 # - modularize session, standard (output from pure php -m)?
 #
 # Conditional build:
-%bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	hardening	# build with hardening patch applied (http://www.hardened-php.net/)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
@@ -104,7 +103,6 @@ Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
 Patch12:	%{name}-curl.patch
-Patch14:	%{name}-allow-db31.patch
 Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
 Patch17:	%{name}-no_pear_install.patch
@@ -134,8 +132,7 @@ BuildRequires:	bison
 BuildRequires:	bzip2-devel
 %{?with_curl:BuildRequires:	curl-devel >= 7.12.0}
 BuildRequires:	cyrus-sasl-devel
-%{!?with_db3:BuildRequires:	db-devel >= 4.0}
-%{?with_db3:BuildRequires:	db3-devel >= 3.1}
+BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %if %{with xmlrpc}
 BuildRequires:	expat-devel
@@ -1558,7 +1555,6 @@ cp php.ini-dist php.ini
 # conditionally...
 %patch11 -p1
 %patch12 -p1
-%patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
@@ -1729,7 +1725,7 @@ for sapi in $sapis; do
 	--enable-xmlreader=shared \
 	--with-bz2=shared \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
-	%{?with_db3:--with-db3}%{!?with_db3:--with-db4} \
+	--with-db4 \
 	--enable-dbase=shared \
 %if %{with xmlrpc}
 	--with-expat-dir=shared,/usr \

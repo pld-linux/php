@@ -1,9 +1,4 @@
 # TODO:
-# - think of including support for:
-#    - mcve,
-#    - ovrimos,
-#    - pfpro,
-#   These extensions BuildRequires proprietary libraries...
 # - deal with modules removed from php and not moved to PECL
 #   removed from php 5.2:
 #   filepro, hw

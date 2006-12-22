@@ -17,7 +17,7 @@
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_with	interbase	# with InterBase extension module
+%bcond_without	interbase	# without InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	mime_magic	# without mime-magic module
@@ -52,7 +52,8 @@
 %undefine	with_mm
 %endif
 
-%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha ppc
+%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha
+# ppc disabled (broken on th-ppc)
 %undefine	with_interbase
 %endif
 

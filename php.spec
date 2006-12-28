@@ -1,20 +1,18 @@
 # TODO:
-# - think of including support for:
-#    - mcve,
-#    - ovrimos,
-#    - pfpro,
-#   These extensions BuildRequires proprietary libraries...
-# - deal with modules removed from php and not moved to PECL
-#   removed from php 5.2:
+# - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
+#   - removed from php 5.0 (currently in php4):
+#   db, hyperwave, java, mcal, overload, qtdom
+#   - removed from php 5.1:
+#   cpdf, fam, oracle
+#   - removed from php 5.2:
 #   filepro, hw
 # - mime_magic can't handle new "string/*" entries in magic.mime
 #   thus doesn't work with system magic.mime database
-# - make additional headers added by mail patch configurable
+# - make additional headers and checking added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
 #
 # Conditional build:
-%bcond_with	db3		# use db3 packages instead of db (4.x) for Berkeley DB support
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	hardening	# build with hardening patch applied (http://www.hardened-php.net/)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
@@ -22,7 +20,7 @@
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_without	interbase	# with InterBase extension module
+%bcond_without	interbase	# without InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	mime_magic	# without mime-magic module
@@ -47,7 +45,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
-%bcond_with		versioning	# build with experimental versioning (to load php4/php5 into same apache)
+%bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -70,7 +68,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 4
+%define	_rel 5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -108,7 +106,6 @@ Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
 Patch12:	%{name}-curl.patch
-Patch14:	%{name}-allow-db31.patch
 Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
 Patch17:	%{name}-no_pear_install.patch
@@ -138,8 +135,7 @@ BuildRequires:	bison
 BuildRequires:	bzip2-devel
 %{?with_curl:BuildRequires:	curl-devel >= 7.12.0}
 BuildRequires:	cyrus-sasl-devel
-%{!?with_db3:BuildRequires:	db-devel >= 4.0}
-%{?with_db3:BuildRequires:	db3-devel >= 3.1}
+BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %if %{with xmlrpc}
 BuildRequires:	expat-devel
@@ -152,6 +148,7 @@ BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
 BuildRequires:	gd-devel >= 2.0.28-4
+BuildRequires:	gd-devel(imagerotate) = 5.2.0
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
@@ -637,6 +634,7 @@ Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	gd >= 2.0.28-4
 Requires:	gd(gif)
+Requires:	gd(imagerotate) = 5.2.0
 Provides:	php(gd)
 
 %description gd
@@ -1562,7 +1560,6 @@ cp php.ini-dist php.ini
 # conditionally...
 %patch11 -p1
 %patch12 -p1
-%patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
@@ -1570,7 +1567,7 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-#%patch23 -p1 # UPDATE?
+%patch23 -p1
 %patch24 -p1
 %patch26 -p1
 
@@ -1705,7 +1702,7 @@ for sapi in $sapis; do
 	--with-pdo-dblib=shared \
 %endif
 %if %{with interbase} && !%{with interbase_inst}
-	--with-pdo-firebird=shared \
+	--with-pdo-firebird=shared,/usr \
 %endif
 	--with-pdo-mysql=shared \
 	%{?with_oci8:--with-pdo-oci=shared} \
@@ -1733,7 +1730,7 @@ for sapi in $sapis; do
 	--enable-xmlreader=shared \
 	--with-bz2=shared \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
-	%{?with_db3:--with-db3}%{!?with_db3:--with-db4} \
+	--with-db4 \
 	--enable-dbase=shared \
 %if %{with xmlrpc}
 	--with-expat-dir=shared,/usr \

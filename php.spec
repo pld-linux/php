@@ -1565,7 +1565,7 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%patch23 -p1
+#%patch23 -p1
 %patch24 -p1
 %patch26 -p1
 

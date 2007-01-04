@@ -68,7 +68,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 7
+%define	_rel 8
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -1911,6 +1911,9 @@ ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 # isn't installed by install-headers make target, we do it manually here.
 # this header file is required by e.g. filter PECL extension
 install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pcre.h
+# for php-pecl-mailparse
+install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
+cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 
 %clean
 rm -rf $RPM_BUILD_ROOT

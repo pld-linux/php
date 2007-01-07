@@ -68,7 +68,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 8
+%define	_rel 9
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -678,6 +678,7 @@ Summary(pl):	Szkielet do obliczania skrótów wiadomo¶ci
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(hash)
+Obsoletes:	php-pecl-hash
 
 %description hash
 Native implementations of common message digest algorithms using a

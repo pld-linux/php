@@ -681,6 +681,7 @@ Summary(pl):	Szkielet do obliczania skrótów wiadomo¶ci
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(hash)
+Obsoletes:	php-pecl-hash
 
 %description hash
 Native implementations of common message digest algorithms using a

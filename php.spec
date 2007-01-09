@@ -68,7 +68,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 9
+%define	_rel 10
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -106,6 +106,7 @@ Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
 Patch12:	%{name}-curl.patch
+Patch13:	%{name}-bug-40073.patch
 Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
 Patch17:	%{name}-no_pear_install.patch
@@ -1559,6 +1560,7 @@ cp php.ini-dist php.ini
 # conditionally...
 %patch11 -p1
 %patch12 -p1
+%patch13 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1

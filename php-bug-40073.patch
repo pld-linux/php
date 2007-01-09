@@ -1,5 +1,14 @@
---- php-5.2/ext/exif/exif.c	2007/01/01 09:36:00	1.173.2.5.2.8
+--- php-5.2/ext/exif/exif.c	2006/10/10 22:22:43	1.173.2.5.2.4
 +++ php-5.2/ext/exif/exif.c	2007/01/09 11:37:17	1.173.2.5.2.9
+@@ -2,7 +2,7 @@
+    +----------------------------------------------------------------------+
+    | PHP Version 5                                                        |
+    +----------------------------------------------------------------------+
+-   | Copyright (c) 1997-2006 The PHP Group                                |
++   | Copyright (c) 1997-2007 The PHP Group                                |
+    +----------------------------------------------------------------------+
+    | This source file is subject to version 3.01 of the PHP license,      |
+    | that is bundled with this package in the file LICENSE, and is        |
 @@ -17,7 +17,7 @@
     +----------------------------------------------------------------------+
   */
@@ -26,3 +35,63 @@
  	info_data->tag    = tag;
  	info_data->format = format;
  	info_data->length = length;
+@@ -3590,7 +3591,7 @@
+ 								exif_error_docref(NULL EXIFERR_CC, ImageInfo, E_NOTICE, "%s THUMBNAIL @0x%04X + 0x%04X", ImageInfo->Thumbnail.data ? "Ignore" : "Read", ImageInfo->Thumbnail.offset, ImageInfo->Thumbnail.size);
+ #endif
+ 								if (!ImageInfo->Thumbnail.data) {
+-									ImageInfo->Thumbnail.data = emalloc(ImageInfo->Thumbnail.size);
++									ImageInfo->Thumbnail.data = safe_emalloc(ImageInfo->Thumbnail.size, 1, 0);
+ 									php_stream_seek(ImageInfo->infile, ImageInfo->Thumbnail.offset, SEEK_SET);
+ 									fgot = php_stream_read(ImageInfo->infile, ImageInfo->Thumbnail.data, ImageInfo->Thumbnail.size);
+ 									if (fgot < ImageInfo->Thumbnail.size) {
+@@ -3623,7 +3624,7 @@
+ 					exif_error_docref(NULL EXIFERR_CC, ImageInfo, E_NOTICE, "%s THUMBNAIL @0x%04X + 0x%04X", ImageInfo->Thumbnail.data ? "Ignore" : "Read", ImageInfo->Thumbnail.offset, ImageInfo->Thumbnail.size);
+ #endif
+ 					if (!ImageInfo->Thumbnail.data && ImageInfo->Thumbnail.offset && ImageInfo->Thumbnail.size && ImageInfo->read_thumbnail) {
+-						ImageInfo->Thumbnail.data = emalloc(ImageInfo->Thumbnail.size);
++						ImageInfo->Thumbnail.data = safe_emalloc(ImageInfo->Thumbnail.size, 1, 0);
+ 						php_stream_seek(ImageInfo->infile, ImageInfo->Thumbnail.offset, SEEK_SET);
+ 						fgot = php_stream_read(ImageInfo->infile, ImageInfo->Thumbnail.data, ImageInfo->Thumbnail.size);
+ 						if (fgot < ImageInfo->Thumbnail.size) {
+@@ -3914,7 +3915,7 @@
+ 		exif_iif_add_int(&ImageInfo, SECTION_COMPUTED, "ByteOrderMotorola", ImageInfo.motorola_intel TSRMLS_CC);
+ 	}
+ 	if (ImageInfo.FocalLength) {
+-		exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "FocalLength" TSRMLS_CC, "%4.1fmm", ImageInfo.FocalLength);
++		exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "FocalLength" TSRMLS_CC, "%4.1Fmm", ImageInfo.FocalLength);
+ 		if(ImageInfo.CCDWidth) {
+ 			exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "35mmFocalLength" TSRMLS_CC, "%dmm", (int)(ImageInfo.FocalLength/ImageInfo.CCDWidth*35+0.5));
+ 		}
+@@ -3924,19 +3925,19 @@
+ 	}
+ 	if(ImageInfo.ExposureTime>0) {
+ 		if(ImageInfo.ExposureTime <= 0.5) {
+-			exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "ExposureTime" TSRMLS_CC, "%0.3f s (1/%d)", ImageInfo.ExposureTime, (int)(0.5 + 1/ImageInfo.ExposureTime));
++			exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "ExposureTime" TSRMLS_CC, "%0.3F s (1/%d)", ImageInfo.ExposureTime, (int)(0.5 + 1/ImageInfo.ExposureTime));
+ 		} else {
+-			exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "ExposureTime" TSRMLS_CC, "%0.3f s", ImageInfo.ExposureTime);
++			exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "ExposureTime" TSRMLS_CC, "%0.3F s", ImageInfo.ExposureTime);
+ 		}
+ 	}
+ 	if(ImageInfo.ApertureFNumber) {
+-		exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "ApertureFNumber" TSRMLS_CC, "f/%.1f", ImageInfo.ApertureFNumber);
++		exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "ApertureFNumber" TSRMLS_CC, "f/%.1F", ImageInfo.ApertureFNumber);
+ 	}
+ 	if(ImageInfo.Distance) {
+ 		if(ImageInfo.Distance<0) {
+ 			exif_iif_add_str(&ImageInfo, SECTION_COMPUTED, "FocusDistance", "Infinite" TSRMLS_CC);
+ 		} else {
+-			exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "FocusDistance" TSRMLS_CC, "%0.2fm", ImageInfo.Distance);
++			exif_iif_add_fmt(&ImageInfo, SECTION_COMPUTED, "FocusDistance" TSRMLS_CC, "%0.2Fm", ImageInfo.Distance);
+ 		}
+ 	}
+ 	if (ImageInfo.UserComment) {
+@@ -4005,7 +4006,7 @@
+    Reads the embedded thumbnail */
+ PHP_FUNCTION(exif_thumbnail)
+ {
+-	zval *p_width, *p_height, *p_imagetype;
++	zval *p_width = 0, *p_height = 0, *p_imagetype = 0;
+ 	char *p_name;
+ 	int p_name_len, ret, arg_c = ZEND_NUM_ARGS();
+ 	image_info_type ImageInfo;

@@ -1,0 +1,28 @@
+--- php-5.2/ext/exif.c	2007/01/01 09:36:00	1.173.2.5.2.8
++++ php-5.2/ext/exif.c	2007/01/09 11:37:17	1.173.2.5.2.9
+@@ -17,7 +17,7 @@
+    +----------------------------------------------------------------------+
+  */
+ 
+-/* $Id$ */
++/* $Id$ */
+ 
+ /*  ToDos
+  *
+@@ -139,7 +139,7 @@
+ };
+ /* }}} */
+ 
+-#define EXIF_VERSION "1.4 $Id$"
++#define EXIF_VERSION "1.4 $Id$"
+ 
+ /* {{{ PHP_MINFO_FUNCTION
+  */
+@@ -1599,6 +1599,7 @@
+ 	image_info->info_list[section_index].list = list;
+ 
+ 	info_data  = &image_info->info_list[section_index].list[image_info->info_list[section_index].count];
++	memset(info_data, 0, sizeof(image_info_data));
+ 	info_data->tag    = tag;
+ 	info_data->format = format;
+ 	info_data->length = length;

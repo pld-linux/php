@@ -69,7 +69,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 8
+%define	_rel 11
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -107,6 +107,7 @@ Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
 Patch12:	%{name}-curl.patch
+Patch13:	%{name}-bug-40073.patch
 Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
 Patch17:	%{name}-no_pear_install.patch
@@ -1562,6 +1563,9 @@ cp php.ini-dist php.ini
 # conditionally...
 %patch11 -p1
 %patch12 -p1
+cd ext/exif
+%patch13 -p0
+cd ../../
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
@@ -2286,7 +2290,6 @@ fi
 %doc CREDITS Zend/ZEND_CHANGES
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
 %doc README.PHP4-TO-PHP5-THIN-CHANGES README.UPDATE_5_2
-%doc README.input_filter
 
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
@@ -2363,6 +2366,7 @@ fi
 %if %{with filter}
 %files filter
 %defattr(644,root,root,755)
+%doc README.input_filter
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
 %attr(755,root,root) %{extensionsdir}/filter.so
 %endif

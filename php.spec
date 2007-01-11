@@ -2287,7 +2287,6 @@ fi
 %doc CREDITS Zend/ZEND_CHANGES
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
 %doc README.PHP4-TO-PHP5-THIN-CHANGES README.UPDATE_5_2
-%doc README.input_filter
 
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
@@ -2364,6 +2363,7 @@ fi
 %if %{with filter}
 %files filter
 %defattr(644,root,root,755)
+%doc README.input_filter
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
 %attr(755,root,root) %{extensionsdir}/filter.so
 %endif

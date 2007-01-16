@@ -181,7 +181,7 @@ BuildRequires:	pam-devel
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm-build >= 4.4.0
-BuildRequires:	rpmbuild(macros) >= 1.344
+BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 %{?with_sqlite:BuildRequires:	sqlite3-devel}
 BuildRequires:	t1lib-devel

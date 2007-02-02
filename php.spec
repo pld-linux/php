@@ -1986,12 +1986,13 @@ fi
 %post %1 \
 if [ "$1" = "1" ]; then \
 	%php_webserver_restart \
-fi
+fi \
 \
 %postun %1 \
 if [ "$1" = "0" ]; then \
 	%php_webserver_restart \
 fi
+%{nil}
 
 # extension scripts defines
 %extension_scripts bcmath

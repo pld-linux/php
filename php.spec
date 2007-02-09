@@ -1802,18 +1802,18 @@ done
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
-%{__make} sapi/cgi/php -f Makefile.fcgi
+%{__make} sapi/cgi/php -f Makefile.fcgi LDFLAGS=-lpthread
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
-%{__make} sapi/cgi/php -f Makefile.cgi
+%{__make} sapi/cgi/php -f Makefile.cgi LDFLAGS=-lpthread
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
-%{__make} sapi/cli/php -f Makefile.cli
+%{__make} sapi/cli/php -f Makefile.cli LDFLAGS=-lpthread
 
 %install
 rm -rf $RPM_BUILD_ROOT

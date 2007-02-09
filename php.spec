@@ -1,4 +1,21 @@
 # TODO:
+
+Configuring TSRM
+checking for i686-pld-linux-ranlib... no
+checking for ranlib... ranlib
+checking for stdarg.h... (cached) yes
+checking for pthreads_cflags... (cached) -pthread
+checking for pthreads_lib... (cached) pthread
+configure: error: Your system seems to lack POSIX threads.
+error: Bad exit status from /var/tmp/rpm-tmp.2373 (%build)
+
+
+RPM build errors:
+    Bad exit status from /var/tmp/rpm-tmp.2373 (%build)
+
+shell returned 1
+
+
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
@@ -69,7 +86,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 11
+%define	_rel 0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	JЙzyk skryptowy PHP
@@ -77,13 +94,13 @@ Summary(pt_BR):	A linguagem de script PHP
 Summary(ru):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на сервер╕
 Name:		php
-Version:	5.2.0
+Version:	5.2.1
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	e6029fafcee029edcfa2ceed7a005333
+# Source0-md5:	261218e3569a777dbd87c16a15f05c8d
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -106,8 +123,6 @@ Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
-Patch12:	%{name}-curl.patch
-Patch13:	%{name}-bug-40073.patch
 Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
 Patch17:	%{name}-no_pear_install.patch
@@ -126,7 +141,6 @@ Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
 Patch38:	%{name}-memory-limit.patch
 Patch39:	%{name}-pear.patch
-Patch40:	%{name}-db4.5.patch
 Patch41:	%{name}-config-dir.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1562,10 +1576,6 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
-%patch12 -p1
-cd ext/exif
-%patch13 -p0
-cd ../../
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
@@ -1589,7 +1599,6 @@ patch -p1 < %{PATCH30} || exit 1
 %patch38 -p1
 %endif
 %patch39 -p1
-%patch40 -p1
 %patch41 -p1
 
 # conflict seems to be resolved by recode patches

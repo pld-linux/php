@@ -1,21 +1,5 @@
-# TODO:
-
-Configuring TSRM
-checking for i686-pld-linux-ranlib... no
-checking for ranlib... ranlib
-checking for stdarg.h... (cached) yes
-checking for pthreads_cflags... (cached) -pthread
-checking for pthreads_lib... (cached) pthread
-configure: error: Your system seems to lack POSIX threads.
-error: Bad exit status from /var/tmp/rpm-tmp.2373 (%build)
-
-
-RPM build errors:
-    Bad exit status from /var/tmp/rpm-tmp.2373 (%build)
-
-shell returned 1
-
-
+# TODO
+# - fix -threads-acfix.patch
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
@@ -76,7 +60,7 @@ shell returned 1
 %undefine	with_interbase
 %endif
 
-%if !%{with apache1} && !%{with apache2}
+%if %{without apache1} && %{without apache2}
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
@@ -122,7 +106,7 @@ Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
-Patch15:	%{name}-threads-acfix.patch
+#Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
 Patch17:	%{name}-no_pear_install.patch
 Patch18:	%{name}-zlib.patch
@@ -176,7 +160,7 @@ BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mhash:BuildRequires:	mhash-devel}
-%{?with_ming:BuildRequires:	ming-devel >= 0.2a-11}
+%{?with_ming:BuildRequires:	ming-devel >= 0.3}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
@@ -1573,7 +1557,7 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
-%patch15 -p1
+#%patch15 -p1 # breaks with ac cache vars, but later -lpthread is missing ...
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
@@ -1816,18 +1800,18 @@ done
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
-%{__make} sapi/cgi/php -f Makefile.fcgi
+%{__make} sapi/cgi/php -f Makefile.fcgi LDFLAGS=-lpthread
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
-%{__make} sapi/cgi/php -f Makefile.cgi
+%{__make} sapi/cgi/php -f Makefile.cgi LDFLAGS=-lpthread
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
-%{__make} sapi/cli/php -f Makefile.cli
+%{__make} sapi/cli/php -f Makefile.cli LDFLAGS=-lpthread
 
 %install
 rm -rf $RPM_BUILD_ROOT

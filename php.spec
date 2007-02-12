@@ -69,7 +69,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 0.1
+%define	_rel 0.2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -147,6 +147,7 @@ BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
 BuildRequires:	gd-devel >= 2.0.28-4
+BuildRequires:	gd-devel(imagerotate) = 5.2.0
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
@@ -632,6 +633,7 @@ Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	gd >= 2.0.28-4
 Requires:	gd(gif)
+Requires:	gd(imagerotate) = 5.2.0
 Provides:	php(gd)
 
 %description gd
@@ -1564,7 +1566,7 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-#%patch23 -p1
+%patch23 -p1
 %patch24 -p1
 %patch26 -p1
 

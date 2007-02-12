@@ -1,4 +1,5 @@
 # TODO
+# - fix -threads-acfix.patch
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom

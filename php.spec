@@ -71,11 +71,11 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 
 %define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
-Summary(fr):	Le langage de script embarque-HTML PHP
-Summary(pl):	JÍzyk skryptowy PHP
-Summary(pt_BR):	A linguagem de script PHP
-Summary(ru):	PHP ˜≈“”…… 5 - —⁄ŸÀ –“≈–“œ√≈””…“œ◊¡Œ…— HTML-∆¡ Ãœ◊, ◊Ÿ–œÃŒ—≈ÕŸ  Œ¡ ”≈“◊≈“≈
-Summary(uk):	PHP ˜≈“”¶ß 5 - Õœ◊¡ –“≈–“œ√≈”’◊¡ŒŒ— HTML-∆¡ Ã¶◊, ◊…ÀœŒ’◊¡Œ¡ Œ¡ ”≈“◊≈“¶
+Summary(fr.UTF-8):   Le langage de script embarque-HTML PHP
+Summary(pl.UTF-8):   Jƒôzyk skryptowy PHP
+Summary(pt_BR.UTF-8):   A linguagem de script PHP
+Summary(ru.UTF-8):   PHP –í–µ—Ä—Å–∏–∏ 5 - —è–∑—ã–∫ –ø—Ä–µ–ø—Ä–æ—Ü–µ—Å—Å–∏—Ä–æ–≤–∞–Ω–∏—è HTML-—Ñ–∞–π–ª–æ–≤, –≤—ã–ø–æ–ª–Ω—è–µ–º—ã–π –Ω–∞ —Å–µ—Ä–≤–µ—Ä–µ
+Summary(uk.UTF-8):   PHP –í–µ—Ä—Å—ñ—ó 5 - –º–æ–≤–∞ –ø—Ä–µ–ø—Ä–æ—Ü–µ—Å—É–≤–∞–Ω–Ω—è HTML-—Ñ–∞–π–ª—ñ–≤, –≤–∏–∫–æ–Ω—É–≤–∞–Ω–∞ –Ω–∞ —Å–µ—Ä–≤–µ—Ä—ñ
 Name:		php
 Version:	5.2.1
 Release:	%{_rel}%{?with_hardening:hardened}
@@ -217,7 +217,7 @@ mod_php module enables the Apache web server to understand and process
 the embedded PHP language in web pages. This package contains php
 version %{version}.
 
-%description -l fr
+%description -l fr.UTF-8
 PHP est un langage de script embarque dans le HTM. PHP essaye de
 rendre simple aux developpeurs d'ecrire des pages web generees
 dynamiquement. PHP incorpore egalement une integration avec plusieurs
@@ -229,49 +229,49 @@ au serveur web apache de comprendre et de traiter le langage PHP
 integre dans des pages web. Ce package contient php version
 %{version}.
 
-%description -l pl
-PHP jest jÍzykiem skryptowym, ktÛrego polecenia umieszcza siÍ w
-plikach HTML. Jest prÛb± u≥atwienia programistom pisania dynamicznie
-generowanych stron WWW. Oferuje takøe wbudowan± integracjÍ z bazami
-danych dla kilku komercyjnych i niekomercyjnych systemÛw baz danych,
-co czyni tworzenie stron korzystaj±cych z baz danych w miarÍ ≥atwym.
-NajczÍ∂ciej PHP jest uøywany prawdopodobnie jako zamiennik skryptÛw
-CGI. Modu≥ mod_php pozwala serwerowi WWW Apache rozumieÊ i przetwarzaÊ
-jÍzyk PHP osadzony w stronach. Ten pakiet zawiera php w wersji
+%description -l pl.UTF-8
+PHP jest jƒôzykiem skryptowym, kt√≥rego polecenia umieszcza siƒô w
+plikach HTML. Jest pr√≥bƒÖ u≈Çatwienia programistom pisania dynamicznie
+generowanych stron WWW. Oferuje tak≈ºe wbudowanƒÖ integracjƒô z bazami
+danych dla kilku komercyjnych i niekomercyjnych system√≥w baz danych,
+co czyni tworzenie stron korzystajƒÖcych z baz danych w miarƒô ≈Çatwym.
+Najczƒô≈õciej PHP jest u≈ºywany prawdopodobnie jako zamiennik skrypt√≥w
+CGI. Modu≈Ç mod_php pozwala serwerowi WWW Apache rozumieƒá i przetwarzaƒá
+jƒôzyk PHP osadzony w stronach. Ten pakiet zawiera php w wersji
 %{version}.
 
-%description -l pt_BR
-PHP: Preprocessador de Hipertexto vers„o 4 È uma linguagem script
-embutida em HTML. Muito de sua sintaxe È emprestada de C, Java e Perl,
-com algumas caracterÌsticas ˙nicas, especÌficas ao PHP. O objetivo da
-linguagem È permitir que desenvolvedores web escrevam p·ginas
-dinamicamente geradas de forma r·pida.
+%description -l pt_BR.UTF-8
+PHP: Preprocessador de Hipertexto vers√£o 4 √© uma linguagem script
+embutida em HTML. Muito de sua sintaxe √© emprestada de C, Java e Perl,
+com algumas caracter√≠sticas √∫nicas, espec√≠ficas ao PHP. O objetivo da
+linguagem √© permitir que desenvolvedores web escrevam p√°ginas
+dinamicamente geradas de forma r√°pida.
 
-%description -l ru
-PHP - ‹‘œ —⁄ŸÀ Œ¡–…”¡Œ…— ”À“…–‘œ◊, ◊”‘“¡…◊¡≈ÕŸ» ◊ HTML-Àœƒ. PHP
-–“≈ƒÃ¡«¡≈‘ …Œ‘≈“«“¡√…¿ ” ÕŒœ÷≈”‘◊œÕ Ûı‚‰, –œ‹‘œÕ’ Œ¡–…”¡Œ…≈ ”À“…–‘œ◊
-ƒÃ— “¡¬œ‘Ÿ ” ¬¡⁄¡Õ… ƒ¡ŒŒŸ» œ‘Œœ”…‘≈ÃÿŒœ –“œ”‘œ. Ó¡…¬œÃ≈≈ –œ–’Ã—“Œœ≈
-…”–œÃÿ⁄œ◊¡Œ…≈ PHP - ⁄¡Õ≈Œ¡ ƒÃ— CGI ”À“…–‘œ◊.
+%description -l ru.UTF-8
+PHP - —ç—Ç–æ —è–∑—ã–∫ –Ω–∞–ø–∏—Å–∞–Ω–∏—è —Å–∫—Ä–∏–ø—Ç–æ–≤, –≤—Å—Ç—Ä–∞–∏–≤–∞–µ–º—ã—Ö –≤ HTML-–∫–æ–¥. PHP
+–ø—Ä–µ–¥–ª–∞–≥–∞–µ—Ç –∏–Ω—Ç–µ—Ä–≥—Ä–∞—Ü–∏—é —Å –º–Ω–æ–∂–µ—Å—Ç–≤–æ–º –°–£–ë–î, –ø–æ—ç—Ç–æ–º—É –Ω–∞–ø–∏—Å–∞–Ω–∏–µ —Å–∫—Ä–∏–ø—Ç–æ–≤
+–¥–ª—è —Ä–∞–±–æ—Ç—ã —Å –±–∞–∑–∞–º–∏ –¥–∞–Ω–Ω—ã—Ö –æ—Ç–Ω–æ—Å–∏—Ç–µ–ª—å–Ω–æ –ø—Ä–æ—Å—Ç–æ. –ù–∞–∏–±–æ–ª–µ–µ –ø–æ–ø—É–ª—è—Ä–Ω–æ–µ
+–∏—Å–ø–æ–ª—å–∑–æ–≤–∞–Ω–∏–µ PHP - –∑–∞–º–µ–Ω–∞ –¥–ª—è CGI —Å–∫—Ä–∏–ø—Ç–æ–≤.
 
-¸‘œ‘ –¡À≈‘ ”œƒ≈“÷…‘ ”¡Õœƒœ”‘¡‘œﬁŒ’¿ (CGI) ◊≈“”…¿ …Œ‘≈“–“≈‘¡‘œ“¡ —⁄ŸÀ¡.
-˜Ÿ ƒœÃ÷ŒŸ ‘¡À÷≈ ’”‘¡Œœ◊…‘ÿ –¡À≈‘ %{name}-common. Â”Ã… ◊¡Õ Œ’÷≈Œ
-…Œ‘≈“–“≈‘¡‘œ“ PHP ◊ À¡ﬁ≈”‘◊≈ Õœƒ’Ã— apache, ’”‘¡Œœ◊…‘≈ –¡À≈‘
+–≠—Ç–æ—Ç –ø–∞–∫–µ—Ç —Å–æ–¥–µ—Ä–∂–∏—Ç —Å–∞–º–æ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω—É—é (CGI) –≤–µ—Ä—Å–∏—é –∏–Ω—Ç–µ—Ä–ø—Ä–µ—Ç–∞—Ç–æ—Ä–∞ —è–∑—ã–∫–∞.
+–í—ã –¥–æ–ª–∂–Ω—ã —Ç–∞–∫–∂–µ —É—Å—Ç–∞–Ω–æ–≤–∏—Ç—å –ø–∞–∫–µ—Ç %{name}-common. –ï—Å–ª–∏ –≤–∞–º –Ω—É–∂–µ–Ω
+–∏–Ω—Ç–µ—Ä–ø—Ä–µ—Ç–∞—Ç–æ—Ä PHP –≤ –∫–∞—á–µ—Å—Ç–≤–µ –º–æ–¥—É–ª—è apache, —É—Å—Ç–∞–Ω–æ–≤–∏—Ç–µ –ø–∞–∫–µ—Ç
 apache-mod_php.
 
-%description -l uk
-PHP - √≈ Õœ◊¡ Œ¡–…”¡ŒŒ— ”À“…–‘¶◊, ›œ ◊¬’ƒœ◊’¿‘ÿ”— ◊ HTML-Àœƒ. PHP
-–“œ–œŒ’§ ¶Œ‘≈«“¡√¶¿ ⁄ ¬¡«¡‘ÿÕ¡ Ûı‚‰, ‘œÕ’ Œ¡–…”¡ŒŒ— ”À“…–‘¶◊ ƒÃ—
-“œ¬œ‘… ⁄ ¬¡⁄¡Õ… ƒ¡Œ…» § ƒœ◊œÃ¶ –“œ”‘…Õ. Ó¡ ¬¶Ãÿ€ –œ–’Ã—“Œ≈
-◊…Àœ“…”‘¡ŒŒ— PHP - ⁄¡Õ¶Œ¡ ƒÃ— CGI ”À“…–‘¶◊.
+%description -l uk.UTF-8
+PHP - —Ü–µ –º–æ–≤–∞ –Ω–∞–ø–∏—Å–∞–Ω–Ω—è —Å–∫—Ä–∏–ø—Ç—ñ–≤, —â–æ –≤–±—É–¥–æ–≤—É—é—Ç—å—Å—è –≤ HTML-–∫–æ–¥. PHP
+–ø—Ä–æ–ø–æ–Ω—É—î —ñ–Ω—Ç–µ–≥—Ä–∞—Ü—ñ—é –∑ –±–∞–≥–∞—Ç—å–º–∞ –°–£–ë–î, —Ç–æ–º—É –Ω–∞–ø–∏—Å–∞–Ω–Ω—è —Å–∫—Ä–∏–ø—Ç—ñ–≤ –¥–ª—è
+—Ä–æ–±–æ—Ç–∏ –∑ –±–∞–∑–∞–º–∏ –¥–∞–Ω–∏—Ö —î –¥–æ–≤–æ–ª—ñ –ø—Ä–æ—Å—Ç–∏–º. –ù–∞–π–±—ñ–ª—å—à –ø–æ–ø—É–ª—è—Ä–Ω–µ
+–≤–∏–∫–æ—Ä–∏—Å—Ç–∞–Ω–Ω—è PHP - –∑–∞–º—ñ–Ω–∞ –¥–ª—è CGI —Å–∫—Ä–∏–ø—Ç—ñ–≤.
 
-„≈  –¡À≈‘ Õ¶”‘…‘ÿ ”¡Õœƒœ”‘¡‘Œ¿ (CGI) ◊≈“”¶¿ ¶Œ‘≈“–“≈‘¡‘œ“¡ Õœ◊…. ˜…
-Õ¡§‘≈ ‘¡Àœ÷ ◊”‘¡Œœ◊…‘… –¡À≈‘ %{name}-common. ÒÀ›œ ◊¡Õ –œ‘“¶¬≈Œ
-¶Œ‘≈“–“≈‘¡‘œ“ PHP ◊ —Àœ”‘¶ Õœƒ’Ã— apache, ◊”‘¡Œœ◊¶‘ÿ –¡À≈‘
+–¶–µ–π –ø–∞–∫–µ—Ç –º—ñ—Å—Ç–∏—Ç—å —Å–∞–º–æ–¥–æ—Å—Ç–∞—Ç–Ω—é (CGI) –≤–µ—Ä—Å—ñ—é —ñ–Ω—Ç–µ—Ä–ø—Ä–µ—Ç–∞—Ç–æ—Ä–∞ –º–æ–≤–∏. –í–∏
+–º–∞—î—Ç–µ —Ç–∞–∫–æ–∂ –≤—Å—Ç–∞–Ω–æ–≤–∏—Ç–∏ –ø–∞–∫–µ—Ç %{name}-common. –Ø–∫—â–æ –≤–∞–º –ø–æ—Ç—Ä—ñ–±–µ–Ω
+—ñ–Ω—Ç–µ—Ä–ø—Ä–µ—Ç–∞—Ç–æ—Ä PHP –≤ —è–∫–æ—Å—Ç—ñ –º–æ–¥—É–ª—è apache, –≤—Å—Ç–∞–Ω–æ–≤—ñ—Ç—å –ø–∞–∫–µ—Ç
 apache-mod_php.
 
 %package -n apache1-mod_php
 Summary:	PHP DSO module for apache 1.3.x
-Summary(pl):	Modu≥ DSO (Dynamic Shared Object) php dla apache 1.3.x
+Summary(pl.UTF-8):   Modu≈Ç DSO (Dynamic Shared Object) php dla apache 1.3.x
 Group:		Development/Languages/PHP
 Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -284,12 +284,12 @@ Obsoletes:	phpfi
 %description -n apache1-mod_php
 PHP as DSO module for apache 1.3.x.
 
-%description -n apache1-mod_php -l pl
-php jako modu≥ DSO (Dynamic Shared Object) dla apache 1.3.x.
+%description -n apache1-mod_php -l pl.UTF-8
+php jako modu≈Ç DSO (Dynamic Shared Object) dla apache 1.3.x.
 
 %package -n apache-mod_php
 Summary:	PHP DSO module for apache 2.x
-Summary(pl):	Modu≥ DSO (Dynamic Shared Object) php dla apache 2.x
+Summary(pl.UTF-8):   Modu≈Ç DSO (Dynamic Shared Object) php dla apache 2.x
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache(modules-api) = %{apache_modules_api}
@@ -300,12 +300,12 @@ Obsoletes:	phpfi
 %description -n apache-mod_php
 PHP as DSO module for apache 2.x.
 
-%description -n apache-mod_php -l pl
-php jako modu≥ DSO (Dynamic Shared Object) dla apache 2.x.
+%description -n apache-mod_php -l pl.UTF-8
+php jako modu≈Ç DSO (Dynamic Shared Object) dla apache 2.x.
 
 %package fcgi
 Summary:	php as FastCGI program
-Summary(pl):	php jako program FastCGI
+Summary(pl.UTF-8):   php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	webserver(php) = %{version}
@@ -313,36 +313,36 @@ Provides:	webserver(php) = %{version}
 %description fcgi
 php as FastCGI program.
 
-%description fcgi -l pl
+%description fcgi -l pl.UTF-8
 php jako program FastCGI.
 
 %package cgi
 Summary:	php as CGI program
-Summary(pl):	php jako program CGI
+Summary(pl.UTF-8):   php jako program CGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description cgi
 php as CGI program.
 
-%description cgi -l pl
+%description cgi -l pl.UTF-8
 php jako program CGI.
 
 %package cli
 Summary:	php as CLI interpreter
-Summary(pl):	php jako interpreter dzia≥aj±cy z linii poleceÒ
+Summary(pl.UTF-8):   php jako interpreter dzia≈ÇajƒÖcy z linii polece≈Ñ
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description cli
 php as CLI interpreter.
 
-%description cli -l pl
-php jako interpreter dzia≥aj±cy z linii poleceÒ.
+%description cli -l pl.UTF-8
+php jako interpreter dzia≈ÇajƒÖcy z linii polece≈Ñ.
 
 %package program
 Summary:	/usr/bin/php symlink
-Summary(pl):	Dowi±zanie symboliczne /usr/bin/php
+Summary(pl.UTF-8):   DowiƒÖzanie symboliczne /usr/bin/php
 Group:		Development/Languages/PHP
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Obsoletes:	/usr/bin/php
@@ -350,14 +350,14 @@ Obsoletes:	/usr/bin/php
 %description program
 Package providing /usr/bin/php symlink to PHP CLI.
 
-%description program -l pl
-Pakiet dostarczaj±cy dowi±zanie symboliczne /usr/bin/php do PHP CLI.
+%description program -l pl.UTF-8
+Pakiet dostarczajƒÖcy dowiƒÖzanie symboliczne /usr/bin/php do PHP CLI.
 
 %package common
 Summary:	Common files needed by both apache module and CGI
-Summary(pl):	WspÛlne pliki dla modu≥u apache'a i programu CGI
-Summary(ru):	Ú¡⁄ƒ≈Ã—≈ÕŸ≈ ¬…¬Ã…œ‘≈À… ƒÃ— php
-Summary(uk):	‚¶¬Ã¶œ‘≈À… ”–¶ÃÿŒœ«œ ◊…Àœ“…”‘¡ŒŒ— ƒÃ— php
+Summary(pl.UTF-8):   Wsp√≥lne pliki dla modu≈Çu apache'a i programu CGI
+Summary(ru.UTF-8):   –†–∞–∑–¥–µ–ª—è–µ–º—ã–µ –±–∏–±–ª–∏–æ—Ç–µ–∫–∏ –¥–ª—è php
+Summary(uk.UTF-8):   –ë—ñ–±–ª—ñ–æ—Ç–µ–∫–∏ —Å–ø—ñ–ª—å–Ω–æ–≥–æ –≤–∏–∫–æ—Ä–∏—Å—Ç–∞–Ω–Ω—è –¥–ª—è php
 Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
@@ -385,23 +385,23 @@ Conflicts:	rpm < 4.4.2-0.2
 %description common
 Common files needed by both apache module and CGI.
 
-%description common -l pl
-WspÛlne pliki dla modu≥u apacha i programu CGI.
+%description common -l pl.UTF-8
+Wsp√≥lne pliki dla modu≈Çu apacha i programu CGI.
 
-%description common -l ru
-¸‘œ‘ –¡À≈‘ ”œƒ≈“÷…‘ œ¬›…≈ ∆¡ ÃŸ ƒÃ— “¡⁄ŒŸ» ◊¡“…¡Œ‘œ◊ “≈¡Ã…⁄¡√…… PHP
-(”¡Õœƒœ”‘¡‘œﬁŒœ  … ◊ À¡ﬁ≈”‘◊≈ Õœƒ’Ã— apache).
+%description common -l ru.UTF-8
+–≠—Ç–æ—Ç –ø–∞–∫–µ—Ç —Å–æ–¥–µ—Ä–∂–∏—Ç –æ–±—â–∏–µ —Ñ–∞–π–ª—ã –¥–ª—è —Ä–∞–∑–Ω—ã—Ö –≤–∞—Ä–∏–∞–Ω—Ç–æ–≤ —Ä–µ–∞–ª–∏–∑–∞—Ü–∏–∏ PHP
+(—Å–∞–º–æ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ–π –∏ –≤ –∫–∞—á–µ—Å—Ç–≤–µ –º–æ–¥—É–ª—è apache).
 
-%description common -l uk
-„≈  –¡À≈‘ Õ¶”‘…‘ÿ ”–¶ÃÿŒ¶ ∆¡ Ã… ƒÃ— “¶⁄Œ…» ◊¡“¶¡Œ‘¶◊ “≈¡Ã¶⁄¡√¶ß PHP
-(”¡Õœƒœ”‘¡‘Œÿœß ‘¡ ◊ —Àœ”‘¶ Õœƒ’Ã— apache).
+%description common -l uk.UTF-8
+–¶–µ–π –ø–∞–∫–µ—Ç –º—ñ—Å—Ç–∏—Ç—å —Å–ø—ñ–ª—å–Ω—ñ —Ñ–∞–π–ª–∏ –¥–ª—è —Ä—ñ–∑–Ω–∏—Ö –≤–∞—Ä—ñ–∞–Ω—Ç—ñ–≤ —Ä–µ–∞–ª—ñ–∑–∞—Ü—ñ—ó PHP
+(—Å–∞–º–æ–¥–æ—Å—Ç–∞—Ç–Ω—å–æ—ó —Ç–∞ –≤ —è–∫–æ—Å—Ç—ñ –º–æ–¥—É–ª—è apache).
 
 %package devel
 Summary:	Files for PHP modules development
-Summary(pl):	Pliki do kompilacji modu≥Ûw PHP
-Summary(pt_BR):	Arquivos de desenvolvimento para PHP
-Summary(ru):	¡À≈‘ “¡⁄“¡¬œ‘À… ƒÃ— –œ”‘“œ≈Œ…— “¡”€…“≈Œ…  PHP
-Summary(uk):	¡À≈‘ “œ⁄“œ¬À… ƒÃ— –œ¬’ƒœ◊… “œ⁄€…“≈Œÿ PHP
+Summary(pl.UTF-8):   Pliki do kompilacji modu≈Ç√≥w PHP
+Summary(pt_BR.UTF-8):   Arquivos de desenvolvimento para PHP
+Summary(ru.UTF-8):   –ü–∞–∫–µ—Ç —Ä–∞–∑—Ä–∞–±–æ—Ç–∫–∏ –¥–ª—è –ø–æ—Å—Ç—Ä–æ–µ–Ω–∏—è —Ä–∞—Å—à–∏—Ä–µ–Ω–∏–π PHP
+Summary(uk.UTF-8):   –ü–∞–∫–µ—Ç —Ä–æ–∑—Ä–æ–±–∫–∏ –¥–ª—è –ø–æ–±—É–¥–æ–≤–∏ —Ä–æ–∑—à–∏—Ä–µ–Ω—å PHP
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf
@@ -419,34 +419,34 @@ install this package and use the new self-contained extensions
 support. For more information, read the file
 README.SELF-CONTAINED-EXTENSIONS.
 
-%description devel -l pl
-Ten pakiet zawiera pliki potrzebne do kompilacji modu≥Ûw PHP. Zamiast
-rekompilowaÊ ca≥e php aby dodaÊ obs≥ugÍ np. oracle, moøna przy uøyciu
-tego pakietu skompilowaÊ samodzielne rozszerzenie. WiÍcej informacji o
-samodzielnych rozszerzeniach moøna znaleºÊ w pliku
+%description devel -l pl.UTF-8
+Ten pakiet zawiera pliki potrzebne do kompilacji modu≈Ç√≥w PHP. Zamiast
+rekompilowaƒá ca≈Çe php aby dodaƒá obs≈Çugƒô np. oracle, mo≈ºna przy u≈ºyciu
+tego pakietu skompilowaƒá samodzielne rozszerzenie. Wiƒôcej informacji o
+samodzielnych rozszerzeniach mo≈ºna znale≈∫ƒá w pliku
 README.SELF-CONTAINED-EXTENSIONS.
 
-%description devel -l pt_BR
-Este pacote contÈm arquivos usados no desenvolvimento de programas ou
-mÛdulos PHP.
+%description devel -l pt_BR.UTF-8
+Este pacote cont√©m arquivos usados no desenvolvimento de programas ou
+m√≥dulos PHP.
 
-%description devel -l ru
-¡À≈‘ php-devel ƒ¡≈‘ ◊œ⁄Õœ÷Œœ”‘ÿ ÀœÕ–…Ã…“œ◊¡‘ÿ ƒ…Œ¡Õ…ﬁ≈”À…≈ “¡”€…“≈Œ…—
-PHP. ¡À≈‘ ◊ÀÃ¿ﬁ¡≈‘ …”»œƒŒŸ  Àœƒ ‹‘…» “¡”€…“≈Œ… . ˜Õ≈”‘œ –œ◊‘œ“Œœ 
-ÀœÕ–…Ã—√…… ¬…Œ¡“Œœ«œ ∆¡ Ã¡ php ƒÃ— ƒœ¬¡◊Ã≈Œ…—, Œ¡–“…Õ≈“, –œƒƒ≈“÷À…
-oracle, ’”‘¡Œœ◊…‘≈ ‹‘œ‘ –¡À≈‘ ƒÃ— ÀœÕ–…Ã…“œ◊¡Œ…— œ‘ƒ≈ÃÿŒŸ» “¡”€…“≈Œ… .
-œƒ“œ¬Œœ”‘… - ◊ ∆¡ Ã≈ README.SELF-CONTAINED-EXTENSIONS.
+%description devel -l ru.UTF-8
+–ü–∞–∫–µ—Ç php-devel –¥–∞–µ—Ç –≤–æ–∑–º–æ–∂–Ω–æ—Å—Ç—å –∫–æ–º–ø–∏–ª–∏—Ä–æ–≤–∞—Ç—å –¥–∏–Ω–∞–º–∏—á–µ—Å–∫–∏–µ —Ä–∞—Å—à–∏—Ä–µ–Ω–∏—è
+PHP. –ü–∞–∫–µ—Ç –≤–∫–ª—é—á–∞–µ—Ç –∏—Å—Ö–æ–¥–Ω—ã–π –∫–æ–¥ —ç—Ç–∏—Ö —Ä–∞—Å—à–∏—Ä–µ–Ω–∏–π. –í–º–µ—Å—Ç–æ –ø–æ–≤—Ç–æ—Ä–Ω–æ–π
+–∫–æ–º–ø–∏–ª—è—Ü–∏–∏ –±–∏–Ω–∞—Ä–Ω–æ–≥–æ —Ñ–∞–π–ª–∞ php –¥–ª—è –¥–æ–±–∞–≤–ª–µ–Ω–∏—è, –Ω–∞–ø—Ä–∏–º–µ—Ä, –ø–æ–¥–¥–µ—Ä–∂–∫–∏
+oracle, —É—Å—Ç–∞–Ω–æ–≤–∏—Ç–µ —ç—Ç–æ—Ç –ø–∞–∫–µ—Ç –¥–ª—è –∫–æ–º–ø–∏–ª–∏—Ä–æ–≤–∞–Ω–∏—è –æ—Ç–¥–µ–ª—å–Ω—ã—Ö —Ä–∞—Å—à–∏—Ä–µ–Ω–∏–π.
+–ü–æ–¥—Ä–æ–±–Ω–æ—Å—Ç–∏ - –≤ —Ñ–∞–π–ª–µ README.SELF-CONTAINED-EXTENSIONS.
 
-%description devel -l uk
-¡À≈‘ php-devel ƒ¡§ Õœ÷Ã…◊¶”‘ÿ ÀœÕ–¶Ã¿◊¡‘… ƒ…Œ¡Õ¶ﬁŒ¶ “œ⁄€…“≈ŒŒ— PHP.
-‰œ –¡À≈‘’ ◊ÀÃ¿ﬁ≈Œœ ◊…»¶ƒŒ…  Àœƒ ƒÃ— “œ⁄€…“≈Œÿ. ˙¡Õ¶”‘ÿ –œ◊‘œ“Œœß
-ÀœÕ–¶Ã—√¶ß ¬¶Œ¡“Œœ«œ ∆¡ Ã’ php ƒÃ— ƒœƒ¡ŒŒ—, Œ¡–“…ÀÃ¡ƒ, –¶ƒ‘“…ÕÀ…
-oracle, ◊”‘¡Œœ◊¶‘ÿ √≈  –¡À≈‘ ƒÃ— ÀœÕ–¶Ã—√¶ß œÀ“≈Õ…» “œ⁄€…“≈Œÿ.
-‰≈‘¡ÃÿŒ¶€¡ ¶Œ∆œ“Õ¡√¶— - ◊ ∆¡ Ã¶ README.SELF-CONTAINED-EXTENSIONS.
+%description devel -l uk.UTF-8
+–ü–∞–∫–µ—Ç php-devel –¥–∞—î –º–æ–∂–ª–∏–≤—ñ—Å—Ç—å –∫–æ–º–ø—ñ–ª—é–≤–∞—Ç–∏ –¥–∏–Ω–∞–º—ñ—á–Ω—ñ —Ä–æ–∑—à–∏—Ä–µ–Ω–Ω—è PHP.
+–î–æ –ø–∞–∫–µ—Ç—É –≤–∫–ª—é—á–µ–Ω–æ –≤–∏—Ö—ñ–¥–Ω–∏–π –∫–æ–¥ –¥–ª—è —Ä–æ–∑—à–∏—Ä–µ–Ω—å. –ó–∞–º—ñ—Å—Ç—å –ø–æ–≤—Ç–æ—Ä–Ω–æ—ó
+–∫–æ–º–ø—ñ–ª—è—Ü—ñ—ó –±—ñ–Ω–∞—Ä–Ω–æ–≥–æ —Ñ–∞–π–ª—É php –¥–ª—è –¥–æ–¥–∞–Ω–Ω—è, –Ω–∞–ø—Ä–∏–∫–ª–∞–¥, –ø—ñ–¥—Ç—Ä–∏–º–∫–∏
+oracle, –≤—Å—Ç–∞–Ω–æ–≤—ñ—Ç—å —Ü–µ–π –ø–∞–∫–µ—Ç –¥–ª—è –∫–æ–º–ø—ñ–ª—è—Ü—ñ—ó –æ–∫—Ä–µ–º–∏—Ö —Ä–æ–∑—à–∏—Ä–µ–Ω—å.
+–î–µ—Ç–∞–ª—å–Ω—ñ—à–∞ —ñ–Ω—Ñ–æ—Ä–º–∞—Ü—ñ—è - –≤ —Ñ–∞–π–ª—ñ README.SELF-CONTAINED-EXTENSIONS.
 
 %package bcmath
 Summary:	bcmath extension module for PHP
-Summary(pl):	Modu≥ bcmath dla PHP
+Summary(pl.UTF-8):   Modu≈Ç bcmath dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(bcmath)
@@ -455,13 +455,13 @@ Provides:	php(bcmath)
 This is a dynamic shared object (DSO) for PHP that will add bc style
 precision math functions support.
 
-%description bcmath -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z dok≥adnych funkcji
+%description bcmath -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z dok≈Çadnych funkcji
 matematycznych takich jak w programie bc.
 
 %package bzip2
 Summary:	Bzip2 extension module for PHP
-Summary(pl):	Modu≥ bzip2 dla PHP
+Summary(pl.UTF-8):   Modu≈Ç bzip2 dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(bzip2)
@@ -470,12 +470,12 @@ Provides:	php(bzip2)
 This is a dynamic shared object (DSO) for PHP that will add bzip2
 compression support to PHP.
 
-%description bzip2 -l pl
-Modu≥ PHP umoøliwiaj±cy uøywanie kompresji bzip2.
+%description bzip2 -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy u≈ºywanie kompresji bzip2.
 
 %package calendar
 Summary:	Calendar extension module for PHP
-Summary(pl):	Modu≥ funkcji kalendarza dla PHP
+Summary(pl.UTF-8):   Modu≈Ç funkcji kalendarza dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(calendar)
@@ -484,12 +484,12 @@ Provides:	php(calendar)
 This is a dynamic shared object (DSO) for PHP that will add calendar
 support.
 
-%description calendar -l pl
-Modu≥ PHP dodaj±cy wsparcie dla kalendarza.
+%description calendar -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy wsparcie dla kalendarza.
 
 %package ctype
 Summary:	ctype extension module for PHP
-Summary(pl):	Modu≥ ctype dla PHP
+Summary(pl.UTF-8):   Modu≈Ç ctype dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ctype)
@@ -498,12 +498,12 @@ Provides:	php(ctype)
 This is a dynamic shared object (DSO) for PHP that will add ctype
 support.
 
-%description ctype -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z funkcji ctype.
+%description ctype -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z funkcji ctype.
 
 %package curl
 Summary:	curl extension module for PHP
-Summary(pl):	Modu≥ curl dla PHP
+Summary(pl.UTF-8):   Modu≈Ç curl dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(curl)
@@ -512,12 +512,12 @@ Provides:	php(curl)
 This is a dynamic shared object (DSO) for PHP that will add curl
 support.
 
-%description curl -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z biblioteki curl.
+%description curl -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z biblioteki curl.
 
 %package dba
 Summary:	DBA extension module for PHP
-Summary(pl):	Modu≥ DBA dla PHP
+Summary(pl.UTF-8):   Modu≈Ç DBA dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dba)
@@ -526,13 +526,13 @@ Provides:	php(dba)
 This is a dynamic shared object (DSO) for PHP that will add flat-file
 databases (DBA) support.
 
-%description dba -l pl
-Modu≥ dla PHP dodaj±cy obs≥ugÍ dla baz danych opartych na plikach
+%description dba -l pl.UTF-8
+Modu≈Ç dla PHP dodajƒÖcy obs≈Çugƒô dla baz danych opartych na plikach
 (DBA).
 
 %package dbase
 Summary:	DBase extension module for PHP
-Summary(pl):	Modu≥ DBase dla PHP
+Summary(pl.UTF-8):   Modu≈Ç DBase dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dbase)
@@ -541,12 +541,12 @@ Provides:	php(dbase)
 This is a dynamic shared object (DSO) for PHP that will add DBase
 support.
 
-%description dbase -l pl
-Modu≥ PHP ze wsparciem dla DBase.
+%description dbase -l pl.UTF-8
+Modu≈Ç PHP ze wsparciem dla DBase.
 
 %package dom
 Summary:	DOM extension module for PHP
-Summary(pl):	Modu≥ DOM dla PHP
+Summary(pl.UTF-8):   Modu≈Ç DOM dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dom)
@@ -558,12 +558,12 @@ Obsoletes:	php-domxml <= 3:4.3.8-1
 This is a dynamic shared object (DSO) for PHP that will add new DOM
 support.
 
-%description dom -l pl
-Modu≥ PHP dodaj±cy now± obs≥ugÍ DOM.
+%description dom -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy nowƒÖ obs≈Çugƒô DOM.
 
 %package exif
 Summary:	exif extension module for PHP
-Summary(pl):	Modu≥ exif dla PHP
+Summary(pl.UTF-8):   Modu≈Ç exif dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(exif)
@@ -572,12 +572,12 @@ Provides:	php(exif)
 This is a dynamic shared object (DSO) for PHP that will add EXIF tags
 support in image files.
 
-%description exif -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ znacznikÛw EXIF w plikach obrazkÛw.
+%description exif -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô znacznik√≥w EXIF w plikach obrazk√≥w.
 
 %package fdf
 Summary:	FDF extension module for PHP
-Summary(pl):	Modu≥ FDF dla PHP
+Summary(pl.UTF-8):   Modu≈Ç FDF dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(fdf)
@@ -586,13 +586,13 @@ Provides:	php(fdf)
 This PHP module adds support for PDF Forms through Adobe FDFTK
 library.
 
-%description fdf -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ formularzy PDF poprzez bibliotekÍ Adobe
+%description fdf -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô formularzy PDF poprzez bibliotekƒô Adobe
 FDFTK.
 
 %package filter
 Summary:	Extension for safely dealing with input parameters
-Summary(pl):	Rozszerzenie do bezpiecznej obs≥ugi danych wej∂ciowych
+Summary(pl.UTF-8):   Rozszerzenie do bezpiecznej obs≈Çugi danych wej≈õciowych
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(filter)
@@ -605,16 +605,16 @@ Input Filter extension is meant to address this issue by implementing
 a set of filters and mechanisms that users can use to safely access
 their input data.
 
-%description filter -l pl
-Wiadomo, øe trzeba zawsze sprawdzaÊ zmienne wej∂ciowe, ale PHP nie
-oferuje naprawdÍ dobrej funkcjonalno∂ci do robienia tego w sposÛb
-bezpieczny. Rozszerzenie Input Filter ma rozwi±zaÊ ten problem poprzez
-zaimplementowanie zestawu filtrÛw i mechanizmÛw, ktÛrych uøytkownicy
-mog± bezpiecznie uøywaÊ do dostÍpu do danych.
+%description filter -l pl.UTF-8
+Wiadomo, ≈ºe trzeba zawsze sprawdzaƒá zmienne wej≈õciowe, ale PHP nie
+oferuje naprawdƒô dobrej funkcjonalno≈õci do robienia tego w spos√≥b
+bezpieczny. Rozszerzenie Input Filter ma rozwiƒÖzaƒá ten problem poprzez
+zaimplementowanie zestawu filtr√≥w i mechanizm√≥w, kt√≥rych u≈ºytkownicy
+mogƒÖ bezpiecznie u≈ºywaƒá do dostƒôpu do danych.
 
 %package ftp
 Summary:	FTP extension module for PHP
-Summary(pl):	Modu≥ FTP dla PHP
+Summary(pl.UTF-8):   Modu≈Ç FTP dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ftp)
@@ -623,12 +623,12 @@ Provides:	php(ftp)
 This is a dynamic shared object (DSO) for PHP that will add FTP
 support.
 
-%description ftp -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ protoko≥u FTP.
+%description ftp -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô protoko≈Çu FTP.
 
 %package gd
 Summary:	GD extension module for PHP
-Summary(pl):	Modu≥ GD dla PHP
+Summary(pl.UTF-8):   Modu≈Ç GD dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	gd >= 2.0.28-4
@@ -640,13 +640,13 @@ Provides:	php(gd)
 This is a dynamic shared object (DSO) for PHP that will add GD
 support, allowing you to create and manipulate images with PHP.
 
-%description gd -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z biblioteki GD, pozwalaj±cej na
-tworzenie i obrÛbkÍ obrazkÛw.
+%description gd -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z biblioteki GD, pozwalajƒÖcej na
+tworzenie i obr√≥bkƒô obrazk√≥w.
 
 %package gettext
 Summary:	gettext extension module for PHP
-Summary(pl):	Modu≥ gettext dla PHP
+Summary(pl.UTF-8):   Modu≈Ç gettext dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(gettext)
@@ -655,12 +655,12 @@ Provides:	php(gettext)
 This is a dynamic shared object (DSO) for PHP that will add gettext
 support.
 
-%description gettext -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ lokalizacji przez gettext.
+%description gettext -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô lokalizacji przez gettext.
 
 %package gmp
 Summary:	gmp extension module for PHP
-Summary(pl):	Modu≥ gmp dla PHP
+Summary(pl.UTF-8):   Modu≈Ç gmp dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(gmp)
@@ -669,13 +669,13 @@ Provides:	php(gmp)
 This is a dynamic shared object (DSO) for PHP that will add arbitrary
 length number support with GNU MP library.
 
-%description gmp -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z biblioteki gmp do obliczeÒ na
-liczbach o dowolnej d≥ugo∂ci.
+%description gmp -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z biblioteki gmp do oblicze≈Ñ na
+liczbach o dowolnej d≈Çugo≈õci.
 
 %package hash
 Summary:	HASH Message Digest Framework
-Summary(pl):	Szkielet do obliczania skrÛtÛw wiadomo∂ci
+Summary(pl.UTF-8):   Szkielet do obliczania skr√≥t√≥w wiadomo≈õci
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(hash)
@@ -685,13 +685,13 @@ Obsoletes:	php-pecl-hash
 Native implementations of common message digest algorithms using a
 generic factory method.
 
-%description hash -l pl
-Natywne implementacje popularnych algorytmÛw obliczania skrÛtÛw
-wiadomo∂ci przy uøyciu wspÛlnego interfejsu.
+%description hash -l pl.UTF-8
+Natywne implementacje popularnych algorytm√≥w obliczania skr√≥t√≥w
+wiadomo≈õci przy u≈ºyciu wsp√≥lnego interfejsu.
 
 %package iconv
 Summary:	iconv extension module for PHP
-Summary(pl):	Modu≥ iconv dla PHP
+Summary(pl.UTF-8):   Modu≈Ç iconv dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(iconv)
@@ -700,13 +700,13 @@ Provides:	php(iconv)
 This is a dynamic shared object (DSO) for PHP that will add iconv
 support.
 
-%description iconv -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ iconv.
+%description iconv -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô iconv.
 
 %package imap
 Summary:	IMAP extension module for PHP
-Summary(pl):	Modu≥ IMAP dla PHP
-Summary(pt_BR):	Um mÛdulo para aplicaÁıes PHP que usam IMAP
+Summary(pl.UTF-8):   Modu≈Ç IMAP dla PHP
+Summary(pt_BR.UTF-8):   Um m√≥dulo para aplica√ß√µes PHP que usam IMAP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(imap)
@@ -715,15 +715,15 @@ Provides:	php(imap)
 This is a dynamic shared object (DSO) for PHP that will add IMAP
 support.
 
-%description imap -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ skrzynek IMAP.
+%description imap -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô skrzynek IMAP.
 
-%description imap -l pt_BR
-Um mÛdulo para aplicaÁıes PHP que usam IMAP.
+%description imap -l pt_BR.UTF-8
+Um m√≥dulo para aplica√ß√µes PHP que usam IMAP.
 
 %package interbase
 Summary:	InterBase/Firebird database module for PHP
-Summary(pl):	Modu≥ bazy danych InterBase/Firebird dla PHP
+Summary(pl.UTF-8):   Modu≈Ç bazy danych InterBase/Firebird dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(interbase)
@@ -733,12 +733,12 @@ Provides:	php(interbase)
 This is a dynamic shared object (DSO) for PHP that will add InterBase
 and Firebird database support.
 
-%description interbase -l pl
-Modu≥ PHP umoøliwiaj±cy dostÍp do baz danych InterBase i Firebird.
+%description interbase -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy dostƒôp do baz danych InterBase i Firebird.
 
 %package json
 Summary:	PHP C extension for JSON serialization
-Summary(pl):	Rozszerzenie C PHP dla serializacji JSON
+Summary(pl.UTF-8):   Rozszerzenie C PHP dla serializacji JSON
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(json)
@@ -748,14 +748,14 @@ Obsoletes:	php-pecl-json
 php-json is an extremely fast PHP C extension for JSON (JavaScript
 Object Notation) serialisation.
 
-%description json -l pl
+%description json -l pl.UTF-8
 php-json to bardzo szybkie rozszerzenie C PHP dla serializacji JSON
 (JavaScript Object Notation).
 
 %package ldap
 Summary:	LDAP extension module for PHP
-Summary(pl):	Modu≥ LDAP dla PHP
-Summary(pt_BR):	Um mÛdulo para aplicaÁıes PHP que usam LDAP
+Summary(pl.UTF-8):   Modu≈Ç LDAP dla PHP
+Summary(pt_BR.UTF-8):   Um m√≥dulo para aplica√ß√µes PHP que usam LDAP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ldap)
@@ -764,15 +764,15 @@ Provides:	php(ldap)
 This is a dynamic shared object (DSO) for PHP that will add LDAP
 support.
 
-%description ldap -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ LDAP.
+%description ldap -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô LDAP.
 
-%description ldap -l pt_BR
-Um mÛdulo para aplicaÁıes PHP que usam LDAP.
+%description ldap -l pt_BR.UTF-8
+Um m√≥dulo para aplica√ß√µes PHP que usam LDAP.
 
 %package mbstring
 Summary:	mbstring extension module for PHP
-Summary(pl):	Modu≥ mbstring dla PHP
+Summary(pl.UTF-8):   Modu≈Ç mbstring dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mbstring)
@@ -781,12 +781,12 @@ Provides:	php(mbstring)
 This is a dynamic shared object (DSO) for PHP that will add multibyte
 string support.
 
-%description mbstring -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ ci±gÛw znakÛw wielobajtowych.
+%description mbstring -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô ciƒÖg√≥w znak√≥w wielobajtowych.
 
 %package mcrypt
 Summary:	mcrypt extension module for PHP
-Summary(pl):	Modu≥ mcrypt dla PHP
+Summary(pl.UTF-8):   Modu≈Ç mcrypt dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mcrypt)
@@ -795,12 +795,12 @@ Provides:	php(mcrypt)
 This is a dynamic shared object (DSO) for PHP that will add mcrypt
 support.
 
-%description mcrypt -l pl
-Modu≥ PHP dodaj±cy moøliwo∂Ê szyfrowania poprzez bibliotekÍ mcrypt.
+%description mcrypt -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy mo≈ºliwo≈õƒá szyfrowania poprzez bibliotekƒô mcrypt.
 
 %package mhash
 Summary:	mhash extension module for PHP
-Summary(pl):	Modu≥ mhash dla PHP
+Summary(pl.UTF-8):   Modu≈Ç mhash dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mhash)
@@ -809,12 +809,12 @@ Provides:	php(mhash)
 This is a dynamic shared object (DSO) for PHP that will add mhash
 support.
 
-%description mhash -l pl
-Modu≥ PHP udostÍpniaj±cy funkcje mieszaj±ce z biblioteki mhash.
+%description mhash -l pl.UTF-8
+Modu≈Ç PHP udostƒôpniajƒÖcy funkcje mieszajƒÖce z biblioteki mhash.
 
 %package mime_magic
 Summary:	mime_magic extension module for PHP
-Summary(pl):	Modu≥ mime_magic dla PHP
+Summary(pl.UTF-8):   Modu≈Ç mime_magic dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	/usr/share/file/magic.mime
@@ -824,13 +824,13 @@ Provides:	php(mime_magic)
 This PHP module adds support for MIME type lookup via file magic
 numbers using magic.mime database.
 
-%description mime_magic -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ wyszukiwania typÛw MIME wed≥ug magicznych
-znacznikÛw plikÛw z uøyciem bazy danych magic.mime.
+%description mime_magic -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô wyszukiwania typ√≥w MIME wed≈Çug magicznych
+znacznik√≥w plik√≥w z u≈ºyciem bazy danych magic.mime.
 
 %package ming
 Summary:	ming extension module for PHP
-Summary(pl):	Modu≥ ming dla PHP
+Summary(pl.UTF-8):   Modu≈Ç ming dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ming)
@@ -839,13 +839,13 @@ Provides:	php(ming)
 This is a dynamic shared object (DSO) for PHP that will add ming
 (Flash - .swf files) support.
 
-%description ming -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ plikÛw Flash (.swf) poprzez bibliotekÍ
+%description ming -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô plik√≥w Flash (.swf) poprzez bibliotekƒô
 ming.
 
 %package mssql
 Summary:	MS SQL extension module for PHP
-Summary(pl):	Modu≥ MS SQL dla PHP
+Summary(pl.UTF-8):   Modu≈Ç MS SQL dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mssql)
@@ -854,14 +854,14 @@ Provides:	php(mssql)
 This is a dynamic shared object (DSO) for PHP that will add MS SQL
 databases support through FreeTDS library.
 
-%description mssql -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ baz danych MS SQL poprzez bibliotekÍ
+%description mssql -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô baz danych MS SQL poprzez bibliotekƒô
 FreeTDS.
 
 %package mysql
 Summary:	MySQL database module for PHP
-Summary(pl):	Modu≥ bazy danych MySQL dla PHP
-Summary(pt_BR):	Um mÛdulo para aplicaÁıes PHP que usam bancos de dados MySQL
+Summary(pl.UTF-8):   Modu≈Ç bazy danych MySQL dla PHP
+Summary(pt_BR.UTF-8):   Um m√≥dulo para aplica√ß√µes PHP que usam bancos de dados MySQL
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mysql)
@@ -870,15 +870,15 @@ Provides:	php(mysql)
 This is a dynamic shared object (DSO) for PHP that will add MySQL
 database support.
 
-%description mysql -l pl
-Modu≥ PHP umoøliwiaj±cy dostÍp do bazy danych MySQL.
+%description mysql -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy dostƒôp do bazy danych MySQL.
 
-%description mysql -l pt_BR
-Um mÛdulo para aplicaÁıes PHP que usam bancos de dados MySQL.
+%description mysql -l pt_BR.UTF-8
+Um m√≥dulo para aplica√ß√µes PHP que usam bancos de dados MySQL.
 
 %package mysqli
 Summary:	MySQLi module for PHP
-Summary(pl):	Modu≥ MySQLi dla PHP
+Summary(pl.UTF-8):   Modu≈Ç MySQLi dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	mysql-libs >= 4.1.0
@@ -889,14 +889,14 @@ This is a dynamic shared object (DSO) for PHP that will add MySQLi
 (Improved MySQL) support. The difference between it and mysql module
 is that it provides access to functionality of MySQL 4.1 and above.
 
-%description mysqli -l pl
-Modu≥ PHP umoøliwiaj±cy udoskonalony dostÍp do bazy danych MySQL.
-RÛønic± miÍdzy nim a modu≥em mysql jest dostÍp do funkcjonalno∂ci
+%description mysqli -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy udoskonalony dostƒôp do bazy danych MySQL.
+R√≥≈ºnicƒÖ miƒôdzy nim a modu≈Çem mysql jest dostƒôp do funkcjonalno≈õci
 MySQL w wersji 4.1 i nowszych.
 
 %package ncurses
 Summary:	ncurses module for PHP
-Summary(pl):	Modu≥ ncurses dla PHP
+Summary(pl.UTF-8):   Modu≈Ç ncurses dla PHP
 Group:		Libraries
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Provides:	php(ncurses)
@@ -905,12 +905,12 @@ Provides:	php(ncurses)
 This PHP module adds support for ncurses functions (only for cli and
 cgi SAPIs).
 
-%description ncurses -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ funkcji ncurses (tylko do SAPI cli i cgi).
+%description ncurses -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô funkcji ncurses (tylko do SAPI cli i cgi).
 
 %package oci8
 Summary:	Oracle 8+ database module for PHP
-Summary(pl):	Modu≥ bazy danych Oracle 8+ dla PHP
+Summary(pl.UTF-8):   Modu≈Ç bazy danych Oracle 8+ dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(oci8)
@@ -920,14 +920,14 @@ Autoreq:	false
 This is a dynamic shared object (DSO) for PHP that will add Oracle 7,
 8, 9 and 10 database support through Oracle8 Call-Interface (OCI8).
 
-%description oci8 -l pl
-Modu≥ PHP umoøliwiaj±cy dostÍp do bazy danych Oracle 7, 8, 9 i 10
+%description oci8 -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy dostƒôp do bazy danych Oracle 7, 8, 9 i 10
 poprzez interfejs Oracle8 Call-Interface (OCI8).
 
 %package odbc
 Summary:	ODBC extension module for PHP
-Summary(pl):	Modu≥ ODBC dla PHP
-Summary(pt_BR):	Um mÛdulo para aplicaÁıes PHP que usam bases de dados ODBC
+Summary(pl.UTF-8):   Modu≈Ç ODBC dla PHP
+Summary(pt_BR.UTF-8):   Um m√≥dulo para aplica√ß√µes PHP que usam bases de dados ODBC
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	unixODBC >= 2.1.1-3
@@ -937,15 +937,15 @@ Provides:	php(odbc)
 This is a dynamic shared object (DSO) for PHP that will add ODBC
 support.
 
-%description odbc -l pl
-Modu≥ PHP ze wsparciem dla ODBC.
+%description odbc -l pl.UTF-8
+Modu≈Ç PHP ze wsparciem dla ODBC.
 
-%description odbc -l pt_BR
-Um mÛdulo para aplicaÁıes PHP que usam ODBC.
+%description odbc -l pt_BR.UTF-8
+Um m√≥dulo para aplica√ß√µes PHP que usam ODBC.
 
 %package openssl
 Summary:	OpenSSL extension module for PHP
-Summary(pl):	Modu≥ OpenSSL dla PHP
+Summary(pl.UTF-8):   Modu≈Ç OpenSSL dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(openssl)
@@ -956,14 +956,14 @@ support.
 
 Warning: this is an experimental module.
 
-%description openssl -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z biblioteki OpenSSL.
+%description openssl -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z biblioteki OpenSSL.
 
-Uwaga: to jest modu≥ eksperymentalny.
+Uwaga: to jest modu≈Ç eksperymentalny.
 
 %package pcntl
 Summary:	Process Control extension module for PHP
-Summary(pl):	Modu≥ Process Control dla PHP
+Summary(pl.UTF-8):   Modu≈Ç Process Control dla PHP
 Group:		Libraries
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Provides:	php(pcntl)
@@ -976,16 +976,16 @@ waitpid(), signal() etc.
 Warning: this is an experimental module. Also, don't use it in
 webserver environment!
 
-%description pcntl -l pl
-Modu≥ PHP umoøliwiaj±cy tworzenie nowych procesÛw i kontrolÍ nad nimi.
-Obs≥uguje funkcje takie jak fork(), waitpid(), signal() i podobne.
+%description pcntl -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy tworzenie nowych proces√≥w i kontrolƒô nad nimi.
+Obs≈Çuguje funkcje takie jak fork(), waitpid(), signal() i podobne.
 
-Uwaga: to jest modu≥ eksperymentalny. Ponadto nie jest przeznaczony do
-uøywania z serwerem WWW - nie prÛbuj tego!
+Uwaga: to jest modu≈Ç eksperymentalny. Ponadto nie jest przeznaczony do
+u≈ºywania z serwerem WWW - nie pr√≥buj tego!
 
 %package pdo
 Summary:	PHP Data Objects (PDO)
-Summary(pl):	Obs≥uga PHP Data Objects (PDO)
+Summary(pl.UTF-8):   Obs≈Çuga PHP Data Objects (PDO)
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pdo)
@@ -995,12 +995,12 @@ Obsoletes:	php-pecl-PDO
 This is a dynamic shared object (DSO) for PHP that will add PDO
 support.
 
-%description pdo -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ PDO (PHP Data Objects).
+%description pdo -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô PDO (PHP Data Objects).
 
 %package pdo-dblib
 Summary:	PHP Data Objects (PDO) FreeTDS support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± FreeTDS
+Summary(pl.UTF-8):   Modu≈Ç PHP Data Objects (PDO) z obs≈ÇugƒÖ FreeTDS
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
@@ -1010,13 +1010,13 @@ Provides:	php(dblib)
 This is a dynamic shared object (DSO) for PHP that will add PDO
 FreeTDS support.
 
-%description pdo-dblib -l pl
-Modu≥ dla PHP dodaj±cy obs≥ugÍ baz danych FreeTDS za po∂rednictwem
+%description pdo-dblib -l pl.UTF-8
+Modu≈Ç dla PHP dodajƒÖcy obs≈Çugƒô baz danych FreeTDS za po≈õrednictwem
 interfejsu PDO.
 
 %package pdo-firebird
 Summary:	PHP Data Objects (PDO) Firebird support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± Firebirda
+Summary(pl.UTF-8):   Modu≈Ç PHP Data Objects (PDO) z obs≈ÇugƒÖ Firebirda
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
@@ -1027,13 +1027,13 @@ Obsoletes:	php-pecl-PDO_FIREBIRD
 This is a dynamic shared object (DSO) for PHP that will add PDO
 Firebird support.
 
-%description pdo-firebird -l pl
-Modu≥ dla PHP dodaj±cy obs≥ugÍ baz danych Firebird za po∂rednictwem
+%description pdo-firebird -l pl.UTF-8
+Modu≈Ç dla PHP dodajƒÖcy obs≈Çugƒô baz danych Firebird za po≈õrednictwem
 interfejsu PDO.
 
 %package pdo-mysql
 Summary:	PHP Data Objects (PDO) MySQL support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± MySQL-a
+Summary(pl.UTF-8):   Modu≈Ç PHP Data Objects (PDO) z obs≈ÇugƒÖ MySQL-a
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
@@ -1044,13 +1044,13 @@ Obsoletes:	php-pecl-PDO_MYSQL
 This is a dynamic shared object (DSO) for PHP that will add PDO MySQL
 support.
 
-%description pdo-mysql -l pl
-Modu≥ dla PHP dodaj±cy obs≥ugÍ baz danych MySQL za po∂rednictwem
+%description pdo-mysql -l pl.UTF-8
+Modu≈Ç dla PHP dodajƒÖcy obs≈Çugƒô baz danych MySQL za po≈õrednictwem
 interfejsu PDO.
 
 %package pdo-oci
 Summary:	PHP Data Objects (PDO) Oracle support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± Oracle'a
+Summary(pl.UTF-8):   Modu≈Ç PHP Data Objects (PDO) z obs≈ÇugƒÖ Oracle'a
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
@@ -1061,13 +1061,13 @@ Obsoletes:	php-pecl-PDO_OCI
 This is a dynamic shared object (DSO) for PHP that will add PDO Oracle
 support.
 
-%description pdo-oci -l pl
-Modu≥ dla PHP dodaj±cy obs≥ugÍ baz danych Oracle za po∂rednictwem
+%description pdo-oci -l pl.UTF-8
+Modu≈Ç dla PHP dodajƒÖcy obs≈Çugƒô baz danych Oracle za po≈õrednictwem
 interfejsu PDO.
 
 %package pdo-odbc
 Summary:	PHP Data Objects (PDO) ODBC support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± ODBC
+Summary(pl.UTF-8):   Modu≈Ç PHP Data Objects (PDO) z obs≈ÇugƒÖ ODBC
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
@@ -1078,13 +1078,13 @@ Obsoletes:	php-pecl-PDO_ODBC
 This is a dynamic shared object (DSO) for PHP that will add PDO ODBC
 support.
 
-%description pdo-odbc -l pl
-Modu≥ dla PHP dodaj±cy obs≥ugÍ baz danych ODBC za po∂rednictwem
+%description pdo-odbc -l pl.UTF-8
+Modu≈Ç dla PHP dodajƒÖcy obs≈Çugƒô baz danych ODBC za po≈õrednictwem
 interfejsu PDO.
 
 %package pdo-pgsql
 Summary:	PHP Data Objects (PDO) PostgreSQL support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± PostgreSQL-a
+Summary(pl.UTF-8):   Modu≈Ç PHP Data Objects (PDO) z obs≈ÇugƒÖ PostgreSQL-a
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
@@ -1095,13 +1095,13 @@ Obsoletes:	php-pecl-PDO_PGSQL
 This is a dynamic shared object (DSO) for PHP that will add PDO
 PostgreSQL support.
 
-%description pdo-pgsql -l pl
-Modu≥ dla PHP dodaj±cy obs≥ugÍ baz danych PostgreSQL za po∂rednictwem
+%description pdo-pgsql -l pl.UTF-8
+Modu≈Ç dla PHP dodajƒÖcy obs≈Çugƒô baz danych PostgreSQL za po≈õrednictwem
 interfejsu PDO.
 
 %package pdo-sqlite
 Summary:	PHP Data Objects (PDO) SQLite support
-Summary(pl):	Modu≥ PHP Data Objects (PDO) z obs≥ug± SQLite
+Summary(pl.UTF-8):   Modu≈Ç PHP Data Objects (PDO) z obs≈ÇugƒÖ SQLite
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
@@ -1112,13 +1112,13 @@ Obsoletes:	php-pecl-PDO_SQLITE
 This is a dynamic shared object (DSO) for PHP that will add PDO SQLite
 support.
 
-%description pdo-sqlite -l pl
-Modu≥ dla PHP dodaj±cy obs≥ugÍ baz danych SQLite za po∂rednictwem
+%description pdo-sqlite -l pl.UTF-8
+Modu≈Ç dla PHP dodajƒÖcy obs≈Çugƒô baz danych SQLite za po≈õrednictwem
 interfejsu PDO.
 
 %package pgsql
 Summary:	PostgreSQL database module for PHP
-Summary(pl):	Modu≥ bazy danych PostgreSQL dla PHP
+Summary(pl.UTF-8):   Modu≈Ç bazy danych PostgreSQL dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pgsql)
@@ -1127,15 +1127,15 @@ Provides:	php(pgsql)
 This is a dynamic shared object (DSO) for PHP that will add PostgreSQL
 database support.
 
-%description pgsql -l pl
-Modu≥ PHP umoøliwiaj±cy dostÍp do bazy danych PostgreSQL.
+%description pgsql -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy dostƒôp do bazy danych PostgreSQL.
 
-%description pgsql -l pt_BR
-Um mÛdulo para aplicaÁıes PHP que usam bancos de dados postgresql.
+%description pgsql -l pt_BR.UTF-8
+Um m√≥dulo para aplica√ß√µes PHP que usam bancos de dados postgresql.
 
 %package posix
 Summary:	POSIX extension module for PHP
-Summary(pl):	Modu≥ POSIX dla PHP
+Summary(pl.UTF-8):   Modu≈Ç POSIX dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(posix)
@@ -1144,12 +1144,12 @@ Provides:	php(posix)
 This is a dynamic shared object (DSO) for PHP that will add POSIX
 functions support to PHP.
 
-%description posix -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z funkcji POSIX.
+%description posix -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z funkcji POSIX.
 
 %package pspell
 Summary:	pspell extension module for PHP
-Summary(pl):	Modu≥ pspell dla PHP
+Summary(pl.UTF-8):   Modu≈Ç pspell dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pspell)
@@ -1159,13 +1159,13 @@ This is a dynamic shared object (DSO) for PHP that will add pspell
 support to PHP. It allows to check the spelling of a word and offer
 suggestions.
 
-%description pspell -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z pspella. Pozwala on na
-sprawdzanie pisowni s≥owa i sugerowanie poprawek.
+%description pspell -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z pspella. Pozwala on na
+sprawdzanie pisowni s≈Çowa i sugerowanie poprawek.
 
 %package readline
 Summary:	readline extension module for PHP
-Summary(pl):	Modu≥ readline dla PHP
+Summary(pl.UTF-8):   Modu≈Ç readline dla PHP
 Group:		Libraries
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Provides:	php(readline)
@@ -1174,12 +1174,12 @@ Provides:	php(readline)
 This PHP module adds support for readline functions (only for cli and
 cgi SAPIs).
 
-%description readline -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ funkcji readline (tylko do SAPI cli i cgi).
+%description readline -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô funkcji readline (tylko do SAPI cli i cgi).
 
 %package recode
 Summary:	recode extension module for PHP
-Summary(pl):	Modu≥ recode dla PHP
+Summary(pl.UTF-8):   Modu≈Ç recode dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	recode >= 3.5d-3
@@ -1189,13 +1189,13 @@ Provides:	php(recode)
 This is a dynamic shared object (DSO) for PHP that will add recode
 support.
 
-%description recode -l pl
-Modu≥ PHP dodaj±cy moøliwo∂Ê konwersji kodowania plikÛw (poprzez
-bibliotekÍ recode).
+%description recode -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy mo≈ºliwo≈õƒá konwersji kodowania plik√≥w (poprzez
+bibliotekƒô recode).
 
 %package shmop
 Summary:	Shared Memory Operations extension module for PHP
-Summary(pl):	Modu≥ shmop dla PHP
+Summary(pl.UTF-8):   Modu≈Ç shmop dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(shmop)
@@ -1206,14 +1206,14 @@ Memory Operations support.
 
 Warning: this is an experimental module.
 
-%description shmop -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z pamiÍci dzielonej.
+%description shmop -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z pamiƒôci dzielonej.
 
-Uwaga: to jest modu≥ eksperymentalny.
+Uwaga: to jest modu≈Ç eksperymentalny.
 
 %package simplexml
 Summary:	Simple XML extension module for PHP
-Summary(pl):	Modu≥ prostego rozszerzenia XML dla PHP
+Summary(pl.UTF-8):   Modu≈Ç prostego rozszerzenia XML dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
@@ -1222,12 +1222,12 @@ Provides:	php(simplexml)
 This is a dynamic shared object (DSO) for PHP that will add Simple XML
 support.
 
-%description simplexml -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ prostego XML-a.
+%description simplexml -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô prostego XML-a.
 
 %package snmp
 Summary:	SNMP extension module for PHP
-Summary(pl):	Modu≥ SNMP dla PHP
+Summary(pl.UTF-8):   Modu≈Ç SNMP dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-sockets = %{epoch}:%{version}-%{release}
@@ -1237,12 +1237,12 @@ Provides:	php(snmp)
 This is a dynamic shared object (DSO) for PHP that will add SNMP
 support.
 
-%description snmp -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ SNMP.
+%description snmp -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô SNMP.
 
 %package soap
 Summary:	soap extension module for PHP
-Summary(pl):	Modu≥ soap dla PHP
+Summary(pl.UTF-8):   Modu≈Ç soap dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(soap)
@@ -1251,12 +1251,12 @@ Provides:	php(soap)
 This is a dynamic shared object (DSO) for PHP that will add SOAP/WSDL
 support.
 
-%description soap -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ SOAP/WSDL.
+%description soap -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô SOAP/WSDL.
 
 %package sockets
 Summary:	sockets extension module for PHP
-Summary(pl):	Modu≥ socket dla PHP
+Summary(pl.UTF-8):   Modu≈Ç socket dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sockets)
@@ -1267,14 +1267,14 @@ support.
 
 Warning: this is an experimental module.
 
-%description sockets -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ gniazdek.
+%description sockets -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô gniazdek.
 
-Uwaga: to jest modu≥ eksperymentalny.
+Uwaga: to jest modu≈Ç eksperymentalny.
 
 %package sqlite
 Summary:	SQLite extension module for PHP
-Summary(pl):	Modu≥ SQLite dla PHP
+Summary(pl.UTF-8):   Modu≈Ç SQLite dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
@@ -1289,20 +1289,20 @@ SQLite is not a client library used to connect to a big database
 server. SQLite is the server. The SQLite library reads and writes
 directly to and from the database files on disk.
 
-%description sqlite -l pl
-SQLite jest napisan± w C bibliotek± implementuj±c± osadzalny silnik
-bazodanowy SQL. Program linkuj±cy siÍ z bibliotek± SQLite moøe mieÊ
-dostÍp do bazy SQL bez potrzeby uruchamiania dodatkowego procesu
+%description sqlite -l pl.UTF-8
+SQLite jest napisanƒÖ w C bibliotekƒÖ implementujƒÖcƒÖ osadzalny silnik
+bazodanowy SQL. Program linkujƒÖcy siƒô z bibliotekƒÖ SQLite mo≈ºe mieƒá
+dostƒôp do bazy SQL bez potrzeby uruchamiania dodatkowego procesu
 RDBMS.
 
-SQLite to nie klient baz danych - biblioteka nie ≥±czy siÍ z serwerami
+SQLite to nie klient baz danych - biblioteka nie ≈ÇƒÖczy siƒô z serwerami
 baz danych. SQLite sam jest serwerem. Biblioteka SQLite czyta i
-zapisuje dane bezpo∂rednio z/do plikÛw baz danych znajduj±cych siÍ na
+zapisuje dane bezpo≈õrednio z/do plik√≥w baz danych znajdujƒÖcych siƒô na
 dysku.
 
 %package sybase
 Summary:	Sybase DB extension module for PHP
-Summary(pl):	Modu≥ Sybase DB dla PHP
+Summary(pl.UTF-8):   Modu≈Ç Sybase DB dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sybase)
@@ -1314,14 +1314,14 @@ MS SQL databases support through SYBDB library. Currently Sybase
 module is not maintained. Using Sybase-CT module is recommended
 instead.
 
-%description sybase -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ baz danych Sybase oraz MS SQL poprzez
-bibliotekÍ SYBDB. W chwili obecnej modu≥ Sybase nie jest wspierany.
-Zaleca siÍ uøywanie modu≥u Sybase-CT.
+%description sybase -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô baz danych Sybase oraz MS SQL poprzez
+bibliotekƒô SYBDB. W chwili obecnej modu≈Ç Sybase nie jest wspierany.
+Zaleca siƒô u≈ºywanie modu≈Çu Sybase-CT.
 
 %package sybase-ct
 Summary:	Sybase-CT extension module for PHP
-Summary(pl):	Modu≥ Sybase-CT dla PHP
+Summary(pl.UTF-8):   Modu≈Ç Sybase-CT dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sybase-ct)
@@ -1331,13 +1331,13 @@ Obsoletes:	php-sybase
 This is a dynamic shared object (DSO) for PHP that will add Sybase and
 MS SQL databases support through CT-lib.
 
-%description sybase-ct -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ baz danych Sybase oraz MS SQL poprzez
+%description sybase-ct -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô baz danych Sybase oraz MS SQL poprzez
 CT-lib.
 
 %package sysvmsg
 Summary:	SysV msg extension module for PHP
-Summary(pl):	Modu≥ SysV msg dla PHP
+Summary(pl.UTF-8):   Modu≈Ç SysV msg dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvmsg)
@@ -1346,12 +1346,12 @@ Provides:	php(sysvmsg)
 This is a dynamic shared object (DSO) for PHP that will add SysV
 message queues support.
 
-%description sysvmsg -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z kolejek komunikatÛw SysV.
+%description sysvmsg -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z kolejek komunikat√≥w SysV.
 
 %package sysvsem
 Summary:	SysV sem extension module for PHP
-Summary(pl):	Modu≥ SysV sem dla PHP
+Summary(pl.UTF-8):   Modu≈Ç SysV sem dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvsem)
@@ -1360,12 +1360,12 @@ Provides:	php(sysvsem)
 This is a dynamic shared object (DSO) for PHP that will add SysV
 semaphores support.
 
-%description sysvsem -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z semaforÛw SysV.
+%description sysvsem -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z semafor√≥w SysV.
 
 %package sysvshm
 Summary:	SysV shm extension module for PHP
-Summary(pl):	Modu≥ SysV shm dla PHP
+Summary(pl.UTF-8):   Modu≈Ç SysV shm dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvshm)
@@ -1374,12 +1374,12 @@ Provides:	php(sysvshm)
 This is a dynamic shared object (DSO) for PHP that will add SysV
 Shared Memory support.
 
-%description sysvshm -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z pamiÍci dzielonej SysV.
+%description sysvshm -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z pamiƒôci dzielonej SysV.
 
 %package tidy
 Summary:	Tidy extension module for PHP
-Summary(pl):	Modu≥ Tidy dla PHP
+Summary(pl.UTF-8):   Modu≈Ç Tidy dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	tidy
@@ -1389,12 +1389,12 @@ Provides:	php(tidy)
 This is a dynamic shared object (DSO) for PHP that will add Tidy
 support.
 
-%description tidy -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z tidy.
+%description tidy -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z tidy.
 
 %package tokenizer
 Summary:	tokenizer extension module for PHP
-Summary(pl):	Modu≥ rozszerzenia tokenizer dla PHP
+Summary(pl.UTF-8):   Modu≈Ç rozszerzenia tokenizer dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(tokenizer)
@@ -1403,12 +1403,12 @@ Provides:	php(tokenizer)
 This is a dynamic shared object (DSO) for PHP that will add tokenizer
 support.
 
-%description tokenizer -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ tokenizera do PHP.
+%description tokenizer -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô tokenizera do PHP.
 
 %package wddx
 Summary:	wddx extension module for PHP
-Summary(pl):	Modu≥ wddx dla PHP
+Summary(pl.UTF-8):   Modu≈Ç wddx dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 #Requires:	%{name}-session = %{epoch}:%{version}-%{release}
@@ -1419,12 +1419,12 @@ Provides:	php(wddx)
 This is a dynamic shared object (DSO) for PHP that will add wddx
 support.
 
-%description wddx -l pl
-Modu≥ PHP umoøliwiaj±cy korzystanie z wddx.
+%description wddx -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy korzystanie z wddx.
 
 %package xml
 Summary:	XML extension module for PHP
-Summary(pl):	Modu≥ XML dla PHP
+Summary(pl.UTF-8):   Modu≈Ç XML dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xml)
@@ -1434,14 +1434,14 @@ This is a dynamic shared object (DSO) for PHP that will add XML
 support. This extension lets you create XML parsers and then define
 handlers for different XML events.
 
-%description xml -l pl
-Modu≥ PHP umoøliwiaj±cy parsowanie plikÛw XML i obs≥ugÍ zdarzeÒ
-zwi±zanych z tymi plikami. Pozwala on tworzyÊ analizatory XML-a i
-nastÍpnie definiowaÊ procedury obs≥ugi dla rÛønych zdarzeÒ XML.
+%description xml -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy parsowanie plik√≥w XML i obs≈Çugƒô zdarze≈Ñ
+zwiƒÖzanych z tymi plikami. Pozwala on tworzyƒá analizatory XML-a i
+nastƒôpnie definiowaƒá procedury obs≈Çugi dla r√≥≈ºnych zdarze≈Ñ XML.
 
 %package xmlreader
 Summary:	XML Reader extension module for PHP
-Summary(pl):	Modu≥ XML Reader dla PHP
+Summary(pl.UTF-8):   Modu≈Ç XML Reader dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
@@ -1453,14 +1453,14 @@ support. The XMLReader extension is an XML Pull parser. The reader
 acts as a cursor going forward on the document stream and stopping at
 each node on the way.
 
-%description xmlreader -l pl
-Modu≥ PHP umoøliwiaj±cy analizÍ plikÛw XML w trybie Pull. Czytnik
-dzia≥a jako kursor przechodz±cy przez strumieÒ dokumentu i
-zatrzymuj±cy siÍ na kaødym wÍºle po drodze.
+%description xmlreader -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy analizƒô plik√≥w XML w trybie Pull. Czytnik
+dzia≈Ça jako kursor przechodzƒÖcy przez strumie≈Ñ dokumentu i
+zatrzymujƒÖcy siƒô na ka≈ºdym wƒô≈∫le po drodze.
 
 %package xmlrpc
 Summary:	xmlrpc extension module for PHP
-Summary(pl):	Modu≥ xmlrpc dla PHP
+Summary(pl.UTF-8):   Modu≈Ç xmlrpc dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xmlrpc)
@@ -1471,14 +1471,14 @@ support.
 
 Warning: this is an experimental module.
 
-%description xmlrpc -l pl
-Modu≥ PHP dodaj±cy obs≥ugÍ XMLRPC.
+%description xmlrpc -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy obs≈Çugƒô XMLRPC.
 
-Uwaga: to jest modu≥ eksperymentalny.
+Uwaga: to jest modu≈Ç eksperymentalny.
 
 %package xmlwriter
 Summary:	Fast, non-cached, forward-only means to write XML data
-Summary(pl):	Szybka, nie cachowana metoda zapisu danych w formacie XML
+Summary(pl.UTF-8):   Szybka, nie cachowana metoda zapisu danych w formacie XML
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xmlwriter)
@@ -1489,14 +1489,14 @@ This extension wraps the libxml xmlWriter API. Represents a writer
 that provides a non-cached, forward-only means of generating streams
 or files containing XML data.
 
-%description xmlwriter -l pl
-To rozszerzenie obudowuje API xmlWriter z libxml. Reprezentuje obs≥ugÍ
-zapisu dostarczaj±c± nie cachowanych metod generowania strumieni lub
-plikÛw zawieraj±cych dane XML.
+%description xmlwriter -l pl.UTF-8
+To rozszerzenie obudowuje API xmlWriter z libxml. Reprezentuje obs≈Çugƒô
+zapisu dostarczajƒÖcƒÖ nie cachowanych metod generowania strumieni lub
+plik√≥w zawierajƒÖcych dane XML.
 
 %package xsl
 Summary:	xsl extension module for PHP
-Summary(pl):	Modu≥ xsl dla PHP
+Summary(pl.UTF-8):   Modu≈Ç xsl dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
@@ -1508,12 +1508,12 @@ Obsoletes:	php-xslt <= 3:4.3.8-1
 This is a dynamic shared object (DSO) for PHP that will add new XSL
 support (using libxslt).
 
-%description xsl -l pl
-Modu≥ PHP dodaj±cy now± obs≥ugÍ XSLT (przy uøyciu libxslt).
+%description xsl -l pl.UTF-8
+Modu≈Ç PHP dodajƒÖcy nowƒÖ obs≈Çugƒô XSLT (przy u≈ºyciu libxslt).
 
 %package zip
 Summary:	Zip management extension
-Summary(pl):	Zarz±dzanie archiwami zip
+Summary(pl.UTF-8):   ZarzƒÖdzanie archiwami zip
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zip)
@@ -1522,13 +1522,13 @@ Obsoletes:	php-pecl-zip
 %description zip
 Zip is an extension to create, modify and read zip files.
 
-%description zip -l pl
-Zip jest rozszerzeniem umoøliwiaj±cym tworzenie, modyfikacjÍ oraz
-odczyt archiwÛw zip.
+%description zip -l pl.UTF-8
+Zip jest rozszerzeniem umo≈ºliwiajƒÖcym tworzenie, modyfikacjƒô oraz
+odczyt archiw√≥w zip.
 
 %package zlib
 Summary:	Zlib extension module for PHP
-Summary(pl):	Modu≥ zlib dla PHP
+Summary(pl.UTF-8):   Modu≈Ç zlib dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zlib)
@@ -1537,8 +1537,8 @@ Provides:	php(zlib)
 This is a dynamic shared object (DSO) for PHP that will add zlib
 compression support to PHP.
 
-%description zlib -l pl
-Modu≥ PHP umoøliwiaj±cy uøywanie kompresji zlib.
+%description zlib -l pl.UTF-8
+Modu≈Ç PHP umo≈ºliwiajƒÖcy u≈ºywanie kompresji zlib.
 
 %prep
 %setup -q

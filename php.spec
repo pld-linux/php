@@ -198,8 +198,8 @@ BuildRequires:	apr-util-devel >= 1:1.0.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		php_sysconfdir		/etc/php
-%define		_sysconfdir		%{php_sysconfdir}
 %define		php_extensiondir	%{_libdir}/php
+%define		_sysconfdir		%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225

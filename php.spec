@@ -70,7 +70,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 1
+%define	_rel 2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -198,6 +198,7 @@ BuildRequires:	apr-util-devel >= 1:1.0.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		php_sysconfdir		/etc/php
+%define		_sysconfdir		%{php_sysconfdir}
 %define		php_extensiondir	%{_libdir}/php
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build

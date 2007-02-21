@@ -1091,6 +1091,7 @@ Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-pgsql)
+Provides:	php-pecl-PDO_PGSQL
 Obsoletes:	php-pecl-PDO_PGSQL
 
 %description pdo-pgsql

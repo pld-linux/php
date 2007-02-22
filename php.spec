@@ -1310,6 +1310,7 @@ Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sybase)
 Obsoletes:	php-sybase-ct
+Conflicts:	php-sybase-ct
 
 %description sybase
 This is a dynamic shared object (DSO) for PHP that will add Sybase and
@@ -1329,6 +1330,7 @@ Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sybase-ct)
 Obsoletes:	php-sybase
+Conflicts:	php-sybase
 
 %description sybase-ct
 This is a dynamic shared object (DSO) for PHP that will add Sybase and

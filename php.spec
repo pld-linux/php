@@ -1796,7 +1796,7 @@ done
 %{__make} build-modules
 
 %if %{with apache1}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1 LDFLAGS=-lpthread
 %endif
 
 %if %{with apache2}

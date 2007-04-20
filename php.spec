@@ -408,6 +408,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf
 Requires:	automake
 Requires:	libtool
+Requires:	pcre-devel
 Requires:	shtool
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel

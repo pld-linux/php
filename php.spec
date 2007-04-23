@@ -79,7 +79,7 @@ Summary(uk):	PHP Верс╕╖ 5 - мова препроцесування HTML-файл╕в, виконувана на серв
 Name:		php
 Version:	5.2.1
 Release:	%{_rel}%{?with_hardening:hardened}
-Epoch:		4
+Epoch:		4.5
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
@@ -125,6 +125,11 @@ Patch36:	%{name}-linkflags-clean.patch
 
 Patch39:	%{name}-pear.patch
 Patch41:	%{name}-config-dir.patch
+# Security patches:
+Patch100:	%{name}-5.1.6-CVE-2007-0455.patch
+Patch101:	%{name}-5.1.6-CVE-2007-1001.patch
+Patch102:	%{name}-5.1.6-CVE-2007-1583.patch
+Patch103:	%{name}-5.1.6-CVE-2007-1718.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1588,6 +1593,12 @@ patch -p1 < %{PATCH30} || exit 1
 
 %patch39 -p1
 %patch41 -p1
+
+# Security patches
+%patch100 -p1
+%patch101 -p1
+%patch102 -p1
+%patch103 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

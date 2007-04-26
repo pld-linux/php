@@ -1096,6 +1096,7 @@ Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-pgsql)
+Provides:	php-pecl-PDO_PGSQL
 Obsoletes:	php-pecl-PDO_PGSQL
 
 %description pdo-pgsql
@@ -1129,8 +1130,6 @@ Summary(pl):	Modu³ bazy danych PostgreSQL dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pgsql)
-Provides:	php-pecl-PDO_PGSQL
-Obsoletes:	php-pecl-PDO_PGSQL
 
 %description pgsql
 This is a dynamic shared object (DSO) for PHP that will add PostgreSQL

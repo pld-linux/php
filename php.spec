@@ -107,25 +107,25 @@ Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
-#Patch15:	%{name}-threads-acfix.patch
-Patch16:	%{name}-tsrmlsfetchgcc2.patch
-Patch17:	%{name}-no_pear_install.patch
-Patch18:	%{name}-zlib.patch
-Patch19:	%{name}-sybase-fix.patch
-Patch20:	%{name}-readline.patch
-Patch21:	%{name}-nohttpd.patch
-Patch23:	%{name}-gd_imagerotate_enable.patch
-Patch24:	%{name}-uint32_t.patch
-Patch26:	%{name}-dba-link.patch
-Patch30:	%{name}-hardening-fix.patch
-Patch31:	%{name}-both-apxs.patch
-Patch32:	%{name}-builddir.patch
-Patch33:	%{name}-zlib-for-getimagesize.patch
-Patch35:	%{name}-versioning.patch
-Patch36:	%{name}-linkflags-clean.patch
-
-Patch39:	%{name}-pear.patch
-Patch41:	%{name}-config-dir.patch
+# XXX: needs fix
+Patch12:	%{name}-threads-acfix.patch
+Patch13:	%{name}-tsrmlsfetchgcc2.patch
+Patch14:	%{name}-no_pear_install.patch
+Patch15:	%{name}-zlib.patch
+Patch16:	%{name}-sybase-fix.patch
+Patch17:	%{name}-readline.patch
+Patch18:	%{name}-nohttpd.patch
+Patch19:	%{name}-gd_imagerotate_enable.patch
+Patch20:	%{name}-uint32_t.patch
+Patch21:	%{name}-dba-link.patch
+Patch22:	%{name}-hardening-fix.patch
+Patch23:	%{name}-both-apxs.patch
+Patch24:	%{name}-builddir.patch
+Patch25:	%{name}-zlib-for-getimagesize.patch
+Patch26:	%{name}-versioning.patch
+Patch27:	%{name}-linkflags-clean.patch
+Patch28:	%{name}-pear.patch
+Patch29:	%{name}-config-dir.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1547,7 +1547,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q
-%patch36 -p1
+%patch27 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1564,29 +1564,29 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
-#%patch15 -p1 # breaks with ac cache vars, but later -lpthread is missing ...
+#%patch12 -p1 # breaks with ac cache vars, but later -lpthread is missing ...
+%patch13 -p1
+%patch14 -p1
+%patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%patch23 -p1
-%patch24 -p1
-%patch26 -p1
 
 %if %{with hardening}
 zcat %{SOURCE8} | patch -p1 || exit 1
-patch -p1 < %{PATCH30} || exit 1
+patch -p1 < %{PATCH22} || exit 1
 %endif
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
+%patch23 -p1
+%patch24 -p1
+%patch25 -p1
 
-%{?with_versioning:%patch35 -p1}
+%{?with_versioning:%patch26 -p1}
 
-%patch39 -p1
-%patch41 -p1
+%patch28 -p1
+%patch29 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

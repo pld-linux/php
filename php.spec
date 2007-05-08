@@ -409,6 +409,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf
 Requires:	automake
 Requires:	libtool
+%{?with_pcre:Requires:	pcre-devel >= 6.6}
 Requires:	shtool
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel

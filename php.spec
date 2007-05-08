@@ -1820,6 +1820,13 @@ cp -af php_config.h.cgi main/php_config.h
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli LDFLAGS=-lpthread
 
+%check
+# Run tests, using the CLI SAPI
+export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
+unset TZ LANG LC_ALL || :
+%{__make} test
+unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
+
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{php_sysconfdir}/{apache,cgi}} \

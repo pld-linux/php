@@ -46,6 +46,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
+%bcond_without	tests	# do not perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
 %define apxs1		/usr/sbin/apxs1
@@ -69,7 +70,11 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 1
+%if %{without tests}
+%define	check	%{nil}
+%endif
+
+%define	_rel 2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP

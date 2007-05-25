@@ -74,7 +74,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define	check	%{nil}
 %endif
 
-%define	_rel 2
+%define	_rel 3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -1610,6 +1610,13 @@ rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
 rm -rf ext/xmlrpc/libxmlrpc
+
+%ifarch ppc ppc64
+# this test hungs on ac-ppc
+#mv ext/reflection/tests/007.php{,ignore}
+# this test gets killed by itself
+mv ext/standard/tests/general_functions/bug39322.phpt{,.broken}
+%endif
 
 %build
 if API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h) && [ $API != %{php_api_version} ]; then

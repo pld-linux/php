@@ -70,10 +70,6 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%if %{without tests}
-%define	check	%{nil}
-%endif
-
 %define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
@@ -1831,12 +1827,13 @@ cp -af php_config.h.cgi main/php_config.h
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli LDFLAGS=-lpthread
 
-%check
+%if %{with tests}
 # Run tests, using the CLI SAPI
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
 unset TZ LANG LC_ALL || :
 %{__make} test
 unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT

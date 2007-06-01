@@ -46,7 +46,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
-%bcond_without	tests
+%bcond_without	tests	# do not perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
 %define apxs1		/usr/sbin/apxs1
@@ -71,7 +71,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 3
+%define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -79,13 +79,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.2.2
+Version:	5.2.3
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	d084337867d70b50a10322577be0e44e
+# Source0-md5:	eb50b751c8e1ced05bd012d5a0e4dec3
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -1798,7 +1798,7 @@ done
 %{__make} build-modules
 
 %if %{with apache1}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1 LDFLAGS=-lpthread
 %endif
 
 %if %{with apache2}
@@ -1808,14 +1808,14 @@ done
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
-%{__make} sapi/cgi/php -f Makefile.fcgi LDFLAGS=-lpthread
+%{__make} sapi/cgi/php-cgi -f Makefile.fcgi LDFLAGS=-lpthread
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
-%{__make} sapi/cgi/php -f Makefile.cgi LDFLAGS=-lpthread
+%{__make} sapi/cgi/php-cgi -f Makefile.cgi LDFLAGS=-lpthread
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
@@ -1858,11 +1858,11 @@ sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_c
 sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
 # install CGI
-libtool --silent --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi
+libtool --silent --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
 
 # install FCGI
 %if %{with fcgi}
-libtool --silent --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+libtool --silent --mode=install install sapi/fcgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
 %endif
 
 # install CLI

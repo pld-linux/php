@@ -74,7 +74,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define	check	%{nil}
 %endif
 
-%define	_rel 0.1
+%define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -1818,14 +1818,14 @@ done
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
-%{__make} sapi/cgi/php -f Makefile.fcgi LDFLAGS=-lpthread
+%{__make} sapi/cgi/php-cgi -f Makefile.fcgi LDFLAGS=-lpthread
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
-%{__make} sapi/cgi/php -f Makefile.cgi LDFLAGS=-lpthread
+%{__make} sapi/cgi/php-cgi -f Makefile.cgi LDFLAGS=-lpthread
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
@@ -1867,11 +1867,11 @@ sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_c
 sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
 # install CGI
-libtool --silent --mode=install install sapi/cgi/php $RPM_BUILD_ROOT%{_bindir}/php.cgi
+libtool --silent --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
 
 # install FCGI
 %if %{with fcgi}
-libtool --silent --mode=install install sapi/fcgi/php $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+libtool --silent --mode=install install sapi/fcgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
 %endif
 
 # install CLI

@@ -70,7 +70,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 1
+%define	_rel 1.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -137,9 +137,7 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
-%if %{with xmlrpc}
-BuildRequires:	expat-devel
-%endif
+%{?with_xmlrpc:BuildRequires:	expat-devel}
 %{?with_fcgi:BuildRequires:	fcgi-devel}
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
@@ -185,7 +183,6 @@ BuildRequires:	rpmbuild(macros) >= 1.238
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
-%{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel}
 BuildRequires:	zlib-devel >= 1.0.9
 %if %{with apache1}
 BuildRequires:	apache1-devel
@@ -1605,7 +1602,7 @@ rm -f ext/recode/config9.m4
 rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
-rm -rf ext/xmlrpc/libxmlrpc
+#rm -rf ext/xmlrpc/libxmlrpc -- system one is broken on 64bit arches
 
 %ifarch ppc ppc64
 # this test hungs on ac-ppc
@@ -1789,7 +1786,7 @@ for sapi in $sapis; do
 	%{?with_tidy:--with-tidy=shared} \
 	--with-tiff-dir=/usr \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
-	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
+	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared} \
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \

@@ -1504,6 +1504,7 @@ Summary:	xsl extension module for PHP
 Summary(pl):	Modu³ xsl dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
 # actually not true, functionality is similar, but API differs
 Provides:	php(xsl)

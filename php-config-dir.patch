@@ -1,5 +1,5 @@
---- php-5.2.0/scripts/php-config.in~	2006-07-27 11:53:16.000000000 +0300
-+++ php-5.2.0/scripts/php-config.in	2006-12-14 01:11:33.348180526 +0200
+--- php-5.2.0/scripts/php-config.in	2006-12-14 01:11:33.348180526 +0200
++++ php-5.2.4/scripts/php-config.in	2007-08-31 19:43:04.061307670 +0300
 @@ -2,6 +2,7 @@
  
  prefix="@prefix@"
@@ -8,21 +8,20 @@
  version="@PHP_VERSION@"
  version_id="@PHP_VERSION_ID@"
  includedir="@includedir@/php"
-@@ -25,6 +26,8 @@
- 	echo $libs;;
- --extension-dir)
- 	echo $extension_dir;;
-+--sysconfdir)
-+	echo $sysconfdir;;
+@@ -53,6 +54,8 @@
+   echo $extension_dir;;
  --include-dir)
- 	echo $includedir;;
+   echo $include_dir;;
++--sysconfdir)
++  echo $sysconfdir;;
  --php-binary)
-@@ -34,7 +37,7 @@
- --vernum)
- 	echo $version_id;;
- *)
--	echo "Usage: $0 [--prefix|--includes|--ldflags|--libs|--extension-dir|--include-dir|--php-binary|--version|--vernum]"
-+	echo "Usage: $0 [--prefix|--includes|--ldflags|--libs|--extension-dir|--sysconfdir|--include-dir|--php-binary|--version|--vernum]"
- 	exit 1;;
- esac
- 
+   echo $php_binary;;
+ --php-sapis)
+@@ -72,6 +75,7 @@
+   --ldflags           [$ldflags]
+   --libs              [$libs]
+   --extension-dir     [$extension_dir]
++  --sysconfdir        [$sysconfdir]
+   --include-dir       [$include_dir]
+   --php-binary        [$php_binary]
+   --php-sapis         [$php_sapis]

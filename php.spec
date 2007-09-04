@@ -123,6 +123,7 @@ Patch32:	%{name}-builddir.patch
 Patch33:	%{name}-zlib-for-getimagesize.patch
 Patch35:	%{name}-versioning.patch
 Patch36:	%{name}-linkflags-clean.patch
+Patch37:	%{name}-apr-apu.patch
 
 Patch39:	%{name}-pear.patch
 Patch41:	%{name}-config-dir.patch
@@ -1585,6 +1586,8 @@ patch -p1 < %{PATCH30} || exit 1
 %patch33 -p1
 
 %{?with_versioning:%patch35 -p1}
+
+%patch37 -p1
 
 %patch39 -p1
 %patch41 -p1

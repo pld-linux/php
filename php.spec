@@ -838,6 +838,7 @@ Summary:	ming extension module for PHP
 Summary(pl.UTF-8):	Moduł ming dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	ming >= 0.3
 Provides:	php(ming)
 
 %description ming

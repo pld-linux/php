@@ -1,5 +1,5 @@
---- soap/php_sdl.c~	2007-05-21 16:13:50.000000000 +0300
-+++ soap/php_sdl.c	2007-10-12 19:53:36.044545571 +0300
+--- php-5.2.4/ext/soap/php_sdl.c~	2007-05-21 16:13:50.000000000 +0300
++++ php-5.2.4/ext/soap/php_sdl.c	2007-10-12 19:53:36.044545571 +0300
 @@ -2012,11 +2012,7 @@
  	HashTable tmp_bindings;
  	HashTable tmp_functions;

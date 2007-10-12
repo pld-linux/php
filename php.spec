@@ -71,7 +71,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 4
+%define	_rel 5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -127,6 +127,7 @@ Patch26:	%{name}-versioning.patch
 Patch27:	%{name}-linkflags-clean.patch
 Patch28:	%{name}-pear.patch
 Patch29:	%{name}-config-dir.patch
+Patch30:	%{name}-bug-42952.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1592,6 +1593,7 @@ patch -p1 < %{PATCH22} || exit 1
 
 %patch28 -p1
 %patch29 -p1
+%patch30 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

@@ -1803,7 +1803,7 @@ done
 %{__make} build-modules
 
 %if %{with apache1}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1 LDFLAGS=-lpthread
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1 LDFLAGS="-lpthread"
 %endif
 
 %if %{with apache2}
@@ -1813,18 +1813,18 @@ done
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
-%{__make} sapi/cgi/php-cgi -f Makefile.fcgi LDFLAGS=-lpthread
+%{__make} sapi/cgi/php-cgi -f Makefile.fcgi LDFLAGS="-lpthread"
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
-%{__make} sapi/cgi/php-cgi -f Makefile.cgi LDFLAGS=-lpthread
+%{__make} sapi/cgi/php-cgi -f Makefile.cgi LDFLAGS="-lpthread"
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
-%{__make} sapi/cli/php -f Makefile.cli LDFLAGS=-lpthread
+%{__make} sapi/cli/php -f Makefile.cli LDFLAGS="-lpthread"
 
 %if %{with tests}
 # Run tests, using the CLI SAPI

@@ -38,7 +38,9 @@
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
 %bcond_without	sybase		# without Sybase extension module
-%bcond_without	sybase_ct	# without Sybase-CT extension module
+%bcond_with	sybase_ct	# without Sybase-CT extension module
+# php5.3-200710222030/ext/sybase_ct/php_sybase_ct.c: In function `php_sybase_fetch_hash':
+# php5.3-200710222030/ext/sybase_ct/php_sybase_ct.c:1802: error: structure has no member named `refcount'
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
@@ -71,7 +73,8 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 5
+%define	_rel	0.1
+%define	_snap	200710222030
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -79,13 +82,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.2.4
+Version:	5.3
 Release:	%{_rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	55c97a671fdabf462cc7a82971a656d2
+Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
+# Source0-md5:	5dc1f8eace01a7fefa382b1da4ff513e
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -107,7 +110,7 @@ Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
-Patch11:	%{name}-acam.patch
+#Patch11:	%{name}-acam.patch
 # XXX: needs fix
 Patch12:	%{name}-threads-acfix.patch
 Patch13:	%{name}-tsrmlsfetchgcc2.patch
@@ -205,8 +208,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
-%define		zend_module_api		20060613
-%define		zend_extension_api	220060519
+%define		zend_module_api		20071006
+%define		zend_extension_api	220070929
 %define		zend_zts			%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug			%{!?debug:0}%{?debug:1}
 
@@ -1552,7 +1555,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q -n %{name}%{version}-%{_snap}
 %patch27 -p1
 %patch0 -p1
 %patch1 -p1
@@ -1561,7 +1564,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%patch7 -p1
+#%patch7 -p1 UPDATE
 %patch8 -p1
 %patch9 -p1
 
@@ -1569,7 +1572,7 @@ cp php.ini-dist php.ini
 %patch10 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
-%patch11 -p1
+#%patch11 -p1 # CHECKME
 #%patch12 -p1 # breaks with ac cache vars, but later -lpthread is missing ...
 %patch13 -p1
 %patch14 -p1

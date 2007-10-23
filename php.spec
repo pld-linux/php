@@ -38,9 +38,7 @@
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
 %bcond_without	sybase		# without Sybase extension module
-%bcond_with	sybase_ct	# without Sybase-CT extension module
-# php5.3-200710222030/ext/sybase_ct/php_sybase_ct.c: In function `php_sybase_fetch_hash':
-# php5.3-200710222030/ext/sybase_ct/php_sybase_ct.c:1802: error: structure has no member named `refcount'
+%bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
@@ -73,8 +71,8 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel	0.2
-%define	_snap	200710222030
+%define	_rel	0.3
+%define	_snap	200710231630
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -88,7 +86,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	5dc1f8eace01a7fefa382b1da4ff513e
+# Source0-md5:	7ed946f72b3b27aadfec579b1addcfaa
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -203,7 +201,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		php_sysconfdir		/etc/php
 %define		php_extensiondir	%{_libdir}/php
-%define		_sysconfdir		%{php_sysconfdir}
+%define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
@@ -1678,8 +1676,8 @@ for sapi in $sapis; do
 	--cache-file=config.cache \
 %endif
 	--with-libdir=%{_lib} \
-	--with-config-file-path=%{php_sysconfdir} \
-	--with-config-file-scan-dir=%{php_sysconfdir}/conf.d \
+	--with-config-file-path=%{_sysconfdir} \
+	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
@@ -1834,7 +1832,7 @@ unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{php_sysconfdir}/{apache,cgi}} \
+install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf} \
@@ -1875,37 +1873,37 @@ echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
-sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{php_sysconfdir}/php.ini
+sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 %if %{with fcgi}
-install %{SOURCE4} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi-fcgi.ini
+install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
-install %{SOURCE5} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi.ini
-install %{SOURCE7} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cli.ini
-install %{SOURCE9} $RPM_BUILD_ROOT%{php_sysconfdir}/browscap.ini
+install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
+install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+install %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache.ini
+install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
-install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache2handler.ini
+install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
 cp -f Zend/LICENSE{,.Zend}
 
 # Generate stub .ini files for each subpackage
-install -d $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 for so in modules/*.so; do
 	mod=$(basename $so .so)
-	conf="%{php_sysconfdir}/conf.d/${mod}.ini"
+	conf="%{_sysconfdir}/conf.d/${mod}.ini"
 	# xml needs to be loaded before wddx
-	[ "$mod" = "wddx" ] && conf="%{php_sysconfdir}/conf.d/xml_${mod}.ini"
+	[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_${mod}.ini"
 	cat > $RPM_BUILD_ROOT${conf} <<EOF
 ; Enable ${mod} extension module
 extension=${mod}.so
@@ -1913,10 +1911,10 @@ EOF
 done
 
 # per SAPI ini directories
-install -d $RPM_BUILD_ROOT%{php_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
 
 # for CLI SAPI only
-mv $RPM_BUILD_ROOT%{php_sysconfdir}/{conf.d/{ncurses,pcntl,readline}.ini,cli.d}
+mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{ncurses,pcntl,readline}.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
@@ -1984,9 +1982,9 @@ sed -i -e '
 %if %{with apache2}
 %triggerpostun -n apache-mod_php -- php < 4:5.0.4-7.1, php < 4:5.0.4-7.1
 # for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
-if [ -f %{php_sysconfdir}/php-apache.ini.rpmsave ]; then
-	cp -f %{php_sysconfdir}/php-apache2handler.ini{,.rpmnew}
-	mv -f %{php_sysconfdir}/php-apache.ini.rpmsave %{php_sysconfdir}/php-apache2handler.ini
+if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
+	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
+	mv -f %{_sysconfdir}/php-apache.ini.rpmsave %{_sysconfdir}/php-apache2handler.ini
 fi
 %endif
 
@@ -2068,182 +2066,182 @@ fi
 %extension_scripts zlib
 
 %triggerun bcmath -- %{name}-bcmath < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bcmath\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bcmath\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun bzip2 -- %{name}-bzip2 < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bzip2\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bzip2\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun calendar -- %{name}-calendar < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*calendar\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*calendar\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ctype -- %{name}-ctype < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ctype\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ctype\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun curl -- %{name}-curl < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*curl\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*curl\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dba -- %{name}-dba < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dba\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dba\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dbase -- %{name}-dbase < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dbase\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dbase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dom -- %{name}-dom < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dom\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dom\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun exif -- %{name}-exif < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*exif\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*exif\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun fdf -- %{name}-fdf < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*fdf\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*fdf\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ftp -- %{name}-ftp < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ftp\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ftp\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun gd -- %{name}-gd < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gd\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gd\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun gettext -- %{name}-gettext < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gettext\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gettext\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun gmp -- %{name}-gmp < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gmp\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gmp\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun iconv -- %{name}-iconv < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*iconv\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*iconv\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun imap -- %{name}-imap < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*imap\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*imap\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun interbase -- %{name}-interbase < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*interbase\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*interbase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ldap -- %{name}-ldap < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ldap\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ldap\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mbstring -- %{name}-mbstring < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mbstring\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mbstring\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mcrypt -- %{name}-mcrypt < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mcrypt\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mcrypt\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mhash -- %{name}-mhash < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mime_magic -- %{name}-mime_magic < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mime_magic\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mime_magic\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ming -- %{name}-ming < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mssql -- %{name}-mssql < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mssql\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mssql\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mysql -- %{name}-mysql < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysql\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysql\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ncurses -- %{name}-ncurses < 4:5.1.2-9.5
-if [ -f %{php_sysconfdir}/php-cgi.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{php_sysconfdir}/php-cgi.ini
+if [ -f %{_sysconfdir}/php-cgi.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cgi.ini
 fi
-if [ -f %{php_sysconfdir}/php-cli.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{php_sysconfdir}/php-cli.ini
+if [ -f %{_sysconfdir}/php-cli.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
 %triggerun mysqli -- %{name}-mysqli < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysqli\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysqli\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun oci8 -- %{name}-oci8 < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*oci8\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*oci8\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun odbc -- %{name}-odbc < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*odbc\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*odbc\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun openssl -- %{name}-openssl < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*openssl\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*openssl\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun pcntl -- %{name}-pcntl < 4:5.1.2-9.5
-if [ -f %{php_sysconfdir}/php-cgi.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{php_sysconfdir}/php-cgi.ini
+if [ -f %{_sysconfdir}/php-cgi.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cgi.ini
 fi
-if [ -f %{php_sysconfdir}/php-cli.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{php_sysconfdir}/php-cli.ini
+if [ -f %{_sysconfdir}/php-cli.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
 %triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun posix -- %{name}-posix < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*posix\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*posix\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun pspell -- %{name}-pspell < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pspell\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pspell\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun readline -- %{name}-readline < 4:5.1.2-9.5
-if [ -f %{php_sysconfdir}/php-cgi.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{php_sysconfdir}/php-cgi.ini
+if [ -f %{_sysconfdir}/php-cgi.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{_sysconfdir}/php-cgi.ini
 fi
-if [ -f %{php_sysconfdir}/php-cli.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{php_sysconfdir}/php-cli.ini
+if [ -f %{_sysconfdir}/php-cli.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
 %triggerun recode -- %{name}-recode < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun snmp -- %{name}-snmp < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*snmp\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*snmp\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun soap -- %{name}-soap < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*soap\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*soap\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sockets -- %{name}-sockets < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sockets\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sockets\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sqlite -- %{name}-sqlite < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sqlite\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sqlite\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sybase -- %{name}-sybase < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sybase-ct -- %{name}-sybase-ct < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase-ct\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase-ct\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sysvmsg -- %{name}-sysvmsg < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvmsg\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvmsg\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sysvsem -- %{name}-sysvsem < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvsem\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvsem\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sysvshm -- %{name}-sysvshm < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvshm\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvshm\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun tidy -- %{name}-tidy < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*tidy\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*tidy\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun wddx -- %{name}-wddx < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*wddx\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*wddx\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun xml -- %{name}-xml < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xml\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xml\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun xmlrpc -- %{name}-xmlrpc < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xmlrpc\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xmlrpc\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun xsl -- %{name}-xsl < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xsl\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xsl\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun zlib -- %{name}-zlib < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*zlib\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*zlib\.so/d' %{_sysconfdir}/php.ini
 
 %if %{with apache1}
 %files -n apache1-mod_php
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
-%dir %{php_sysconfdir}/apache.d
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-apache.ini
+%dir %{_sysconfdir}/apache.d
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
 %attr(755,root,root) %{_libdir}/apache1/libphp5.so
 /home/services/apache/icons/*
 %endif
@@ -2252,8 +2250,8 @@ fi
 %files -n apache-mod_php
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/httpd.conf/*_mod_php.conf
-%dir %{php_sysconfdir}/apache2handler.d
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-apache2handler.ini
+%dir %{_sysconfdir}/apache2handler.d
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
 /home/services/httpd/icons/*
 %endif
@@ -2262,21 +2260,21 @@ fi
 %files fcgi
 %defattr(644,root,root,755)
 %doc sapi/cgi/README.FastCGI
-%dir %{php_sysconfdir}/cgi-fcgi.d
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-cgi-fcgi.ini
+%dir %{_sysconfdir}/cgi-fcgi.d
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 %attr(755,root,root) %{_bindir}/php.fcgi
 %endif
 
 %files cgi
 %defattr(644,root,root,755)
-%dir %{php_sysconfdir}/cgi.d
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-cgi.ini
+%dir %{_sysconfdir}/cgi.d
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi.ini
 %attr(755,root,root) %{_bindir}/php.cgi
 
 %files cli
 %defattr(644,root,root,755)
-%dir %{php_sysconfdir}/cli.d
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-cli.ini
+%dir %{_sysconfdir}/cli.d
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
 %attr(755,root,root) %{_bindir}/php.cli
 %{_mandir}/man1/php.1*
 %{_mandir}/man1/php.cli.1*
@@ -2292,10 +2290,10 @@ fi
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
 %doc README.PHP4-TO-PHP5-THIN-CHANGES README.UPDATE_5_2
 
-%dir %{php_sysconfdir}
-%dir %{php_sysconfdir}/conf.d
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php.ini
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/browscap.ini
+%dir %{_sysconfdir}
+%dir %{_sysconfdir}/conf.d
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/browscap.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
 
@@ -2317,50 +2315,50 @@ fi
 
 %files bcmath
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/bcmath.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/bcmath.ini
 %attr(755,root,root) %{php_extensiondir}/bcmath.so
 
 %files bzip2
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/bz2.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/bz2.ini
 %attr(755,root,root) %{php_extensiondir}/bz2.so
 
 %files calendar
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/calendar.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/calendar.ini
 %attr(755,root,root) %{php_extensiondir}/calendar.so
 
 %files ctype
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/ctype.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ctype.ini
 %attr(755,root,root) %{php_extensiondir}/ctype.so
 
 %if %{with curl}
 %files curl
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/curl.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/curl.ini
 %attr(755,root,root) %{php_extensiondir}/curl.so
 %endif
 
 %files dba
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/dba.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dba.ini
 %attr(755,root,root) %{php_extensiondir}/dba.so
 
 %files dbase
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/dbase.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dbase.ini
 %attr(755,root,root) %{php_extensiondir}/dbase.so
 
 %files dom
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/dom.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
 
 %if %{with fdf}
 %files fdf
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/fdf.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/fdf.ini
 %attr(755,root,root) %{php_extensiondir}/fdf.so
 %endif
 
@@ -2368,232 +2366,232 @@ fi
 %files filter
 %defattr(644,root,root,755)
 %doc README.input_filter
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/filter.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
 %attr(755,root,root) %{php_extensiondir}/filter.so
 %endif
 
 %files exif
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/exif.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
 %attr(755,root,root) %{php_extensiondir}/exif.so
 
 %files ftp
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/ftp.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ftp.ini
 %attr(755,root,root) %{php_extensiondir}/ftp.so
 
 %files gd
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/gd.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gd.ini
 %attr(755,root,root) %{php_extensiondir}/gd.so
 
 %files gettext
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/gettext.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gettext.ini
 %attr(755,root,root) %{php_extensiondir}/gettext.so
 
 %files gmp
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/gmp.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{php_extensiondir}/gmp.so
 
 %files hash
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/hash.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/hash.ini
 %attr(755,root,root) %{php_extensiondir}/hash.so
 
 %files iconv
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/iconv.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/iconv.ini
 %attr(755,root,root) %{php_extensiondir}/iconv.so
 
 %if %{with imap}
 %files imap
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/imap.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/imap.ini
 %attr(755,root,root) %{php_extensiondir}/imap.so
 %endif
 
 %if %{with interbase}
 %files interbase
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/interbase.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/interbase.ini
 %attr(755,root,root) %{php_extensiondir}/interbase.so
 %endif
 
 %files json
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/json.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/json.ini
 %attr(755,root,root) %{php_extensiondir}/json.so
 
 %if %{with ldap}
 %files ldap
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/ldap.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ldap.ini
 %attr(755,root,root) %{php_extensiondir}/ldap.so
 %endif
 
 %files mbstring
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/mbstring.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{php_extensiondir}/mbstring.so
 
 %files mcrypt
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/mcrypt.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mcrypt.ini
 %attr(755,root,root) %{php_extensiondir}/mcrypt.so
 
 %if %{with mhash}
 %files mhash
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/mhash.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mhash.ini
 %attr(755,root,root) %{php_extensiondir}/mhash.so
 %endif
 
 %if %{with mime_magic}
 %files mime_magic
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/mime_magic.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mime_magic.ini
 %attr(755,root,root) %{php_extensiondir}/mime_magic.so
 %endif
 
 %if %{with ming}
 %files ming
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/ming.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ming.ini
 %attr(755,root,root) %{php_extensiondir}/ming.so
 %endif
 
 %if %{with mssql}
 %files mssql
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/mssql.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mssql.ini
 %attr(755,root,root) %{php_extensiondir}/mssql.so
 %endif
 
 %files mysql
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/mysql.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysql.ini
 %attr(755,root,root) %{php_extensiondir}/mysql.so
 
 %if %{with mysqli}
 %files mysqli
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/mysqli.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysqli.ini
 %attr(755,root,root) %{php_extensiondir}/mysqli.so
 %endif
 
 %files ncurses
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/cli.d/ncurses.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/ncurses.ini
 %attr(755,root,root) %{php_extensiondir}/ncurses.so
 
 %if %{with oci8}
 %files oci8
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/oci8.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/oci8.ini
 %attr(755,root,root) %{php_extensiondir}/oci8.so
 %endif
 
 %if %{with odbc}
 %files odbc
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/odbc.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/odbc.ini
 %attr(755,root,root) %{php_extensiondir}/odbc.so
 %endif
 
 %if %{with openssl}
 %files openssl
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/openssl.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/openssl.ini
 %attr(755,root,root) %{php_extensiondir}/openssl.so
 %endif
 
 %files pcntl
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/cli.d/pcntl.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
 
 %files pdo
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pdo.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
 %attr(755,root,root) %{php_extensiondir}/pdo.so
 
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 %files pdo-dblib
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pdo_dblib.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_dblib.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_dblib.so
 %endif
 
 %if %{with interbase} && !%{with interbase_inst}
 %files pdo-firebird
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pdo_firebird.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_firebird.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_firebird.so
 %endif
 
 %files pdo-mysql
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pdo_mysql.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_mysql.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_mysql.so
 
 %if %{with oci8}
 %files pdo-oci
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pdo_oci.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_oci.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_oci.so
 %endif
 
 %if %{with odbc}
 %files pdo-odbc
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pdo_odbc.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_odbc.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_odbc.so
 %endif
 
 %if %{with pgsql}
 %files pdo-pgsql
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pdo_pgsql.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_pgsql.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_pgsql.so
 %endif
 
 %if %{with sqlite}
 %files pdo-sqlite
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pdo_sqlite.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_sqlite.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_sqlite.so
 %endif
 
 %if %{with pgsql}
 %files pgsql
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pgsql.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pgsql.ini
 %attr(755,root,root) %{php_extensiondir}/pgsql.so
 %endif
 
 %files posix
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/posix.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/posix.ini
 %attr(755,root,root) %{php_extensiondir}/posix.so
 
 %if %{with pspell}
 %files pspell
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/pspell.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pspell.ini
 %attr(755,root,root) %{php_extensiondir}/pspell.so
 %endif
 
 %files readline
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/cli.d/readline.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/readline.ini
 %attr(755,root,root) %{php_extensiondir}/readline.so
 
 %if %{with recode}
 %files recode
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/recode.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/recode.ini
 %attr(755,root,root) %{php_extensiondir}/recode.so
 %endif
 
@@ -2603,120 +2601,120 @@ fi
 # we could add R: -simplexml to -common...
 %files simplexml
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/simplexml.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
 %endif
 
 %files shmop
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/shmop.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/shmop.ini
 %attr(755,root,root) %{php_extensiondir}/shmop.so
 
 %if %{with snmp}
 %files snmp
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/snmp.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/snmp.ini
 %attr(755,root,root) %{php_extensiondir}/snmp.so
 %endif
 
 %files soap
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/soap.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/soap.ini
 %attr(755,root,root) %{php_extensiondir}/soap.so
 
 %files sockets
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/sockets.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sockets.ini
 %attr(755,root,root) %{php_extensiondir}/sockets.so
 
 %if %{with sqlite}
 %files sqlite
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/sqlite.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sqlite.ini
 %attr(755,root,root) %{php_extensiondir}/sqlite.so
 %endif
 
 %if %{with sybase}
 %files sybase
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/sybase.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sybase.ini
 %attr(755,root,root) %{php_extensiondir}/sybase.so
 %endif
 
 %if %{with sybase_ct}
 %files sybase-ct
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/sybase_ct.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sybase_ct.ini
 %attr(755,root,root) %{php_extensiondir}/sybase_ct.so
 %endif
 
 %files sysvmsg
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/sysvmsg.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sysvmsg.ini
 %attr(755,root,root) %{php_extensiondir}/sysvmsg.so
 
 %files sysvsem
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/sysvsem.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sysvsem.ini
 %attr(755,root,root) %{php_extensiondir}/sysvsem.so
 
 %files sysvshm
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/sysvshm.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sysvshm.ini
 %attr(755,root,root) %{php_extensiondir}/sysvshm.so
 
 %if %{with tidy}
 %files tidy
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/tidy.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tidy.ini
 %attr(755,root,root) %{php_extensiondir}/tidy.so
 %endif
 
 %files tokenizer
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/tokenizer.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tokenizer.ini
 %attr(755,root,root) %{php_extensiondir}/tokenizer.so
 
 %if %{with wddx}
 %files wddx
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/*wddx.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*wddx.ini
 %attr(755,root,root) %{php_extensiondir}/wddx.so
 %endif
 
 %files xml
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/xml.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xml.ini
 %attr(755,root,root) %{php_extensiondir}/xml.so
 
 %files xmlreader
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/xmlreader.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlreader.ini
 %attr(755,root,root) %{php_extensiondir}/xmlreader.so
 
 %if %{with xmlrpc}
 %files xmlrpc
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/xmlrpc.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlrpc.ini
 %attr(755,root,root) %{php_extensiondir}/xmlrpc.so
 %endif
 
 %files xmlwriter
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/xmlwriter.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlwriter.ini
 %attr(755,root,root) %{php_extensiondir}/xmlwriter.so
 
 %files xsl
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/xsl.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xsl.ini
 %attr(755,root,root) %{php_extensiondir}/xsl.so
 
 %files zip
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/zip.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zip.ini
 %attr(755,root,root) %{php_extensiondir}/zip.so
 
 %files zlib
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/zlib.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zlib.ini
 %attr(755,root,root) %{php_extensiondir}/zlib.so

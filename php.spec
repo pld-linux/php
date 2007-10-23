@@ -73,7 +73,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel	0.1
+%define	_rel	0.2
 %define	_snap	200710222030
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -110,7 +110,6 @@ Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
-#Patch11:	%{name}-acam.patch
 # XXX: needs fix
 Patch12:	%{name}-threads-acfix.patch
 Patch13:	%{name}-tsrmlsfetchgcc2.patch
@@ -1570,10 +1569,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 cp php.ini-dist php.ini
 %patch10 -p1
-# for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
-# conditionally...
-#%patch11 -p1 # CHECKME
-#%patch12 -p1 # breaks with ac cache vars, but later -lpthread is missing ...
+%patch12 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
@@ -1591,7 +1587,6 @@ patch -p1 < %{PATCH22} || exit 1
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
-
 %{?with_versioning:%patch26 -p1}
 
 %patch28 -p1
@@ -1806,7 +1801,7 @@ done
 %{__make} build-modules
 
 %if %{with apache1}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1 LDFLAGS="-lpthread"
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
 %endif
 
 %if %{with apache2}
@@ -1816,18 +1811,18 @@ done
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
-%{__make} sapi/cgi/php-cgi -f Makefile.fcgi LDFLAGS="-lpthread"
+%{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
-%{__make} sapi/cgi/php-cgi -f Makefile.cgi LDFLAGS="-lpthread"
+%{__make} sapi/cgi/php-cgi -f Makefile.cgi
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
-%{__make} sapi/cli/php -f Makefile.cli LDFLAGS="-lpthread"
+%{__make} sapi/cli/php -f Makefile.cli
 
 %if %{with tests}
 # Run tests, using the CLI SAPI

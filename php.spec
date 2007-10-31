@@ -12,6 +12,7 @@
 # - make additional headers and checking added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
+# - XXX php-fcgi thinks it is cgi api!!!!! XXXX
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -71,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		_rel 0.1
+%define		_rel 0.2
 %define		_rc RC1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -1572,7 +1573,7 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
-#%patch12 -p1 # breaks with ac cache vars, but later -lpthread is missing ...
+%patch12 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
@@ -1654,30 +1655,32 @@ apxs2
 %endif
 "
 for sapi in $sapis; do
+	: SAPI $sapi
 	[ -f Makefile.$sapi ] && continue # skip if already configured (for faster debugging purposes)
 
-	%configure \
-	`
+	sapi_args=''
 	case $sapi in
 	cgi)
-		echo --enable-discard-path --enable-force-cgi-redirect
-	;;
+		sapi_args='--enable-discard-path --enable-force-cgi-redirect'
+		;;
 	cli)
-		echo --disable-cgi
-	;;
+		sapi_args='--disable-cgi'
+		;;
 	fcgi)
-		echo --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect
-	;;
+		sapi_args='--enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
+		;;
 	apxs1)
-		ver=%(rpm -q --qf '%%{version}' apache1-apxs)
-		echo --with-apxs=%{apxs1} --with-apache-version=$ver
-	;;
+		ver=$(rpm -q --qf '%{V}' apache1-devel)
+		sapi_args="--with-apxs=%{apxs1} --with-apache-version=$ver"
+		;;
 	apxs2)
-		ver=%(rpm -q --qf '%%{version}' apache-apxs)
-		echo --with-apxs2=%{apxs2} --with-apache-version=$ver
-	;;
+		ver=$(rpm -q --qf '%{V}' apache-devel)
+		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
+		;;
 	esac
-	` \
+
+	%configure \
+	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"
 	--cache-file=config.cache \
 %endif
@@ -1805,7 +1808,7 @@ done
 %{__make} build-modules
 
 %if %{with apache1}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1 LDFLAGS="-lpthread"
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
 %endif
 
 %if %{with apache2}
@@ -1815,18 +1818,18 @@ done
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
-%{__make} sapi/cgi/php-cgi -f Makefile.fcgi LDFLAGS="-lpthread"
+%{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
-%{__make} sapi/cgi/php-cgi -f Makefile.cgi LDFLAGS="-lpthread"
+%{__make} sapi/cgi/php-cgi -f Makefile.cgi
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
-%{__make} sapi/cli/php -f Makefile.cli LDFLAGS="-lpthread"
+%{__make} sapi/cli/php -f Makefile.cli
 
 %if %{with tests}
 # Run tests, using the CLI SAPI

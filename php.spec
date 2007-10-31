@@ -12,7 +12,6 @@
 # - make additional headers and checking added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
-# - XXX php-fcgi thinks it is cgi api!!!!! XXXX
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -1818,13 +1817,14 @@ done
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
+rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
-rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
+rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
 
 # CLI

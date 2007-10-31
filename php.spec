@@ -71,7 +71,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		_rel 0.2
+%define		_rel 0.3
 %define		_rc RC1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -1820,16 +1820,19 @@ cp -af php_config.h.fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -q)" = cgi-fcgi ] || exit 1
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -q)" = cgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -q)" = cli ] || exit 1
 
 %if %{with tests}
 # Run tests, using the CLI SAPI

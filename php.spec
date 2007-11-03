@@ -171,7 +171,7 @@ BuildRequires:	libxslt-devel >= 1.1.0
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
 BuildRequires:	ncurses-ext-devel
-%{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
+%{?with_ldap:BuildRequires:	openldap-devel >= 2.4.6}
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif

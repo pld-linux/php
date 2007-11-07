@@ -1,3 +1,9 @@
+Related links:
+
+http://bugs.php.net/bug.php?id=41593
+http://bugs.php.net/bug.php?id=36158
+http://php-fpm.anight.org/
+
 --- php5.3-200711071330/sapi/cgi/cgi_main.c	2007-11-01 13:32:38.000000000 +0200
 +++ php5.3-200711071330-graceful2/sapi/cgi/cgi_main.c	2007-11-07 22:12:10.025949153 +0200
 @@ -101,6 +101,9 @@

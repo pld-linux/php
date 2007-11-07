@@ -71,8 +71,8 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		_rel 0.4
-%define		_rc RC1
+%define		_rel 0.2
+%define		_rc RC2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -87,7 +87,7 @@ License:	PHP
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 Source0:	http://downloads.php.net/ilia/%{name}-%{version}%{_rc}.tar.bz2
-# Source0-md5:	2f0c9ecbd50213958e9b69ec69f715ec
+# Source0-md5:	deb66ac45b18ced1077365b0e0179995
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -171,7 +171,7 @@ BuildRequires:	libxslt-devel >= 1.1.0
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
 BuildRequires:	ncurses-ext-devel
-%{?with_ldap:BuildRequires:	openldap-devel >= 2.4.6}
+%{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
@@ -1820,19 +1820,19 @@ cp -af php_config.h.fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -q)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -q)" = cgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -q)" = cli ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
 
 %if %{with tests}
 # Run tests, using the CLI SAPI

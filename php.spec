@@ -72,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define	_rel	0.3
-%define	_snap	200710231630
+%define	_snap	200711071330
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -86,7 +86,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	7ed946f72b3b27aadfec579b1addcfaa
+# Source0-md5:	249fadb1cfeb0ec9afc2c24cb44d77f5
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -1648,30 +1648,32 @@ apxs2
 %endif
 "
 for sapi in $sapis; do
+	: SAPI $sapi
 	[ -f Makefile.$sapi ] && continue # skip if already configured (for faster debugging purposes)
 
-	%configure \
-	`
+	sapi_args=''
 	case $sapi in
 	cgi)
-		echo --enable-discard-path --enable-force-cgi-redirect
+		sapi_args='--enable-discard-path --enable-force-cgi-redirect'
 	;;
 	cli)
-		echo --disable-cgi
+		sapi_args='--disable-cgi'
 	;;
 	fcgi)
-		echo --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect
+		sapi_args='--enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
 	;;
 	apxs1)
-		ver=%(rpm -q --qf '%%{version}' apache1-apxs)
-		echo --with-apxs=%{apxs1} --with-apache-version=$ver
+		ver=$(rpm -q --qf '%{V}' apache1-devel)
+		sapi_args="--with-apxs=%{apxs1} --with-apache-version=$ver"
 	;;
 	apxs2)
-		ver=%(rpm -q --qf '%%{version}' apache-apxs)
-		echo --with-apxs2=%{apxs2} --with-apache-version=$ver
+		ver=$(rpm -q --qf '%{V}' apache-devel)
+		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	esac
-	` \
+
+	%configure \
+	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"
 	--cache-file=config.cache \
 %endif
@@ -1809,18 +1811,22 @@ done
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
+rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
-rm -rf sapi/cgi/.libs sapi/cgi/*.lo
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -q)" = cgi-fcgi ] || exit 1
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
+rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -q)" = cgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -q)" = cli ] || exit 1
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
@@ -2259,7 +2265,7 @@ fi
 %if %{with fcgi}
 %files fcgi
 %defattr(644,root,root,755)
-%doc sapi/cgi/README.FastCGI
+%doc sapi/cgi/README.FastCGI sapi/cgi/CHANGES
 %dir %{_sysconfdir}/cgi-fcgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 %attr(755,root,root) %{_bindir}/php.fcgi
@@ -2289,6 +2295,7 @@ fi
 %doc CREDITS Zend/ZEND_CHANGES
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
 %doc README.PHP4-TO-PHP5-THIN-CHANGES README.UPDATE_5_2
+%doc README.namespaces
 
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d

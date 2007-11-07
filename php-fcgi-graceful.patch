@@ -1,0 +1,82 @@
+--- php5.3-200711071330/sapi/cgi/cgi_main.c	2007-11-01 13:32:38.000000000 +0200
++++ php5.3-200711071330-graceful/sapi/cgi/cgi_main.c	2007-11-07 17:40:37.884171760 +0200
+@@ -101,6 +101,9 @@
+  */
+ static int parent = 1;
+ 
++/* Socket we are listening on incoming connections */
++static int fcgi_fd = -1;
++
+ /**
+  * Process group
+  */
+@@ -116,6 +119,7 @@
+ static char *php_optarg = NULL;
+ static int php_optind = 1;
+ static zend_module_entry cgi_module_entry;
++static int accept_socket = -1;
+ 
+ static const opt_struct OPTIONS[] = {
+ 	{'a', 0, "interactive"},
+@@ -1211,16 +1215,38 @@
+ #endif
+ 
+ #ifndef PHP_WIN32
+-	sigaction(SIGTERM, &old_term, 0);
+-
+ 	/* Kill all the processes in our process group */
+-	kill(-pgroup, SIGTERM);
++	if (signal == SIGINT) {
++		sigaction(SIGTERM, &old_int, 0);
++		kill(-pgroup, SIGINT);
++	} else {
++		sigaction(SIGTERM, &old_term, 0);
++		kill(-pgroup, SIGTERM);
++	}
+ #endif
+ 
+ 	/* We should exit at this point, but MacOSX doesn't seem to */
+ 	exit(0);
+ }
+ 
++/**
++ * Graceful shutdown. Close listening sockets.
++ */
++void fastcgi_graceful_shutdown(int signal)
++{
++#ifdef DEBUG_FASTCGI
++	fprintf(stderr, "FastCGI graceful shutdown, pid %d\n", getpid());
++#endif
++
++	/* This will make FCGI shutdown itself later in the loop, however we should finish our request cleanly */
++	fcgi_shutdown();
++
++	/* Whoever we also close the listeing socket (which PHP itself doesn't seem to do?!) */
++	closesocket(fcgi_fd);
++	fcgi_fd = -1;
++}
++
++
+ PHP_INI_BEGIN()
+ 	STD_PHP_INI_ENTRY("cgi.rfc2616_headers",     "0",  PHP_INI_ALL,    OnUpdateBool,   rfc2616_headers, php_cgi_globals_struct, php_cgi_globals)
+ 	STD_PHP_INI_ENTRY("cgi.nph",                 "0",  PHP_INI_ALL,    OnUpdateBool,   nph, php_cgi_globals_struct, php_cgi_globals)
+@@ -1328,7 +1354,6 @@
+ 	int requests = 0;
+ 	int fastcgi = fcgi_is_fastcgi();
+ 	char *bindpath = NULL;
+-	int fcgi_fd = 0;
+ 	fcgi_request request;
+ 	int repeats = 1;
+ 	int benchmark = 0;
+@@ -1581,7 +1606,10 @@
+ 					/* don't catch our signals */
+ 					sigaction(SIGTERM, &old_term, 0);
+ 					sigaction(SIGQUIT, &old_quit, 0);
+-					sigaction(SIGINT,  &old_int,  0);
++					/* handler for SIGINT */
++					act.sa_flags = 0;
++					act.sa_handler = fastcgi_graceful_shutdown;
++					sigaction(SIGINT, &act, &old_int);
+ 					break;
+ 				case -1:
+ 					perror("php (pre-forking)");

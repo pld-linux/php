@@ -12,6 +12,7 @@
 # - make additional headers and checking added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
+# - sapi/cgi has fastcgi always built in, ie -fcgi and -cgi packages are the same
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -71,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel	0.3
+%define	_rel	0.13
 %define	_snap	200711071330
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -128,6 +129,7 @@ Patch27:	%{name}-linkflags-clean.patch
 Patch28:	%{name}-pear.patch
 Patch29:	%{name}-config-dir.patch
 Patch30:	%{name}-bug-42952.patch
+Patch31:	%{name}-fcgi-graceful.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1590,6 +1592,7 @@ patch -p1 < %{PATCH22} || exit 1
 %patch28 -p1
 %patch29 -p1
 %patch30 -p1
+%patch31 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1634,6 +1637,7 @@ if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 	touch _built-conf
 fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
+export CPPFLAGS=-DDEBUG_FASTCGI
 
 sapis="
 %if %{with fcgi}
@@ -1821,7 +1825,7 @@ cp -r sapi/cgi sapi/fcgi
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -q)" = cgi ] || exit 1
+#[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -q)" = cgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h

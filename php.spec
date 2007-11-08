@@ -46,7 +46,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
-%bcond_with	tests	# perform "make test"
+%bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
 %define apxs1		/usr/sbin/apxs1
@@ -70,7 +70,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 4
+%define	_rel 5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr):	Le langage de script embarque-HTML PHP
 Summary(pl):	Jêzyk skryptowy PHP
@@ -128,6 +128,7 @@ Patch38:	%{name}-fcgi-error_log-no-newlines.patch
 Patch39:	%{name}-pear.patch
 Patch40:	%{name}-config-dir.patch
 Patch41:	%{name}-bug-42952.patch
+Patch42:	%{name}-fcgi-graceful.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1593,6 +1594,7 @@ patch -p1 < %{PATCH30} || exit 1
 %patch39 -p1
 %patch40 -p1
 %patch41 -p1
+%patch42 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1619,19 +1621,24 @@ rm -rf ext/pdo_sqlite/sqlite
 mv ext/standard/tests/general_functions/bug39322.phpt{,.broken}
 %endif
 
+cp -f Zend/LICENSE{,.Zend}
+
 %build
-if API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h) && [ $API != %{php_api_version} ]; then
-	echo "Set %%define php_api_version to $API and rerun."
+API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
+if [ $API != %{php_api_version} ]; then
+	echo "Set %%define php_api_version to $API and re-run."
 	exit 1
 fi
 
-if API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h) && [ $API != %{zend_module_api} ]; then
-	echo "Set %%define zend_module_api to $API and rerun."
+API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h)
+if [ $API != %{zend_module_api} ]; then
+	echo "Set %%define zend_module_api to $API and re-run."
 	exit 1
 fi
 
-if API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h) && [ $API != %{zend_extension_api} ]; then
-	echo "Set %%define zend_extension_api to $API and rerun."
+API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h)
+if [ $API != %{zend_extension_api} ]; then
+	echo "Set %%define zend_extension_api to $API and re-run."
 	exit 1
 fi
 
@@ -1658,30 +1665,32 @@ apxs2
 %endif
 "
 for sapi in $sapis; do
+	: SAPI $sapi
 	[ -f Makefile.$sapi ] && continue # skip if already configured (for faster debugging purposes)
 
-	%configure \
-	`
+	sapi_args=''
 	case $sapi in
 	cgi)
-		echo --enable-discard-path --enable-force-cgi-redirect
-	;;
+		sapi_args='--enable-discard-path --enable-force-cgi-redirect'
+		;;
 	cli)
-		echo --disable-cgi
-	;;
+		sapi_args='--disable-cgi'
+		;;
 	fcgi)
-		echo --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect
-	;;
+		sapi_args='--enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
+		;;
 	apxs1)
-		ver=%(rpm -q --qf '%%{version}' apache1-apxs)
-		echo --with-apxs=%{apxs1} --with-apache-version=$ver
-	;;
+		ver=$(rpm -q --qf '%{V}' apache1-devel)
+		sapi_args="--with-apxs=%{apxs1} --with-apache-version=$ver"
+		;;
 	apxs2)
-		ver=%(rpm -q --qf '%%{version}' apache-apxs)
-		echo --with-apxs2=%{apxs2} --with-apache-version=$ver
-	;;
+		ver=$(rpm -q --qf '%{V}' apache-devel)
+		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
+		;;
 	esac
-	` \
+
+	%configure \
+	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"
 	--cache-file=config.cache \
 %endif
@@ -1813,24 +1822,28 @@ done
 %endif
 
 %if %{with apache2}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2 LDFLAGS=-lpthread
 %endif
 
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
+rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi LDFLAGS=-lpthread
 cp -r sapi/cgi sapi/fcgi
-rm -rf sapi/cgi/.libs sapi/cgi/*.lo
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
+rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi LDFLAGS=-lpthread
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli LDFLAGS=-lpthread
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
@@ -1845,7 +1858,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{php_sysconfdir}/{apache,cgi}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
-	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf} \
+	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
 # install the apache modules' files
@@ -1900,25 +1913,27 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 
 %if %{with apache2}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
-cp -f Zend/LICENSE{,.Zend}
-
 # Generate stub .ini files for each subpackage
 install -d $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d
-for so in modules/*.so; do
-	mod=$(basename $so .so)
-	conf="%{php_sysconfdir}/conf.d/${mod}.ini"
-	# xml needs to be loaded before wddx
-	[ "$mod" = "wddx" ] && conf="%{php_sysconfdir}/conf.d/xml_${mod}.ini"
-	cat > $RPM_BUILD_ROOT${conf} <<EOF
-; Enable ${mod} extension module
-extension=${mod}.so
-EOF
-done
+generate_inifiles() {
+	for so in modules/*.so; do
+		mod=$(basename $so .so)
+		conf="%{php_sysconfdir}/conf.d/$mod.ini"
+		# xml needs to be loaded before wddx
+		[ "$mod" = "wddx" ] && conf="%{php_sysconfdir}/conf.d/xml_$mod.ini"
+		echo "+ $conf"
+		cat > $RPM_BUILD_ROOT$conf <<-EOF
+			; Enable $mod extension module
+			extension=$mod.so
+		EOF
+	done
+}
+generate_inifiles
 
 # per SAPI ini directories
 install -d $RPM_BUILD_ROOT%{php_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
@@ -1978,7 +1993,7 @@ fi
 
 # restart webserver at the end of transaction
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
-[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
+[ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
 
 %if %{with apache1}
 %triggerpostun -n apache1-mod_php -- php < 4:5.0.4-9.11
@@ -2259,7 +2274,7 @@ fi
 %if %{with apache2}
 %files -n apache-mod_php
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/httpd.conf/*_mod_php.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{php_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so

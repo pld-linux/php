@@ -71,7 +71,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		_rel 0.2
+%define		_rel 0.4
 %define		_rc RC2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -130,6 +130,7 @@ Patch27:	%{name}-linkflags-clean.patch
 Patch28:	%{name}-pear.patch
 Patch29:	%{name}-config-dir.patch
 Patch30:	%{name}-bug-42952.patch
+Patch31:	%{name}-fcgi-graceful.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1596,6 +1597,7 @@ patch -p1 < %{PATCH22} || exit 1
 %patch28 -p1
 %patch29 -p1
 %patch30 -p1
+%patch31 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1615,19 +1617,24 @@ rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
 rm -rf ext/xmlrpc/libxmlrpc
 
+cp -f Zend/LICENSE{,.Zend}
+
 %build
-if API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h) && [ $API != %{php_api_version} ]; then
-	echo "Set %%define php_api_version to $API and rerun."
+API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
+if [ $API != %{php_api_version} ]; then
+	echo "Set %%define php_api_version to $API and re-run."
 	exit 1
 fi
 
-if API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h) && [ $API != %{zend_module_api} ]; then
-	echo "Set %%define zend_module_api to $API and rerun."
+API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h)
+if [ $API != %{zend_module_api} ]; then
+	echo "Set %%define zend_module_api to $API and re-run."
 	exit 1
 fi
 
-if API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h) && [ $API != %{zend_extension_api} ]; then
-	echo "Set %%define zend_extension_api to $API and rerun."
+API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h)
+if [ $API != %{zend_extension_api} ]; then
+	echo "Set %%define zend_extension_api to $API and re-run."
 	exit 1
 fi
 
@@ -1847,7 +1854,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{php_sysconfdir}/{apache,cgi}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
-	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf} \
+	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
 # install the apache modules' files
@@ -1902,25 +1909,27 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 
 %if %{with apache2}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
-cp -f Zend/LICENSE{,.Zend}
-
 # Generate stub .ini files for each subpackage
 install -d $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d
-for so in modules/*.so; do
-	mod=$(basename $so .so)
-	conf="%{php_sysconfdir}/conf.d/${mod}.ini"
-	# xml needs to be loaded before wddx
-	[ "$mod" = "wddx" ] && conf="%{php_sysconfdir}/conf.d/xml_${mod}.ini"
-	cat > $RPM_BUILD_ROOT${conf} <<EOF
-; Enable ${mod} extension module
-extension=${mod}.so
-EOF
-done
+generate_inifiles() {
+	for so in modules/*.so; do
+		mod=$(basename $so .so)
+		conf="%{php_sysconfdir}/conf.d/$mod.ini"
+		# xml needs to be loaded before wddx
+		[ "$mod" = "wddx" ] && conf="%{php_sysconfdir}/conf.d/xml_$mod.ini"
+		echo "+ $conf"
+		cat > $RPM_BUILD_ROOT$conf <<-EOF
+			; Enable $mod extension module
+			extension=$mod.so
+		EOF
+	done
+}
+generate_inifiles
 
 # per SAPI ini directories
 install -d $RPM_BUILD_ROOT%{php_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
@@ -1980,7 +1989,7 @@ fi
 
 # restart webserver at the end of transaction
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
-[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
+[ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
 
 %if %{with apache1}
 %triggerpostun -n apache1-mod_php -- php < 4:5.0.4-9.11
@@ -2261,7 +2270,7 @@ fi
 %if %{with apache2}
 %files -n apache-mod_php
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/httpd.conf/*_mod_php.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{php_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so

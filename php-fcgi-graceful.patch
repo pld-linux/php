@@ -1,5 +1,7 @@
 Related links:
 
+http://bugs.php.net/bug.php?id=43224 this patch
+
 http://bugs.php.net/bug.php?id=41593
 http://bugs.php.net/bug.php?id=36158
 http://php-fpm.anight.org/
@@ -16,8 +18,8 @@ while ($i < 35) {
 echo "end!<br>\n";
 ?>
 
---- php5.3-200711071330/sapi/cgi/cgi_main.c	2007-11-01 13:32:38.000000000 +0200
-+++ php5.3-200711071330-graceful2/sapi/cgi/cgi_main.c	2007-11-07 22:12:10.025949153 +0200
+--- php5.3-200711090930/sapi/cgi/cgi_main.c	2007-11-01 13:32:38.000000000 +0200
++++ php5.3-200711090930-graceful/sapi/cgi/cgi_main.c	2007-11-09 13:34:22.974559020 +0200
 @@ -101,6 +101,9 @@
   */
  static int parent = 1;
@@ -63,10 +65,8 @@ echo "end!<br>\n";
  
  					/* don't catch our signals */
 -					sigaction(SIGTERM, &old_term, 0);
--					sigaction(SIGQUIT, &old_quit, 0);
--					sigaction(SIGINT,  &old_int,  0);
-+					sigaction(SIGQUIT, &act, &old_quit);
-+					sigaction(SIGINT, &act, &old_int);
+ 					sigaction(SIGQUIT, &old_quit, 0);
+ 					sigaction(SIGINT,  &old_int,  0);
 +
 +					/* call graceful shutdown handler for SIGTERM */
 +					act.sa_flags = 0;

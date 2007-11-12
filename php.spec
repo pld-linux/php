@@ -90,7 +90,7 @@ Source1:	zend.gif
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-cgi.ini
-Source6:	%{name}-apache.ini
+Source5:	%{name}-apache.ini
 Source6:	%{name}-cli.ini
 Source7:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
 # Source7-md5:	47a742fa9fab2826ad10c13a2376111a

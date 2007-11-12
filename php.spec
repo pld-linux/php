@@ -46,6 +46,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
+%bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
@@ -128,6 +129,8 @@ Patch28:	%{name}-pear.patch
 Patch29:	%{name}-config-dir.patch
 Patch30:	%{name}-bug-42952.patch
 Patch31:	%{name}-fcgi-graceful.patch
+Patch32:	%{name}-apr-apu.patch
+Patch33:	%{name}-fcgi-error_log-no-newlines.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -141,6 +144,7 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %if %{with xmlrpc}
 BuildRequires:	expat-devel
+%{?with_system_xmlrpc_epi:BuildRequires:    xmlrpc-epi-devel}
 %endif
 %{?with_fcgi:BuildRequires:	fcgi-devel}
 %{?with_fdf:BuildRequires:	fdftk-devel}
@@ -187,7 +191,6 @@ BuildRequires:	rpmbuild(macros) >= 1.238
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
-%{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel}
 BuildRequires:	zlib-devel >= 1.0.9
 %if %{with apache1}
 BuildRequires:	apache1-devel
@@ -1596,6 +1599,8 @@ patch -p1 < %{PATCH22} || exit 1
 %patch29 -p1
 %patch30 -p1
 %patch31 -p1
+%patch32 -p1
+%patch33 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1613,7 +1618,9 @@ rm -f ext/recode/config9.m4
 rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
+%if %{without system_xmlrpc_epi}
 rm -rf ext/xmlrpc/libxmlrpc
+%endif
 
 %ifarch ppc ppc64
 # this test hungs on ac-ppc
@@ -1804,7 +1811,7 @@ for sapi in $sapis; do
 	%{?with_tidy:--with-tidy=shared} \
 	--with-tiff-dir=/usr \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
-	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
+	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared%{?with_system_xmlrpc_epi:,/usr}} \
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \

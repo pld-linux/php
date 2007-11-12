@@ -46,7 +46,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
-%bcond_with	tests		# default off; test process very often hangs on buildersl; perform "make test"
+%bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
 %define apxs1		/usr/sbin/apxs1
@@ -57,8 +57,7 @@
 %undefine	with_mm
 %endif
 
-%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha
-# ppc disabled (broken on th-ppc)
+%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha ppc
 %undefine	with_interbase
 %endif
 
@@ -71,8 +70,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		_rel 0.2
-%define		_rc RC2
+%define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -85,9 +83,8 @@ Release:	%{_rel}%{?_rc:.%{_rc}}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-#Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://downloads.php.net/ilia/%{name}-%{version}%{_rc}.tar.bz2
-# Source0-md5:	deb66ac45b18ced1077365b0e0179995
+Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+# Source0-md5:	1fe14ca892460b09f06729941a1bb605
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -110,26 +107,28 @@ Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
-# XXX: needs fix
-Patch12:	%{name}-threads-acfix.patch
-Patch13:	%{name}-tsrmlsfetchgcc2.patch
-Patch14:	%{name}-no_pear_install.patch
-Patch15:	%{name}-zlib.patch
-Patch16:	%{name}-sybase-fix.patch
-Patch17:	%{name}-readline.patch
-Patch18:	%{name}-nohttpd.patch
-Patch19:	%{name}-gd_imagerotate_enable.patch
-Patch20:	%{name}-uint32_t.patch
-Patch21:	%{name}-dba-link.patch
-Patch22:	%{name}-hardening-fix.patch
-Patch23:	%{name}-both-apxs.patch
-Patch24:	%{name}-builddir.patch
-Patch25:	%{name}-zlib-for-getimagesize.patch
-Patch26:	%{name}-versioning.patch
-Patch27:	%{name}-linkflags-clean.patch
-Patch28:	%{name}-pear.patch
-Patch29:	%{name}-config-dir.patch
-Patch30:	%{name}-bug-42952.patch
+Patch15:	%{name}-threads-acfix.patch
+Patch16:	%{name}-tsrmlsfetchgcc2.patch
+Patch17:	%{name}-no_pear_install.patch
+Patch18:	%{name}-zlib.patch
+Patch19:	%{name}-sybase-fix.patch
+Patch20:	%{name}-readline.patch
+Patch21:	%{name}-nohttpd.patch
+Patch23:	%{name}-gd_imagerotate_enable.patch
+Patch24:	%{name}-uint32_t.patch
+Patch26:	%{name}-dba-link.patch
+Patch30:	%{name}-hardening-fix.patch
+Patch31:	%{name}-both-apxs.patch
+Patch32:	%{name}-builddir.patch
+Patch33:	%{name}-zlib-for-getimagesize.patch
+Patch35:	%{name}-versioning.patch
+Patch36:	%{name}-linkflags-clean.patch
+Patch37:	%{name}-apr-apu.patch
+Patch38:	%{name}-fcgi-error_log-no-newlines.patch
+Patch39:	%{name}-pear.patch
+Patch40:	%{name}-config-dir.patch
+Patch41:	%{name}-bug-42952.patch
+Patch42:	%{name}-fcgi-graceful.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -141,9 +140,7 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
-%if %{with xmlrpc}
-BuildRequires:	expat-devel
-%endif
+%{?with_xmlrpc:BuildRequires:	expat-devel}
 %{?with_fcgi:BuildRequires:	fcgi-devel}
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
@@ -189,7 +186,6 @@ BuildRequires:	rpmbuild(macros) >= 1.238
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
-%{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel}
 BuildRequires:	zlib-devel >= 1.0.9
 %if %{with apache1}
 BuildRequires:	apache1-devel
@@ -841,7 +837,6 @@ Summary:	ming extension module for PHP
 Summary(pl.UTF-8):	Moduł ming dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	ming >= 0.3
 Provides:	php(ming)
 
 %description ming
@@ -1475,6 +1470,7 @@ Summary:	xmlrpc extension module for PHP
 Summary(pl.UTF-8):	Moduł xmlrpc dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(xmlrpc)
 
 %description xmlrpc
@@ -1554,8 +1550,8 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{version}%{_rc}
-%patch27 -p1
+%setup -q
+%patch36 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1572,9 +1568,6 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
@@ -1582,20 +1575,26 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch23 -p1
+%patch24 -p1
+%patch26 -p1
 
 %if %{with hardening}
 zcat %{SOURCE8} | patch -p1 || exit 1
-patch -p1 < %{PATCH22} || exit 1
+patch -p1 < %{PATCH30} || exit 1
 %endif
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
+%patch31 -p1
+%patch32 -p1
+%patch33 -p1
 
-%{?with_versioning:%patch26 -p1}
+%{?with_versioning:%patch35 -p1}
 
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
+%patch37 -p1
+%patch38 -p1
+%patch39 -p1
+%patch40 -p1
+%patch41 -p1
+%patch42 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1613,21 +1612,33 @@ rm -f ext/recode/config9.m4
 rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
-rm -rf ext/xmlrpc/libxmlrpc
+#rm -rf ext/xmlrpc/libxmlrpc -- system one is broken on 64bit arches
+
+%ifarch ppc ppc64
+# this test hungs on ac-ppc
+#mv ext/reflection/tests/007.php{,ignore}
+# this test gets killed by itself
+mv ext/standard/tests/general_functions/bug39322.phpt{,.broken}
+%endif
+
+cp -f Zend/LICENSE{,.Zend}
 
 %build
-if API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h) && [ $API != %{php_api_version} ]; then
-	echo "Set %%define php_api_version to $API and rerun."
+API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
+if [ $API != %{php_api_version} ]; then
+	echo "Set %%define php_api_version to $API and re-run."
 	exit 1
 fi
 
-if API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h) && [ $API != %{zend_module_api} ]; then
-	echo "Set %%define zend_module_api to $API and rerun."
+API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h)
+if [ $API != %{zend_module_api} ]; then
+	echo "Set %%define zend_module_api to $API and re-run."
 	exit 1
 fi
 
-if API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h) && [ $API != %{zend_extension_api} ]; then
-	echo "Set %%define zend_extension_api to $API and rerun."
+API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h)
+if [ $API != %{zend_extension_api} ]; then
+	echo "Set %%define zend_extension_api to $API and re-run."
 	exit 1
 fi
 
@@ -1792,7 +1803,7 @@ for sapi in $sapis; do
 	%{?with_tidy:--with-tidy=shared} \
 	--with-tiff-dir=/usr \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
-	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
+	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared} \
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
@@ -1847,7 +1858,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{php_sysconfdir}/{apache,cgi}} \
 	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
-	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf} \
+	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
 # install the apache modules' files
@@ -1902,25 +1913,27 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 
 %if %{with apache2}
 install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
-cp -f Zend/LICENSE{,.Zend}
-
 # Generate stub .ini files for each subpackage
 install -d $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d
-for so in modules/*.so; do
-	mod=$(basename $so .so)
-	conf="%{php_sysconfdir}/conf.d/${mod}.ini"
-	# xml needs to be loaded before wddx
-	[ "$mod" = "wddx" ] && conf="%{php_sysconfdir}/conf.d/xml_${mod}.ini"
-	cat > $RPM_BUILD_ROOT${conf} <<EOF
-; Enable ${mod} extension module
-extension=${mod}.so
-EOF
-done
+generate_inifiles() {
+	for so in modules/*.so; do
+		mod=$(basename $so .so)
+		conf="%{php_sysconfdir}/conf.d/$mod.ini"
+		# xml needs to be loaded before wddx
+		[ "$mod" = "wddx" ] && conf="%{php_sysconfdir}/conf.d/xml_$mod.ini"
+		echo "+ $conf"
+		cat > $RPM_BUILD_ROOT$conf <<-EOF
+			; Enable $mod extension module
+			extension=$mod.so
+		EOF
+	done
+}
+generate_inifiles
 
 # per SAPI ini directories
 install -d $RPM_BUILD_ROOT%{php_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
@@ -1980,7 +1993,7 @@ fi
 
 # restart webserver at the end of transaction
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
-[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
+[ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
 
 %if %{with apache1}
 %triggerpostun -n apache1-mod_php -- php < 4:5.0.4-9.11
@@ -2261,7 +2274,7 @@ fi
 %if %{with apache2}
 %files -n apache-mod_php
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/httpd.conf/*_mod_php.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{php_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so

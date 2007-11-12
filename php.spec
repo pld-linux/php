@@ -86,16 +86,16 @@ License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	1fe14ca892460b09f06729941a1bb605
-Source2:	zend.gif
-Source3:	%{name}-mod_%{name}.conf
-Source4:	%{name}-cgi-fcgi.ini
-Source5:	%{name}-cgi.ini
+Source1:	zend.gif
+Source2:	%{name}-mod_%{name}.conf
+Source3:	%{name}-cgi-fcgi.ini
+Source4:	%{name}-cgi.ini
 Source6:	%{name}-apache.ini
-Source7:	%{name}-cli.ini
-Source8:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
-# Source8-md5:	47a742fa9fab2826ad10c13a2376111a
+Source6:	%{name}-cli.ini
+Source7:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
+# Source7-md5:	47a742fa9fab2826ad10c13a2376111a
 # Taken from: http://browsers.garykeith.com/downloads.asp
-Source9:	%{name}_browscap.ini
+Source8:	%{name}_browscap.ini
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -108,7 +108,6 @@ Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
-# XXX: needs fix
 Patch12:	%{name}-threads-acfix.patch
 Patch13:	%{name}-tsrmlsfetchgcc2.patch
 Patch14:	%{name}-no_pear_install.patch
@@ -1584,7 +1583,7 @@ cp php.ini-dist php.ini
 %patch21 -p1
 
 %if %{with hardening}
-zcat %{SOURCE8} | patch -p1 || exit 1
+zcat %{SOURCE7} | patch -p1 || exit 1
 patch -p1 < %{PATCH22} || exit 1
 %endif
 %patch23 -p1
@@ -1900,23 +1899,23 @@ ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{php_sysconfdir}/php.ini
 %if %{with fcgi}
-install %{SOURCE4} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi-fcgi.ini
+install %{SOURCE3} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi-fcgi.ini
 %endif
-install %{SOURCE5} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi.ini
-install %{SOURCE7} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cli.ini
-install %{SOURCE9} $RPM_BUILD_ROOT%{php_sysconfdir}/browscap.ini
+install %{SOURCE4} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi.ini
+install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cli.ini
+install %{SOURCE8} $RPM_BUILD_ROOT%{php_sysconfdir}/browscap.ini
 
 %if %{with apache1}
-install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache.ini
+install %{SOURCE1} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
+install %{SOURCE5} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
-install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
-install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache2handler.ini
+install %{SOURCE1} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
+install %{SOURCE5} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 

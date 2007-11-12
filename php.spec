@@ -85,16 +85,16 @@ License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	1fe14ca892460b09f06729941a1bb605
-Source2:	zend.gif
-Source3:	%{name}-mod_%{name}.conf
-Source4:	%{name}-cgi-fcgi.ini
-Source5:	%{name}-cgi.ini
-Source6:	%{name}-apache.ini
-Source7:	%{name}-cli.ini
-Source8:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
-# Source8-md5:	47a742fa9fab2826ad10c13a2376111a
+Source1:	zend.gif
+Source2:	%{name}-mod_%{name}.conf
+Source3:	%{name}-cgi-fcgi.ini
+Source4:	%{name}-cgi.ini
+Source5:	%{name}-apache.ini
+Source6:	%{name}-cli.ini
+Source7:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
+# Source7-md5:	47a742fa9fab2826ad10c13a2376111a
 # Taken from: http://browsers.garykeith.com/downloads.asp
-Source9:	%{name}_browscap.ini
+Source8:	%{name}_browscap.ini
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -107,28 +107,28 @@ Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
-Patch15:	%{name}-threads-acfix.patch
-Patch16:	%{name}-tsrmlsfetchgcc2.patch
-Patch17:	%{name}-no_pear_install.patch
-Patch18:	%{name}-zlib.patch
-Patch19:	%{name}-sybase-fix.patch
-Patch20:	%{name}-readline.patch
-Patch21:	%{name}-nohttpd.patch
-Patch23:	%{name}-gd_imagerotate_enable.patch
-Patch24:	%{name}-uint32_t.patch
-Patch26:	%{name}-dba-link.patch
-Patch30:	%{name}-hardening-fix.patch
-Patch31:	%{name}-both-apxs.patch
-Patch32:	%{name}-builddir.patch
-Patch33:	%{name}-zlib-for-getimagesize.patch
-Patch35:	%{name}-versioning.patch
-Patch36:	%{name}-linkflags-clean.patch
-Patch37:	%{name}-apr-apu.patch
-Patch38:	%{name}-fcgi-error_log-no-newlines.patch
-Patch39:	%{name}-pear.patch
-Patch40:	%{name}-config-dir.patch
-Patch41:	%{name}-bug-42952.patch
-Patch42:	%{name}-fcgi-graceful.patch
+Patch12:	%{name}-threads-acfix.patch
+Patch13:	%{name}-tsrmlsfetchgcc2.patch
+Patch14:	%{name}-no_pear_install.patch
+Patch15:	%{name}-zlib.patch
+Patch16:	%{name}-sybase-fix.patch
+Patch17:	%{name}-readline.patch
+Patch18:	%{name}-nohttpd.patch
+Patch19:	%{name}-gd_imagerotate_enable.patch
+Patch20:	%{name}-uint32_t.patch
+Patch21:	%{name}-dba-link.patch
+Patch22:	%{name}-hardening-fix.patch
+Patch23:	%{name}-both-apxs.patch
+Patch24:	%{name}-builddir.patch
+Patch25:	%{name}-zlib-for-getimagesize.patch
+Patch26:	%{name}-versioning.patch
+Patch27:	%{name}-linkflags-clean.patch
+Patch28:	%{name}-apr-apu.patch
+Patch29:	%{name}-fcgi-error_log-no-newlines.patch
+Patch30:	%{name}-pear.patch
+Patch31:	%{name}-config-dir.patch
+Patch32:	%{name}-bug-42952.patch
+Patch33:	%{name}-fcgi-graceful.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1551,7 +1551,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q
-%patch36 -p1
+%patch27 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1568,6 +1568,9 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
@@ -1575,26 +1578,23 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%patch23 -p1
-%patch24 -p1
-%patch26 -p1
 
 %if %{with hardening}
-zcat %{SOURCE8} | patch -p1 || exit 1
-patch -p1 < %{PATCH30} || exit 1
+zcat %{SOURCE7} | patch -p1 || exit 1
+patch -p1 < %{PATCH22} || exit 1
 %endif
+%patch23 -p1
+%patch24 -p1
+%patch25 -p1
+
+%{?with_versioning:%patch26 -p1}
+
+%patch28 -p1
+%patch29 -p1
+%patch30 -p1
 %patch31 -p1
 %patch32 -p1
 %patch33 -p1
-
-%{?with_versioning:%patch35 -p1}
-
-%patch37 -p1
-%patch38 -p1
-%patch39 -p1
-%patch40 -p1
-%patch41 -p1
-%patch42 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1898,23 +1898,23 @@ ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{php_sysconfdir}/php.ini
 %if %{with fcgi}
-install %{SOURCE4} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi-fcgi.ini
+install %{SOURCE3} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi-fcgi.ini
 %endif
-install %{SOURCE5} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi.ini
-install %{SOURCE7} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cli.ini
-install %{SOURCE9} $RPM_BUILD_ROOT%{php_sysconfdir}/browscap.ini
+install %{SOURCE4} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cgi.ini
+install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cli.ini
+install %{SOURCE8} $RPM_BUILD_ROOT%{php_sysconfdir}/browscap.ini
 
 %if %{with apache1}
-install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache.ini
+install %{SOURCE1} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
+install %{SOURCE5} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
-install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
-install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache2handler.ini
+install %{SOURCE1} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
+install %{SOURCE5} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 

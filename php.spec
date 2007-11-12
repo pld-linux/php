@@ -46,7 +46,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
-%bcond_with	tests		# default off; test process very often hangs on buildersl; perform "make test"
+%bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
 %define apxs1		/usr/sbin/apxs1
@@ -1474,6 +1474,7 @@ Summary:	xmlrpc extension module for PHP
 Summary(pl.UTF-8):	Moduł xmlrpc dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(xmlrpc)
 
 %description xmlrpc
@@ -1614,6 +1615,13 @@ rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
 rm -rf ext/xmlrpc/libxmlrpc
+
+%ifarch ppc ppc64
+# this test hungs on ac-ppc
+#mv ext/reflection/tests/007.php{,ignore}
+# this test gets killed by itself
+mv ext/standard/tests/general_functions/bug39322.phpt{,.broken}
+%endif
 
 cp -f Zend/LICENSE{,.Zend}
 

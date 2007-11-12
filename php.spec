@@ -70,7 +70,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 5
+%define	_rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -78,13 +78,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.2.4
-Release:	%{_rel}%{?with_hardening:hardened}
+Version:	5.2.5
+Release:	%{_rel}%{?_rc:.%{_rc}}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	55c97a671fdabf462cc7a82971a656d2
+# Source0-md5:	1fe14ca892460b09f06729941a1bb605
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -107,7 +107,7 @@ Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
-#Patch15:	%{name}-threads-acfix.patch
+Patch15:	%{name}-threads-acfix.patch
 Patch16:	%{name}-tsrmlsfetchgcc2.patch
 Patch17:	%{name}-no_pear_install.patch
 Patch18:	%{name}-zlib.patch
@@ -1568,7 +1568,7 @@ cp php.ini-dist php.ini
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
 %patch11 -p1
-#%patch15 -p1 # breaks with ac cache vars, but later -lpthread is missing ...
+%patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
@@ -1818,18 +1818,18 @@ done
 %{__make} build-modules
 
 %if %{with apache1}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1 LDFLAGS=-lpthread
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
 %endif
 
 %if %{with apache2}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2 LDFLAGS=-lpthread
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
 %endif
 
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
-%{__make} sapi/cgi/php-cgi -f Makefile.fcgi LDFLAGS=-lpthread
+%{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
 [ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
@@ -1837,12 +1837,12 @@ cp -r sapi/cgi sapi/fcgi
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
-%{__make} sapi/cgi/php-cgi -f Makefile.cgi LDFLAGS=-lpthread
+%{__make} sapi/cgi/php-cgi -f Makefile.cgi
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
-%{__make} sapi/cli/php -f Makefile.cli LDFLAGS=-lpthread
+%{__make} sapi/cli/php -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
 
 %if %{with tests}

@@ -123,12 +123,12 @@ Patch24:	%{name}-builddir.patch
 Patch25:	%{name}-zlib-for-getimagesize.patch
 Patch26:	%{name}-versioning.patch
 Patch27:	%{name}-linkflags-clean.patch
-Patch28:	%{name}-apr-apu.patch
-Patch29:	%{name}-fcgi-error_log-no-newlines.patch
-Patch30:	%{name}-pear.patch
-Patch31:	%{name}-config-dir.patch
-Patch32:	%{name}-bug-42952.patch
-Patch33:	%{name}-fcgi-graceful.patch
+Patch28:	%{name}-pear.patch
+Patch29:	%{name}-config-dir.patch
+Patch30:	%{name}-bug-42952.patch
+Patch31:	%{name}-fcgi-graceful.patch
+Patch32:	%{name}-apr-apu.patch
+Patch33:	%{name}-fcgi-error_log-no-newlines.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}

@@ -46,6 +46,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
+%bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
@@ -140,7 +141,10 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
-%{?with_xmlrpc:BuildRequires:	expat-devel}
+%if %{with xmlrpc}
+BuildRequires:	expat-devel
+%{?with_system_xmlrpc_epi:BuildRequires:    xmlrpc-epi-devel}
+%endif
 %{?with_fcgi:BuildRequires:	fcgi-devel}
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
@@ -1612,7 +1616,9 @@ rm -f ext/recode/config9.m4
 rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
-#rm -rf ext/xmlrpc/libxmlrpc -- system one is broken on 64bit arches
+%if %{without system_xmlrpc_epi}
+rm -rf ext/xmlrpc/libxmlrpc
+%endif
 
 %ifarch ppc ppc64
 # this test hungs on ac-ppc
@@ -1803,7 +1809,7 @@ for sapi in $sapis; do
 	%{?with_tidy:--with-tidy=shared} \
 	--with-tiff-dir=/usr \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
-	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared} \
+	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared%{?with_system_xmlrpc_epi:,/usr}} \
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \

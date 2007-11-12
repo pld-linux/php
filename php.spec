@@ -1616,7 +1616,7 @@ rm -f ext/recode/config9.m4
 rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
-%if %{without system_xmlrpc_epi}
+%if %{with system_xmlrpc_epi}
 rm -rf ext/xmlrpc/libxmlrpc
 %endif
 

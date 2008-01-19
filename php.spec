@@ -72,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		_rel 5
+%define		_rel 6
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -204,7 +204,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		php_sysconfdir		/etc/php
 %define		php_extensiondir	%{_libdir}/php
-%define		_sysconfdir		%{php_sysconfdir}
+%define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
@@ -1864,7 +1864,7 @@ unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{php_sysconfdir}/{apache,cgi}} \
-	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
+	$RPM_BUILD_ROOT%{_datadir}/apache-icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
@@ -1913,14 +1913,14 @@ install %{SOURCE6} $RPM_BUILD_ROOT%{php_sysconfdir}/php-cli.ini
 install %{SOURCE8} $RPM_BUILD_ROOT%{php_sysconfdir}/browscap.ini
 
 %if %{with apache1}
-install %{SOURCE1} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
+install %{SOURCE1} php.gif $RPM_BUILD_ROOT%{_datadir}/apache-icons
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
 install %{SOURCE5} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
-install %{SOURCE1} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
+install %{SOURCE1} php.gif $RPM_BUILD_ROOT%{_datadir}/apache-icons
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 install %{SOURCE5} $RPM_BUILD_ROOT%{php_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
@@ -2276,7 +2276,7 @@ fi
 %dir %{php_sysconfdir}/apache.d
 %config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-apache.ini
 %attr(755,root,root) %{_libdir}/apache1/libphp5.so
-/home/services/apache/icons/*
+%{_datadir}/apache-icons/*
 %endif
 
 %if %{with apache2}
@@ -2286,7 +2286,7 @@ fi
 %dir %{php_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
-/home/services/httpd/icons/*
+%{_datadir}/apache-icons/*
 %endif
 
 %if %{with fcgi}

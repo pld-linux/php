@@ -12,6 +12,7 @@
 # - make additional headers and checking added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
+# - http://forum.lighttpd.net/topic/34454
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)

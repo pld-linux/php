@@ -1,0 +1,3 @@
+- rel 7
+- add php-curl-limit-speed.patch, so PHP now supports limiting upload/download
+  speed when using cURL

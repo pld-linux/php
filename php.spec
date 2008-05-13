@@ -331,6 +331,7 @@ Summary:	php as CGI program
 Summary(pl.UTF-8):	php jako program CGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(cgi)
 
 %description cgi
 php as CGI program.

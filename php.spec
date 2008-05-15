@@ -71,7 +71,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define	_rel 1
+%define		rel 2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -80,7 +80,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.6
-Release:	%{_rel}%{?_rc:.%{_rc}}%{?with_hardening:hardened}
+Release:	%{rel}%{?_rc:.%{_rc}}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries

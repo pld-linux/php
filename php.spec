@@ -83,7 +83,7 @@ Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування 
 Name:		php
 Version:	5.2.6
 Release:	%{_rel}%{?_rc:.%{_rc}}%{?with_hardening:hardened}
-Epoch:		4
+Epoch:		5
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2

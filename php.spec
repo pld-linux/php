@@ -1660,6 +1660,7 @@ if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 	rm -f Makefile.{fcgi,cgi,cli,apxs{1,2}} # now remove Makefile copies
 	%{__libtoolize}
 	%{__aclocal}
+	cp -f /usr/share/automake/config.* .
 	./buildconf --force
 	touch _built-conf
 fi

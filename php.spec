@@ -32,7 +32,6 @@
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
-#%bcond_without	pcre		# without PCRE extension module		# pcre must be enabled
 %bcond_without	pgsql		# without PostgreSQL extension module
 %bcond_without	phar		# without phar extension module
 %bcond_without	pspell		# without pspell extension module
@@ -65,7 +64,7 @@
 %endif
 
 %if %{without apache1} && %{without apache2}
-ERROR: You need to select at least one Apache SAPI to build shared modules.
+ERROR:		You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 # filter depends on pcre
@@ -127,9 +126,8 @@ Patch24:	%{name}-builddir.patch
 Patch25:	%{name}-zlib-for-getimagesize.patch
 Patch26:	%{name}-versioning.patch
 Patch27:	%{name}-linkflags-clean.patch
-Patch28:	%{name}-pear.patch			
+Patch28:	%{name}-pear.patch
 Patch29:	%{name}-config-dir.patch
-#Patch30:	%{name}-bug-42952.patch
 Patch31:	%{name}-fcgi-graceful.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -238,43 +236,52 @@ integre dans des pages web. Ce package contient php version
 
 %description -l pl.UTF-8
 PHP jest językiem skryptowym, którego polecenia umieszcza się w
-plikach HTML. Jest próbą ułatwienia programistom pisania dynamicznie
-generowanych stron WWW. Oferuje także wbudowaną integrację z bazami
-danych dla kilku komercyjnych i niekomercyjnych systemów baz danych,
-co czyni tworzenie stron korzystających z baz danych w miarę łatwym.
-Najczęściej PHP jest używany prawdopodobnie jako zamiennik skryptów
-CGI. Moduł mod_php pozwala serwerowi WWW Apache rozumieć i przetwarzać
-język PHP osadzony w stronach. Ten pakiet zawiera php w wersji
-%{version}.
+plikach HTML. Jest próbą ułatwienia programistom pisania
+dynamicznie generowanych stron WWW. Oferuje także wbudowaną
+integrację z bazami danych dla kilku komercyjnych i niekomercyjnych
+systemów baz danych, co czyni tworzenie stron korzystających z baz
+danych w miarę łatwym. Najczęściej PHP jest używany
+prawdopodobnie jako zamiennik skryptów CGI. Moduł mod_php pozwala
+serwerowi WWW Apache rozumieć i przetwarzać język PHP osadzony w
+stronach. Ten pakiet zawiera php w wersji %{version}.
 
 %description -l pt_BR.UTF-8
 PHP: Preprocessador de Hipertexto versão 4 é uma linguagem script
-embutida em HTML. Muito de sua sintaxe é emprestada de C, Java e Perl,
-com algumas características únicas, específicas ao PHP. O objetivo da
-linguagem é permitir que desenvolvedores web escrevam páginas
-dinamicamente geradas de forma rápida.
+embutida em HTML. Muito de sua sintaxe é emprestada de C, Java e
+Perl, com algumas características únicas, específicas ao PHP. O
+objetivo da linguagem é permitir que desenvolvedores web escrevam
+páginas dinamicamente geradas de forma rápida.
 
 %description -l ru.UTF-8
-PHP - это язык написания скриптов, встраиваемых в HTML-код. PHP
-предлагает интерграцию с множеством СУБД, поэтому написание скриптов
-для работы с базами данных относительно просто. Наиболее популярное
-использование PHP - замена для CGI скриптов.
+PHP - это язык написания скриптов,
+встраиваемых в HTML-код. PHP предлагает
+интерграцию с множеством СУБД,
+поэтому написание скриптов для работы
+с базами данных относительно просто.
+Наиболее популярное использование PHP -
+замена для CGI скриптов.
 
-Этот пакет содержит самодостаточную (CGI) версию интерпретатора языка.
-Вы должны также установить пакет %{name}-common. Если вам нужен
-интерпретатор PHP в качестве модуля apache, установите пакет
-apache-mod_php.
+Этот пакет содержит самодостаточную
+(CGI) версию интерпретатора языка. Вы
+должны также установить пакет
+%{name}-common. Если вам нужен интерпретатор
+PHP в качестве модуля apache, установите
+пакет apache-mod_php.
 
 %description -l uk.UTF-8
-PHP - це мова написання скриптів, що вбудовуються в HTML-код. PHP
-пропонує інтеграцію з багатьма СУБД, тому написання скриптів для
-роботи з базами даних є доволі простим. Найбільш популярне
-використання PHP - заміна для CGI скриптів.
+PHP - це мова написання скриптів, що
+вбудовуються в HTML-код. PHP пропонує
+інтеграцію з багатьма СУБД, тому
+написання скриптів для роботи з
+базами даних є доволі простим.
+Найбільш популярне використання PHP -
+заміна для CGI скриптів.
 
-Цей пакет містить самодостатню (CGI) версію інтерпретатора мови. Ви
-маєте також встановити пакет %{name}-common. Якщо вам потрібен
-інтерпретатор PHP в якості модуля apache, встановіть пакет
-apache-mod_php.
+Цей пакет містить самодостатню (CGI)
+версію інтерпретатора мови. Ви маєте
+також встановити пакет %{name}-common. Якщо
+вам потрібен інтерпретатор PHP в якості
+модуля apache, встановіть пакет apache-mod_php.
 
 %package -n apache1-mod_php
 Summary:	PHP DSO module for apache 1.3.x
@@ -398,12 +405,16 @@ Common files needed by both apache module and CGI.
 Wspólne pliki dla modułu apacha i programu CGI.
 
 %description common -l ru.UTF-8
-Этот пакет содержит общие файлы для разных вариантов реализации PHP
-(самодостаточной и в качестве модуля apache).
+Этот пакет содержит общие файлы для
+разных вариантов реализации PHP
+(самодостаточной и в качестве модуля
+apache).
 
 %description common -l uk.UTF-8
-Цей пакет містить спільні файли для різних варіантів реалізації PHP
-(самодостатньої та в якості модуля apache).
+Цей пакет містить спільні файли для
+різних варіантів реалізації PHP
+(самодостатньої та в якості модуля
+apache).
 
 %package devel
 Summary:	Files for PHP modules development
@@ -430,29 +441,38 @@ support. For more information, read the file
 README.SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l pl.UTF-8
-Ten pakiet zawiera pliki potrzebne do kompilacji modułów PHP. Zamiast
-rekompilować całe php aby dodać obsługę np. oracle, można przy użyciu
-tego pakietu skompilować samodzielne rozszerzenie. Więcej informacji o
-samodzielnych rozszerzeniach można znaleźć w pliku
-README.SELF-CONTAINED-EXTENSIONS.
+Ten pakiet zawiera pliki potrzebne do kompilacji modułów PHP.
+Zamiast rekompilować całe php aby dodać obsługę np. oracle,
+można przy użyciu tego pakietu skompilować samodzielne
+rozszerzenie. Więcej informacji o samodzielnych rozszerzeniach można
+znaleźć w pliku README.SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l pt_BR.UTF-8
 Este pacote contém arquivos usados no desenvolvimento de programas ou
 módulos PHP.
 
 %description devel -l ru.UTF-8
-Пакет php-devel дает возможность компилировать динамические расширения
-PHP. Пакет включает исходный код этих расширений. Вместо повторной
-компиляции бинарного файла php для добавления, например, поддержки
-oracle, установите этот пакет для компилирования отдельных расширений.
-Подробности - в файле README.SELF-CONTAINED-EXTENSIONS.
+Пакет php-devel дает возможность
+компилировать динамические
+расширения PHP. Пакет включает исходный
+код этих расширений. Вместо повторной
+компиляции бинарного файла php для
+добавления, например, поддержки oracle,
+установите этот пакет для
+компилирования отдельных расширений.
+Подробности - в файле
+README.SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l uk.UTF-8
-Пакет php-devel дає можливість компілювати динамічні розширення PHP.
-До пакету включено вихідний код для розширень. Замість повторної
-компіляції бінарного файлу php для додання, наприклад, підтримки
-oracle, встановіть цей пакет для компіляції окремих розширень.
-Детальніша інформація - в файлі README.SELF-CONTAINED-EXTENSIONS.
+Пакет php-devel дає можливість
+компілювати динамічні розширення PHP.
+До пакету включено вихідний код для
+розширень. Замість повторної
+компіляції бінарного файлу php для
+додання, наприклад, підтримки oracle,
+встановіть цей пакет для компіляції
+окремих розширень. Детальніша
+інформація - в файлі README.SELF-CONTAINED-EXTENSIONS.
 
 %package bcmath
 Summary:	bcmath extension module for PHP
@@ -597,8 +617,8 @@ This PHP module adds support for PDF Forms through Adobe FDFTK
 library.
 
 %description fdf -l pl.UTF-8
-Moduł PHP dodający obsługę formularzy PDF poprzez bibliotekę Adobe
-FDFTK.
+Moduł PHP dodający obsługę formularzy PDF poprzez bibliotekę
+Adobe FDFTK.
 
 %package filter
 Summary:	Extension for safely dealing with input parameters
@@ -618,9 +638,9 @@ their input data.
 %description filter -l pl.UTF-8
 Wiadomo, że trzeba zawsze sprawdzać zmienne wejściowe, ale PHP nie
 oferuje naprawdę dobrej funkcjonalności do robienia tego w sposób
-bezpieczny. Rozszerzenie Input Filter ma rozwiązać ten problem poprzez
-zaimplementowanie zestawu filtrów i mechanizmów, których użytkownicy
-mogą bezpiecznie używać do dostępu do danych.
+bezpieczny. Rozszerzenie Input Filter ma rozwiązać ten problem
+poprzez zaimplementowanie zestawu filtrów i mechanizmów, których
+użytkownicy mogą bezpiecznie używać do dostępu do danych.
 
 %package ftp
 Summary:	FTP extension module for PHP
@@ -651,8 +671,8 @@ This is a dynamic shared object (DSO) for PHP that will add GD
 support, allowing you to create and manipulate images with PHP.
 
 %description gd -l pl.UTF-8
-Moduł PHP umożliwiający korzystanie z biblioteki GD, pozwalającej na
-tworzenie i obróbkę obrazków.
+Moduł PHP umożliwiający korzystanie z biblioteki GD, pozwalającej
+na tworzenie i obróbkę obrazków.
 
 %package gettext
 Summary:	gettext extension module for PHP
@@ -680,8 +700,8 @@ This is a dynamic shared object (DSO) for PHP that will add arbitrary
 length number support with GNU MP library.
 
 %description gmp -l pl.UTF-8
-Moduł PHP umożliwiający korzystanie z biblioteki gmp do obliczeń na
-liczbach o dowolnej długości.
+Moduł PHP umożliwiający korzystanie z biblioteki gmp do obliczeń
+na liczbach o dowolnej długości.
 
 %package hash
 Summary:	HASH Message Digest Framework
@@ -806,7 +826,8 @@ This is a dynamic shared object (DSO) for PHP that will add mcrypt
 support.
 
 %description mcrypt -l pl.UTF-8
-Moduł PHP dodający możliwość szyfrowania poprzez bibliotekę mcrypt.
+Moduł PHP dodający możliwość szyfrowania poprzez bibliotekę
+mcrypt.
 
 %package mhash
 Summary:	mhash extension module for PHP
@@ -835,8 +856,8 @@ This PHP module adds support for MIME type lookup via file magic
 numbers using magic.mime database.
 
 %description mime_magic -l pl.UTF-8
-Moduł PHP dodający obsługę wyszukiwania typów MIME według magicznych
-znaczników plików z użyciem bazy danych magic.mime.
+Moduł PHP dodający obsługę wyszukiwania typów MIME według
+magicznych znaczników plików z użyciem bazy danych magic.mime.
 
 %package ming
 Summary:	ming extension module for PHP
@@ -851,8 +872,8 @@ This is a dynamic shared object (DSO) for PHP that will add ming
 (Flash - .swf files) support.
 
 %description ming -l pl.UTF-8
-Moduł PHP dodający obsługę plików Flash (.swf) poprzez bibliotekę
-ming.
+Moduł PHP dodający obsługę plików Flash (.swf) poprzez
+bibliotekę ming.
 
 %package mssql
 Summary:	MS SQL extension module for PHP
@@ -902,8 +923,8 @@ is that it provides access to functionality of MySQL 4.1 and above.
 
 %description mysqli -l pl.UTF-8
 Moduł PHP umożliwiający udoskonalony dostęp do bazy danych MySQL.
-Różnicą między nim a modułem mysql jest dostęp do funkcjonalności
-MySQL w wersji 4.1 i nowszych.
+Różnicą między nim a modułem mysql jest dostęp do
+funkcjonalności MySQL w wersji 4.1 i nowszych.
 
 %package ncurses
 Summary:	ncurses module for PHP
@@ -917,7 +938,8 @@ This PHP module adds support for ncurses functions (only for cli and
 cgi SAPIs).
 
 %description ncurses -l pl.UTF-8
-Moduł PHP dodający obsługę funkcji ncurses (tylko do SAPI cli i cgi).
+Moduł PHP dodający obsługę funkcji ncurses (tylko do SAPI cli i
+cgi).
 
 %package oci8
 Summary:	Oracle 8+ database module for PHP
@@ -988,11 +1010,12 @@ Warning: this is an experimental module. Also, don't use it in
 webserver environment!
 
 %description pcntl -l pl.UTF-8
-Moduł PHP umożliwiający tworzenie nowych procesów i kontrolę nad nimi.
-Obsługuje funkcje takie jak fork(), waitpid(), signal() i podobne.
+Moduł PHP umożliwiający tworzenie nowych procesów i kontrolę nad
+nimi. Obsługuje funkcje takie jak fork(), waitpid(), signal() i
+podobne.
 
-Uwaga: to jest moduł eksperymentalny. Ponadto nie jest przeznaczony do
-używania z serwerem WWW - nie próbuj tego!
+Uwaga: to jest moduł eksperymentalny. Ponadto nie jest przeznaczony
+do używania z serwerem WWW - nie próbuj tego!
 
 %package pdo
 Summary:	PHP Data Objects (PDO)
@@ -1022,8 +1045,8 @@ This is a dynamic shared object (DSO) for PHP that will add PDO
 FreeTDS support.
 
 %description pdo-dblib -l pl.UTF-8
-Moduł dla PHP dodający obsługę baz danych FreeTDS za pośrednictwem
-interfejsu PDO.
+Moduł dla PHP dodający obsługę baz danych FreeTDS za
+pośrednictwem interfejsu PDO.
 
 %package pdo-firebird
 Summary:	PHP Data Objects (PDO) Firebird support
@@ -1039,8 +1062,8 @@ This is a dynamic shared object (DSO) for PHP that will add PDO
 Firebird support.
 
 %description pdo-firebird -l pl.UTF-8
-Moduł dla PHP dodający obsługę baz danych Firebird za pośrednictwem
-interfejsu PDO.
+Moduł dla PHP dodający obsługę baz danych Firebird za
+pośrednictwem interfejsu PDO.
 
 %package pdo-mysql
 Summary:	PHP Data Objects (PDO) MySQL support
@@ -1108,8 +1131,8 @@ This is a dynamic shared object (DSO) for PHP that will add PDO
 PostgreSQL support.
 
 %description pdo-pgsql -l pl.UTF-8
-Moduł dla PHP dodający obsługę baz danych PostgreSQL za pośrednictwem
-interfejsu PDO.
+Moduł dla PHP dodający obsługę baz danych PostgreSQL za
+pośrednictwem interfejsu PDO.
 
 %package pdo-sqlite
 Summary:	PHP Data Objects (PDO) SQLite support
@@ -1146,18 +1169,18 @@ Moduł PHP umożliwiający dostęp do bazy danych PostgreSQL.
 Um módulo para aplicações PHP que usam bancos de dados postgresql.
 
 %package phar
-Summary:	phar database module for PHP
-Summary(pl.UTF-8):	Moduł phar dla PHP
+Summary:	phar archive module for PHP
+Summary(pl.UTF-8):	Moduł archiwów phar dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(phar)
 
 %description phar
 This is a dynamic shared object (DSO) for PHP that will add phar
-archive a support.
+archive support.
 
 %description phar -l pl.UTF-8
-Moduł PHP umożliwiający dostęp do achiwów .phar.
+Moduł PHP umożliwiający dostęp do achiwów phar.
 
 %package posix
 Summary:	POSIX extension module for PHP
@@ -1201,7 +1224,8 @@ This PHP module adds support for readline functions (only for cli and
 cgi SAPIs).
 
 %description readline -l pl.UTF-8
-Moduł PHP dodający obsługę funkcji readline (tylko do SAPI cli i cgi).
+Moduł PHP dodający obsługę funkcji readline (tylko do SAPI cli i
+cgi).
 
 %package recode
 Summary:	recode extension module for PHP
@@ -1316,15 +1340,15 @@ server. SQLite is the server. The SQLite library reads and writes
 directly to and from the database files on disk.
 
 %description sqlite -l pl.UTF-8
-SQLite jest napisaną w C biblioteką implementującą osadzalny silnik
-bazodanowy SQL. Program linkujący się z biblioteką SQLite może mieć
-dostęp do bazy SQL bez potrzeby uruchamiania dodatkowego procesu
-RDBMS.
+SQLite jest napisaną w C biblioteką implementującą osadzalny
+silnik bazodanowy SQL. Program linkujący się z biblioteką SQLite
+może mieć dostęp do bazy SQL bez potrzeby uruchamiania dodatkowego
+procesu RDBMS.
 
-SQLite to nie klient baz danych - biblioteka nie łączy się z serwerami
-baz danych. SQLite sam jest serwerem. Biblioteka SQLite czyta i
-zapisuje dane bezpośrednio z/do plików baz danych znajdujących się na
-dysku.
+SQLite to nie klient baz danych - biblioteka nie łączy się z
+serwerami baz danych. SQLite sam jest serwerem. Biblioteka SQLite
+czyta i zapisuje dane bezpośrednio z/do plików baz danych
+znajdujących się na dysku.
 
 %package sybase
 Summary:	Sybase DB extension module for PHP
@@ -1518,9 +1542,9 @@ that provides a non-cached, forward-only means of generating streams
 or files containing XML data.
 
 %description xmlwriter -l pl.UTF-8
-To rozszerzenie obudowuje API xmlWriter z libxml. Reprezentuje obsługę
-zapisu dostarczającą nie cachowanych metod generowania strumieni lub
-plików zawierających dane XML.
+To rozszerzenie obudowuje API xmlWriter z libxml. Reprezentuje
+obsługę zapisu dostarczającą nie cachowanych metod generowania
+strumieni lub plików zawierających dane XML.
 
 %package xsl
 Summary:	xsl extension module for PHP
@@ -1608,7 +1632,6 @@ patch -p1 < %{PATCH22} || exit 1
 # just for tabs?!
 %patch28 -p1
 %patch29 -p1
-####%patch30 -p1
 %patch31 -p1
 
 # conflict seems to be resolved by recode patches
@@ -1655,7 +1678,6 @@ if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
 export CPPFLAGS=-DDEBUG_FASTCGI
-export PATH="/usr/lib64/ccache:$PATH"
 
 sapis="
 %if %{with fcgi}
@@ -1693,7 +1715,7 @@ for sapi in $sapis; do
 		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	esac
-	
+
 	%configure \
 	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"
@@ -1813,7 +1835,7 @@ for sapi in $sapis; do
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
-	--enable-zip=shared,/usr \
+--enable-zip=shared,%{_prefix} \
 
 	cp -f Makefile Makefile.$sapi
 	cp -f main/php_config.h php_config.h.$sapi
@@ -1837,7 +1859,7 @@ cp -af php_config.h.fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
-# test off for now, php binary SEGVs in buildroot (seems to work after install 
+# test off for now, php binary SEGVs in buildroot (seems to work after install
 # though); see bug: 45079
 # [ "$(echo '<?php echo php_sapi_name();' | ./sapi/fcgi/php-cgi -q)" = cgi-fcgi ] || exit 1
 %endif
@@ -1846,14 +1868,14 @@ cp -r sapi/cgi sapi/fcgi
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
-# test off for now, php binary SEGVs in buildroot (seems to work after install 
+# test off for now, php binary SEGVs in buildroot (seems to work after install
 # though); see bug: 45079
 # [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -q)" = cgi-fcgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
-# test off for now, php binary SEGVs in buildroot (seems to work after install 
+# test off for now, php binary SEGVs in buildroot (seems to work after install
 # though); see bug: 45079
 # [ "$(echo '<?php echo php_sapi_name();' | ./sapi/cli/php -q)" = cli ] || exit 1
 

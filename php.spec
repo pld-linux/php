@@ -12,6 +12,7 @@
 # - make additional headers and checking added by mail patch configurable
 # - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
+# - http://forum.lighttpd.net/topic/34454
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -71,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 2
+%define		rel 3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -130,6 +131,8 @@ Patch30:	%{name}-bug-42952.patch
 Patch31:	%{name}-fcgi-graceful.patch
 Patch32:	%{name}-apr-apu.patch
 Patch33:	%{name}-fcgi-error_log-no-newlines.patch
+Patch34:	%{name}-curl-limit-speed.patch
+
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -259,21 +262,11 @@ PHP - это язык написания скриптов, встраиваем�
 для работы с базами данных относительно просто. Наиболее популярное
 использование PHP - замена для CGI скриптов.
 
-Этот пакет содержит самодостаточную (CGI) версию интерпретатора языка.
-Вы должны также установить пакет %{name}-common. Если вам нужен
-интерпретатор PHP в качестве модуля apache, установите пакет
-apache-mod_php.
-
 %description -l uk.UTF-8
 PHP - це мова написання скриптів, що вбудовуються в HTML-код. PHP
 пропонує інтеграцію з багатьма СУБД, тому написання скриптів для
 роботи з базами даних є доволі простим. Найбільш популярне
 використання PHP - заміна для CGI скриптів.
-
-Цей пакет містить самодостатню (CGI) версію інтерпретатора мови. Ви
-маєте також встановити пакет %{name}-common. Якщо вам потрібен
-інтерпретатор PHP в якості модуля apache, встановіть пакет
-apache-mod_php.
 
 %package -n apache1-mod_php
 Summary:	PHP DSO module for apache 1.3.x
@@ -327,6 +320,7 @@ Summary:	php as CGI program
 Summary(pl.UTF-8):	php jako program CGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(cgi)
 
 %description cgi
 php as CGI program.
@@ -1599,6 +1593,7 @@ patch -p1 < %{PATCH22} || exit 1
 %patch31 -p1
 %patch32 -p1
 %patch33 -p1
+%patch34 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

@@ -1,0 +1,13 @@
+--- php-5.2.6/ext/posix/posix.c.orig	2008-06-03 20:39:01.000000000 +0200
++++ php-5.2.6/ext/posix/posix.c	2008-06-03 20:38:26.000000000 +0200
+@@ -36,6 +36,10 @@
+ #endif
+ 
+ #include <sys/resource.h>
++/* We want domainname instead of __domainname */
++#ifndef __USE_GNU
++#define __USE_GNU
++#endif
+ #include <sys/utsname.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>

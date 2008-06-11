@@ -64,16 +64,11 @@
 %endif
 
 %if %{without apache1} && %{without apache2}
-ERROR:		You need to select at least one Apache SAPI to build shared modules.
-%endif
-
-# filter depends on pcre
-%if %{without pcre}
-%undefine	with_filter
+ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define	_rel	0.14
-%define	_snap	200805231030
+%define	_snap	200806111030
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -87,7 +82,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	dcd0e73852d4d322902f47f32593e223
+# Source0-md5:	93f22cdb11d380b140f891b7259c7a3a
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -126,9 +121,9 @@ Patch24:	%{name}-builddir.patch
 Patch25:	%{name}-zlib-for-getimagesize.patch
 Patch26:	%{name}-versioning.patch
 Patch27:	%{name}-linkflags-clean.patch
-Patch28:	%{name}-pear.patch
 Patch29:	%{name}-config-dir.patch
 Patch31:	%{name}-fcgi-graceful.patch
+Patch35:	%{name}-ac.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1603,10 +1598,9 @@ patch -p1 < %{PATCH22} || exit 1
 %patch25 -p1
 %{?with_versioning:%patch26 -p1}
 
-# just for tabs?!
-%patch28 -p1
 %patch29 -p1
 %patch31 -p1
+%patch35 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1645,7 +1639,7 @@ fi
 export EXTENSION_DIR="%{php_extensiondir}"
 if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 	rm -f Makefile.{fcgi,cgi,cli,apxs{1,2}} # now remove Makefile copies
-	%{__libtoolize}
+	%{__libtoolize} --install
 	%{__aclocal}
 	./buildconf --force
 	touch _built-conf
@@ -1672,7 +1666,7 @@ for sapi in $sapis; do
 	sapi_args=''
 	case $sapi in
 	cgi)
-		sapi_args=' --disable-fastcgi --enable-discard-path --enable-force-cgi-redirect'
+		sapi_args='--enable-discard-path --enable-force-cgi-redirect'
 	;;
 	cli)
 		sapi_args='--disable-cgi'

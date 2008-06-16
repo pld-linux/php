@@ -73,7 +73,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 5.1
+%define		rel 6
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -136,6 +136,7 @@ Patch34:	%{name}-curl-limit-speed.patch
 Patch35:	%{name}-ac.patch
 Patch36:	%{name}-mime_magic.patch
 Patch37:	%{name}-libtool.patch
+Patch38:	%{name}-tds.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -155,7 +156,7 @@ BuildRequires:	expat-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
-BuildRequires:	freetds-devel
+BuildRequires:	freetds-devel >= 0.82
 %endif
 BuildRequires:	freetype-devel >= 2.0
 BuildRequires:	gd-devel >= 2.0.28-4
@@ -1601,6 +1602,7 @@ patch -p1 < %{PATCH22} || exit 1
 %patch35 -p1
 %patch36 -p1
 %patch37 -p1
+%patch38 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

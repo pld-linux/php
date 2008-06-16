@@ -410,7 +410,7 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf
 Requires:	automake
-Requires:	libtool
+Requires:	libtool >= 2.2
 %{?with_pcre:Requires:	pcre-devel >= 6.6}
 Requires:	shtool
 Obsoletes:	php-pear-devel

@@ -73,7 +73,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 5
+%define		rel 5.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -134,7 +134,8 @@ Patch32:	%{name}-apr-apu.patch
 Patch33:	%{name}-fcgi-error_log-no-newlines.patch
 Patch34:	%{name}-curl-limit-speed.patch
 Patch35:	%{name}-ac.patch
-
+Patch36:	%{name}-mime_magic.patch
+Patch37:	%{name}-libtool.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1598,6 +1599,8 @@ patch -p1 < %{PATCH22} || exit 1
 %patch33 -p1
 %patch34 -p1
 %patch35 -p1
+%patch36 -p1
+%patch37 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1949,7 +1952,9 @@ mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{ncurses,pcntl,readline}.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
-ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
+for i in libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4; do
+	ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
+done
 ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 

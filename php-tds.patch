@@ -78,3 +78,14 @@
    fi
  
    PHP_ADD_INCLUDE($PDO_FREETDS_INCLUDE_DIR)
+--- php/ext/sybase_ct/config.m4~	2007-07-03 19:25:35.000000000 +0200
++++ php/ext/sybase_ct/config.m4	2008-06-16 10:42:20.463792334 +0200
+@@ -31,7 +31,7 @@
+   fi
+   
+   PHP_ADD_LIBPATH($SYBASE_CT_LIBDIR, SYBASE_CT_SHARED_LIBADD)
+-  if test -f $SYBASE_CT_INCDIR/tds.h; then
++  if test -f $SYBASE_CT_INCDIR/sybdb.h; then
+     PHP_ADD_LIBRARY(ct,, SYBASE_CT_SHARED_LIBADD)
+     SYBASE_CT_LIBS="-L$SYBASE_CT_LIBDIR -lct"
+   else

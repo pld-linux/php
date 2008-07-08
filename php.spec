@@ -38,7 +38,6 @@
 %bcond_without	recode		# without recode extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
-%bcond_without	sybase		# without Sybase extension module
 %bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
@@ -68,7 +67,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define	_rel	0.14
-%define	_snap	200806111030
+%define	_snap	200807080830
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -82,7 +81,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	93f22cdb11d380b140f891b7259c7a3a
+# Source0-md5:	e48e452ecefa427fcc7dbe82cfd5fa5d
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -109,7 +108,6 @@ Patch12:	%{name}-threads-acfix.patch
 Patch13:	%{name}-tsrmlsfetchgcc2.patch
 Patch14:	%{name}-no_pear_install.patch
 Patch15:	%{name}-zlib.patch
-Patch16:	%{name}-sybase-fix.patch
 Patch17:	%{name}-readline.patch
 Patch18:	%{name}-nohttpd.patch
 Patch19:	%{name}-gd_imagerotate_enable.patch
@@ -123,7 +121,6 @@ Patch26:	%{name}-versioning.patch
 Patch27:	%{name}-linkflags-clean.patch
 Patch29:	%{name}-config-dir.patch
 Patch31:	%{name}-fcgi-graceful.patch
-Patch35:	%{name}-ac.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -141,7 +138,7 @@ BuildRequires:	expat-devel
 %{?with_fcgi:BuildRequires:	fcgi-devel}
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
-%if %{with mssql} || %{with sybase} || %{with sybase_ct}
+%if %{with mssql} || %{with sybase_ct}
 BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
@@ -164,7 +161,6 @@ BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
-BuildRequires:	ncurses-ext-devel
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
@@ -898,20 +894,6 @@ Moduł PHP umożliwiający udoskonalony dostęp do bazy danych MySQL.
 Różnicą między nim a modułem mysql jest dostęp do funkcjonalności
 MySQL w wersji 4.1 i nowszych.
 
-%package ncurses
-Summary:	ncurses module for PHP
-Summary(pl.UTF-8):	Moduł ncurses dla PHP
-Group:		Libraries
-Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
-Provides:	php(ncurses)
-
-%description ncurses
-This PHP module adds support for ncurses functions (only for cli and
-cgi SAPIs).
-
-%description ncurses -l pl.UTF-8
-Moduł PHP dodający obsługę funkcji ncurses (tylko do SAPI cli i cgi).
-
 %package oci8
 Summary:	Oracle 8+ database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych Oracle 8+ dla PHP
@@ -1319,26 +1301,6 @@ baz danych. SQLite sam jest serwerem. Biblioteka SQLite czyta i
 zapisuje dane bezpośrednio z/do plików baz danych znajdujących się na
 dysku.
 
-%package sybase
-Summary:	Sybase DB extension module for PHP
-Summary(pl.UTF-8):	Moduł Sybase DB dla PHP
-Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(sybase)
-Obsoletes:	php-sybase-ct
-Conflicts:	php-sybase-ct
-
-%description sybase
-This is a dynamic shared object (DSO) for PHP that will add Sybase and
-MS SQL databases support through SYBDB library. Currently Sybase
-module is not maintained. Using Sybase-CT module is recommended
-instead.
-
-%description sybase -l pl.UTF-8
-Moduł PHP dodający obsługę baz danych Sybase oraz MS SQL poprzez
-bibliotekę SYBDB. W chwili obecnej moduł Sybase nie jest wspierany.
-Zaleca się używanie modułu Sybase-CT.
-
 %package sybase-ct
 Summary:	Sybase-CT extension module for PHP
 Summary(pl.UTF-8):	Moduł Sybase-CT dla PHP
@@ -1582,7 +1544,6 @@ cp php.ini-dist php.ini
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
-%patch16 -p1
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
@@ -1600,7 +1561,6 @@ patch -p1 < %{PATCH22} || exit 1
 
 %patch29 -p1
 %patch31 -p1
-%patch35 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1717,7 +1677,7 @@ for sapi in $sapis; do
 	--enable-json=shared \
 	--enable-hash \
 	--enable-xmlwriter=shared \
-%if %{with mssql} || %{with sybase} || %{with sybase_ct}
+%if %{with mssql} || %{with sybase_ct}
 	--with-pdo-dblib=shared \
 %endif
 %if %{with interbase} && !%{with interbase_inst}
@@ -1769,14 +1729,13 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
-	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic.mime}%{!?with_mime_magic:--disable-mime-magic} \
+	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	%{?with_mysqli:--with-mysqli=shared} \
-	--with-ncurses=shared \
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
@@ -1792,7 +1751,6 @@ for sapi in $sapis; do
 	--with-regex=php \
 	--without-sablot-js \
 	%{?with_snmp:--with-snmp=shared} \
-	%{?with_sybase:--with-sybase=shared,/usr} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	%{!?with_sqlite:--without-sqlite --without-pdo-sqlite}%{?with_sqlite:--with-sqlite=shared,/usr --enable-sqlite-utf8} \
 	--with-t1lib=shared \
@@ -1939,7 +1897,7 @@ done
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
 
 # for CLI SAPI only
-mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{ncurses,pcntl,readline}.ini,cli.d}
+mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{pcntl,readline}.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
@@ -2075,7 +2033,6 @@ fi
 %extension_scripts soap
 %extension_scripts sockets
 %extension_scripts sqlite
-%extension_scripts sybase
 %extension_scripts sybase-ct
 %extension_scripts sysvmsg
 %extension_scripts sysvsem
@@ -2166,14 +2123,6 @@ fi
 %triggerun mysql -- %{name}-mysql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysql\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun ncurses -- %{name}-ncurses < 4:5.1.2-9.5
-if [ -f %{_sysconfdir}/php-cgi.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cgi.ini
-fi
-if [ -f %{_sysconfdir}/php-cli.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cli.ini
-fi
-
 %triggerun mysqli -- %{name}-mysqli < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysqli\.so/d' %{_sysconfdir}/php.ini
 
@@ -2231,9 +2180,6 @@ fi
 
 %triggerun sqlite -- %{name}-sqlite < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sqlite\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun sybase -- %{name}-sybase < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sybase-ct -- %{name}-sybase-ct < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase-ct\.so/d' %{_sysconfdir}/php.ini
@@ -2514,11 +2460,6 @@ fi
 %attr(755,root,root) %{php_extensiondir}/mysqli.so
 %endif
 
-%files ncurses
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/ncurses.ini
-%attr(755,root,root) %{php_extensiondir}/ncurses.so
-
 %if %{with oci8}
 %files oci8
 %defattr(644,root,root,755)
@@ -2550,7 +2491,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
 %attr(755,root,root) %{php_extensiondir}/pdo.so
 
-%if %{with mssql} || %{with sybase} || %{with sybase_ct}
+%if %{with mssql} || %{with sybase_ct}
 %files pdo-dblib
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_dblib.ini
@@ -2672,13 +2613,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sqlite.ini
 %attr(755,root,root) %{php_extensiondir}/sqlite.so
-%endif
-
-%if %{with sybase}
-%files sybase
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sybase.ini
-%attr(755,root,root) %{php_extensiondir}/sybase.so
 %endif
 
 %if %{with sybase_ct}

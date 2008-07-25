@@ -67,7 +67,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define	_rel	0.14
-%define	_snap	200807080830
+%define	_snap	200807250630
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -81,7 +81,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	e48e452ecefa427fcc7dbe82cfd5fa5d
+# Source0-md5:	eb8f2c9250b2324d8fe408db468bc60c
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -100,7 +100,6 @@ Patch4:		%{name}-libpq_fs_h_path.patch
 Patch5:		%{name}-filter-shared.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
-Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 # XXX: needs fix
@@ -1535,7 +1534,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch5 -p1
 %patch6 -p1
 ####%patch7 -p1 UPDATE
-%patch8 -p1
 %patch9 -p1
 
 cp php.ini-dist php.ini

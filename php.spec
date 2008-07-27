@@ -25,6 +25,7 @@
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
+%bcond_without	mime_magic	# without mime-magic module
 %bcond_without	ming		# without ming extension module
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
@@ -138,7 +139,7 @@ BuildRequires:	expat-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase_ct}
-BuildRequires:	freetds-devel
+BuildRequires:	freetds-devel >= 0.82
 %endif
 BuildRequires:	freetype-devel >= 2.0
 BuildRequires:	gd-devel >= 2.0.28-4
@@ -811,6 +812,22 @@ support.
 
 %description mhash -l pl.UTF-8
 Moduł PHP udostępniający funkcje mieszające z biblioteki mhash.
+
+%package mime_magic
+Summary:	mime_magic extension module for PHP
+Summary(pl.UTF-8):	Moduł mime_magic dla PHP
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	/usr/share/file/magic.mime
+Provides:	php(mime_magic)
+
+%description mime_magic
+This PHP module adds support for MIME type lookup via file magic
+numbers using magic.mime database.
+
+%description mime_magic -l pl.UTF-8
+Moduł PHP dodający obsługę wyszukiwania typów MIME według magicznych
+znaczników plików z użyciem bazy danych magic.mime.
 
 %package ming
 Summary:	ming extension module for PHP
@@ -1715,6 +1732,7 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
+	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
@@ -1993,6 +2011,7 @@ fi
 %extension_scripts mbstring
 %extension_scripts mcrypt
 %extension_scripts mhash
+%extension_scripts mime_magic
 %extension_scripts ming
 %extension_scripts mssql
 %extension_scripts mysql
@@ -2093,6 +2112,9 @@ fi
 
 %triggerun mhash -- %{name}-mhash < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{_sysconfdir}/php.ini
+
+%triggerun mime_magic -- %{name}-mime_magic < 4:5.0.4-9.1
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mime_magic\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ming -- %{name}-ming < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{_sysconfdir}/php.ini
@@ -2405,6 +2427,13 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mhash.ini
 %attr(755,root,root) %{php_extensiondir}/mhash.so
+%endif
+
+%if %{with mime_magic}
+%files mime_magic
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mime_magic.ini
+%attr(755,root,root) %{php_extensiondir}/mime_magic.so
 %endif
 
 %if %{with ming}

@@ -25,7 +25,6 @@
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
-%bcond_without	mime_magic	# without mime-magic module
 %bcond_without	ming		# without ming extension module
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
@@ -66,8 +65,8 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel	0.14
-%define	_snap	200807250630
+%define	_rel	0.18
+%define	_snap	200807271230
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -81,7 +80,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	eb8f2c9250b2324d8fe408db468bc60c
+# Source0-md5:	d83532167568752266f3097c9df9b3a9
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -120,6 +119,7 @@ Patch26:	%{name}-versioning.patch
 Patch27:	%{name}-linkflags-clean.patch
 Patch29:	%{name}-config-dir.patch
 Patch31:	%{name}-fcgi-graceful.patch
+Patch38:	%{name}-tds.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -358,6 +358,7 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	php(date)
+Provides:	php(fileinfo)
 Provides:	php(hash)
 Provides:	php(libxml)
 Provides:	php(modules_api) = %{php_api_version}
@@ -375,6 +376,7 @@ Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
+Obsoletes:	php-pecl-fileinfo
 Obsoletes:	php-session < 3:4.2.1-2
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
@@ -809,22 +811,6 @@ support.
 
 %description mhash -l pl.UTF-8
 Moduł PHP udostępniający funkcje mieszające z biblioteki mhash.
-
-%package mime_magic
-Summary:	mime_magic extension module for PHP
-Summary(pl.UTF-8):	Moduł mime_magic dla PHP
-Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	/usr/share/file/magic.mime
-Provides:	php(mime_magic)
-
-%description mime_magic
-This PHP module adds support for MIME type lookup via file magic
-numbers using magic.mime database.
-
-%description mime_magic -l pl.UTF-8
-Moduł PHP dodający obsługę wyszukiwania typów MIME według magicznych
-znaczników plików z użyciem bazy danych magic.mime.
 
 %package ming
 Summary:	ming extension module for PHP
@@ -1559,6 +1545,7 @@ patch -p1 < %{PATCH22} || exit 1
 
 %patch29 -p1
 %patch31 -p1
+%patch38 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1603,7 +1590,7 @@ if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 	touch _built-conf
 fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
-export CPPFLAGS=-DDEBUG_FASTCGI
+export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP"
 
 sapis="
 %if %{with fcgi}
@@ -1681,7 +1668,8 @@ for sapi in $sapis; do
 %if %{with interbase} && !%{with interbase_inst}
 	--with-pdo-firebird=shared,/usr \
 %endif
-	--with-pdo-mysql=shared \
+	--with-mysql-sock=/var/lib/mysql/mysql.sock \
+	--with-pdo-mysql=shared,mysqlnd \
 	%{?with_oci8:--with-pdo-oci=shared} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
@@ -1727,13 +1715,11 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
-	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
-	--with-mysql-sock=/var/lib/mysql/mysql.sock \
-	%{?with_mysqli:--with-mysqli=shared} \
+	%{?with_mysqli:--with-mysqli=shared,mysqlnd} \
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
@@ -1900,7 +1886,7 @@ mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{pcntl,readline}.ini,cli.d}
 # use system automake and {lib,sh}tool
 ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
-ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
 # as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h
@@ -2007,7 +1993,6 @@ fi
 %extension_scripts mbstring
 %extension_scripts mcrypt
 %extension_scripts mhash
-%extension_scripts mime_magic
 %extension_scripts ming
 %extension_scripts mssql
 %extension_scripts mysql
@@ -2108,9 +2093,6 @@ fi
 
 %triggerun mhash -- %{name}-mhash < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun mime_magic -- %{name}-mime_magic < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mime_magic\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ming -- %{name}-ming < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{_sysconfdir}/php.ini
@@ -2423,13 +2405,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mhash.ini
 %attr(755,root,root) %{php_extensiondir}/mhash.so
-%endif
-
-%if %{with mime_magic}
-%files mime_magic
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mime_magic.ini
-%attr(755,root,root) %{php_extensiondir}/mime_magic.so
 %endif
 
 %if %{with ming}

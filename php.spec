@@ -67,7 +67,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define	_rel	0.18
-%define	_snap	200807271230
+%define	_snap	200808101830
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -81,7 +81,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	d83532167568752266f3097c9df9b3a9
+# Source0-md5:	efc03522ee7fe966f2fb827bc1a0ab31
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -530,20 +530,6 @@ databases (DBA) support.
 %description dba -l pl.UTF-8
 Moduł dla PHP dodający obsługę dla baz danych opartych na plikach
 (DBA).
-
-%package dbase
-Summary:	DBase extension module for PHP
-Summary(pl.UTF-8):	Moduł DBase dla PHP
-Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(dbase)
-
-%description dbase
-This is a dynamic shared object (DSO) for PHP that will add DBase
-support.
-
-%description dbase -l pl.UTF-8
-Moduł PHP ze wsparciem dla DBase.
 
 %package dom
 Summary:	DOM extension module for PHP
@@ -1713,7 +1699,6 @@ for sapi in $sapis; do
 	--with-bz2=shared \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	--with-db4 \
-	--enable-dbase=shared \
 %if %{with xmlrpc}
 	--with-expat-dir=shared,/usr \
 %else
@@ -1993,7 +1978,6 @@ fi
 %extension_scripts ctype
 %extension_scripts curl
 %extension_scripts dba
-%extension_scripts dbase
 %extension_scripts dom
 %extension_scripts exif
 %extension_scripts fdf
@@ -2067,9 +2051,6 @@ fi
 
 %triggerun dba -- %{name}-dba < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dba\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun dbase -- %{name}-dbase < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dbase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dom -- %{name}-dom < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dom\.so/d' %{_sysconfdir}/php.ini
@@ -2322,11 +2303,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dba.ini
 %attr(755,root,root) %{php_extensiondir}/dba.so
-
-%files dbase
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dbase.ini
-%attr(755,root,root) %{php_extensiondir}/dbase.so
 
 %files dom
 %defattr(644,root,root,755)

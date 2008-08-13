@@ -167,7 +167,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 BuildRequires:	pam-devel
-%{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
+BuildRequires:	pcre-devel >= 6.6
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -364,7 +364,7 @@ Provides:	php(hash)
 Provides:	php(libxml)
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
-%{?with_pcre:Provides:	php(pcre)}
+Provides:	php(pcre)
 Provides:	php(reflection)
 Provides:	php(session)
 Provides:	php(simplexml)
@@ -372,7 +372,6 @@ Provides:	php(spl)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
-%{?with_pcre:Provides:	php-pcre}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pcre < 4:5.2.0
@@ -407,7 +406,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf
 Requires:	automake
 Requires:	libtool
-%{?with_pcre:Requires:	pcre-devel >= 6.6}
+Requires:	pcre-devel >= 6.6
 Requires:	shtool
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel

@@ -59,8 +59,7 @@
 %undefine	with_mm
 %endif
 
-%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha
-# ppc disabled (broken on th-ppc)
+%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha ppc
 %undefine	with_interbase
 %endif
 
@@ -73,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 7
+%define		rel 6
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -88,7 +87,6 @@ License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	7380ffecebd95c6edb317ef861229ebd
-Source1:	zend.gif
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-cgi.ini
@@ -133,10 +131,7 @@ Patch31:	%{name}-fcgi-graceful.patch
 Patch32:	%{name}-apr-apu.patch
 Patch33:	%{name}-fcgi-error_log-no-newlines.patch
 Patch34:	%{name}-curl-limit-speed.patch
-Patch35:	%{name}-ac.patch
-Patch36:	%{name}-mime_magic.patch
-Patch37:	%{name}-libtool.patch
-Patch38:	%{name}-tds.patch
+
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -156,7 +151,7 @@ BuildRequires:	expat-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
-BuildRequires:	freetds-devel >= 0.82
+BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
 BuildRequires:	gd-devel >= 2.0.28-4
@@ -169,7 +164,7 @@ BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libtiff-devel
-BuildRequires:	libtool >= 2.2
+BuildRequires:	libtool >= 1.4.3
 BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.1.0
@@ -411,7 +406,7 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf
 Requires:	automake
-Requires:	libtool >= 2.2
+Requires:	libtool
 %{?with_pcre:Requires:	pcre-devel >= 6.6}
 Requires:	shtool
 Obsoletes:	php-pear-devel
@@ -841,7 +836,6 @@ Summary:	ming extension module for PHP
 Summary(pl.UTF-8):	Moduł ming dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	ming >= 0.3
 Provides:	php(ming)
 
 %description ming
@@ -1601,10 +1595,6 @@ patch -p1 < %{PATCH22} || exit 1
 %patch32 -p1
 %patch33 -p1
 %patch34 -p1
-%patch35 -p1
-%patch36 -p1
-%patch37 -p1
-%patch38 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1659,7 +1649,6 @@ if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 	rm -f Makefile.{fcgi,cgi,cli,apxs{1,2}} # now remove Makefile copies
 	%{__libtoolize}
 	%{__aclocal}
-	cp -f /usr/share/automake/config.* .
 	./buildconf --force
 	touch _built-conf
 fi
@@ -1869,7 +1858,6 @@ unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi}} \
-	$RPM_BUILD_ROOT%{_datadir}/apache-icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
@@ -1918,14 +1906,12 @@ install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
-install %{SOURCE1} php.gif $RPM_BUILD_ROOT%{_datadir}/apache-icons
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
 install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
-install %{SOURCE1} php.gif $RPM_BUILD_ROOT%{_datadir}/apache-icons
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
@@ -1956,10 +1942,8 @@ mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{ncurses,pcntl,readline}.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
-for i in libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4; do
-	ln -snf %{_aclocaldir}/${i} $RPM_BUILD_ROOT%{_libdir}/php/build
-done
-ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
 ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
 # as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h
@@ -2283,7 +2267,6 @@ fi
 %dir %{_sysconfdir}/apache.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
 %attr(755,root,root) %{_libdir}/apache1/libphp5.so
-%{_datadir}/apache-icons/*
 %endif
 
 %if %{with apache2}
@@ -2293,7 +2276,6 @@ fi
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
-%{_datadir}/apache-icons/*
 %endif
 
 %if %{with fcgi}

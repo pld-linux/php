@@ -72,7 +72,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 6
+%define		rel 7
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -96,6 +96,8 @@ Source7:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
 # Source7-md5:	47a742fa9fab2826ad10c13a2376111a
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source8:	%{name}_browscap.ini
+Source9:	http://ftp.linux.ee/pub/gentoo/distfiles/distfiles/%{name}-patchset-%{version}-r8.tar.bz2
+# Source9-md5:	0f411800537648d0748417124291bd58
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -1583,13 +1585,18 @@ cp php.ini-dist php.ini
 
 %if %{with hardening}
 zcat %{SOURCE7} | patch -p1 || exit 1
-patch -p1 < %{PATCH22} || exit 1
+%{__patch} -p1 < %{PATCH22} || exit 1
 %endif
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
 
 %{?with_versioning:%patch26 -p1}
+
+%{__tar} jxf %{SOURCE9}
+for a in %{version}/%{version}/*.patch; do
+	%{__patch} -p1 < $a
+done
 
 %patch28 -p1
 %patch29 -p1

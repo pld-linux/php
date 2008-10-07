@@ -131,7 +131,9 @@ Patch31:	%{name}-fcgi-graceful.patch
 Patch32:	%{name}-apr-apu.patch
 Patch33:	%{name}-fcgi-error_log-no-newlines.patch
 Patch34:	%{name}-curl-limit-speed.patch
-
+Patch39:	%{name}-mysql-charsetphpini.patch
+Patch40:	%{name}-mysqli-charsetphpini.patch
+Patch41:	%{name}-pdo_mysql-charsetphpini.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1595,6 +1597,11 @@ patch -p1 < %{PATCH22} || exit 1
 %patch32 -p1
 %patch33 -p1
 %patch34 -p1
+
+# mysql default charset for mysql/mysql/pdo-mysql extensions
+%patch39 -p1
+%patch40 -p0
+%patch41 -p0
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

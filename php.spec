@@ -73,7 +73,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 10
+%define		rel 11
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -97,6 +97,8 @@ Source7:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
 # Source7-md5:	47a742fa9fab2826ad10c13a2376111a
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source8:	%{name}_browscap.ini
+Source9:	http://ftp.linux.ee/pub/gentoo/distfiles/distfiles/%{name}-patchset-%{version}-r8.tar.bz2
+# Source9-md5:	0f411800537648d0748417124291bd58
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -136,6 +138,10 @@ Patch35:	%{name}-ac.patch
 Patch36:	%{name}-mime_magic.patch
 Patch37:	%{name}-libtool.patch
 Patch38:	%{name}-tds.patch
+Patch39:	%{name}-mysql-charsetphpini.patch
+Patch40:	%{name}-mysqli-charsetphpini.patch
+Patch41:	%{name}-pdo_mysql-charsetphpini.patch
+Patch42:	%{name}-ini-charsetphpini.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1593,6 +1599,11 @@ patch -p1 < %{PATCH22} || exit 1
 
 %{?with_versioning:%patch26 -p1}
 
+%{__tar} jxf %{SOURCE9}
+for a in %{version}/%{version}/*.patch; do
+	%{__patch} -p1 < $a
+done
+
 %patch28 -p1
 %patch29 -p1
 %patch30 -p1
@@ -1604,6 +1615,12 @@ patch -p1 < %{PATCH22} || exit 1
 %patch36 -p1
 %patch37 -p1
 %patch38 -p1
+
+# mysql default charset for mysql/mysql/pdo-mysql extensions
+%patch39 -p1
+%patch40 -p0
+%patch41 -p0
+%patch42 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

@@ -2362,7 +2362,8 @@ fi
 %{_libdir}/libphp_common.la
 %{_includedir}/php
 %{_libdir}/php/build
-%{_mandir}/man1/*
+%{_mandir}/man1/php-config.1*
+%{_mandir}/man1/phpize.1*
 
 %files bcmath
 %defattr(644,root,root,755)

@@ -143,6 +143,9 @@ Patch40:	%{name}-mysqli-charsetphpini.patch
 Patch41:	%{name}-pdo_mysql-charsetphpini.patch
 Patch42:	%{name}-ini-charsetphpini.patch
 URL:		http://www.php.net/
+# Requires review:
+# http://securitytracker.com/alerts/2008/Oct/1020995.html
+BuildRequires:	security(CVE-2008-3659)
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.53

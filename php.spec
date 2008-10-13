@@ -146,6 +146,8 @@ URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
 BuildRequires:	security(CVE-2008-3659)
+# http://securitytracker.com/alerts/2008/Oct/1020994.html
+BuildRequires:	security(CVE-2008-3660)
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.53

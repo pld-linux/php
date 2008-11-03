@@ -188,3 +188,105 @@
  
  #endif
  
+--- php-5.2.6/sapi/cgi/fpm/fpm_children.c	2008-11-03 21:47:04.141104879 +0200
++++ php-5.2.6-zts/sapi/cgi/fpm/fpm_children.c	2008-11-03 21:45:17.088199172 +0200
+@@ -32,7 +32,7 @@
+ static time_t *last_faults;
+ static int fault;
+ 
+-static int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop);
++static int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop TSRMLS_DC);
+ 
+ static void fpm_children_cleanup(int which, void *arg)
+ {
+@@ -127,7 +127,7 @@
+ 	return child;
+ }
+ 
+-static void fpm_child_init(struct fpm_worker_pool_s *wp)
++static void fpm_child_init(struct fpm_worker_pool_s *wp TSRMLS_DC)
+ {
+ 	fpm_globals.max_requests = wp->config->max_requests;
+ 
+@@ -135,7 +135,7 @@
+ 		0 > fpm_unix_init_child(wp) ||
+ 		0 > fpm_signals_init_child() ||
+ 		0 > fpm_env_init_child(wp) ||
+-		0 > fpm_php_init_child(wp)) {
++		0 > fpm_php_init_child(wp TSRMLS_CC)) {
+ 
+ 		zlog(ZLOG_STUFF, ZLOG_ERROR, "child failed to initialize (pool %s)", wp->config->name);
+ 		exit(255);
+@@ -154,7 +154,7 @@
+ 	return 0;
+ }
+ 
+-void fpm_children_bury()
++void fpm_children_bury(TSRMLS_D)
+ {
+ 	int status;
+ 	pid_t pid;
+@@ -246,7 +246,7 @@
+ 				}
+ 			}
+ 
+-			fpm_children_make(wp, 1 /* in event loop */);
++			fpm_children_make(wp, 1 /* in event loop */ TSRMLS_CC);
+ 
+ 			if (fpm_globals.is_child) {
+ 				break;
+@@ -308,7 +308,7 @@
+ 	fpm_child_link(child);
+ }
+ 
+-static int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop)
++static int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop TSRMLS_DC)
+ {
+ 	int enough = 0;
+ 	pid_t pid;
+@@ -333,7 +333,7 @@
+ 				if (in_event_loop) {
+ 					fpm_event_exit_loop();
+ 				}
+-				fpm_child_init(wp);
++				fpm_child_init(wp TSRMLS_CC);
+ 				return 0;
+ 
+ 			case -1 :
+@@ -357,9 +357,9 @@
+ 	return 1; /* we are done */
+ }
+ 
+-int fpm_children_create_initial(struct fpm_worker_pool_s *wp)
++int fpm_children_create_initial(struct fpm_worker_pool_s *wp TSRMLS_DC)
+ {
+-	return fpm_children_make(wp, 0 /* not in event loop yet */);
++	return fpm_children_make(wp, 0 /* not in event loop yet */ TSRMLS_CC);
+ }
+ 
+ int fpm_children_init_main()
+--- php-5.2.6/sapi/cgi/fpm/fpm_children.h	2008-11-03 21:47:04.141104879 +0200
++++ php-5.2.6-zts/sapi/cgi/fpm/fpm_children.h	2008-11-03 21:45:49.607859881 +0200
+@@ -9,9 +9,10 @@
+ #include <sys/types.h>
+ #include <event.h>
+ 
++#include "TSRM.h"
+ #include "fpm_worker_pool.h"
+ 
+-int fpm_children_create_initial(struct fpm_worker_pool_s *wp);
++int fpm_children_create_initial(struct fpm_worker_pool_s *wp TSRMLS_DC);
+ int fpm_children_free(struct fpm_child_s *child);
+ void fpm_children_bury();
+ int fpm_children_init_main();
+--- php-5.2.6/sapi/cgi/fpm/fpm_clock.c	2008-11-03 21:47:04.141104879 +0200
++++ php-5.2.6-zts/sapi/cgi/fpm/fpm_clock.c	2008-11-03 21:46:02.415277547 +0200
+@@ -13,7 +13,7 @@
+ 
+ 
+ /* posix monotonic clock - preferred source of time */
+-#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_MONOTONIC)
++#if 0 && defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_MONOTONIC)
+ 
+ static int monotonic_works;
+ 

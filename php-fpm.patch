@@ -483,16 +483,20 @@ diff -Nru php-5.2.6.vanilla/sapi/cgi/config9.m4 php-5.2.6.fpm/sapi/cgi/config9.m
      dnl --enable-force-cgi-redirect
      AC_MSG_CHECKING(whether to force Apache CGI redirect)
      if test "$PHP_FORCE_CGI_REDIRECT" = "yes"; then
-@@ -93,10 +111,10 @@
-         BUILD_CGI="echo '\#! .' > php.sym && echo >>php.sym && nm -BCpg \`echo \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) | sed 's/\([A-Za-z0-9_]*\)\.lo/\1.o/g'\` | \$(AWK) '{ if (((\$\$2 == \"T\") || (\$\$2 == \"D\") || (\$\$2 == \"B\")) && (substr(\$\$3,1,1) != \".\")) { print \$\$3 } }' | sort -u >> php.sym && \$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) -Wl,-brtl -Wl,-bE:php.sym \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
+@@ -108,13 +108,13 @@
+ 
+     case $host_alias in
+       *aix*)
+-        BUILD_CGI="echo '\#! .' > php.sym && echo >>php.sym && nm -BCpg \`echo \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) | sed 's/\([A-Za-z0-9_]*\)\.lo/\1.o/g'\` | \$(AWK) '{ if (((\$\$2 == \"T\") || (\$\$2 == \"D\") || (\$\$2 == \"B\")) && (substr(\$\$3,1,1) != \".\")) { print \$\$3 } }' | sort -u >> php.sym && \$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) -Wl,-brtl -Wl,-bE:php.sym \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
++        BUILD_CGI="echo '\#! .' > php.sym && echo >>php.sym && nm -BCpg \`echo \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) | sed 's/\([A-Za-z0-9_]*\)\.lo/\1.o/g'\` | \$(AWK) '{ if (((\$\$2 == \"T\") || (\$\$2 == \"D\") || (\$\$2 == \"B\")) && (substr(\$\$3,1,1) != \".\")) { print \$\$3 } }' | sort -u >> php.sym && \$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) -Wl,-brtl -Wl,-bE:php.sym \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(SAPI_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
          ;;
        *darwin*)
--        BUILD_CGI="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_SAPI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
-+        BUILD_CGI="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_SAPI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(SAPI_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
+-        BUILD_CGI="\$(CC) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_SAPI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
++        BUILD_CGI="\$(CC) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_SAPI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(SAPI_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
        ;;
        *)
--        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
-+        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(SAPI_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
+-        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
++        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(SAPI_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
        ;;
      esac
  
@@ -1238,10 +1242,9 @@ diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/conf/php-fpm.conf.in php-5.2.6.fpm/sapi
 +	</workers>
 +
 +</configuration>
-diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/config.m4 php-5.2.6.fpm/sapi/cgi/fpm/config.m4
---- php-5.2.6.vanilla/sapi/cgi/fpm/config.m4	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/cgi/fpm/config.m4	2008-09-19 05:22:37.000000000 +0400
-@@ -0,0 +1,145 @@
+--- php-5.2.6.fpm/sapi/cgi/fpm/config.m4	2008-09-19 05:22:37.000000000 +0400
++++ php-5.2.6.fpm/sapi/cgi/fpm/config.m4    2008-09-19 05:22:37.000000000 +0400
+@@ -0,0 +1,118 @@
 +
 +FPM_VERSION="0.5.9"
 +
@@ -1261,8 +1264,8 @@ diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/config.m4 php-5.2.6.fpm/sapi/cgi/fpm/co
 +AC_FPM_TRACE
 +dnl AC_FPM_JUDY
 +
-+LIBEVENT_CFLAGS="-I$abs_srcdir/libevent"
-+LIBEVENT_LIBS="$abs_builddir/libevent/libevent.a"
++LIBEVENT_CFLAGS=""
++LIBEVENT_LIBS="-levent"
 +
 +SAPI_EXTRA_DEPS="$LIBEVENT_LIBS"
 +
@@ -1312,33 +1315,6 @@ diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/config.m4 php-5.2.6.fpm/sapi/cgi/fpm/co
 +PHP_ADD_BUILD_DIR(sapi/cgi/fpm)
 +
 +install_fpm="install-fpm"
-+
-+PHP_CONFIGURE_PART(Configuring libevent)
-+
-+test -d "$abs_builddir/libevent" || mkdir -p $abs_builddir/libevent
-+
-+dnl this is a bad hack
-+
-+chmod +x "$abs_srcdir/libevent/configure" \
-+		"$abs_srcdir/libevent/config.guess" \
-+		"$abs_srcdir/libevent/config.sub" \
-+		"$abs_srcdir/libevent/depcomp" \
-+		"$abs_srcdir/libevent/install-sh" \
-+		"$abs_srcdir/libevent/missing" \
-+		"$abs_srcdir/libevent/mkinstalldirs"
-+
-+libevent_configure="cd $abs_builddir/libevent ; CFLAGS=\"$CFLAGS $GCC_CFLAGS\" $abs_srcdir/libevent/configure --disable-shared"
-+
-+(eval $libevent_configure)
-+
-+if test ! -f "$abs_builddir/libevent/Makefile" ; then
-+	echo "Failed to configure libevent" >&2
-+	exit 1
-+fi
-+
-+dnl another hack for stealing libevent dependant library list
-+
-+LIBEVENT_LIBS="$LIBEVENT_LIBS `echo "@LIBS@" | $abs_builddir/libevent/config.status --file=-:-`"
 +
 +SAPI_EXTRA_LIBS="$LIBEVENT_LIBS $LIBXML_LIBS $JUDY_LIBS"
 +
@@ -7156,10 +7132,9 @@ diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/zlog.h php-5.2.6.fpm/sapi/cgi/fpm/zlog.
 +#define ZLOG_SYSERROR (ZLOG_ERROR | ZLOG_HAVE_ERRNO)
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/cgi/Makefile.frag php-5.2.6.fpm/sapi/cgi/Makefile.frag
---- php-5.2.6.vanilla/sapi/cgi/Makefile.frag	2003-07-02 05:08:26.000000000 +0400
-+++ php-5.2.6.fpm/sapi/cgi/Makefile.frag	2008-05-01 20:42:06.000000000 +0400
+--- php-5.2.6/sapi/cgi/Makefile.frag~	2008-11-03 19:29:12.000000000 +0200
++++ php-5.2.6/sapi/cgi/Makefile.frag	2008-11-03 19:31:19.361921087 +0200
 @@ -1,2 +1,2 @@
--$(SAPI_CGI_PATH): $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS)
-+$(SAPI_CGI_PATH): $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)
+-$(SAPI_CGI_PATH): libphp_common.la $(PHP_SAPI_OBJS)
++$(SAPI_CGI_PATH): libphp_common.la $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)
  	$(BUILD_CGI)

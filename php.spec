@@ -142,6 +142,7 @@ Patch39:	%{name}-mysql-charsetphpini.patch
 Patch40:	%{name}-mysqli-charsetphpini.patch
 Patch41:	%{name}-pdo_mysql-charsetphpini.patch
 Patch42:	%{name}-ini-charsetphpini.patch
+Patch43:	%{name}-use-prog_sendmail.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -1596,7 +1597,7 @@ cp php.ini-dist php.ini
 
 %if %{with hardening}
 zcat %{SOURCE7} | patch -p1 || exit 1
-patch -p1 < %{PATCH22} || exit 1
+%{__patch} -p1 < %{PATCH22} || exit 1
 %endif
 %patch23 -p1
 %patch24 -p1
@@ -1626,6 +1627,8 @@ done
 %patch40 -p0
 %patch41 -p0
 %patch42 -p1
+
+%patch43 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

@@ -345,29 +345,11 @@ diff -Nru php-5.2.6.vanilla/main/php_config.h.in php-5.2.6.fpm/main/php_config.h
  	if (bindpath) {
  		fcgi_fd = fcgi_listen(bindpath, 128);
  		if (fcgi_fd < 0) {
-@@ -1473,7 +1578,7 @@
+@@ -1625,7 +1625,11 @@
  	
  	if (fastcgi) {
  		/* How many times to run PHP scripts before dying */
 -		if (getenv("PHP_FCGI_MAX_REQUESTS")) {
-+		if (!fpm && getenv("PHP_FCGI_MAX_REQUESTS")) {
- 			max_requests = atoi(getenv("PHP_FCGI_MAX_REQUESTS"));
- 			if (max_requests < 0) {
- 				fprintf(stderr, "PHP_FCGI_MAX_REQUESTS is not valid\n");
-@@ -1490,7 +1595,7 @@
- 
- #ifndef PHP_WIN32
- 	/* Pre-fork, if required */
--	if (getenv("PHP_FCGI_CHILDREN")) {
-+	if (!fpm && getenv("PHP_FCGI_CHILDREN")) {
- 		children = atoi(getenv("PHP_FCGI_CHILDREN"));
- 		if (children < 0) {
- 			fprintf(stderr, "PHP_FCGI_CHILDREN is not valid\n");
-@@ -1520,7 +1625,11 @@
- 	
- 	if (fastcgi) {
- 		/* How many times to run PHP scripts before dying */
--		if (!fpm && getenv("PHP_FCGI_MAX_REQUESTS")) {
 +		if (
 +#if PHP_FASTCGI_PM
 +				!fpm &&
@@ -376,11 +358,11 @@ diff -Nru php-5.2.6.vanilla/main/php_config.h.in php-5.2.6.fpm/main/php_config.h
  			max_requests = atoi(getenv("PHP_FCGI_MAX_REQUESTS"));
  			if (max_requests < 0) {
  				fprintf(stderr, "PHP_FCGI_MAX_REQUESTS is not valid\n");
-@@ -1537,7 +1646,11 @@
+@@ -1642,7 +1646,11 @@
  
  #ifndef PHP_WIN32
  	/* Pre-fork, if required */
--	if (!fpm && getenv("PHP_FCGI_CHILDREN")) {
+-	if (getenv("PHP_FCGI_CHILDREN")) {
 +	if (
 +#if PHP_FASTCGI_PM
 +			!fpm &&

@@ -8,8 +8,8 @@ diff -Nru php-5.2.6.vanilla/configure.in php-5.2.6.fpm/configure.in
  
 +if test "$PHP_FASTCGI" = "yes" -a "$PHP_FPM" = "yes"; then
 +  PHP_CONFIGURE_PART(Running FastCGI Process Manager checks)
-+  sinclude(sapi/fpm/fpm/acinclude.m4)
-+  sinclude(sapi/fpm/fpm/config.m4)
++  sinclude(sapi/cgi/fpm/acinclude.m4)
++  sinclude(sapi/cgi/fpm/config.m4)
 +fi
 +
  divert(3)
@@ -129,9 +129,9 @@ diff -Nru php-5.2.6.vanilla/main/php_config.h.in php-5.2.6.fpm/main/php_config.h
  /* Define if system uses EBCDIC */
  #undef CHARSET_EBCDIC
  
-diff -Nru php-5.2.6.vanilla/sapi/fpm/cgi_main.c php-5.2.6.fpm/sapi/fpm/cgi_main.c
---- php-5.2.6.vanilla/sapi/fpm/cgi_main.c	2008-04-09 13:16:40.000000000 +0400
-+++ php-5.2.6.fpm/sapi/fpm/cgi_main.c	2008-07-22 01:50:58.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/cgi_main.c php-5.2.6.fpm/sapi/cgi/cgi_main.c
+--- php-5.2.6.vanilla/sapi/cgi/cgi_main.c	2008-04-09 13:16:40.000000000 +0400
++++ php-5.2.6.fpm/sapi/cgi/cgi_main.c	2008-07-22 01:50:58.000000000 +0400
 @@ -55,6 +55,9 @@
  #if HAVE_SYS_WAIT_H
  #include <sys/wait.h>
@@ -448,9 +448,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/cgi_main.c php-5.2.6.fpm/sapi/fpm/cgi_main.
  #endif
  
  		if (cgi_sapi_module.php_ini_path_override) {
-diff -Nru php-5.2.6.vanilla/sapi/fpm/config9.m4 php-5.2.6.fpm/sapi/fpm/config9.m4
---- php-5.2.6.vanilla/sapi/fpm/config9.m4	2007-07-12 03:20:36.000000000 +0400
-+++ php-5.2.6.fpm/sapi/fpm/config9.m4	2008-07-20 20:46:41.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/config9.m4 php-5.2.6.fpm/sapi/cgi/config9.m4
+--- php-5.2.6.vanilla/sapi/cgi/config9.m4	2007-07-12 03:20:36.000000000 +0400
++++ php-5.2.6.fpm/sapi/cgi/config9.m4	2008-07-20 20:46:41.000000000 +0400
 @@ -22,6 +22,10 @@
  [  --disable-path-info-check CGI: If this is disabled, paths such as
                              /info.php/test?a=b will fail to work], yes, no)
@@ -496,9 +496,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/config9.m4 php-5.2.6.fpm/sapi/fpm/config9.m
        ;;
      esac
  
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fastcgi.c php-5.2.6.fpm/sapi/fpm/fastcgi.c
---- php-5.2.6.vanilla/sapi/fpm/fastcgi.c	2008-04-03 14:24:44.000000000 +0400
-+++ php-5.2.6.fpm/sapi/fpm/fastcgi.c	2008-05-15 23:37:01.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fastcgi.c php-5.2.6.fpm/sapi/cgi/fastcgi.c
+--- php-5.2.6.vanilla/sapi/cgi/fastcgi.c	2008-04-03 14:24:44.000000000 +0400
++++ php-5.2.6.fpm/sapi/cgi/fastcgi.c	2008-05-15 23:37:01.000000000 +0400
 @@ -27,6 +27,11 @@
  #include <stdarg.h>
  #include <errno.h>
@@ -669,9 +669,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fastcgi.c php-5.2.6.fpm/sapi/fpm/fastcgi.c
  #if defined(HAVE_SYS_POLL_H) && defined(HAVE_POLL)
  					struct pollfd fds;
  					int ret;
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fastcgi.h php-5.2.6.fpm/sapi/fpm/fastcgi.h
---- php-5.2.6.vanilla/sapi/fpm/fastcgi.h	2007-12-31 10:20:16.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fastcgi.h	2008-05-01 20:42:06.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fastcgi.h php-5.2.6.fpm/sapi/cgi/fastcgi.h
+--- php-5.2.6.vanilla/sapi/cgi/fastcgi.h	2007-12-31 10:20:16.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fastcgi.h	2008-05-01 20:42:06.000000000 +0400
 @@ -114,6 +114,9 @@
  int fcgi_init(void);
  void fcgi_shutdown(void);
@@ -691,9 +691,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fastcgi.h php-5.2.6.fpm/sapi/fpm/fastcgi.h
  #ifdef PHP_WIN32
  void fcgi_impersonate(void);
  #endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/acinclude.m4 php-5.2.6.fpm/sapi/fpm/fpm/acinclude.m4
---- php-5.2.6.vanilla/sapi/fpm/fpm/acinclude.m4	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/acinclude.m4	2008-07-21 06:39:38.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/acinclude.m4 php-5.2.6.fpm/sapi/cgi/fpm/acinclude.m4
+--- php-5.2.6.vanilla/sapi/cgi/fpm/acinclude.m4	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/acinclude.m4	2008-07-21 06:39:38.000000000 +0400
 @@ -0,0 +1,383 @@
 +
 +AC_DEFUN([AC_FPM_CHECK_FUNC],
@@ -1078,9 +1078,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/acinclude.m4 php-5.2.6.fpm/sapi/fpm/fpm
 +		AC_MSG_RESULT([no])
 +	])
 +])
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/conf/php-fpm.conf.in php-5.2.6.fpm/sapi/fpm/fpm/conf/php-fpm.conf.in
---- php-5.2.6.vanilla/sapi/fpm/fpm/conf/php-fpm.conf.in	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/conf/php-fpm.conf.in	2008-05-23 00:53:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/conf/php-fpm.conf.in php-5.2.6.fpm/sapi/cgi/fpm/conf/php-fpm.conf.in
+--- php-5.2.6.vanilla/sapi/cgi/fpm/conf/php-fpm.conf.in	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/conf/php-fpm.conf.in	2008-05-23 00:53:15.000000000 +0400
 @@ -0,0 +1,156 @@
 +<?xml version="1.0" ?>
 +<configuration>
@@ -1238,9 +1238,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/conf/php-fpm.conf.in php-5.2.6.fpm/sapi
 +	</workers>
 +
 +</configuration>
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/config.m4 php-5.2.6.fpm/sapi/fpm/fpm/config.m4
---- php-5.2.6.vanilla/sapi/fpm/fpm/config.m4	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/config.m4	2008-09-19 05:22:37.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/config.m4 php-5.2.6.fpm/sapi/cgi/fpm/config.m4
+--- php-5.2.6.vanilla/sapi/cgi/fpm/config.m4	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/config.m4	2008-09-19 05:22:37.000000000 +0400
 @@ -0,0 +1,145 @@
 +
 +FPM_VERSION="0.5.9"
@@ -1291,7 +1291,7 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/config.m4 php-5.2.6.fpm/sapi/fpm/fpm/co
 +FPM_CFLAGS="$LIBEVENT_CFLAGS $LIBXML_CFLAGS $JUDY_CFLAGS"
 +
 +dnl FPM_CFLAGS="$FPM_CFLAGS -DJUDYERROR_NOTEST" # for Judy
-+FPM_CFLAGS="$FPM_CFLAGS -I$abs_srcdir/sapi/fpm" # for fastcgi.h
++FPM_CFLAGS="$FPM_CFLAGS -I$abs_srcdir/sapi/cgi" # for fastcgi.h
 +
 +if test "$ICC" = "yes" ; then
 +	FPM_ADD_CFLAGS="-Wall -wd279,310,869,810,981"
@@ -1305,11 +1305,11 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/config.m4 php-5.2.6.fpm/sapi/fpm/fpm/co
 +
 +FPM_CFLAGS="$FPM_ADD_CFLAGS $FPM_CFLAGS"
 +
-+PHP_ADD_MAKEFILE_FRAGMENT($abs_srcdir/sapi/fpm/fpm/Makefile.frag)
++PHP_ADD_MAKEFILE_FRAGMENT($abs_srcdir/sapi/cgi/fpm/Makefile.frag)
 +
-+PHP_ADD_SOURCES(sapi/fpm/fpm, $FPM_SOURCES, $FPM_CFLAGS, sapi)
++PHP_ADD_SOURCES(sapi/cgi/fpm, $FPM_SOURCES, $FPM_CFLAGS, sapi)
 +
-+PHP_ADD_BUILD_DIR(sapi/fpm/fpm)
++PHP_ADD_BUILD_DIR(sapi/cgi/fpm)
 +
 +install_fpm="install-fpm"
 +
@@ -1384,12 +1384,12 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/config.m4 php-5.2.6.fpm/sapi/fpm/fpm/co
 +PHP_SUBST_OLD(php_fpm_group)
 +PHP_SUBST_OLD(FPM_VERSION)
 +
-+PHP_OUTPUT(sapi/fpm/fpm/fpm_autoconf.h)
-+PHP_OUTPUT(sapi/fpm/fpm/php-fpm.conf:sapi/fpm/fpm/conf/php-fpm.conf.in)
-+PHP_OUTPUT(sapi/fpm/fpm/php-fpm:sapi/fpm/fpm/init.d/php-fpm.in)
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_arrays.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_arrays.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_arrays.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_arrays.h	2008-05-24 21:38:47.000000000 +0400
++PHP_OUTPUT(sapi/cgi/fpm/fpm_autoconf.h)
++PHP_OUTPUT(sapi/cgi/fpm/php-fpm.conf:sapi/cgi/fpm/conf/php-fpm.conf.in)
++PHP_OUTPUT(sapi/cgi/fpm/php-fpm:sapi/cgi/fpm/init.d/php-fpm.in)
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_arrays.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_arrays.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_arrays.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_arrays.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,110 @@
 +
 +	/* $Id$ */
@@ -1501,9 +1501,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_arrays.h php-5.2.6.fpm/sapi/fpm/fpm
 +}
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_atomic.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_atomic.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_atomic.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_atomic.h	2008-09-19 03:34:11.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_atomic.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_atomic.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_atomic.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_atomic.h	2008-09-19 03:34:11.000000000 +0400
 @@ -0,0 +1,85 @@
 +
 +	/* $Id$ */
@@ -1590,9 +1590,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_atomic.h php-5.2.6.fpm/sapi/fpm/fpm
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_autoconf.h.in php-5.2.6.fpm/sapi/fpm/fpm/fpm_autoconf.h.in
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_autoconf.h.in	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_autoconf.h.in	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_autoconf.h.in php-5.2.6.fpm/sapi/cgi/fpm/fpm_autoconf.h.in
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_autoconf.h.in	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_autoconf.h.in	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,9 @@
 +
 +	/* $Id$ */
@@ -1603,9 +1603,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_autoconf.h.in php-5.2.6.fpm/sapi/fp
 +#define PHP_FPM_LOG_PATH  "@php_fpm_log_path@"
 +#define PHP_FPM_PID_PATH  "@php_fpm_pid_path@"
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm.c php-5.2.6.fpm/sapi/fpm/fpm/fpm.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm.c	2008-07-20 20:38:31.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm.c php-5.2.6.fpm/sapi/cgi/fpm/fpm.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm.c	2008-07-20 20:38:31.000000000 +0400
 @@ -0,0 +1,84 @@
 +
 +	/* $Id$ */
@@ -1691,9 +1691,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm.c php-5.2.6.fpm/sapi/fpm/fpm/fpm.c
 +	return fpm_globals.listening_socket;
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_children.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_children.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_children.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_children.c	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_children.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_children.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_children.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_children.c	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,383 @@
 +
 +	/* $Id$ */
@@ -2078,9 +2078,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_children.c php-5.2.6.fpm/sapi/fpm/f
 +	return 0;
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_children.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_children.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_children.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_children.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_children.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_children.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_children.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_children.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,33 @@
 +
 +	/* $Id$ */
@@ -2115,9 +2115,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_children.h php-5.2.6.fpm/sapi/fpm/f
 +};
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_cleanup.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_cleanup.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_cleanup.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_cleanup.c	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_cleanup.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_cleanup.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_cleanup.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_cleanup.c	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,51 @@
 +
 +	/* $Id$ */
@@ -2170,9 +2170,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_cleanup.c php-5.2.6.fpm/sapi/fpm/fp
 +	fpm_array_free(&cleanups);
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_cleanup.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_cleanup.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_cleanup.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_cleanup.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_cleanup.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_cleanup.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_cleanup.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_cleanup.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,21 @@
 +
 +	/* $Id$ */
@@ -2195,9 +2195,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_cleanup.h php-5.2.6.fpm/sapi/fpm/fp
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_clock.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_clock.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_clock.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_clock.c	2008-09-19 03:19:59.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_clock.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_clock.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_clock.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_clock.c	2008-09-19 03:19:59.000000000 +0400
 @@ -0,0 +1,115 @@
 +
 +	/* $Id$ */
@@ -2314,9 +2314,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_clock.c php-5.2.6.fpm/sapi/fpm/fpm/
 +}
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_clock.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_clock.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_clock.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_clock.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_clock.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_clock.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_clock.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_clock.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,13 @@
 +
 +	/* $Id$ */
@@ -2331,9 +2331,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_clock.h php-5.2.6.fpm/sapi/fpm/fpm/
 +int fpm_clock_get(struct timeval *tv);
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_conf.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_conf.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_conf.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_conf.c	2008-09-19 04:54:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_conf.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_conf.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_conf.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_conf.c	2008-09-19 04:54:15.000000000 +0400
 @@ -0,0 +1,530 @@
 +
 +	/* $Id$ */
@@ -2865,9 +2865,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_conf.c php-5.2.6.fpm/sapi/fpm/fpm/f
 +
 +	return 0;
 +}
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_conf.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_conf.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_conf.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_conf.h	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_conf.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_conf.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_conf.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_conf.h	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,73 @@
 +
 +	/* $Id$ */
@@ -2942,9 +2942,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_conf.h php-5.2.6.fpm/sapi/fpm/fpm/f
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_config.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_config.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_config.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_config.h	2008-05-25 04:30:43.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_config.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_config.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_config.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_config.h	2008-05-25 04:30:43.000000000 +0400
 @@ -0,0 +1,39 @@
 +
 +	/* $Id$ */
@@ -2985,9 +2985,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_config.h php-5.2.6.fpm/sapi/fpm/fpm
 +#define HAVE_FPM_TRACE 0
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_env.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_env.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_env.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_env.c	2008-09-19 03:19:59.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_env.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_env.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_env.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_env.c	2008-09-19 03:19:59.000000000 +0400
 @@ -0,0 +1,125 @@
 +
 +	/* $Id$ */
@@ -3114,9 +3114,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_env.c php-5.2.6.fpm/sapi/fpm/fpm/fp
 +
 +	return 0;
 +}
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_env.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_env.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_env.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_env.h	2008-09-19 03:19:59.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_env.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_env.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_env.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_env.h	2008-09-19 03:19:59.000000000 +0400
 @@ -0,0 +1,24 @@
 +
 +	/* $Id$ */
@@ -3142,9 +3142,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_env.h php-5.2.6.fpm/sapi/fpm/fpm/fp
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_events.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_events.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_events.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_events.c	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_events.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_events.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_events.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_events.c	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,133 @@
 +
 +	/* $Id$ */
@@ -3279,9 +3279,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_events.c php-5.2.6.fpm/sapi/fpm/fpm
 +	(*ev->ev_callback)( (int) ev->ev_fd, (short) ev->ev_res, ev->ev_arg);	
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_events.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_events.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_events.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_events.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_events.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_events.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_events.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_events.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,16 @@
 +
 +	/* $Id$ */
@@ -3299,9 +3299,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_events.h php-5.2.6.fpm/sapi/fpm/fpm
 +
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm.h php-5.2.6.fpm/sapi/fpm/fpm/fpm.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm.h php-5.2.6.fpm/sapi/cgi/fpm/fpm.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,30 @@
 +
 +	/* $Id$ */
@@ -3333,9 +3333,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm.h php-5.2.6.fpm/sapi/fpm/fpm/fpm.h
 +extern int fpm;
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_php.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_php.c	2008-07-20 20:16:28.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_php.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_php.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_php.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_php.c	2008-07-20 20:16:28.000000000 +0400
 @@ -0,0 +1,171 @@
 +
 +	/* $Id$ */
@@ -3508,9 +3508,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php.c php-5.2.6.fpm/sapi/fpm/fpm/fp
 +
 +	return 0;
 +}
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_php.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_php.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_php.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_php.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_php.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_php.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,20 @@
 +
 +	/* $Id$ */
@@ -3532,9 +3532,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php.h php-5.2.6.fpm/sapi/fpm/fpm/fp
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php_trace.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_php_trace.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php_trace.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_php_trace.c	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_php_trace.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_php_trace.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_php_trace.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_php_trace.c	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,170 @@
 +
 +	/* $Id$ */
@@ -3706,9 +3706,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php_trace.c php-5.2.6.fpm/sapi/fpm/
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php_trace.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_php_trace.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php_trace.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_php_trace.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_php_trace.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_php_trace.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_php_trace.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_php_trace.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,13 @@
 +
 +	/* $Id$ */
@@ -3723,9 +3723,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_php_trace.h php-5.2.6.fpm/sapi/fpm/
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_process_ctl.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_process_ctl.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_process_ctl.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_process_ctl.c	2008-07-21 17:13:44.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_process_ctl.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_process_ctl.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_process_ctl.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_process_ctl.c	2008-07-21 17:13:44.000000000 +0400
 @@ -0,0 +1,352 @@
 +
 +	/* $Id$ */
@@ -4079,9 +4079,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_process_ctl.c php-5.2.6.fpm/sapi/fp
 +	evtimer_add(&heartbeat, &tv);
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_process_ctl.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_process_ctl.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_process_ctl.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_process_ctl.h	2008-07-21 01:33:10.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_process_ctl.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_process_ctl.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_process_ctl.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_process_ctl.h	2008-07-21 01:33:10.000000000 +0400
 @@ -0,0 +1,39 @@
 +
 +	/* $Id$ */
@@ -4122,9 +4122,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_process_ctl.h php-5.2.6.fpm/sapi/fp
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_request.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_request.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_request.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_request.c	2008-09-01 03:34:36.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_request.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_request.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_request.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_request.c	2008-09-01 03:34:36.000000000 +0400
 @@ -0,0 +1,163 @@
 +
 +	/* $Id$ */
@@ -4289,9 +4289,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_request.c php-5.2.6.fpm/sapi/fpm/fp
 +
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_request.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_request.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_request.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_request.h	2008-07-20 05:47:16.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_request.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_request.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_request.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_request.h	2008-07-20 05:47:16.000000000 +0400
 @@ -0,0 +1,27 @@
 +
 +	/* $Id$ */
@@ -4320,9 +4320,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_request.h php-5.2.6.fpm/sapi/fpm/fp
 +};
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_shm.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_shm.c	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_shm.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_shm.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_shm.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_shm.c	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,100 @@
 +
 +	/* $Id$ */
@@ -4424,9 +4424,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm.c php-5.2.6.fpm/sapi/fpm/fpm/fp
 +	return ret;
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_shm.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_shm.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_shm.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_shm.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_shm.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_shm.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,22 @@
 +
 +	/* $Id$ */
@@ -4450,9 +4450,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm.h php-5.2.6.fpm/sapi/fpm/fpm/fp
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm_slots.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_shm_slots.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm_slots.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_shm_slots.c	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_shm_slots.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_shm_slots.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_shm_slots.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_shm_slots.c	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,127 @@
 +
 +	/* $Id$ */
@@ -4581,9 +4581,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm_slots.c php-5.2.6.fpm/sapi/fpm/
 +	s->lock = 0;
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm_slots.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_shm_slots.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm_slots.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_shm_slots.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_shm_slots.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_shm_slots.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_shm_slots.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_shm_slots.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,43 @@
 +
 +	/* $Id$ */
@@ -4628,9 +4628,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_shm_slots.h php-5.2.6.fpm/sapi/fpm/
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_signals.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_signals.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_signals.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_signals.c	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_signals.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_signals.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_signals.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_signals.c	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,252 @@
 +
 +	/* $Id$ */
@@ -4884,9 +4884,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_signals.c php-5.2.6.fpm/sapi/fpm/fp
 +{
 +	return sp[0];
 +}
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_signals.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_signals.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_signals.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_signals.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_signals.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_signals.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_signals.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_signals.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,16 @@
 +
 +	/* $Id$ */
@@ -4904,9 +4904,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_signals.h php-5.2.6.fpm/sapi/fpm/fp
 +extern const char *fpm_signal_names[NSIG + 1];
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_sockets.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_sockets.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_sockets.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_sockets.c	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_sockets.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_sockets.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_sockets.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_sockets.c	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,425 @@
 +
 +	/* $Id$ */
@@ -5333,9 +5333,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_sockets.c php-5.2.6.fpm/sapi/fpm/fp
 +
 +	return 0;
 +}
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_sockets.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_sockets.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_sockets.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_sockets.h	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_sockets.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_sockets.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_sockets.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_sockets.h	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,37 @@
 +
 +	/* $Id$ */
@@ -5374,9 +5374,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_sockets.h php-5.2.6.fpm/sapi/fpm/fp
 +			(unsigned int) ((unsigned char *) &(sin_addr)->s_addr)[3]
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_stdio.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_stdio.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_stdio.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_stdio.c	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_stdio.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_stdio.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_stdio.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_stdio.c	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,277 @@
 +
 +	/* $Id$ */
@@ -5655,9 +5655,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_stdio.c php-5.2.6.fpm/sapi/fpm/fpm/
 +
 +	return 0;
 +}
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_stdio.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_stdio.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_stdio.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_stdio.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_stdio.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_stdio.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_stdio.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_stdio.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,20 @@
 +
 +	/* $Id$ */
@@ -5679,9 +5679,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_stdio.h php-5.2.6.fpm/sapi/fpm/fpm/
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_str.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_str.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_str.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_str.h	2008-05-24 21:38:47.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_str.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_str.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_str.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_str.h	2008-05-24 21:38:47.000000000 +0400
 @@ -0,0 +1,49 @@
 +
 +	/* $Id$ */
@@ -5732,9 +5732,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_str.h php-5.2.6.fpm/sapi/fpm/fpm/fp
 +}
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace.c	2008-07-21 00:59:00.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace.c	2008-07-21 00:59:00.000000000 +0400
 @@ -0,0 +1,46 @@
 +
 +	/* $Id$ */
@@ -5782,9 +5782,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace.c php-5.2.6.fpm/sapi/fpm/fpm/
 +	}
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace.h	2008-07-21 07:04:25.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace.h	2008-07-21 07:04:25.000000000 +0400
 @@ -0,0 +1,17 @@
 +
 +	/* $Id$ */
@@ -5803,9 +5803,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace.h php-5.2.6.fpm/sapi/fpm/fpm/
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace_mach.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace_mach.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace_mach.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace_mach.c	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace_mach.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace_mach.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace_mach.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace_mach.c	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,102 @@
 +
 +	/* $Id$ */
@@ -5909,9 +5909,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace_mach.c php-5.2.6.fpm/sapi/fpm
 +	return 0;
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace_pread.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace_pread.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace_pread.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace_pread.c	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace_pread.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace_pread.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace_pread.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace_pread.c	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,67 @@
 +
 +	/* $Id$ */
@@ -5980,9 +5980,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace_pread.c php-5.2.6.fpm/sapi/fp
 +	return 0;
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace_ptrace.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace_ptrace.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace_ptrace.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_trace_ptrace.c	2008-09-19 03:34:11.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace_ptrace.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace_ptrace.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_trace_ptrace.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_trace_ptrace.c	2008-09-19 03:34:11.000000000 +0400
 @@ -0,0 +1,85 @@
 +
 +	/* $Id$ */
@@ -6069,9 +6069,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_trace_ptrace.c php-5.2.6.fpm/sapi/f
 +	return 0;
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_unix.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_unix.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_unix.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_unix.c	2008-09-19 03:19:59.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_unix.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_unix.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_unix.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_unix.c	2008-09-19 03:19:59.000000000 +0400
 @@ -0,0 +1,289 @@
 +
 +	/* $Id$ */
@@ -6362,9 +6362,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_unix.c php-5.2.6.fpm/sapi/fpm/fpm/f
 +
 +	return 0;
 +}
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_unix.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_unix.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_unix.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_unix.h	2008-05-25 17:21:13.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_unix.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_unix.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_unix.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_unix.h	2008-05-25 17:21:13.000000000 +0400
 @@ -0,0 +1,17 @@
 +
 +	/* $Id$ */
@@ -6383,9 +6383,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_unix.h php-5.2.6.fpm/sapi/fpm/fpm/f
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_worker_pool.c php-5.2.6.fpm/sapi/fpm/fpm/fpm_worker_pool.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_worker_pool.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_worker_pool.c	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_worker_pool.c php-5.2.6.fpm/sapi/cgi/fpm/fpm_worker_pool.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_worker_pool.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_worker_pool.c	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,67 @@
 +
 +	/* $Id$ */
@@ -6454,9 +6454,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_worker_pool.c php-5.2.6.fpm/sapi/fp
 +
 +	return 0;
 +}
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_worker_pool.h php-5.2.6.fpm/sapi/fpm/fpm/fpm_worker_pool.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/fpm_worker_pool.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/fpm_worker_pool.h	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/fpm_worker_pool.h php-5.2.6.fpm/sapi/cgi/fpm/fpm_worker_pool.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/fpm_worker_pool.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/fpm_worker_pool.h	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,46 @@
 +
 +	/* $Id$ */
@@ -6504,9 +6504,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/fpm_worker_pool.h php-5.2.6.fpm/sapi/fp
 +
 +#endif
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/init.d/php-fpm.in php-5.2.6.fpm/sapi/fpm/fpm/init.d/php-fpm.in
---- php-5.2.6.vanilla/sapi/fpm/fpm/init.d/php-fpm.in	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/init.d/php-fpm.in	2008-08-05 20:31:27.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/init.d/php-fpm.in php-5.2.6.fpm/sapi/cgi/fpm/init.d/php-fpm.in
+--- php-5.2.6.vanilla/sapi/cgi/fpm/init.d/php-fpm.in	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/init.d/php-fpm.in	2008-08-05 20:31:27.000000000 +0400
 @@ -0,0 +1,139 @@
 +#! /bin/sh
 +
@@ -6647,12 +6647,12 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/init.d/php-fpm.in php-5.2.6.fpm/sapi/fp
 +	;;
 +
 +esac
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/Makefile.frag php-5.2.6.fpm/sapi/fpm/fpm/Makefile.frag
---- php-5.2.6.vanilla/sapi/fpm/fpm/Makefile.frag	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/Makefile.frag	2008-03-28 16:51:22.000000000 +0300
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/Makefile.frag php-5.2.6.fpm/sapi/cgi/fpm/Makefile.frag
+--- php-5.2.6.vanilla/sapi/cgi/fpm/Makefile.frag	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/Makefile.frag	2008-03-28 16:51:22.000000000 +0300
 @@ -0,0 +1,21 @@
 +
-+install-fpm: sapi/fpm/fpm/php-fpm.conf sapi/fpm/fpm/php-fpm
++install-fpm: sapi/cgi/fpm/php-fpm.conf sapi/cgi/fpm/php-fpm
 +	@echo "Installing FPM config:            $(INSTALL_ROOT)$(php_fpm_conf_path)"
 +	-@$(mkinstalldirs) \
 +		$(INSTALL_ROOT)$(prefix)/sbin \
@@ -6665,16 +6665,16 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/Makefile.frag php-5.2.6.fpm/sapi/fpm/fp
 +	else \
 +		dest=`basename "$(php_fpm_conf_path)"` ; \
 +	fi ; \
-+	$(INSTALL_DATA) $(top_builddir)/sapi/fpm/fpm/php-fpm.conf $(INSTALL_ROOT)`dirname "$(php_fpm_conf_path)"`/$$dest
++	$(INSTALL_DATA) $(top_builddir)/sapi/cgi/fpm/php-fpm.conf $(INSTALL_ROOT)`dirname "$(php_fpm_conf_path)"`/$$dest
 +	@echo "Installing init.d script:         $(INSTALL_ROOT)$(prefix)/sbin/php-fpm"
-+	-@$(INSTALL) -m 0755 $(top_builddir)/sapi/fpm/fpm/php-fpm $(INSTALL_ROOT)$(prefix)/sbin/php-fpm
++	-@$(INSTALL) -m 0755 $(top_builddir)/sapi/cgi/fpm/php-fpm $(INSTALL_ROOT)$(prefix)/sbin/php-fpm
 +
 +$(top_builddir)/libevent/libevent.a: $(top_builddir)/libevent/Makefile
 +	cd $(top_builddir)/libevent && $(MAKE) libevent.a
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/xml_config.c php-5.2.6.fpm/sapi/fpm/fpm/xml_config.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/xml_config.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/xml_config.c	2008-08-26 19:09:15.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/xml_config.c php-5.2.6.fpm/sapi/cgi/fpm/xml_config.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/xml_config.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/xml_config.c	2008-08-26 19:09:15.000000000 +0400
 @@ -0,0 +1,278 @@
 +
 +	/* $Id$ */
@@ -6954,9 +6954,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/xml_config.c php-5.2.6.fpm/sapi/fpm/fpm
 +	return 0;
 +}
 +
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/xml_config.h php-5.2.6.fpm/sapi/fpm/fpm/xml_config.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/xml_config.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/xml_config.h	2008-09-19 03:02:58.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/xml_config.h php-5.2.6.fpm/sapi/cgi/fpm/xml_config.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/xml_config.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/xml_config.h	2008-09-19 03:02:58.000000000 +0400
 @@ -0,0 +1,43 @@
 +
 +	/* $Id$ */
@@ -7001,9 +7001,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/xml_config.h php-5.2.6.fpm/sapi/fpm/fpm
 +enum { XML_CONF_SCALAR = 1, XML_CONF_SUBSECTION = 2 };
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/zlog.c php-5.2.6.fpm/sapi/fpm/fpm/zlog.c
---- php-5.2.6.vanilla/sapi/fpm/fpm/zlog.c	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/zlog.c	2008-05-23 01:08:32.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/zlog.c php-5.2.6.fpm/sapi/cgi/fpm/zlog.c
+--- php-5.2.6.vanilla/sapi/cgi/fpm/zlog.c	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/zlog.c	2008-05-23 01:08:32.000000000 +0400
 @@ -0,0 +1,113 @@
 +
 +	/* $Id$ */
@@ -7118,9 +7118,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/zlog.c php-5.2.6.fpm/sapi/fpm/fpm/zlog.
 +
 +	write(zlog_fd > -1 ? zlog_fd : STDERR_FILENO, buf, len);
 +}
-diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/zlog.h php-5.2.6.fpm/sapi/fpm/fpm/zlog.h
---- php-5.2.6.vanilla/sapi/fpm/fpm/zlog.h	1970-01-01 03:00:00.000000000 +0300
-+++ php-5.2.6.fpm/sapi/fpm/fpm/zlog.h	2008-05-23 01:08:32.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/fpm/zlog.h php-5.2.6.fpm/sapi/cgi/fpm/zlog.h
+--- php-5.2.6.vanilla/sapi/cgi/fpm/zlog.h	1970-01-01 03:00:00.000000000 +0300
++++ php-5.2.6.fpm/sapi/cgi/fpm/zlog.h	2008-05-23 01:08:32.000000000 +0400
 @@ -0,0 +1,34 @@
 +
 +	/* $Id$ */
@@ -7156,9 +7156,9 @@ diff -Nru php-5.2.6.vanilla/sapi/fpm/fpm/zlog.h php-5.2.6.fpm/sapi/fpm/fpm/zlog.
 +#define ZLOG_SYSERROR (ZLOG_ERROR | ZLOG_HAVE_ERRNO)
 +
 +#endif
-diff -Nru php-5.2.6.vanilla/sapi/fpm/Makefile.frag php-5.2.6.fpm/sapi/fpm/Makefile.frag
---- php-5.2.6.vanilla/sapi/fpm/Makefile.frag	2003-07-02 05:08:26.000000000 +0400
-+++ php-5.2.6.fpm/sapi/fpm/Makefile.frag	2008-05-01 20:42:06.000000000 +0400
+diff -Nru php-5.2.6.vanilla/sapi/cgi/Makefile.frag php-5.2.6.fpm/sapi/cgi/Makefile.frag
+--- php-5.2.6.vanilla/sapi/cgi/Makefile.frag	2003-07-02 05:08:26.000000000 +0400
++++ php-5.2.6.fpm/sapi/cgi/Makefile.frag	2008-05-01 20:42:06.000000000 +0400
 @@ -1,2 +1,2 @@
 -$(SAPI_CGI_PATH): $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS)
 +$(SAPI_CGI_PATH): $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)

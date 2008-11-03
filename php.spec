@@ -47,6 +47,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
+%bcond_without	fpm		# fpm patches from http://php-fpm.anight.org/
 %bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
@@ -143,6 +144,8 @@ Patch40:	%{name}-mysqli-charsetphpini.patch
 Patch41:	%{name}-pdo_mysql-charsetphpini.patch
 Patch42:	%{name}-ini-charsetphpini.patch
 Patch43:	%{name}-use-prog_sendmail.patch
+Patch44:	%{name}-fpm.patch
+Patch45:	%{name}-fpm-zts.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -216,6 +219,10 @@ BuildRequires:	apache1-devel
 BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
+%endif
+%if %{with fpm}
+BuildRequires:	judy-devel
+BuildRequires:	libevent-devel >= 1.2
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -1615,7 +1622,7 @@ done
 %patch30 -p1
 %patch31 -p1
 %patch32 -p1
-%patch33 -p1
+#%patch33 -p1
 %patch34 -p1
 %patch35 -p1
 %patch36 -p1
@@ -1629,6 +1636,11 @@ done
 %patch42 -p1
 
 %patch43 -p1
+
+%if %{with fpm}
+%patch44 -p1
+%patch45 -p1
+%endif
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1680,7 +1692,7 @@ fi
 
 export EXTENSION_DIR="%{php_extensiondir}"
 if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
-	rm -f Makefile.{fcgi,cgi,cli,apxs{1,2}} # now remove Makefile copies
+	rm -f Makefile.{fcgi,fpm,cgi,cli,apxs{1,2}} # now remove Makefile copies
 	%{__libtoolize}
 	%{__aclocal}
 	cp -f /usr/share/automake/config.* .
@@ -1692,6 +1704,9 @@ export PROG_SENDMAIL="/usr/lib/sendmail"
 sapis="
 %if %{with fcgi}
 fcgi
+%endif
+%if %{with fpm}
+fpm
 %endif
 cgi cli
 %if %{with apache1}
@@ -1715,6 +1730,9 @@ for sapi in $sapis; do
 		;;
 	fcgi)
 		sapi_args='--enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
+		;;
+	fpm)
+		sapi_args='--enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect --enable-fpm'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
@@ -1759,6 +1777,11 @@ for sapi in $sapis; do
 	--enable-json=shared \
 	--enable-hash=shared \
 	--enable-xmlwriter=shared \
+%if %{with fpm}
+	--with-fpm-conf=%{_sysconfdir}/fpm.conf \
+	--with-fpm-log=/var/log/fpm.log \
+	--with-fpm-pid=/var/run/php/fpm.pid \
+%endif
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 	--with-pdo-dblib=shared \
 %endif
@@ -1862,15 +1885,6 @@ done
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
 %endif
 
-# FCGI
-%if %{with fcgi}
-cp -af php_config.h.fcgi main/php_config.h
-rm -rf sapi/cgi/.libs sapi/cgi/*.lo
-%{__make} sapi/cgi/php-cgi -f Makefile.fcgi
-cp -r sapi/cgi sapi/fcgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
-%endif
-
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
@@ -1881,6 +1895,23 @@ rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
+
+# FCGI
+%if %{with fcgi}
+cp -af php_config.h.fcgi main/php_config.h
+rm -rf sapi/cgi/.libs sapi/cgi/*.lo
+%{__make} sapi/cgi/php-cgi -f Makefile.fcgi
+cp -r sapi/cgi sapi/fcgi
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
+%endif
+
+%if %{with fpm}
+cp -af php_config.h.fpm main/php_config.h
+rm -rf sapi/cgi/.libs sapi/cgi/*.lo
+%{__make} sapi/cgi/php-cgi -f Makefile.fpm
+cp -r sapi/cgi sapi/fpm
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn)" = cgi-fcgi ] || exit 1
+%endif
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
@@ -1923,6 +1954,13 @@ libtool --silent --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindi
 # install FCGI
 %if %{with fcgi}
 libtool --silent --mode=install install sapi/fcgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+%endif
+
+# install FCGI PM
+%if %{with fpm}
+libtool --silent --mode=install install sapi/fpm/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.fpm
+%{__make} install-fpm -f Makefile.fpm \
+	INSTALL_ROOT=$RPM_BUILD_ROOT
 %endif
 
 # install CLI
@@ -2322,6 +2360,11 @@ fi
 %dir %{_sysconfdir}/cgi-fcgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 %attr(755,root,root) %{_bindir}/php.fcgi
+%if %{with fpm}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fpm.conf
+%attr(755,root,root) %{_bindir}/php.fpm
+%attr(755,root,root) %{_sbindir}/php-fpm
+%endif
 %endif
 
 %files cgi

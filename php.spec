@@ -25,7 +25,6 @@
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
-%bcond_without	mime_magic	# without mime-magic module
 %bcond_without	ming		# without ming extension module
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
@@ -67,7 +66,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define	_rel	0.18
-%define	_snap	200808101830
+%define	_snap	200811082130
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -81,7 +80,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	efc03522ee7fe966f2fb827bc1a0ab31
+# Source0-md5:	e4e977f880e3df1b3ff9c0d3210ab9b7
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -121,6 +120,7 @@ Patch27:	%{name}-linkflags-clean.patch
 Patch29:	%{name}-config-dir.patch
 Patch31:	%{name}-fcgi-graceful.patch
 Patch38:	%{name}-tds.patch
+
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -797,22 +797,6 @@ support.
 
 %description mhash -l pl.UTF-8
 Moduł PHP udostępniający funkcje mieszające z biblioteki mhash.
-
-%package mime_magic
-Summary:	mime_magic extension module for PHP
-Summary(pl.UTF-8):	Moduł mime_magic dla PHP
-Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	/usr/share/file/magic.mime
-Provides:	php(mime_magic)
-
-%description mime_magic
-This PHP module adds support for MIME type lookup via file magic
-numbers using magic.mime database.
-
-%description mime_magic -l pl.UTF-8
-Moduł PHP dodający obsługę wyszukiwania typów MIME według magicznych
-znaczników plików z użyciem bazy danych magic.mime.
 
 %package ming
 Summary:	ming extension module for PHP
@@ -1525,7 +1509,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch9 -p1
 
 cp php.ini-dist php.ini
-%patch10 -p1
+#%patch10 -p1
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
@@ -1547,7 +1531,7 @@ patch -p1 < %{PATCH22} || exit 1
 
 %patch29 -p1
 %patch31 -p1
-%patch38 -p1
+#%patch38 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1707,7 +1691,7 @@ for sapi in $sapis; do
 	--with-iconv=shared \
 	--with-freetype-dir=shared \
 	--with-gettext=shared \
-	--with-gd=shared,/usr \
+	--with-gd=shared \
 	--with-gdbm \
 	--with-gmp=shared \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
@@ -1716,7 +1700,6 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
-	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
@@ -1994,7 +1977,6 @@ fi
 %extension_scripts mbstring
 %extension_scripts mcrypt
 %extension_scripts mhash
-%extension_scripts mime_magic
 %extension_scripts ming
 %extension_scripts mssql
 %extension_scripts mysql
@@ -2092,9 +2074,6 @@ fi
 
 %triggerun mhash -- %{name}-mhash < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun mime_magic -- %{name}-mime_magic < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mime_magic\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ming -- %{name}-ming < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{_sysconfdir}/php.ini
@@ -2402,13 +2381,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mhash.ini
 %attr(755,root,root) %{php_extensiondir}/mhash.so
-%endif
-
-%if %{with mime_magic}
-%files mime_magic
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mime_magic.ini
-%attr(755,root,root) %{php_extensiondir}/mime_magic.so
 %endif
 
 %if %{with ming}

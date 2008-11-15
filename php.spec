@@ -63,6 +63,7 @@
 %ifnarch %{ix86} %{x8664} sparc sparcv9 alpha
 # ppc disabled (broken on th-ppc)
 %undefine	with_interbase
+%undefine	with_fpm
 %endif
 
 %if %{without apache1} && %{without apache2}
@@ -84,7 +85,7 @@ Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування 
 Name:		php
 Version:	5.2.6
 Release:	%{rel}%{?_rc:.%{_rc}}%{?with_hardening:hardened}
-Epoch:		4
+Epoch:		5
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2

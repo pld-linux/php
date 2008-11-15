@@ -63,6 +63,10 @@
 %ifnarch %{ix86} %{x8664} sparc sparcv9 alpha
 # ppc disabled (broken on th-ppc)
 %undefine	with_interbase
+%endif
+
+%ifnarch %{ix86} %{x8664}
+# unsupported, see sapi/cgi/fpm/fpm_atomic.h
 %undefine	with_fpm
 %endif
 

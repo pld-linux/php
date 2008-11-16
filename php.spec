@@ -106,6 +106,7 @@ Source8:	%{name}_browscap.ini
 Source9:	http://ftp.linux.ee/pub/gentoo/distfiles/distfiles/%{name}-patchset-%{version}-r8.tar.bz2
 # Source9-md5:	0f411800537648d0748417124291bd58
 Source10:	%{name}-fpm.init
+Source11:	%{name}-fpm.logrotate
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -392,6 +393,7 @@ URL:		http://php-fpm.anight.org/
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libevent >= 1.4.7-3
+Requires:	logrotate
 Requires:	rc-scripts
 Provides:	webserver(php) = %{version}
 
@@ -1992,6 +1994,8 @@ libtool --silent --mode=install install sapi/fpm/php-cgi $RPM_BUILD_ROOT%{_bindi
 %{__make} install-fpm -f Makefile.fpm \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 install %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
+install -d $RPM_BUILD_ROOT/etc/logrotate.d
+install %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
 %endif
 
 # install CLI
@@ -2426,6 +2430,7 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fpm.conf
 %attr(755,root,root) %{_bindir}/php.fpm
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/php-fpm
 %attr(754,root,root) /etc/rc.d/init.d/php-fpm
 %endif
 

@@ -36,18 +36,7 @@ stop() {
 	if [ -f /var/lock/subsys/php-fpm ]; then
 		# Stop daemons.
 		msg_stopping "PHP FastCGI Process Manager"
-		killproc --pidfile $pidfile php-fpm -TERM
-		rm -f /var/lock/subsys/php-fpm
-	else
-		msg_not_running "PHP FastCGI Process Manager"
-	fi
-}
-
-# Gracefully shutting down php_fpm
-quit() {
-	if [ -f /var/lock/subsys/php-fpm ]; then
-		# Stop daemons.
-		msg_stopping "PHP FastCGI Process Manager"
+		# always gracefully shut down php-fpm
 		killproc --pidfile $pidfile php-fpm -QUIT
 		rm -f /var/lock/subsys/php-fpm
 	else
@@ -84,7 +73,7 @@ case "$1" in
   start)
   	start
 	;;
-  stop)
+  stop|quit)
   	stop
 	;;
   restart)
@@ -96,9 +85,6 @@ case "$1" in
 	;;
   reload|force-reload)
 	reload USR2 7
-	;;
-  quit) # graceful shutdown
-	quit
 	;;
   flush-logs|logrotate)
 	reload USR1 0

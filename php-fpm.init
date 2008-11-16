@@ -18,107 +18,54 @@
 # Get network config
 . /etc/sysconfig/network
 
-php_fpm_BIN=/usr/bin/php.fpm
-php_fpm_CONF=/etc/php/fpm.conf
-php_fpm_PID=/var/run/php/fpm.pid
-
-php_opts="--fpm-config $php_fpm_CONF"
-
-wait_for_pid() {
-	local try=0
-	while test $try -lt 35; do
-		case "$1" in
-			'created')
-			if [ -f "$2" ]; then
-				try=''
-				break
-			fi
-			;;
-
-			'removed')
-			if [ ! -f "$2" ]; then
-				try=''
-				break
-			fi
-			;;
-		esac
-
-		echo -n .
-		try=`expr $try + 1`
-		sleep 1
-	done
-}
+pidfile=/var/run/php/fpm.pid
 
 start() {
-	echo -n "Starting php_fpm "
-
-	$php_fpm_BIN --fpm $php_opts
-
-	if [ "$?" != 0 ] ; then
-		echo " failed"
-		exit 1
-	fi
-
-	wait_for_pid created $php_fpm_PID
-
-	if [ -n "$try" ] ; then
-		echo " failed"
-		exit 1
+	# Check if the service is already running?
+	if [ ! -f /var/lock/subsys/php-fpm ]; then
+		msg_starting "PHP FastCGI Process Manager"
+		daemon /usr/bin/php.fpm --fpm --fpm-config /etc/php/fpm.conf
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/php-fpm
 	else
-		echo " done"
+		msg_already_running "PHP FastCGI Process Manager"
 	fi
 }
 
 stop() {
-	echo -n "Shutting down php_fpm "
-
-	if [ ! -r $php_fpm_PID ] ; then
-		echo "warning, no pid file found - php-fpm is not running ?"
-		exit 1
-	fi
-
-	kill -TERM `cat $php_fpm_PID`
-
-	wait_for_pid removed $php_fpm_PID
-
-	if [ -n "$try" ] ; then
-		echo " failed"
-		exit 1
+	if [ -f /var/lock/subsys/php-fpm ]; then
+		# Stop daemons.
+		msg_stopping "PHP FastCGI Process Manager"
+		killproc --pidfile $pidfile php-fpm -TERM
+		rm -f /var/lock/subsys/php-fpm
 	else
-		echo " done"
+		msg_not_running "PHP FastCGI Process Manager"
 	fi
 }
 
+# Gracefully shutting down php_fpm
 quit() {
-	echo -n "Gracefully shutting down php_fpm "
-
-	if [ ! -r $php_fpm_PID ] ; then
-		echo "warning, no pid file found - php-fpm is not running ?"
-		exit 1
-	fi
-
-	kill -QUIT `cat $php_fpm_PID`
-
-	wait_for_pid removed $php_fpm_PID
-
-	if [ -n "$try" ] ; then
-		echo " failed"
-		exit 1
+	if [ -f /var/lock/subsys/php-fpm ]; then
+		# Stop daemons.
+		msg_stopping "PHP FastCGI Process Manager"
+		killproc --pidfile $pidfile php-fpm -QUIT
+		rm -f /var/lock/subsys/php-fpm
 	else
-		echo " done"
+		msg_not_running "PHP FastCGI Process Manager"
 	fi
 }
 
 reload() {
-	echo -n "Reload service php-fpm "
-
-	if [ ! -r $php_fpm_PID ] ; then
-		echo "warning, no pid file found - php-fpm is not running ?"
-		exit 1
+	local sig=${1:-HUP}
+	local retnr=${2:-7}
+	if [ -f /var/lock/subsys/php-fpm ]; then
+		msg_reloading "PHP FastCGI Process Manager"
+		killproc --pidfile $pidfile php-fpm -$sig
+		RETVAL=$?
+	else
+		msg_not_running "PHP FastCGI Process Manager"
+		RETVAL=$retnr
 	fi
-
-	kill -USR2 `cat $php_fpm_PID`
-	echo " done"
 }
 
 condrestart() {
@@ -126,22 +73,9 @@ condrestart() {
 		stop
 		start
 	else
-		msg_not_running php-fpm
+		msg_not_running "PHP FastCGI Process Manager"
 		RETVAL=$1
 	fi
-}
-
-flush-logs() {
-	echo -n "Re-opening php-fpm log file "
-
-	if [ ! -r $php_fpm_PID ] ; then
-		echo "warning, no pid file found - php-fpm is not running ?"
-		exit 1
-	fi
-
-	kill -USR1 `cat $php_fpm_PID`
-
-	echo " done"
 }
 
 RETVAL=0
@@ -161,13 +95,13 @@ case "$1" in
 	condrestart 0
 	;;
   reload|force-reload)
-	reload
+	reload USR2 7
 	;;
   quit) # graceful shutdown
-  	quit
+	quit
 	;;
   flush-logs|logrotate)
-  	flush-logs
+	reload USR1 0
 	;;
   status)
 	status php-fpm php.fpm

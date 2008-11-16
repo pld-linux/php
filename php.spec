@@ -151,6 +151,8 @@ Patch42:	%{name}-ini-charsetphpini.patch
 Patch43:	%{name}-use-prog_sendmail.patch
 Patch44:	%{name}-fpm.patch
 Patch45:	%{name}-fpm-zts.patch
+Patch46:	%{name}-fpm-libs.patch
+Patch47:	%{name}-fpm-libevent.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -175,7 +177,7 @@ BuildRequires:	expat-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
-BuildRequires:	freetds-devel >= 0.82
+BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
 BuildRequires:	gd-devel >= 2.0.28-4
@@ -196,7 +198,7 @@ BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_ming:BuildRequires:	ming-devel >= 0.3}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 BuildRequires:	mysql-devel >= 4.0.0
-%{?with_mysqli:BuildRequires:	mysql-devel >= 5.1.29}
+%{?with_mysqli:BuildRequires:	mysql-devel >= 4.1}
 BuildRequires:	ncurses-ext-devel
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
@@ -227,7 +229,7 @@ BuildRequires:	apr-util-devel >= 1:1.0.0
 %endif
 %if %{with fpm}
 BuildRequires:	judy-devel
-BuildRequires:	libevent-devel >= 1.2
+BuildRequires:	libevent-devel >= 1.4.7-3
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -334,6 +336,7 @@ Summary:	php as FastCGI program
 Summary(pl.UTF-8):	php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+%{?with_fpm:Requires:	libevent >= 1.4.7-3}
 Provides:	webserver(php) = %{version}
 
 %description fcgi
@@ -1644,7 +1647,11 @@ done
 
 %if %{with fpm}
 %patch44 -p1
-%patch45 -p1
+cd sapi/cgi/fpm
+%patch45 -p0
+cd -
+%patch46 -p1
+%patch47 -p1
 %endif
 
 # conflict seems to be resolved by recode patches
@@ -1728,24 +1735,24 @@ for sapi in $sapis; do
 	sapi_args=''
 	case $sapi in
 	cgi)
-		sapi_args='--enable-discard-path --enable-force-cgi-redirect'
+		sapi_args='--disable-cli --enable-discard-path --enable-force-cgi-redirect'
 		;;
 	cli)
 		sapi_args='--disable-cgi'
 		;;
 	fcgi)
-		sapi_args='--enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
+		sapi_args='--disable-cli --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
 		;;
 	fpm)
-		sapi_args='--enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect --enable-fpm'
+		sapi_args='--disable-cli --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect --enable-fpm'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
-		sapi_args="--with-apxs=%{apxs1} --with-apache-version=$ver"
+		sapi_args="--disable-cli --with-apxs=%{apxs1} --with-apache-version=$ver"
 		;;
 	apxs2)
 		ver=$(rpm -q --qf '%{V}' apache-devel)
-		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
+		sapi_args="--disable-cli --with-apxs2=%{apxs2} --with-apache-version=$ver"
 		;;
 	esac
 
@@ -1876,6 +1883,7 @@ for sapi in $sapis; do
 
 	cp -f Makefile Makefile.$sapi
 	cp -f main/php_config.h php_config.h.$sapi
+	cp -f config.log config.log.$sapi
 done
 
 # must make this first, so modules can link against it.

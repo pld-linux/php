@@ -1,4 +1,4 @@
---- php-5.2.6/sapi/cgi/fpm/conf/php-fpm.conf.in~	2008-11-16 17:28:21.256858344 +0200
+--- php-5.2.6/sapi/cgi/fpm/conf/php-fpm.conf.in	2008-11-16 17:30:12.321010353 +0200
 +++ php-5.2.6/sapi/cgi/fpm/conf/php-fpm.conf.in	2008-11-16 17:30:12.321010353 +0200
 @@ -38,7 +38,7 @@
  
@@ -22,3 +22,19 @@
  
  			Process manager settings
  			<value name="pm">
+@@ -139,14 +139,7 @@
+ 			Pass environment variables like LD_LIBRARY_PATH
+ 			All $VARIABLEs are taken from current environment
+ 			<value name="environment">
+-				<value name="HOSTNAME">$HOSTNAME</value>
+-				<value name="PATH">/usr/local/bin:/usr/bin:/bin</value>
+-				<value name="TMP">/tmp</value>
+-				<value name="TMPDIR">/tmp</value>
+-				<value name="TEMP">/tmp</value>
+-				<value name="OSTYPE">$OSTYPE</value>
+-				<value name="MACHTYPE">$MACHTYPE</value>
+-				<value name="MALLOC_CHECK_">2</value>
++				<value name="PATH">$PATH</value>
+ 			</value>
+ 
+ 		</section>

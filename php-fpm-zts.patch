@@ -1,5 +1,10 @@
---- php-5.2.6/sapi/cgi/fpm/fpm_php.c	2008-11-03 21:14:16.462343387 +0200
-+++ php-5.2.6-zts/sapi/cgi/fpm/fpm_php.c	2008-11-03 20:48:33.138185064 +0200
+Index: fpm_php.c
+===================================================================
+RCS file: /home/anight/cvsroot/fpm/fpm_php.c,v
+retrieving revision 1.22
+diff -u -r1.22 fpm_php.c
+--- fpm_php.c	19 Jul 2008 01:27:04 -0000	1.22
++++ fpm_php.c	14 Nov 2008 21:30:26 -0000
 @@ -19,7 +19,7 @@
  #include "fpm_cleanup.h"
  #include "fpm_worker_pool.h"
@@ -36,7 +41,7 @@
  					s = 0;
  				}
  				break;
-@@ -66,11 +66,11 @@
+@@ -66,12 +66,13 @@
  	}
  
  	if (s) {
@@ -45,12 +50,19 @@
  	}
  }
  
--static int fpm_php_apply_defines(struct fpm_worker_pool_s *wp)
-+static int fpm_php_apply_defines(struct fpm_worker_pool_s *wp TSRMLS_DC)
+ static int fpm_php_apply_defines(struct fpm_worker_pool_s *wp)
  {
++	TSRMLS_FETCH();
  	struct key_value_s *kv;
  
-@@ -89,29 +89,29 @@
+ 	for (kv = wp->config->php_defines; kv; kv = kv->next) {
+@@ -84,34 +85,34 @@
+ 			zval zv;
+ 
+ #if defined(PHP_VERSION_ID) && (PHP_VERSION_ID >= 50300)
+-			php_dl(value, MODULE_PERSISTENT, &zv, 1);
++			php_dl(value, MODULE_PERSISTENT, &zv, 1 TSRMLS_CC);
+ #else
  			zval filename;
  			ZVAL_STRINGL(&filename, value, value_len, 0);
  #if (PHP_MAJOR_VERSION >= 5)
@@ -85,7 +97,7 @@
  		}
  	}
  
-@@ -127,24 +127,24 @@
+@@ -127,24 +128,25 @@
  	return 0;
  }
  
@@ -107,49 +119,49 @@
  	return SG(request_info).content_length;
  }
  
--static void fpm_php_cleanup(int which, void *arg)
-+static void fpm_php_cleanup(int which, void *arg TSRMLS_DC)
+ static void fpm_php_cleanup(int which, void *arg)
  {
 -	php_module_shutdown();
++	TSRMLS_FETCH();
 +	php_module_shutdown(TSRMLS_C);
  	sapi_shutdown();
  }
  
-@@ -155,14 +155,15 @@
- 
- int fpm_php_init_main()
- {
-+	// XXX unable to pass TSRMLS_CC to the cleanup func!
- 	fpm_cleanup_add(FPM_CLEANUP_PARENT, fpm_php_cleanup, 0);
- 
- 	return 0;
- }
- 
--int fpm_php_init_child(struct fpm_worker_pool_s *wp)
-+int fpm_php_init_child(struct fpm_worker_pool_s *wp TSRMLS_DC)
- {
--	if (0 > fpm_php_apply_defines(wp) ||
-+	if (0 > fpm_php_apply_defines(wp TSRMLS_CC) ||
- 		0 > fpm_php_set_allowed_clients(wp)) {
- 		return -1;
- 	}
---- php-5.2.6-zts/sapi/cgi/fpm/fpm_php.h	2008-11-03 20:46:17.348139255 +0200
-+++ php-5.2.6/sapi/cgi/fpm/fpm_php.h	2008-11-03 21:40:41.811143906 +0200
-@@ -6,10 +6,11 @@
+Index: fpm_php.h
+===================================================================
+RCS file: /home/anight/cvsroot/fpm/fpm_php.h,v
+retrieving revision 1.10
+diff -u -r1.10 fpm_php.h
+--- fpm_php.h	24 May 2008 17:38:47 -0000	1.10
++++ fpm_php.h	14 Nov 2008 21:36:00 -0000
+@@ -5,14 +5,16 @@
+ #ifndef FPM_PHP_H
  #define FPM_PHP_H 1
  
- #include "fpm_worker_pool.h"
-+#include "TSRM.h"
+-#include "fpm_worker_pool.h"
++#include <TSRM.h>
  
  #include "build-defs.h" /* for PHP_ defines */
  
--int fpm_php_init_child(struct fpm_worker_pool_s *wp);
-+int fpm_php_init_child(struct fpm_worker_pool_s *wp TSRMLS_DC);
- char *fpm_php_script_filename();
- char *fpm_php_request_method();
- size_t fpm_php_content_length();
---- php-5.2.6/sapi/cgi/fpm/fpm_php_trace.c	2008-11-03 21:14:16.462343387 +0200
-+++ php-5.2.6-zts/sapi/cgi/fpm/fpm_php_trace.c	2008-11-03 20:47:26.611462721 +0200
++struct fpm_worker_pool_s;
++
+ int fpm_php_init_child(struct fpm_worker_pool_s *wp);
+-char *fpm_php_script_filename();
+-char *fpm_php_request_method();
+-size_t fpm_php_content_length();
++char *fpm_php_script_filename(TSRMLS_D);
++char *fpm_php_request_method(TSRMLS_D);
++size_t fpm_php_content_length(TSRMLS_D);
+ void fpm_php_soft_quit();
+ int fpm_php_init_main();
+ 
+Index: fpm_php_trace.c
+===================================================================
+RCS file: /home/anight/cvsroot/fpm/fpm_php_trace.c,v
+retrieving revision 1.27
+diff -u -r1.27 fpm_php_trace.c
+--- fpm_php_trace.c	26 Aug 2008 15:09:15 -0000	1.27
++++ fpm_php_trace.c	14 Nov 2008 21:33:49 -0000
 @@ -35,7 +35,7 @@
  #endif
  
@@ -159,16 +171,15 @@
  {
  	int callers_limit = 20;
  	pid_t pid = child->pid;
-@@ -131,7 +131,7 @@
- 	return 0;
- }
+@@ -133,6 +133,7 @@
  
--void fpm_php_trace(struct fpm_child_s *child)
-+void fpm_php_trace(struct fpm_child_s *child TSRMLS_DC)
+ void fpm_php_trace(struct fpm_child_s *child)
  {
++	TSRMLS_FETCH();
  	FILE *slowlog;
  
-@@ -148,7 +148,7 @@
+ 	zlog(ZLOG_STUFF, ZLOG_NOTICE, "about to trace %d", (int) child->pid);
+@@ -148,7 +149,7 @@
  		goto done1;
  	}
  
@@ -177,160 +188,32 @@
  		fprintf(slowlog, "+++ dump failed\n");
  	}
  
---- php-5.2.6/sapi/cgi/fpm/fpm_php_trace.h	2008-11-03 21:14:16.462343387 +0200
-+++ php-5.2.6-zts/sapi/cgi/fpm/fpm_php_trace.h	2008-11-03 20:47:38.411626098 +0200
-@@ -7,7 +7,7 @@
+Index: fpm_request.c
+===================================================================
+RCS file: /home/anight/cvsroot/fpm/fpm_request.c,v
+retrieving revision 1.9
+diff -u -r1.9 fpm_request.c
+--- fpm_request.c	31 Aug 2008 23:34:36 -0000	1.9
++++ fpm_request.c	14 Nov 2008 21:18:38 -0000
+@@ -49,9 +49,10 @@
  
- struct fpm_child_s;
- 
--void fpm_php_trace(struct fpm_child_s *);
-+void fpm_php_trace(struct fpm_child_s *child TSRMLS_DC);
- 
- #endif
- 
---- php-5.2.6/sapi/cgi/fpm/fpm_children.c	2008-11-03 21:47:04.141104879 +0200
-+++ php-5.2.6-zts/sapi/cgi/fpm/fpm_children.c	2008-11-03 21:45:17.088199172 +0200
-@@ -32,7 +32,7 @@
- static time_t *last_faults;
- static int fault;
- 
--static int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop);
-+static int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop TSRMLS_DC);
- 
- static void fpm_children_cleanup(int which, void *arg)
+ void fpm_request_info()
  {
-@@ -127,7 +127,7 @@
- 	return child;
- }
++	TSRMLS_FETCH();
+ 	struct fpm_shm_slot_s *slot;
+-	char *request_method = fpm_php_request_method();
+-	char *script_filename = fpm_php_script_filename();
++	char *request_method = fpm_php_request_method(TSRMLS_C);
++	char *script_filename = fpm_php_script_filename(TSRMLS_C);
  
--static void fpm_child_init(struct fpm_worker_pool_s *wp)
-+static void fpm_child_init(struct fpm_worker_pool_s *wp TSRMLS_DC)
- {
- 	fpm_globals.max_requests = wp->config->max_requests;
+ 	slot = fpm_shm_slots_acquire(0, 0);
  
-@@ -135,7 +135,7 @@
- 		0 > fpm_unix_init_child(wp) ||
- 		0 > fpm_signals_init_child() ||
- 		0 > fpm_env_init_child(wp) ||
--		0 > fpm_php_init_child(wp)) {
-+		0 > fpm_php_init_child(wp TSRMLS_CC)) {
- 
- 		zlog(ZLOG_STUFF, ZLOG_ERROR, "child failed to initialize (pool %s)", wp->config->name);
- 		exit(255);
-@@ -154,7 +154,7 @@
- 	return 0;
- }
- 
--void fpm_children_bury()
-+void fpm_children_bury(TSRMLS_D)
- {
- 	int status;
- 	pid_t pid;
-@@ -246,7 +246,7 @@
- 				}
- 			}
- 
--			fpm_children_make(wp, 1 /* in event loop */);
-+			fpm_children_make(wp, 1 /* in event loop */ TSRMLS_CC);
- 
- 			if (fpm_globals.is_child) {
- 				break;
-@@ -308,7 +308,7 @@
- 	fpm_child_link(child);
- }
- 
--static int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop)
-+static int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop TSRMLS_DC)
- {
- 	int enough = 0;
- 	pid_t pid;
-@@ -333,7 +333,7 @@
- 				if (in_event_loop) {
- 					fpm_event_exit_loop();
- 				}
--				fpm_child_init(wp);
-+				fpm_child_init(wp TSRMLS_CC);
- 				return 0;
- 
- 			case -1 :
-@@ -357,9 +357,9 @@
- 	return 1; /* we are done */
- }
- 
--int fpm_children_create_initial(struct fpm_worker_pool_s *wp)
-+int fpm_children_create_initial(struct fpm_worker_pool_s *wp TSRMLS_DC)
- {
--	return fpm_children_make(wp, 0 /* not in event loop yet */);
-+	return fpm_children_make(wp, 0 /* not in event loop yet */ TSRMLS_CC);
- }
- 
- int fpm_children_init_main()
---- php-5.2.6/sapi/cgi/fpm/fpm_children.h	2008-11-03 21:47:04.141104879 +0200
-+++ php-5.2.6-zts/sapi/cgi/fpm/fpm_children.h	2008-11-03 21:45:49.607859881 +0200
-@@ -9,9 +9,10 @@
- #include <sys/types.h>
- #include <event.h>
- 
-+#include "TSRM.h"
- #include "fpm_worker_pool.h"
- 
--int fpm_children_create_initial(struct fpm_worker_pool_s *wp);
-+int fpm_children_create_initial(struct fpm_worker_pool_s *wp TSRMLS_DC);
- int fpm_children_free(struct fpm_child_s *child);
- void fpm_children_bury();
- int fpm_children_init_main();
---- php-5.2.6/sapi/cgi/fpm/fpm_clock.c	2008-11-03 21:47:04.141104879 +0200
-+++ php-5.2.6-zts/sapi/cgi/fpm/fpm_clock.c	2008-11-03 21:46:02.415277547 +0200
-@@ -13,7 +13,7 @@
- 
- 
- /* posix monotonic clock - preferred source of time */
--#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_MONOTONIC)
-+#if 0 && defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_MONOTONIC)
- 
- static int monotonic_works;
- 
---- php-5.2.6/sapi/cgi/fpm/fpm.c	2008-11-03 22:08:17.285352817 +0200
-+++ php-5.2.6-zts/sapi/cgi/fpm/fpm.c	2008-11-03 22:07:14.678692152 +0200
-@@ -56,7 +56,7 @@
- 
- /*	children: return listening socket
- 	parent: never return */
--int fpm_run(int *max_requests)
-+int fpm_run(int *max_requests TSRMLS_DC)
- {
- 	struct fpm_worker_pool_s *wp;
- 
-@@ -64,7 +64,7 @@
- 	for (wp = fpm_worker_all_pools; wp; wp = wp->next) {
- 		int is_parent;
- 
--		is_parent = fpm_children_create_initial(wp);
-+		is_parent = fpm_children_create_initial(wp TSRMLS_CC);
- 
- 		if (!is_parent) {
- 			goto run_child;
---- php-5.2.6/sapi/cgi/fpm/fpm.h	2008-11-03 22:08:17.288686240 +0200
-+++ php-5.2.6-zts/sapi/cgi/fpm/fpm.h	2008-11-03 22:06:06.847658292 +0200
-@@ -6,8 +6,9 @@
- #define FPM_H 1
- 
- #include <unistd.h>
-+#include "TSRM.h"
- 
--int fpm_run(int *max_requests);
-+int fpm_run(int *max_requests TSRMLS_DC);
- int fpm_init(int argc, char **argv, char *config);
- 
- struct fpm_globals_s {
---- php-5.2.6/sapi/cgi/cgi_main.c~	2008-11-03 22:09:38.000000000 +0200
-+++ php-5.2.6/sapi/cgi/cgi_main.c	2008-11-03 22:13:01.700949038 +0200
-@@ -1604,7 +1604,7 @@
- 			return FAILURE;
- 		}
- 
--		fcgi_fd = fpm_run(&max_requests);
-+		fcgi_fd = fpm_run(&max_requests TSRMLS_CC);
- 
- 		fcgi_set_is_fastcgi(fastcgi = 1);
+@@ -63,7 +64,7 @@
+ 		cpystrn(slot->request_method, request_method, sizeof(slot->request_method));
  	}
+ 
+-	slot->content_length = fpm_php_content_length();
++	slot->content_length = fpm_php_content_length(TSRMLS_C);
+ 
+ 	/* if cgi.fix_pathinfo is set to "1" and script cannot be found (404)
+ 		the sapi_globals.request_info.path_translated is set to NULL */

@@ -105,6 +105,7 @@ Source7:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
 Source8:	%{name}_browscap.ini
 Source9:	http://ftp.linux.ee/pub/gentoo/distfiles/distfiles/%{name}-patchset-%{version}-r8.tar.bz2
 # Source9-md5:	0f411800537648d0748417124291bd58
+Source10:	%{name}-fpm.init
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -153,6 +154,8 @@ Patch44:	%{name}-fpm.patch
 Patch45:	%{name}-fpm-zts.patch
 Patch46:	%{name}-fpm-libs.patch
 Patch47:	%{name}-fpm-libevent.patch
+Patch48:	%{name}-fpm-config.patch
+Patch49:	%{name}-fpm-initdir.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -336,7 +339,6 @@ Summary:	php as FastCGI program
 Summary(pl.UTF-8):	php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%{?with_fpm:Requires:	libevent >= 1.4.7-3}
 Provides:	webserver(php) = %{version}
 
 %description fcgi
@@ -382,6 +384,19 @@ Package providing /usr/bin/php symlink to PHP CLI.
 
 %description program -l pl.UTF-8
 Pakiet dostarczający dowiązanie symboliczne /usr/bin/php do PHP CLI.
+
+%package fpm
+Summary:	PHP FastCGI Process Manager
+Group:		Development/Languages/PHP
+URL:		http://php-fpm.anight.org/
+Requires(post,preun):	/sbin/chkconfig
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	libevent >= 1.4.7-3
+Requires:	rc-scripts
+Provides:	webserver(php) = %{version}
+
+%description fpm
+PHP FastCGI Process Manager.
 
 %package common
 Summary:	Common files needed by both apache module and CGI
@@ -1652,6 +1667,8 @@ cd sapi/cgi/fpm
 cd -
 %patch46 -p1
 %patch47 -p1
+%patch48 -p1
+%patch49 -p1
 %endif
 
 # conflict seems to be resolved by recode patches
@@ -1974,6 +1991,7 @@ libtool --silent --mode=install install sapi/fcgi/php-cgi $RPM_BUILD_ROOT%{_bind
 libtool --silent --mode=install install sapi/fpm/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.fpm
 %{__make} install-fpm -f Makefile.fpm \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
+install %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
 %endif
 
 # install CLI
@@ -2063,6 +2081,16 @@ fi
 %postun -n apache-mod_php
 if [ "$1" = "0" ]; then
 	%service -q httpd restart
+fi
+
+%post fpm
+/sbin/chkconfig --add php-fpm
+%service php-fpm restart
+
+%preun fpm
+if [ "$1" = 0 ]; then
+	%service php-fpm stop
+	/sbin/chkconfig --del php-fpm
 fi
 
 %post	common -p /sbin/ldconfig
@@ -2373,11 +2401,6 @@ fi
 %dir %{_sysconfdir}/cgi-fcgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 %attr(755,root,root) %{_bindir}/php.fcgi
-%if %{with fpm}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fpm.conf
-%attr(755,root,root) %{_bindir}/php.fpm
-%attr(755,root,root) %{_sbindir}/php-fpm
-%endif
 %endif
 
 %files cgi
@@ -2397,6 +2420,14 @@ fi
 %files program
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php
+
+%if %{with fpm}
+%files fpm
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fpm.conf
+%attr(755,root,root) %{_bindir}/php.fpm
+%attr(754,root,root) /etc/rc.d/init.d/php-fpm
+%endif
 
 %files common
 %defattr(644,root,root,755)

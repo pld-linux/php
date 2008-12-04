@@ -194,7 +194,11 @@ BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libtiff-devel
-BuildRequires:	libtool >= 2.2
+%if "%{pld_release}" != "ac"
+BuildRequires:	libtool >= 2:2.2
+%else
+BuildRequires:	libtool
+%endif
 BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.1.0
@@ -215,6 +219,7 @@ BuildRequires:	pam-devel
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
+BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
@@ -454,7 +459,11 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf
 Requires:	automake
-Requires:	libtool >= 2.2
+%if "%{pld_release}" != "ac"
+Requires:	libtool >= 2:2.2
+%else
+Requires:	libtool
+%endif
 %{?with_pcre:Requires:	pcre-devel >= 6.6}
 Requires:	shtool
 Obsoletes:	php-pear-devel
@@ -1651,7 +1660,9 @@ done
 %patch34 -p1
 %patch35 -p1
 %patch36 -p1
+%if "%{pld_release}" != "ac"
 %patch37 -p1
+%endif
 %patch38 -p1
 
 # mysql default charset for mysql/mysql/pdo-mysql extensions
@@ -2049,11 +2060,16 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler
 mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{ncurses,pcntl,readline}.ini,cli.d}
 
 # use system automake and {lib,sh}tool
-ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
-for i in libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4; do
-	ln -snf %{_aclocaldir}/${i} $RPM_BUILD_ROOT%{_libdir}/php/build
-done
-ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+if [ -f %{_datadir}/libtool/config/ltmain.sh; then
+	ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
+	for i in libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4; do
+		ln -snf %{_aclocaldir}/${i} $RPM_BUILD_ROOT%{_libdir}/php/build
+	done
+	ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+else
+	ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
+	ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+fi
 ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
 # as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h

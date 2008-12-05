@@ -358,7 +358,7 @@ diff -Nru php-5.2.6.vanilla/main/php_config.h.in php-5.2.6.fpm/main/php_config.h
  			max_requests = atoi(getenv("PHP_FCGI_MAX_REQUESTS"));
  			if (max_requests < 0) {
  				fprintf(stderr, "PHP_FCGI_MAX_REQUESTS is not valid\n");
-@@ -1642,7 +1646,11 @@
+@@ -1677,7 +1677,11 @@
  
  #ifndef PHP_WIN32
  	/* Pre-fork, if required */
@@ -368,9 +368,9 @@ diff -Nru php-5.2.6.vanilla/main/php_config.h.in php-5.2.6.fpm/main/php_config.h
 +			!fpm &&
 +#endif
 +			getenv("PHP_FCGI_CHILDREN")) {
- 		children = atoi(getenv("PHP_FCGI_CHILDREN"));
+ 		char * children_str = getenv("PHP_FCGI_CHILDREN");
+ 		children = atoi(children_str);
  		if (children < 0) {
- 			fprintf(stderr, "PHP_FCGI_CHILDREN is not valid\n");
 @@ -1616,6 +1729,8 @@
  #endif
  
@@ -531,7 +531,7 @@ diff -Nru php-5.2.6.vanilla/sapi/cgi/fastcgi.c php-5.2.6.fpm/sapi/cgi/fastcgi.c
  #endif
  	}
  	return is_fastcgi;
-@@ -255,9 +262,24 @@
+@@ -256,11 +256,27 @@
  	}
  }
  
@@ -547,15 +547,18 @@ diff -Nru php-5.2.6.vanilla/sapi/cgi/fastcgi.c php-5.2.6.fpm/sapi/cgi/fastcgi.c
 +
  void fcgi_shutdown(void)
  {
- 	is_fastcgi = 0;
-+
+ 	if (is_initialized) {
+ 		zend_hash_destroy(&fcgi_mgmt_vars);
+ 	}
++	
 +	if (allowed_clients) {
 +		free(allowed_clients);
 +		allowed_clients = 0;
 +	}
++
+ 	is_fastcgi = 0;
  }
  
- #ifdef _WIN32
 @@ -330,6 +352,41 @@
  }
  #endif

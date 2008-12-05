@@ -79,7 +79,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 18
+%define		rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -87,13 +87,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.2.6
+Version:	5.2.7
 Release:	%{rel}%{?_rc:.%{_rc}}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	7380ffecebd95c6edb317ef861229ebd
+# Source0-md5:	9ffc42edbb7faad965699666ddd559bc
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-cgi.ini
@@ -103,7 +103,7 @@ Source7:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
 # Source7-md5:	47a742fa9fab2826ad10c13a2376111a
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source8:	%{name}_browscap.ini
-Source9:	http://ftp.linux.ee/pub/gentoo/distfiles/distfiles/%{name}-patchset-%{version}-r8.tar.bz2
+Source9:	http://ftp.linux.ee/pub/gentoo/distfiles/distfiles/%{name}-patchset-5.2.6-r8.tar.bz2
 # Source9-md5:	0f411800537648d0748417124291bd58
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
@@ -115,7 +115,6 @@ Patch4:		%{name}-libpq_fs_h_path.patch
 Patch5:		%{name}-filter-shared.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
-Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
@@ -1617,7 +1616,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-%patch8 -p1
 %patch9 -p1
 
 cp php.ini-dist php.ini
@@ -1647,8 +1645,9 @@ zcat %{SOURCE7} | patch -p1 || exit 1
 %{?with_versioning:%patch26 -p1}
 
 %{__tar} jxf %{SOURCE9}
-for a in %{version}/%{version}/*.patch; do
-	%{__patch} -p1 < $a
+for a in 5.2.*/5.2.*/*.patch; do
+#	obsolete patches, no patches for new version yet
+#	%{__patch} -p1 < $a
 done
 
 %patch28 -p1

@@ -88,7 +88,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.7
-Release:	%{rel}%{?_rc:.%{_rc}}%{?with_hardening:hardened}
+Release:	%{rel}%{?with_hardening:hardened}
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -103,7 +103,7 @@ Source7:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
 # Source7-md5:	47a742fa9fab2826ad10c13a2376111a
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source8:	%{name}_browscap.ini
-Source9:	http://ftp.linux.ee/pub/gentoo/distfiles/distfiles/%{name}-patchset-5.2.6-r8.tar.bz2
+Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{name}-patchset-5.2.6-r8.tar.bz2
 # Source9-md5:	0f411800537648d0748417124291bd58
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
@@ -115,6 +115,7 @@ Patch4:		%{name}-libpq_fs_h_path.patch
 Patch5:		%{name}-filter-shared.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
+Patch8:		%{name}-no-metaccld.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 Patch11:	%{name}-acam.patch
@@ -1616,6 +1617,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 %patch9 -p1
 
 cp php.ini-dist php.ini
@@ -1645,9 +1647,29 @@ zcat %{SOURCE7} | patch -p1 || exit 1
 %{?with_versioning:%patch26 -p1}
 
 %{__tar} jxf %{SOURCE9}
-for a in 5.2.*/5.2.*/*.patch; do
-#	obsolete patches, no patches for new version yet
-#	%{__patch} -p1 < $a
+v=%{SOURCE9} v=${v#*/php-patchset-} v=${v%%-*}
+mv $v/$v gentoo-patchset
+rm -f gentoo-patchset/001_tests-ignore-php-ini.patch
+rm -f gentoo-patchset/002_run-tests-ignore-php-ini.patch
+rm -f gentoo-patchset/005_stream_context_set_params-crash.patch
+rm -f gentoo-patchset/006_PDORow-crash.patch
+rm -f gentoo-patchset/007_dom-setAttributeNode-crash.patch
+rm -f gentoo-patchset/008_imap-bufferoverflows.patch
+rm -f gentoo-patchset/009_array-function-crashes.patch
+rm -f gentoo-patchset/010_ticks-zts-crashes.patch
+rm -f gentoo-patchset/011_ze-number-overflow-crash.patch
+rm -f gentoo-patchset/012_pcre-integer-overflow.patch
+rm -f gentoo-patchset/013_GNU_SOURCE-string.c.patch
+rm -f gentoo-patchset/014_explode-overflow.patch
+rm -f gentoo-patchset/015_CVE-2008-2665-wrapper-safemode-bypass.patch
+rm -f gentoo-patchset/016_cgi-doubledot-filename-DoS.patch
+rm -f gentoo-patchset/017_xmlrpc-invalid-callback-crash.patch
+rm -f gentoo-patchset/018_gd-imageloadfont-overflows.patch
+rm -f gentoo-patchset/019_new-memory-corruption.patch
+rm -f gentoo-patchset/020_gd-noise-gbug234459.patch
+rm -f gentoo-patchset/021_snmp-memleaks-gbug231528.patch
+for a in gentoo-patchset/*.patch; do
+	%{__patch} -p1 < $a
 done
 
 %patch28 -p1

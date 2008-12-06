@@ -60,9 +60,14 @@
 %undefine	with_mm
 %endif
 
-%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha
+%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha ppc
+%undefine	with_interbase
+%endif
+%if "%{pld_release}" == "th"
+%ifarch ppc
 # ppc disabled (broken on th-ppc)
 %undefine	with_interbase
+%endif
 %endif
 
 %ifnarch %{ix86} %{x8664}

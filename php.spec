@@ -79,7 +79,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 1
+%define		rel 2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -157,6 +157,8 @@ Patch46:	%{name}-fpm-libs.patch
 Patch47:	%{name}-fpm-libevent.patch
 Patch48:	%{name}-fpm-config.patch
 Patch49:	%{name}-fpm-initdir.patch
+# drop when http://bugs.php.net/bug.php?id=45996 solved
+Patch50:	%{name}-xml-force-expat.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -173,6 +175,8 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
+# until php bug#45996 is solved
+BuildRequires:	expat-devel
 %if %{with xmlrpc}
 BuildRequires:	expat-devel
 %{?with_system_xmlrpc_epi:BuildRequires:    xmlrpc-epi-devel}
@@ -1705,6 +1709,8 @@ cd -
 %patch49 -p1
 %endif
 
+%patch50 -p1
+
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
 
@@ -1819,18 +1825,15 @@ for sapi in $sapis; do
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	--enable-inline-optimization \
-	--enable-memory-limit \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
 	--enable-ctype=shared \
 	--enable-dba=shared \
-	--with-inifile \
-	--with-flatfile \
 	--enable-dom=shared \
 	--enable-exif=shared \
 	--enable-ftp=shared \
 	--enable-gd-native-ttf \
-	--enable-gd-jus-conf \
+	--enable-gd-jis-conv \
 	--enable-libxml \
 	--enable-magic-quotes \
 	--enable-mbstring=shared,all \
@@ -1865,7 +1868,6 @@ for sapi in $sapis; do
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
-	--enable-track-vars \
 	--enable-trans-sid \
 	--enable-safe-mode \
 	--enable-soap=shared \
@@ -1880,9 +1882,9 @@ for sapi in $sapis; do
 	--with-db4 \
 	--enable-dbase=shared \
 %if %{with xmlrpc}
-	--with-expat-dir=shared,/usr \
+	--with-libexpat-dir=shared,/usr \
 %else
-	--without-expat-dir \
+	--without-libexpat-dir \
 %endif
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \
@@ -1917,14 +1919,12 @@ for sapi in $sapis; do
 	--with-readline=shared \
 	%{?with_recode:--with-recode=shared} \
 	--with-regex=php \
-	--without-sablot-js \
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase:--with-sybase=shared,/usr} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	%{?with_sqlite:--with-sqlite=shared,/usr --enable-sqlite-utf8} \
 	--with-t1lib=shared \
 	%{?with_tidy:--with-tidy=shared} \
-	--with-tiff-dir=/usr \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
 	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared%{?with_system_xmlrpc_epi:,/usr}} \
 	--with-xsl=shared \

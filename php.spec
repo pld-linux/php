@@ -10,13 +10,11 @@
 # - mime_magic can't handle new "string/*" entries in magic.mime
 #   thus doesn't work with system magic.mime database
 # - make additional headers and checking added by mail patch configurable
-# - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
 # - http://forum.lighttpd.net/topic/34454
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
-%bcond_with	hardening	# build with hardening patch applied (http://www.hardened-php.net/)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
@@ -93,7 +91,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.7
-Release:	%{rel}%{?with_hardening:hardened}
+Release:	%{rel}
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -104,8 +102,6 @@ Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-cgi.ini
 Source5:	%{name}-apache.ini
 Source6:	%{name}-cli.ini
-Source7:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
-# Source7-md5:	47a742fa9fab2826ad10c13a2376111a
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source8:	%{name}_browscap.ini
 Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{name}-patchset-5.2.6-r8.tar.bz2
@@ -134,7 +130,7 @@ Patch18:	%{name}-nohttpd.patch
 Patch19:	%{name}-gd_imagerotate_enable.patch
 Patch20:	%{name}-uint32_t.patch
 Patch21:	%{name}-dba-link.patch
-Patch22:	%{name}-hardening-fix.patch
+#Patch22
 Patch23:	%{name}-both-apxs.patch
 Patch24:	%{name}-builddir.patch
 Patch25:	%{name}-zlib-for-getimagesize.patch
@@ -164,6 +160,8 @@ Patch48:	%{name}-fpm-config.patch
 Patch49:	%{name}-fpm-initdir.patch
 # drop when http://bugs.php.net/bug.php?id=45996 solved
 Patch50:	%{name}-xml-force-expat.patch
+# quickfix for http://bugs.php.net/bug.php?id=42718 (to be part of 5.2.8) 
+Patch51:	%{name}-broken_filter_and_magic_quotes.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -1645,10 +1643,6 @@ cp php.ini-dist php.ini
 %patch20 -p1
 %patch21 -p1
 
-%if %{with hardening}
-zcat %{SOURCE7} | patch -p1 || exit 1
-%{__patch} -p1 < %{PATCH22} || exit 1
-%endif
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
@@ -1715,6 +1709,7 @@ cd -
 %endif
 
 %patch50 -p1
+%patch51 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

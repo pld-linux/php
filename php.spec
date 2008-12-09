@@ -82,7 +82,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 4
+%define		rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -90,13 +90,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.2.7
+Version:	5.2.8
 Release:	%{rel}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	9ffc42edbb7faad965699666ddd559bc
+# Source0-md5:	8760a833cf10433d3e72271ab0d0eccf
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-cgi.ini
@@ -160,8 +160,6 @@ Patch48:	%{name}-fpm-config.patch
 Patch49:	%{name}-fpm-initdir.patch
 # drop when http://bugs.php.net/bug.php?id=45996 solved
 Patch50:	%{name}-xml-force-expat.patch
-# quickfix for http://bugs.php.net/bug.php?id=42718 (to be part of 5.2.8) 
-Patch51:	%{name}-broken_filter_and_magic_quotes.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -1709,7 +1707,6 @@ cd -
 %endif
 
 %patch50 -p1
-%patch51 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

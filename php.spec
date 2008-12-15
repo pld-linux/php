@@ -45,11 +45,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
-%if "%{pld_release}" == "ac"
-%bcond_with		fpm		# fpm patches from http://php-fpm.anight.org/ (libevent needs update)
-%else
 %bcond_without	fpm		# fpm patches from http://php-fpm.anight.org/
-%endif
 %bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)

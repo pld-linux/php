@@ -24,7 +24,7 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/php-fpm ]; then
 		msg_starting "PHP FastCGI Process Manager"
-		daemon /usr/bin/php.fpm --fpm --fpm-config /etc/php/fpm.conf
+		daemon --pidfile $pidfile /usr/bin/php.fpm --fpm --fpm-config /etc/php/fpm.conf
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/php-fpm
 	else
@@ -37,7 +37,8 @@ stop() {
 		# Stop daemons.
 		msg_stopping "PHP FastCGI Process Manager"
 		# always gracefully shut down php-fpm
-		killproc --pidfile $pidfile php-fpm -QUIT
+		/sbin/start-stop-daemon -q --stop -s QUIT --retry QUIT/600/TERM/10 --pidfile $pidfile
+		[ "$?" -eq 0 ] && ok || fail
 		rm -f /var/lock/subsys/php-fpm
 	else
 		msg_not_running "PHP FastCGI Process Manager"

@@ -44,7 +44,7 @@
 %bcond_without	apache1		# disable building apache 1.3.x module
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
-%bcond_without	zts		# disable experimental-zts
+%bcond_without	zts		# disable Zend Thread Safety
 %bcond_without	fpm		# fpm patches from http://php-fpm.anight.org/
 %bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
@@ -135,7 +135,6 @@ Patch23:	%{name}-both-apxs.patch
 Patch24:	%{name}-builddir.patch
 Patch25:	%{name}-zlib-for-getimagesize.patch
 Patch26:	%{name}-versioning.patch
-Patch27:	%{name}-linkflags-clean.patch
 Patch28:	%{name}-pear.patch
 Patch29:	%{name}-config-dir.patch
 Patch30:	%{name}-bug-42952.patch
@@ -153,9 +152,6 @@ Patch41:	%{name}-pdo_mysql-charsetphpini.patch
 Patch42:	%{name}-ini-charsetphpini.patch
 Patch43:	%{name}-use-prog_sendmail.patch
 Patch44:	%{name}-fpm.patch
-Patch45:	%{name}-fpm-zts.patch
-Patch46:	%{name}-fpm-libs.patch
-Patch47:	%{name}-fpm-libevent.patch
 Patch48:	%{name}-fpm-config.patch
 Patch49:	%{name}-fpm-initdir.patch
 # drop when http://bugs.php.net/bug.php?id=45996 solved
@@ -1613,7 +1609,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q
-%patch27 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1697,11 +1692,6 @@ done
 
 %if %{with fpm}
 %patch44 -p1
-cd sapi/cgi/fpm
-%patch45 -p0
-cd -
-%patch46 -p1
-%patch47 -p1
 %patch48 -p1
 %patch49 -p1
 %endif

@@ -82,7 +82,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 2
+%define		rel 3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -156,6 +156,7 @@ Patch48:	%{name}-fpm-config.patch
 Patch49:	%{name}-fpm-initdir.patch
 # drop when http://bugs.php.net/bug.php?id=45996 solved
 Patch50:	%{name}-xml-force-expat.patch
+Patch51:	%{name}-include_path.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -1697,6 +1698,7 @@ done
 %endif
 
 %patch50 -p1
+%patch51 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

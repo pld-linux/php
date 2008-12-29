@@ -24,8 +24,6 @@
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
-%bcond_without	mhash		# without mhash extension module
-%bcond_without	ming		# without ming extension module
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
@@ -66,7 +64,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define	_rel	0.18
-%define	_snap	200811082130
+%define	_snap	200812271530
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -80,7 +78,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	e4e977f880e3df1b3ff9c0d3210ab9b7
+# Source0-md5:	5af2615d3f9547157138a713cf7bab7c
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -116,7 +114,6 @@ Patch23:	%{name}-both-apxs.patch
 Patch24:	%{name}-builddir.patch
 Patch25:	%{name}-zlib-for-getimagesize.patch
 Patch26:	%{name}-versioning.patch
-Patch27:	%{name}-linkflags-clean.patch
 Patch29:	%{name}-config-dir.patch
 Patch31:	%{name}-fcgi-graceful.patch
 Patch38:	%{name}-tds.patch
@@ -156,8 +153,6 @@ BuildRequires:	libtool >= 1.4.3
 BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.1.0
-%{?with_mhash:BuildRequires:	mhash-devel}
-%{?with_ming:BuildRequires:	ming-devel >= 0.3}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
@@ -374,6 +369,7 @@ Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
+Obsoletes:	php-mhash
 Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-pecl-fileinfo
@@ -783,36 +779,6 @@ support.
 
 %description mcrypt -l pl.UTF-8
 Moduł PHP dodający możliwość szyfrowania poprzez bibliotekę mcrypt.
-
-%package mhash
-Summary:	mhash extension module for PHP
-Summary(pl.UTF-8):	Moduł mhash dla PHP
-Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(mhash)
-
-%description mhash
-This is a dynamic shared object (DSO) for PHP that will add mhash
-support.
-
-%description mhash -l pl.UTF-8
-Moduł PHP udostępniający funkcje mieszające z biblioteki mhash.
-
-%package ming
-Summary:	ming extension module for PHP
-Summary(pl.UTF-8):	Moduł ming dla PHP
-Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	ming >= 0.3
-Provides:	php(ming)
-
-%description ming
-This is a dynamic shared object (DSO) for PHP that will add ming
-(Flash - .swf files) support.
-
-%description ming -l pl.UTF-8
-Moduł PHP dodający obsługę plików Flash (.swf) poprzez bibliotekę
-ming.
 
 %package mssql
 Summary:	MS SQL extension module for PHP
@@ -1497,7 +1463,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q -n %{name}%{version}-%{_snap}
-%patch27 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1699,8 +1664,6 @@ for sapi in $sapis; do
 	--with-jpeg-dir=/usr \
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
-	%{?with_mhash:--with-mhash=shared} \
-	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
 	--with-mysql=shared,/usr \
@@ -1976,8 +1939,6 @@ fi
 %extension_scripts ldap
 %extension_scripts mbstring
 %extension_scripts mcrypt
-%extension_scripts mhash
-%extension_scripts ming
 %extension_scripts mssql
 %extension_scripts mysql
 %extension_scripts mysqli
@@ -2071,12 +2032,6 @@ fi
 
 %triggerun mcrypt -- %{name}-mcrypt < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mcrypt\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun mhash -- %{name}-mhash < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun ming -- %{name}-ming < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mssql -- %{name}-mssql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mssql\.so/d' %{_sysconfdir}/php.ini
@@ -2375,20 +2330,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mcrypt.ini
 %attr(755,root,root) %{php_extensiondir}/mcrypt.so
-
-%if %{with mhash}
-%files mhash
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mhash.ini
-%attr(755,root,root) %{php_extensiondir}/mhash.so
-%endif
-
-%if %{with ming}
-%files ming
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ming.ini
-%attr(755,root,root) %{php_extensiondir}/ming.so
-%endif
 
 %if %{with mssql}
 %files mssql

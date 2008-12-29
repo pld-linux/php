@@ -1,78 +1,172 @@
---- php-5.2.0/ext/gd/config.m4.orig	2005-11-29 19:25:59.000000000 +0100
-+++ php-5.2.0/ext/gd/config.m4	2006-12-22 23:41:12.363074440 +0100
-@@ -261,6 +261,7 @@
-   PHP_CHECK_LIBRARY(gd, gdFontCacheShutdown,    [AC_DEFINE(HAVE_GD_FONTCACHESHUTDOWN,1, [ ])], [], [ -L$GD_LIB $GD_SHARED_LIBADD ])
+diff -ur php5.3-200812262130/ext/gd/config.m4 mod/ext/gd/config.m4
+--- php5.3-200812262130/ext/gd/config.m4	2008-07-18 04:34:20.000000000 +0200
++++ mod/ext/gd/config.m4	2008-12-27 01:12:23.000000000 +0100
+@@ -255,6 +255,7 @@
    PHP_CHECK_LIBRARY(gd, gdFreeFontCache,        [AC_DEFINE(HAVE_GD_FREEFONTCACHE,    1, [ ])], [], [ -L$GD_LIB $GD_SHARED_LIBADD ])
+   PHP_CHECK_LIBRARY(gd, gdFontCacheMutexSetup,  [AC_DEFINE(HAVE_GD_FONTMUTEX,        1, [ ])], [], [ -L$GD_LIB $GD_SHARED_LIBADD ])
    PHP_CHECK_LIBRARY(gd, gdNewDynamicCtxEx,      [AC_DEFINE(HAVE_GD_DYNAMIC_CTX_EX,   1, [ ])], [], [ -L$GD_LIB $GD_SHARED_LIBADD ])
 +  PHP_CHECK_LIBRARY(gd, gdImageRotate,          [AC_DEFINE(HAVE_GD_ROTATE,           1, [ ])], [], [ -L$GD_LIB $GD_SHARED_LIBADD ])
  ])
  
  dnl
-@@ -313,6 +314,7 @@
-   AC_DEFINE(HAVE_GD_FONTCACHESHUTDOWN,1, [ ])
+@@ -308,6 +309,7 @@
+   AC_DEFINE(HAVE_GD_FONTMUTEX,        1, [ ])
    AC_DEFINE(HAVE_GD_DYNAMIC_CTX_EX,   1, [ ])
    AC_DEFINE(HAVE_GD_GIF_CTX,          1, [ ])
 +  AC_DEFINE(HAVE_GD_ROTATE,           1, [ ])
  
  dnl Make sure the libgd/ is first in the include path
    GDLIB_CFLAGS="-DHAVE_LIBPNG"
---- php-5.2.0/ext/gd/gd.c.orig	2006-10-18 18:04:37.000000000 +0200
-+++ php-5.2.0/ext/gd/gd.c	2006-12-22 23:45:04.600308887 +0100
-@@ -314,7 +314,7 @@
+diff -ur php5.3-200812262130/ext/gd/gd.c mod/ext/gd/gd.c
+--- php5.3-200812262130/ext/gd/gd.c	2008-12-12 14:35:20.000000000 +0100
++++ mod/ext/gd/gd.c	2008-12-27 01:18:43.000000000 +0100
+@@ -296,7 +296,7 @@
  ZEND_END_ARG_INFO()
  #endif
  
 -#ifdef HAVE_GD_BUNDLED
 +#ifdef HAVE_GD_ROTATE
- static
  ZEND_BEGIN_ARG_INFO_EX(arginfo_imagerotate, 0, 0, 3)
  	ZEND_ARG_INFO(0, im)
-@@ -1020,8 +1020,10 @@
- 	PHP_FE(imagecopyresampled,						arginfo_imagecopyresampled)
+ 	ZEND_ARG_INFO(0, angle)
+@@ -927,9 +927,12 @@
+ 	PHP_FE(imagegrabscreen,							arginfo_imagegrabscreen)
  #endif
  
--#ifdef HAVE_GD_BUNDLED
 +#ifdef HAVE_GD_ROTATE
- 	PHP_FE(imagerotate,     						arginfo_imagerotate)
++ 	PHP_FE(imagerotate,     						arginfo_imagerotate)
 +#endif
-+#ifdef HAVE_GD_BUNDLED
- 	PHP_FE(imageantialias,							arginfo_imageantialias)
++
+ #ifdef HAVE_GD_BUNDLED
+-	PHP_FE(imagerotate,     						arginfo_imagerotate)
+-	PHP_FE(imageantialias,							arginfo_imageantialias)
++ 	PHP_FE(imageantialias,							arginfo_imageantialias)
  #endif
  
-@@ -1248,11 +1250,13 @@
+ #if HAVE_GD_IMAGESETTILE
+@@ -1079,7 +1082,7 @@
+ 	PHP_INI_ENTRY("gd.jpeg_ignore_warning", "0", PHP_INI_ALL, NULL)
+ PHP_INI_END()
+ /* }}} */
+-	
++
+ /* {{{ php_free_gd_image
+  */
+ static void php_free_gd_image(zend_rsrc_list_entry *rsrc TSRMLS_DC)
+@@ -1140,7 +1143,7 @@
+ #endif
+ 
+ 	REGISTER_INI_ENTRIES();
+-	
++
+ 	REGISTER_LONG_CONSTANT("IMG_GIF", 1, CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_LONG_CONSTANT("IMG_JPG", 2, CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_LONG_CONSTANT("IMG_JPEG", 2, CONST_CS | CONST_PERSISTENT);
+@@ -1168,11 +1171,14 @@
  #ifdef GD2_FMT_COMPRESSED
  	REGISTER_LONG_CONSTANT("IMG_GD2_COMPRESSED", GD2_FMT_COMPRESSED, CONST_CS | CONST_PERSISTENT);
  #endif
 -#if HAVE_GD_BUNDLED
-+#ifdef HAVE_GD_ROTATE
++#if HAVE_GD_ROTATE
  	REGISTER_LONG_CONSTANT("IMG_EFFECT_REPLACE", gdEffectReplace, CONST_CS | CONST_PERSISTENT);
  	REGISTER_LONG_CONSTANT("IMG_EFFECT_ALPHABLEND", gdEffectAlphaBlend, CONST_CS | CONST_PERSISTENT);
  	REGISTER_LONG_CONSTANT("IMG_EFFECT_NORMAL", gdEffectNormal, CONST_CS | CONST_PERSISTENT);
  	REGISTER_LONG_CONSTANT("IMG_EFFECT_OVERLAY", gdEffectOverlay, CONST_CS | CONST_PERSISTENT);
 +#endif
++
 +#if HAVE_GD_BUNDLED
  	REGISTER_LONG_CONSTANT("GD_BUNDLED", 1, CONST_CS | CONST_PERSISTENT);
+ 
  	/* Section Filters */
- 	REGISTER_LONG_CONSTANT("IMG_FILTER_NEGATE", IMAGE_FILTER_NEGATE, CONST_CS | CONST_PERSISTENT);
-@@ -2055,7 +2059,7 @@
+@@ -1760,7 +1766,7 @@
+ 	long cx, cy, w, h, ST, E, col, style;
+ 	gdImagePtr im;
+ 	int e, st;
+-	
++
+ 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rllllllll", &IM, &cx, &cy, &w, &h, &ST, &E, &col, &style) == FAILURE) {
+ 		return;
+ 	}
+@@ -2008,7 +2014,7 @@
+ 	if ( handle == 0 ) {
+ 		goto clean;
+ 	}
+-	pPrintWindow = (tPrintWindow) GetProcAddress(handle, "PrintWindow");  
++	pPrintWindow = (tPrintWindow) GetProcAddress(handle, "PrintWindow");
+ 
+ 	if ( pPrintWindow )  {
+ 		pPrintWindow(window, memDC, (UINT) client_area);
+@@ -2105,7 +2111,7 @@
  /* }}} */
- #endif
+ #endif /* PHP_WIN32 */
  
 -#ifdef HAVE_GD_BUNDLED
 +#ifdef HAVE_GD_ROTATE
  /* {{{ proto resource imagerotate(resource src_im, float angle, int bgdcolor [, int ignoretransparent])
     Rotate an image using a custom angle */
  PHP_FUNCTION(imagerotate)
---- php-5.2.0/ext/gd/php_gd.h.orig	2006-01-01 13:50:06.000000000 +0100
-+++ php-5.2.0/ext/gd/php_gd.h	2006-12-22 23:42:04.138024927 +0100
-@@ -112,8 +112,10 @@
- PHP_FUNCTION(imagecopyresampled);
+@@ -3362,7 +3368,7 @@
+ {
+ 	zval *IM;
+ 	gdImagePtr im;
+-	
++
+ 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &IM) == FAILURE) {
+ 		return;
+ 	}
+@@ -3946,7 +3952,7 @@
+ 			if (zend_hash_get_current_data_ex(HASH_OF(EXT), (void **) &item, &pos) == FAILURE) {
+ 				continue;
+ 			}
+-		
++
+ 			if (strcmp("linespacing", key) == 0) {
+ 				convert_to_double_ex(item);
+ 				strex.flags |= gdFTEX_LINESPACE;
+@@ -3972,7 +3978,7 @@
+ #endif
+ 
+ 	PHP_GD_CHECK_OPEN_BASEDIR((char *)fontname, "Invalid font filename");
+-	
++
+ #ifdef USE_GD_IMGSTRTTF
+ # if HAVE_GD_STRINGFTEX
+ 	if (extended) {
+@@ -4373,11 +4379,11 @@
+ 	if (argc != 3 && argc != 6) {
+ 		ZEND_WRONG_PARAM_COUNT();
+ 	}
+-	
++
+ 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "srl|lld", &str, &str_len, &fnt, &sz, &sp, &wd, &angle) == FAILURE) {
+ 		return;
+ 	}
+-	
++
+ 	if (argc == 6) {
+ 		space = sp;
+ 		add_width = wd;
+@@ -4562,7 +4568,7 @@
+ #ifdef HAVE_GD_JPG
+     long ignore_warning;
+ #endif
+-	
++
+ 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sslll", &f_org, &f_org_len, &f_dest, &f_dest_len, &height, &width, &threshold) == FAILURE) {
+ 		return;
+ 	}
+diff -ur php5.3-200812262130/ext/gd/php_gd.h mod/ext/gd/php_gd.h
+--- php5.3-200812262130/ext/gd/php_gd.h	2008-07-18 04:34:20.000000000 +0200
++++ mod/ext/gd/php_gd.h	2008-12-27 01:20:04.000000000 +0100
+@@ -119,8 +119,11 @@
+ PHP_FUNCTION(imagegrabscreen);
  #endif
  
 -#ifdef HAVE_GD_BUNDLED
 +#ifdef HAVE_GD_ROTATE
  PHP_FUNCTION(imagerotate);
 +#endif
++
 +#ifdef HAVE_GD_BUNDLED
  PHP_FUNCTION(imageantialias);
  #endif

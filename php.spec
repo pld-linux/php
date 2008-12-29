@@ -12,6 +12,8 @@
 # - make additional headers and checking added by mail patch configurable
 # - modularize session, standard (output from pure php -m)?
 # - http://forum.lighttpd.net/topic/34454
+# - Security note: CVE-2008-5498 (no solution at this time):
+#   http://securitytracker.com/alerts/2008/Dec/1021494.html
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)

@@ -1,12 +1,11 @@
-adds missing include in zend_strtod.c (caused build to fail on sparc)
-
---- php-5.0.3/Zend/zend_strtod.c~	2004-12-14 09:41:35.000000000 +0100
-+++ php-5.0.3/Zend/zend_strtod.c	2004-12-21 08:45:10.050119856 +0100
-@@ -90,6 +90,7 @@
-  */
+diff -ur php5.3-200812262130/Zend/zend_strtod.c mod/Zend/zend_strtod.c
+--- php5.3-200812262130/Zend/zend_strtod.c	2008-12-02 18:36:12.000000000 +0100
++++ mod/Zend/zend_strtod.c	2008-12-27 01:28:47.000000000 +0100
+@@ -93,6 +93,7 @@
  
+ #include <zend_operators.h>
  #include <zend_strtod.h>
 +#include <stdint.h>
+ #include <zend_float.h>
  
- #if defined(LIBC_SCCS) && !defined(lint)
- static char *rcsid = "$OpenBSD: strtod.c,v 1.19 2004/02/03 16:52:11 drahn Exp $";
+ #ifdef ZTS

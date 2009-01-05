@@ -84,7 +84,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 3
+%define		rel 4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -151,7 +151,6 @@ Patch38:	%{name}-tds.patch
 Patch39:	%{name}-mysql-charsetphpini.patch
 Patch40:	%{name}-mysqli-charsetphpini.patch
 Patch41:	%{name}-pdo_mysql-charsetphpini.patch
-Patch42:	%{name}-ini-charsetphpini.patch
 Patch43:	%{name}-use-prog_sendmail.patch
 Patch44:	%{name}-fpm.patch
 Patch48:	%{name}-fpm-config.patch
@@ -1689,7 +1688,6 @@ done
 %patch39 -p1
 %patch40 -p0
 %patch41 -p0
-%patch42 -p1
 
 %patch43 -p1
 

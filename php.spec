@@ -84,7 +84,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 5
+%define		rel 6
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -106,8 +106,8 @@ Source5:	%{name}-apache.ini
 Source6:	%{name}-cli.ini
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source8:	%{name}_browscap.ini
-Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{name}-patchset-5.2.6-r8.tar.bz2
-# Source9-md5:	0f411800537648d0748417124291bd58
+Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{name}-patchset-%{version}-r1.tar.bz2
+# Source9-md5:	d67f23f5e69664e06fce89b064d5bbab
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
 Patch0:		%{name}-shared.patch
@@ -1647,25 +1647,6 @@ cp php.ini-dist php.ini
 %{__tar} jxf %{SOURCE9}
 v=%{SOURCE9} v=${v#*/php-patchset-} v=${v%%-*}
 mv $v/$v gentoo-patchset
-rm -f gentoo-patchset/001_tests-ignore-php-ini.patch
-rm -f gentoo-patchset/002_run-tests-ignore-php-ini.patch
-rm -f gentoo-patchset/005_stream_context_set_params-crash.patch
-rm -f gentoo-patchset/006_PDORow-crash.patch
-rm -f gentoo-patchset/007_dom-setAttributeNode-crash.patch
-rm -f gentoo-patchset/008_imap-bufferoverflows.patch
-rm -f gentoo-patchset/009_array-function-crashes.patch
-rm -f gentoo-patchset/010_ticks-zts-crashes.patch
-rm -f gentoo-patchset/011_ze-number-overflow-crash.patch
-rm -f gentoo-patchset/012_pcre-integer-overflow.patch
-rm -f gentoo-patchset/013_GNU_SOURCE-string.c.patch
-rm -f gentoo-patchset/014_explode-overflow.patch
-rm -f gentoo-patchset/015_CVE-2008-2665-wrapper-safemode-bypass.patch
-rm -f gentoo-patchset/016_cgi-doubledot-filename-DoS.patch
-rm -f gentoo-patchset/017_xmlrpc-invalid-callback-crash.patch
-rm -f gentoo-patchset/018_gd-imageloadfont-overflows.patch
-rm -f gentoo-patchset/019_new-memory-corruption.patch
-rm -f gentoo-patchset/020_gd-noise-gbug234459.patch
-rm -f gentoo-patchset/021_snmp-memleaks-gbug231528.patch
 for a in gentoo-patchset/*.patch; do
 	%{__patch} -p1 < $a
 done

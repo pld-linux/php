@@ -20,7 +20,6 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
-%bcond_without	embed		# without experimental embed SAPI
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
@@ -344,31 +343,18 @@ PHP as DSO module for apache 2.x.
 %description -n apache-mod_php -l pl.UTF-8
 php jako moduł DSO (Dynamic Shared Object) dla apache 2.x.
 
-%package embed
-Summary:	php as an embed SAPI
-Summary(pl.utf-8):	php jako osadzone SAPI
+%package fcgi
+Summary:	php as FastCGI program
+Summary(pl.UTF-8):	php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	webserver(php) = %{version}
 
-%description embed
-php as fastcgi program.
-
-%description embed -l pl.utf-8
-php jako program fastcgi.
-
-%package fcgi
-summary:	php as fastcgi program
-summary(pl.utf-8):	php jako program fastcgi
-group:		development/languages/php
-requires:	%{name}-common = %{epoch}:%{version}-%{release}
-provides:	webserver(php) = %{version}
-
 %description fcgi
-php as fastcgi program.
+php as FastCGI program.
 
-%description fcgi -l pl.utf-8
-php jako program fastcgi.
+%description fcgi -l pl.UTF-8
+php jako program FastCGI.
 
 %package cgi
 Summary:	php as CGI program
@@ -1755,9 +1741,6 @@ fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
 
 sapis="
-%if %{with embed}
-embed
-%endif
 %if %{with fcgi}
 fcgi
 %endif
@@ -1783,9 +1766,6 @@ for sapi in $sapis; do
 		;;
 	cli)
 		sapi_args='--disable-cgi'
-		;;
-	embed)
-		sapi_args="--enable-embed=shared"
 		;;
 	fcgi)
 		sapi_args='--disable-cli --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'

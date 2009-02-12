@@ -257,6 +257,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		zend_zts			%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug			%{!?debug:0}%{?debug:1}
 
+%if %{with oci8}
+# ORACLE_HOME is required for oci8 ext to build
+%{expand:%%define _preserve_env %_preserve_env ORACLE_HOME}
+%endif
+
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
 easy for developers to write dynamically generated web pages. PHP also

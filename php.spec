@@ -16,7 +16,6 @@
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
-%bcond_with	hardening	# build with hardening patch applied (http://www.hardened-php.net/)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	curl		# without CURL extension module
@@ -44,7 +43,6 @@
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
 %bcond_with	tests		# default off; test process very often hangs on buildersl; perform "make test"
-%bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -64,7 +62,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define	_rel	0.18
-%define	_snap	200812271530
+%define	_snap	200902241530
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -73,20 +71,18 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.3
-Release:	%{_rel}%{?with_hardening:hardened}@%{_snap}
+Release:	%{_rel}@%{_snap}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	5af2615d3f9547157138a713cf7bab7c
+# Source0-md5:	8ac3a7ca1f401a95893d764e536efb77
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
 Source5:	%{name}-cgi.ini
 Source6:	%{name}-apache.ini
 Source7:	%{name}-cli.ini
-Source8:	http://www.hardened-php.net/hardening-patch-5.0.4-0.3.0.patch.gz
-# Source8-md5:	47a742fa9fab2826ad10c13a2376111a
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source9:	%{name}_browscap.ini
 Patch0:		%{name}-shared.patch
@@ -101,7 +97,6 @@ Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
 # XXX: needs fix
 Patch12:	%{name}-threads-acfix.patch
-Patch13:	%{name}-tsrmlsfetchgcc2.patch
 Patch14:	%{name}-no_pear_install.patch
 Patch15:	%{name}-zlib.patch
 Patch17:	%{name}-readline.patch
@@ -109,14 +104,13 @@ Patch18:	%{name}-nohttpd.patch
 Patch19:	%{name}-gd_imagerotate_enable.patch
 Patch20:	%{name}-uint32_t.patch
 Patch21:	%{name}-dba-link.patch
-Patch22:	%{name}-hardening-fix.patch
 Patch23:	%{name}-both-apxs.patch
 Patch24:	%{name}-builddir.patch
 Patch25:	%{name}-zlib-for-getimagesize.patch
-Patch26:	%{name}-versioning.patch
 Patch29:	%{name}-config-dir.patch
 Patch31:	%{name}-fcgi-graceful.patch
 Patch38:	%{name}-tds.patch
+Patch43:	%{name}-use-prog_sendmail.patch
 
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -192,10 +186,15 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
-%define		zend_module_api		20071006
-%define		zend_extension_api	220070929
-%define		zend_zts			%{!?with_zts:0}%{?with_zts:1}
-%define		php_debug			%{!?debug:0}%{?debug:1}
+%define		zend_module_api		20090115
+%define		zend_extension_api	220090115
+%define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
+%define		php_debug		%{!?debug:0}%{?debug:1}
+
+%if %{with oci8}
+# ORACLE_HOME is required for oci8 ext to build
+%{expand:%%define _preserve_env %_preserve_env ORACLE_HOME}
+%endif
 
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
@@ -1465,7 +1464,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %setup -q -n %{name}%{version}-%{_snap}
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
+#%patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
@@ -1476,7 +1475,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 cp php.ini-dist php.ini
 #%patch10 -p1
 %patch12 -p1
-%patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch17 -p1
@@ -1485,18 +1483,15 @@ cp php.ini-dist php.ini
 %patch20 -p1
 %patch21 -p1
 
-%if %{with hardening}
-zcat %{SOURCE8} | patch -p1 || exit 1
-patch -p1 < %{PATCH22} || exit 1
-%endif
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
-%{?with_versioning:%patch26 -p1}
 
 %patch29 -p1
 %patch31 -p1
 #%patch38 -p1
+
+%patch43 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1568,15 +1563,15 @@ for sapi in $sapis; do
 		sapi_args='--disable-cgi'
 	;;
 	fcgi)
-		sapi_args='--enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
+		sapi_args=''
 	;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
-		sapi_args="--with-apxs=%{apxs1} --with-apache-version=$ver"
+		sapi_args="--with-apxs=%{apxs1}"
 	;;
 	apxs2)
 		ver=$(rpm -q --qf '%{V}' apache-devel)
-		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
+		sapi_args="--with-apxs2=%{apxs2}"
 	;;
 	esac
 
@@ -1592,18 +1587,14 @@ for sapi in $sapis; do
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	--enable-inline-optimization \
-	--enable-memory-limit \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
 	--enable-ctype=shared \
 	--enable-dba=shared \
-	--with-inifile \
-	--with-flatfile \
 	--enable-dom=shared \
 	--enable-exif=shared \
 	--enable-ftp=shared \
 	--enable-gd-native-ttf \
-	--enable-gd-jus-conf \
 	--enable-libxml \
 	--enable-magic-quotes \
 	--enable-mbstring=shared,all \
@@ -1626,7 +1617,6 @@ for sapi in $sapis; do
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--enable-posix=shared \
-	--enable-reflection \
 	--enable-session \
 	--enable-shared \
 	--enable-shmop=shared \
@@ -1634,8 +1624,6 @@ for sapi in $sapis; do
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
-	--enable-track-vars \
-	--enable-trans-sid \
 	--enable-safe-mode \
 	--enable-soap=shared \
 	--enable-sockets=shared \
@@ -1647,11 +1635,6 @@ for sapi in $sapis; do
 	--with-bz2=shared \
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	--with-db4 \
-%if %{with xmlrpc}
-	--with-expat-dir=shared,/usr \
-%else
-	--without-expat-dir \
-%endif
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \
 	--with-freetype-dir=shared \
@@ -1681,13 +1664,11 @@ for sapi in $sapis; do
 	--with-readline=shared \
 	%{?with_recode:--with-recode=shared} \
 	--with-regex=php \
-	--without-sablot-js \
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	%{!?with_sqlite:--without-sqlite --without-pdo-sqlite}%{?with_sqlite:--with-sqlite=shared,/usr --enable-sqlite-utf8} \
 	--with-t1lib=shared \
 	%{?with_tidy:--with-tidy=shared} \
-	--with-tiff-dir=/usr \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
 	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
 	--with-xsl=shared \

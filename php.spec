@@ -84,7 +84,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 9
+%define		rel 1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -92,13 +92,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.2.8
+Version:	5.2.9
 Release:	%{rel}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	8760a833cf10433d3e72271ab0d0eccf
+# Source0-md5:	280d6cda7f72a4fc6de42fda21ac2db7
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-cgi.ini
@@ -106,7 +106,7 @@ Source5:	%{name}-apache.ini
 Source6:	%{name}-cli.ini
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source8:	%{name}_browscap.ini
-Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{name}-patchset-%{version}-r1.tar.bz2
+#Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{name}-patchset-%{version}-r1.tar.bz2
 # Source9-md5:	d67f23f5e69664e06fce89b064d5bbab
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
@@ -144,7 +144,6 @@ Patch31:	%{name}-fcgi-graceful.patch
 Patch32:	%{name}-apr-apu.patch
 Patch33:	%{name}-fcgi-error_log-no-newlines.patch
 Patch34:	%{name}-curl-limit-speed.patch
-Patch35:	%{name}-ac.patch
 Patch36:	%{name}-mime_magic.patch
 Patch37:	%{name}-libtool.patch
 Patch38:	%{name}-tds.patch
@@ -158,7 +157,6 @@ Patch49:	%{name}-fpm-initdir.patch
 # drop when http://bugs.php.net/bug.php?id=45996 solved
 Patch50:	%{name}-xml-force-expat.patch
 Patch51:	%{name}-include_path.patch
-Patch52:	%{name}-strtotime-memleak.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -1650,12 +1648,14 @@ cp php.ini-dist php.ini
 
 %{?with_versioning:%patch26 -p1}
 
+%if 0
 %{__tar} jxf %{SOURCE9}
 v=%{SOURCE9} v=${v#*/php-patchset-} v=${v%%-*}
 mv $v/$v gentoo-patchset
 for a in gentoo-patchset/*.patch; do
 	%{__patch} -p1 < $a
 done
+%endif
 
 %patch28 -p1
 %patch29 -p1
@@ -1664,7 +1664,6 @@ done
 %patch32 -p1
 #%patch33 -p1
 %patch34 -p1
-%patch35 -p1
 %patch36 -p1
 %if "%{pld_release}" != "ac"
 %patch37 -p1
@@ -1686,8 +1685,6 @@ done
 
 %patch50 -p1
 %patch51 -p1
-
-%patch52 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

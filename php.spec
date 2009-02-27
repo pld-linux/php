@@ -12,8 +12,6 @@
 # - make additional headers and checking added by mail patch configurable
 # - modularize session, standard (output from pure php -m)?
 # - http://forum.lighttpd.net/topic/34454
-# - Security note: CVE-2008-5498 (no solution at this time):
-#   http://securitytracker.com/alerts/2008/Dec/1021494.html
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -157,11 +155,6 @@ Patch42:	%{name}-fpm-initdir.patch
 Patch43:	%{name}-xml-force-expat.patch
 Patch44:	%{name}-include_path.patch
 URL:		http://www.php.net/
-# Requires review:
-# http://securitytracker.com/alerts/2008/Oct/1020995.html
-# BuildRequires:	security(CVE-2008-3659)
-# http://securitytracker.com/alerts/2008/Oct/1020994.html
-# BuildRequires:	security(CVE-2008-3660)
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.53

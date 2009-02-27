@@ -132,31 +132,30 @@ Patch18:	%{name}-nohttpd.patch
 Patch19:	%{name}-gd_imagerotate_enable.patch
 Patch20:	%{name}-uint32_t.patch
 Patch21:	%{name}-dba-link.patch
-#Patch22
-Patch23:	%{name}-both-apxs.patch
-Patch24:	%{name}-builddir.patch
-Patch25:	%{name}-zlib-for-getimagesize.patch
-Patch26:	%{name}-versioning.patch
-Patch28:	%{name}-pear.patch
-Patch29:	%{name}-config-dir.patch
-Patch30:	%{name}-bug-42952.patch
-Patch31:	%{name}-fcgi-graceful.patch
-Patch32:	%{name}-apr-apu.patch
-Patch33:	%{name}-fcgi-error_log-no-newlines.patch
-Patch34:	%{name}-curl-limit-speed.patch
-Patch36:	%{name}-mime_magic.patch
-Patch37:	%{name}-libtool.patch
-Patch38:	%{name}-tds.patch
-Patch39:	%{name}-mysql-charsetphpini.patch
-Patch40:	%{name}-mysqli-charsetphpini.patch
-Patch41:	%{name}-pdo_mysql-charsetphpini.patch
-Patch43:	%{name}-use-prog_sendmail.patch
-Patch44:	%{name}-fpm.patch
-Patch48:	%{name}-fpm-config.patch
-Patch49:	%{name}-fpm-initdir.patch
+Patch22:	%{name}-both-apxs.patch
+Patch23:	%{name}-builddir.patch
+Patch24:	%{name}-zlib-for-getimagesize.patch
+Patch25:	%{name}-versioning.patch
+Patch26:	%{name}-pear.patch
+Patch27:	%{name}-config-dir.patch
+Patch28:	%{name}-bug-42952.patch
+Patch29:	%{name}-fcgi-graceful.patch
+Patch30:	%{name}-apr-apu.patch
+Patch31:	%{name}-fcgi-error_log-no-newlines.patch
+Patch32:	%{name}-curl-limit-speed.patch
+Patch33:	%{name}-mime_magic.patch
+Patch34:	%{name}-libtool.patch
+Patch35:	%{name}-tds.patch
+Patch36:	%{name}-mysql-charsetphpini.patch
+Patch37:	%{name}-mysqli-charsetphpini.patch
+Patch38:	%{name}-pdo_mysql-charsetphpini.patch
+Patch39:	%{name}-use-prog_sendmail.patch
+Patch40:	%{name}-fpm.patch
+Patch41:	%{name}-fpm-config.patch
+Patch42:	%{name}-fpm-initdir.patch
 # drop when http://bugs.php.net/bug.php?id=45996 solved
-Patch50:	%{name}-xml-force-expat.patch
-Patch51:	%{name}-include_path.patch
+Patch43:	%{name}-xml-force-expat.patch
+Patch44:	%{name}-include_path.patch
 URL:		http://www.php.net/
 # Requires review:
 # http://securitytracker.com/alerts/2008/Oct/1020995.html
@@ -1641,12 +1640,11 @@ cp php.ini-dist php.ini
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-
+%patch22 -p1
 %patch23 -p1
 %patch24 -p1
-%patch25 -p1
 
-%{?with_versioning:%patch26 -p1}
+%{?with_versioning:%patch25 -p1}
 
 %if 0
 %{__tar} jxf %{SOURCE9}
@@ -1657,34 +1655,34 @@ for a in gentoo-patchset/*.patch; do
 done
 %endif
 
+%patch26 -p1
+%patch27 -p1
 %patch28 -p1
 %patch29 -p1
 %patch30 -p1
-%patch31 -p1
+#%patch31 -p1
 %patch32 -p1
-#%patch33 -p1
-%patch34 -p1
-%patch36 -p1
+%patch33 -p1
 %if "%{pld_release}" != "ac"
-%patch37 -p1
+%patch34 -p1
 %endif
-%patch38 -p1
+%patch35 -p1
 
 # mysql default charset for mysql/mysql/pdo-mysql extensions
-%patch39 -p1
-%patch40 -p0
-%patch41 -p0
+%patch36 -p1
+%patch37 -p0
+%patch38 -p0
 
-%patch43 -p1
+%patch39 -p1
 
 %if %{with fpm}
-%patch44 -p1
-%patch48 -p1
-%patch49 -p1
+%patch40 -p1
+%patch41 -p1
+%patch42 -p1
 %endif
 
-%patch50 -p1
-%patch51 -p1
+%patch43 -p1
+%patch44 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

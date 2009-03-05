@@ -239,18 +239,18 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		php_sysconfdir		/etc/php
 %define		php_extensiondir	%{_libdir}/php
-%define		_sysconfdir			%{php_sysconfdir}
+%define		_sysconfdir		%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
 %define		zend_module_api		20060613
 %define		zend_extension_api	220060519
-%define		zend_zts			%{!?with_zts:0}%{?with_zts:1}
-%define		php_debug			%{!?debug:0}%{?debug:1}
+%define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
+%define		php_debug		%{!?debug:0}%{?debug:1}
 
 %if %{with oci8}
 # ORACLE_HOME is required for oci8 ext to build
-%{expand:%%define _preserve_env %_preserve_env ORACLE_HOME}
+%define _preserve_env %_preserve_env_base ORACLE_HOME
 %endif
 
 %description

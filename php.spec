@@ -106,7 +106,7 @@ Source6:	%{name}-cli.ini
 Source8:	%{name}_browscap.ini
 # lynx -dump ftp://distfiles.gentoo.org/pub/gentoo/distfiles/|grep -o ftp://.*php-patchset.*tar.bz2
 #Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{name}-patchset-%{version}-r1.tar.bz2
-# Source9-md5:	d67f23f5e69664e06fce89b064d5bbab
+## Source9-md5:	d67f23f5e69664e06fce89b064d5bbab
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
 Patch0:		%{name}-shared.patch

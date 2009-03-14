@@ -62,7 +62,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define	_rel	0.18
-%define	_snap	200902241530
+%define	_snap	200903141330
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -70,13 +70,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3
+Version:	5.3.0
 Release:	%{_rel}@%{_snap}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://snaps.php.net/%{name}%{version}-%{_snap}.tar.bz2
-# Source0-md5:	8ac3a7ca1f401a95893d764e536efb77
+Source0:	http://snaps.php.net/%{name}5.3-%{_snap}.tar.bz2
+# Source0-md5:	1c090604bc8f3bd0a20db98896402671
 Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
@@ -1461,7 +1461,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}%{version}-%{_snap}
+%setup -q -n %{name}5.3-%{_snap}
 %patch0 -p1
 %patch1 -p1
 #%patch2 -p1

@@ -143,7 +143,11 @@ BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libtiff-devel
+%if "%{pld_release}" != "ac"
+BuildRequires:	libtool >= 2:2.2
+%else
 BuildRequires:	libtool >= 1.4.3
+%endif
 BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.1.0
@@ -161,6 +165,7 @@ BuildRequires:	pcre-devel >= 6.6
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
+BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
@@ -193,7 +198,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %if %{with oci8}
 # ORACLE_HOME is required for oci8 ext to build
-%{expand:%%define _preserve_env %_preserve_env ORACLE_HOME}
+%define _preserve_env %_preserve_env_base ORACLE_HOME
 %endif
 
 %description
@@ -243,21 +248,11 @@ PHP - это язык написания скриптов, встраиваем�
 для работы с базами данных относительно просто. Наиболее популярное
 использование PHP - замена для CGI скриптов.
 
-Этот пакет содержит самодостаточную (CGI) версию интерпретатора языка.
-Вы должны также установить пакет %{name}-common. Если вам нужен
-интерпретатор PHP в качестве модуля apache, установите пакет
-apache-mod_php.
-
 %description -l uk.UTF-8
 PHP - це мова написання скриптів, що вбудовуються в HTML-код. PHP
 пропонує інтеграцію з багатьма СУБД, тому написання скриптів для
 роботи з базами даних є доволі простим. Найбільш популярне
 використання PHP - заміна для CGI скриптів.
-
-Цей пакет містить самодостатню (CGI) версію інтерпретатора мови. Ви
-маєте також встановити пакет %{name}-common. Якщо вам потрібен
-інтерпретатор PHP в якості модуля apache, встановіть пакет
-apache-mod_php.
 
 %package -n apache1-mod_php
 Summary:	PHP DSO module for apache 1.3.x
@@ -311,6 +306,7 @@ Summary:	php as CGI program
 Summary(pl.UTF-8):	php jako program CGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(cgi)
 
 %description cgi
 php as CGI program.
@@ -674,7 +670,9 @@ wiadomości przy użyciu wspólnego interfejsu.
 Summary:	iconv extension module for PHP
 Summary(pl.UTF-8):	Moduł iconv dla PHP
 Group:		Libraries
+Requires:	%{_libdir}/gconv
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	iconv
 Provides:	php(iconv)
 
 %description iconv
@@ -1382,6 +1380,7 @@ Summary:	xmlrpc extension module for PHP
 Summary(pl.UTF-8):	Moduł xmlrpc dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(xmlrpc)
 
 %description xmlrpc
@@ -1512,26 +1511,30 @@ rm -rf ext/pdo_sqlite/sqlite
 rm -rf ext/xmlrpc/libxmlrpc
 
 %build
-if API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h) && [ $API != %{php_api_version} ]; then
-	echo "Set %%define php_api_version to $API and rerun."
+API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
+if [ $API != %{php_api_version} ]; then
+	echo "Set %%define php_api_version to $API and re-run."
 	exit 1
 fi
 
-if API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h) && [ $API != %{zend_module_api} ]; then
-	echo "Set %%define zend_module_api to $API and rerun."
+API=$(awk '/#define ZEND_MODULE_API_NO/{print $3}' Zend/zend_modules.h)
+if [ $API != %{zend_module_api} ]; then
+	echo "Set %%define zend_module_api to $API and re-run."
 	exit 1
 fi
 
-if API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h) && [ $API != %{zend_extension_api} ]; then
-	echo "Set %%define zend_extension_api to $API and rerun."
+API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h)
+if [ $API != %{zend_extension_api} ]; then
+	echo "Set %%define zend_extension_api to $API and re-run."
 	exit 1
 fi
 
 export EXTENSION_DIR="%{php_extensiondir}"
 if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
 	rm -f Makefile.{fcgi,cgi,cli,apxs{1,2}} # now remove Makefile copies
-	%{__libtoolize} --install
+	%{__libtoolize}
 	%{__aclocal}
+	cp -f /usr/share/automake/config.* .
 	./buildconf --force
 	touch _built-conf
 fi
@@ -1582,7 +1585,7 @@ for sapi in $sapis; do
 %endif
 	--with-libdir=%{_lib} \
 	--with-config-file-path=%{_sysconfdir} \
- 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
+	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
@@ -1678,6 +1681,7 @@ for sapi in $sapis; do
 
 	cp -f Makefile Makefile.$sapi
 	cp -f main/php_config.h php_config.h.$sapi
+	cp -f config.log config.log.$sapi
 done
 
 # must make this first, so modules can link against it.
@@ -1729,9 +1733,8 @@ unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi}} \
-	$RPM_BUILD_ROOT/home/services/{httpd,apache}/icons \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
-	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/httpd.conf} \
+	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
 # install the apache modules' files
@@ -1795,16 +1798,20 @@ cp -f Zend/LICENSE{,.Zend}
 
 # Generate stub .ini files for each subpackage
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
-for so in modules/*.so; do
-	mod=$(basename $so .so)
-	conf="%{_sysconfdir}/conf.d/${mod}.ini"
-	# xml needs to be loaded before wddx
-	[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_${mod}.ini"
-	cat > $RPM_BUILD_ROOT${conf} <<EOF
-; Enable ${mod} extension module
-extension=${mod}.so
-EOF
-done
+generate_inifiles() {
+	for so in modules/*.so; do
+		mod=$(basename $so .so)
+		conf="%{_sysconfdir}/conf.d/$mod.ini"
+		# xml needs to be loaded before wddx
+		[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_$mod.ini"
+		echo "+ $conf"
+		cat > $RPM_BUILD_ROOT$conf <<-EOF
+			; Enable $mod extension module
+			extension=$mod.so
+		EOF
+	done
+}
+generate_inifiles
 
 # per SAPI ini directories
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
@@ -1813,9 +1820,16 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler
 mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{pcntl,readline}.ini,cli.d}
 
 # use system automake and {lib,sh}tool
-ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
-ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
-ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+%if "%{pld_release}" != "ac"
+	ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
+	for i in libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4; do
+		ln -snf %{_aclocaldir}/${i} $RPM_BUILD_ROOT%{_libdir}/php/build
+	done
+	ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+%else
+	ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
+	ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+%endif
 ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
 # as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h
@@ -1864,7 +1878,7 @@ fi
 
 # restart webserver at the end of transaction
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
-[ ! -f /etc/httpd/httpd.conf/??_mod_php.conf ] || %service -q httpd restart
+[ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
 
 %if %{with apache1}
 %triggerpostun -n apache1-mod_php -- php < 4:5.0.4-9.11
@@ -2115,17 +2129,15 @@ fi
 %dir %{_sysconfdir}/apache.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
 %attr(755,root,root) %{_libdir}/apache1/libphp5.so
-/home/services/apache/icons/*
 %endif
 
 %if %{with apache2}
 %files -n apache-mod_php
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/httpd.conf/*_mod_php.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
-/home/services/httpd/icons/*
 %endif
 
 %if %{with fcgi}
@@ -2184,7 +2196,8 @@ fi
 %{_libdir}/libphp_common.la
 %{_includedir}/php
 %{_libdir}/php/build
-%{_mandir}/man1/*
+%{_mandir}/man1/php-config.1*
+%{_mandir}/man1/phpize.1*
 
 %files bcmath
 %defattr(644,root,root,755)

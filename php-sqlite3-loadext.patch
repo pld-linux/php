@@ -1,0 +1,35 @@
+--- php5.3-200903141330/ext/sqlite3/config0.m4~	2009-01-13 05:41:28.000000000 +0200
++++ php5.3-200903141330/ext/sqlite3/config0.m4	2009-03-16 19:13:43.350625710 +0200
+@@ -51,6 +51,10 @@
+       AC_DEFINE(HAVE_SQLITE3_KEY, 1, [have commercial sqlite3 with crypto support])
+     ])
+ 
++    PHP_CHECK_LIBRARY(sqlite3,sqlite3_enable_load_extension,[
++      AC_DEFINE(HAVE_SQLITE3_LOAD_EXTENSION, 1, [have sqlite3 built with --enable-load-extension])
++    ])
++
+   else
+     AC_MSG_CHECKING([bundled sqlite3 library])
+     AC_MSG_RESULT([yes])
+--- php5.3-200903141330/ext/sqlite3/sqlite3.c	2009-03-16 19:17:13.464135377 +0200
++++ php5.3-200903141330/ext/sqlite3/sqlite3.c	2009-03-16 21:04:41.540170714 +0200
+@@ -283,6 +283,11 @@
+ 		return;
+ 	}
+ 
++#ifdef HAVE_SQLITE3_LOAD_EXTENSION
++	php_error_docref(NULL TSRMLS_CC, E_WARNING, "Your version of SQLite doesn't support loading extensions");
++	RETURN_FALSE;
++#else
++
+ 	if (!SQLITE3G(extension_dir)) {
+ 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "SQLite Extension are disabled");
+ 		RETURN_FALSE;
+@@ -326,6 +331,7 @@
+ 	sqlite3_enable_load_extension(db_obj->db, 0);
+ 
+ 	RETURN_TRUE;
++#endif
+ }
+ /* }}} */
+ 

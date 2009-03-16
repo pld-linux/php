@@ -61,8 +61,8 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define	_rel	0.18
-%define	_snap	200903141330
+%define		rel		0.19
+%define		snap	200903141330
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -71,13 +71,12 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.3.0
-Release:	%{_rel}@%{_snap}
+Release:	%{rel}@%{snap}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://snaps.php.net/%{name}5.3-%{_snap}.tar.bz2
+Source0:	http://snaps.php.net/%{name}5.3-%{snap}.tar.bz2
 # Source0-md5:	1c090604bc8f3bd0a20db98896402671
-Source2:	zend.gif
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
 Source5:	%{name}-cgi.ini
@@ -1460,7 +1459,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}5.3-%{_snap}
+%setup -q -n %{name}5.3-%{snap}
 %patch0 -p1
 %patch1 -p1
 #%patch2 -p1
@@ -1610,7 +1609,7 @@ for sapi in $sapis; do
 %if %{with mssql} || %{with sybase_ct}
 	--with-pdo-dblib=shared \
 %endif
-%if %{with interbase} && !%{with interbase_inst}
+%if %{with interbase} && %{without interbase_inst}
 	--with-pdo-firebird=shared,/usr \
 %endif
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
@@ -1652,7 +1651,7 @@ for sapi in $sapis; do
 	--with-mcrypt=shared \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
-	--with-mysql=shared,/usr \
+	--with-mysql=shared,mysqlnd \
 	%{?with_mysqli:--with-mysqli=shared,mysqlnd} \
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
@@ -1702,25 +1701,19 @@ cp -af php_config.h.fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
-# test off for now, php binary SEGVs in buildroot (seems to work after install
-# though); see bug: 45079
-# [ "$(echo '<?php echo php_sapi_name();' | ./sapi/fcgi/php-cgi -q)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?php echo php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
 
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
-# test off for now, php binary SEGVs in buildroot (seems to work after install
-# though); see bug: 45079
-# [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -q)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
-# test off for now, php binary SEGVs in buildroot (seems to work after install
-# though); see bug: 45079
-# [ "$(echo '<?php echo php_sapi_name();' | ./sapi/cli/php -q)" = cli ] || exit 1
+[ "$(echo '<?php echo php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
@@ -1781,15 +1774,13 @@ install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 install %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
-install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/apache/icons
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
-install %{SOURCE2} php.gif $RPM_BUILD_ROOT/home/services/httpd/icons
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/httpd.conf/70_mod_php.conf
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif

@@ -1,5 +1,4 @@
 # TODO
-# - fix -threads-acfix.patch
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
@@ -7,12 +6,30 @@
 #   cpdf, fam, oracle
 #   - removed from php 5.2:
 #   filepro, hw
-# - mime_magic can't handle new "string/*" entries in magic.mime
-#   thus doesn't work with system magic.mime database
+#   - removed from php 5.3:
+#   dbase, mhash, mime_magic, ming, ncurses, sybase
 # - make additional headers and checking added by mail patch configurable
-# - apply -hardened patch by default ?
 # - modularize session, standard (output from pure php -m)?
 # - sapi/cgi has fastcgi always built in, ie -fcgi and -cgi packages are the same
+# - lib64 patch obsolete by $PHP_LIBDIR ?
+# - some mods should be shared:
+#$ php -m
+#+Core
+# date
+#+ereg
+#+fileinfo
+#+hash
+# libxml
+#+mysqlnd
+# pcre
+# Reflection
+# session
+# SimpleXML
+# SPL
+#+sqlite3
+
+
+
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -34,6 +51,7 @@
 %bcond_without	recode		# without recode extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
+%bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
@@ -61,8 +79,8 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define		rel		0.19
-%define		snap	200903141330
+%define		rel		0.25
+%define		snap	200903161730
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -76,7 +94,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}5.3-%{snap}.tar.bz2
-# Source0-md5:	1c090604bc8f3bd0a20db98896402671
+# Source0-md5:	e89fa842889c4cb6a15d2aeddc83ba91
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
 Source5:	%{name}-cgi.ini
@@ -94,7 +112,6 @@ Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
-# XXX: needs fix
 Patch12:	%{name}-threads-acfix.patch
 Patch14:	%{name}-no_pear_install.patch
 Patch15:	%{name}-zlib.patch
@@ -110,7 +127,7 @@ Patch29:	%{name}-config-dir.patch
 Patch31:	%{name}-fcgi-graceful.patch
 Patch38:	%{name}-tds.patch
 Patch43:	%{name}-use-prog_sendmail.patch
-
+Patch44:	%{name}-sqlite3-loadext.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -166,7 +183,7 @@ BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.238
 %{?with_sqlite:BuildRequires:	sqlite-devel}
-%{?with_sqlite:BuildRequires:	sqlite3-devel}
+%{?with_sqlite3:BuildRequires:	sqlite3-devel >= 3.3.9}
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
@@ -563,6 +580,21 @@ library.
 %description fdf -l pl.UTF-8
 Moduł PHP dodający obsługę formularzy PDF poprzez bibliotekę Adobe
 FDFTK.
+
+%package fileinfo
+Summary:	libmagic bindings
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(fileinfo)
+Obsoletes:	php-pecl-fileinfo
+
+%description fileinfo
+This extension allows retrieval of information regarding vast majority
+of file. This information may include dimensions, quality, length
+etc...
+
+Additionally it can also be used to retrieve the MIME type for a
+particular file and for text files proper language encoding.
 
 %package filter
 Summary:	Extension for safely dealing with input parameters
@@ -1207,7 +1239,9 @@ Uwaga: to jest moduł eksperymentalny.
 Summary:	SQLite extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite dla PHP
 Group:		Libraries
+URL:		http://php.net/manual/en/book.sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+# sqlite ext extends spl and pdo
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite)
 
@@ -1221,6 +1255,34 @@ server. SQLite is the server. The SQLite library reads and writes
 directly to and from the database files on disk.
 
 %description sqlite -l pl.UTF-8
+SQLite jest napisaną w C biblioteką implementującą osadzalny silnik
+bazodanowy SQL. Program linkujący się z biblioteką SQLite może mieć
+dostęp do bazy SQL bez potrzeby uruchamiania dodatkowego procesu
+RDBMS.
+
+SQLite to nie klient baz danych - biblioteka nie łączy się z serwerami
+baz danych. SQLite sam jest serwerem. Biblioteka SQLite czyta i
+zapisuje dane bezpośrednio z/do plików baz danych znajdujących się na
+dysku.
+
+%package sqlite3
+Summary:	SQLite3 extension module for PHP
+Summary(pl.UTF-8):	Moduł SQLite3 dla PHP
+Group:		Libraries
+URL:		http://php.net/manual/en/book.sqlite.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(sqlite3)
+
+%description sqlite3
+SQLite is a C library that implements an embeddable SQL database
+engine. Programs that link with the SQLite library can have SQL
+database access without running a separate RDBMS process.
+
+SQLite is not a client library used to connect to a big database
+server. SQLite is the server. The SQLite library reads and writes
+directly to and from the database files on disk.
+
+%description sqlite3 -l pl.UTF-8
 SQLite jest napisaną w C biblioteką implementującą osadzalny silnik
 bazodanowy SQL. Program linkujący się z biblioteką SQLite może mieć
 dostęp do bazy SQL bez potrzeby uruchamiania dodatkowego procesu
@@ -1487,12 +1549,14 @@ cp php.ini-dist php.ini
 #%patch38 -p1
 
 %patch43 -p1
+%patch44 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
 
 # remove all bundled libraries not to link with them accidentally
 #rm -rf ext/sqlite/libsqlite
+rm -rf ext/sqlite3/libsqlite
 #rm -rf ext/bcmath/libbcmath
 #rm -rf ext/date/lib
 #rm -rf ext/dba/libcdb
@@ -1592,6 +1656,7 @@ for sapi in $sapis; do
 	--enable-dba=shared \
 	--enable-dom=shared \
 	--enable-exif=shared \
+	--enable-fileinfo=shared \
 	--enable-ftp=shared \
 	--enable-gd-native-ttf \
 	--enable-libxml \
@@ -1601,7 +1666,7 @@ for sapi in $sapis; do
 	--enable-pcntl=shared \
 	--enable-pdo=shared \
 	--enable-json=shared \
-	--enable-hash \
+	--enable-hash=shared \
 	--enable-xmlwriter=shared \
 %if %{with mssql} || %{with sybase_ct}
 	--with-pdo-dblib=shared \
@@ -1662,10 +1727,11 @@ for sapi in $sapis; do
 	%{?with_pspell:--with-pspell=shared} \
 	--with-readline=shared \
 	%{?with_recode:--with-recode=shared} \
-	--with-regex=php \
+	--with-regex=system \
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	%{!?with_sqlite:--without-sqlite --without-pdo-sqlite}%{?with_sqlite:--with-sqlite=shared,/usr --enable-sqlite-utf8} \
+	%{!?with_sqlite3:--without-sqlite3}%{?with_sqlite3:--with-sqlite3=shared,/usr} \
 	--with-t1lib=shared \
 	%{?with_tidy:--with-tidy=shared} \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
@@ -1909,6 +1975,7 @@ fi
 %extension_scripts dom
 %extension_scripts exif
 %extension_scripts fdf
+%extension_scripts fileinfo
 %extension_scripts filter
 %extension_scripts ftp
 %extension_scripts gd
@@ -1944,6 +2011,7 @@ fi
 %extension_scripts soap
 %extension_scripts sockets
 %extension_scripts sqlite
+%extension_scripts sqlite3
 %extension_scripts sybase-ct
 %extension_scripts sysvmsg
 %extension_scripts sysvsem
@@ -2231,6 +2299,12 @@ fi
 %attr(755,root,root) %{php_extensiondir}/fdf.so
 %endif
 
+%files fileinfo
+%defattr(644,root,root,755)
+%doc README.input_filter
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/fileinfo.ini
+%attr(755,root,root) %{php_extensiondir}/fileinfo.so
+
 %if %{with filter}
 %files filter
 %defattr(644,root,root,755)
@@ -2264,13 +2338,10 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{php_extensiondir}/gmp.so
 
-%if 0
-# hash built in... can't get 5.3 to compile with shared hash for now
 %files hash
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/hash.ini
 %attr(755,root,root) %{php_extensiondir}/hash.so
-%endif
 
 %files iconv
 %defattr(644,root,root,755)
@@ -2483,8 +2554,17 @@ fi
 %if %{with sqlite}
 %files sqlite
 %defattr(644,root,root,755)
+%doc ext/sqlite/{README,TODO,CREDITS}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sqlite.ini
 %attr(755,root,root) %{php_extensiondir}/sqlite.so
+%endif
+
+%if %{with sqlite3}
+%files sqlite3
+%defattr(644,root,root,755)
+%doc ext/sqlite3/CREDITS
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sqlite3.ini
+%attr(755,root,root) %{php_extensiondir}/sqlite3.so
 %endif
 
 %if %{with sybase_ct}

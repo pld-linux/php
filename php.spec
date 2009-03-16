@@ -17,6 +17,7 @@
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
+%bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
@@ -82,7 +83,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 2
+%define		rel 3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -179,8 +180,10 @@ BuildRequires:	flex
 BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
+%if %{without system_gd}
 BuildRequires:	gd-devel >= 2.0.28-4
 BuildRequires:	gd-devel(imagerotate) = 5.2.0
+%endif
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
@@ -689,9 +692,11 @@ Summary:	GD extension module for PHP
 Summary(pl.UTF-8):	Moduł GD dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+%if %{without system_gd}
 Requires:	gd >= 2.0.28-4
 Requires:	gd(gif)
 Requires:	gd(imagerotate) = 5.2.0
+%endif
 Provides:	php(gd)
 
 %description gd
@@ -1857,7 +1862,7 @@ for sapi in $sapis; do
 	--with-iconv=shared \
 	--with-freetype-dir=shared \
 	--with-gettext=shared \
-	--with-gd=shared,/usr \
+	--with-gd=shared%{!?with_system_gd:,/usr} \
 	--with-gdbm \
 	--with-gmp=shared \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \

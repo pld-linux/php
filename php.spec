@@ -239,7 +239,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		php_sysconfdir		/etc/php
 %define		php_extensiondir	%{_libdir}/php
-%define		_sysconfdir		%{php_sysconfdir}
+%define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20041225
@@ -2130,9 +2130,9 @@ sed -i -e '
 %if %{with apache2}
 %triggerpostun -n apache-mod_php -- php < 4:5.0.4-7.1, php < 4:5.0.4-7.1
 # for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
-if [ -f %{php_sysconfdir}/php-apache.ini.rpmsave ]; then
-	cp -f %{php_sysconfdir}/php-apache2handler.ini{,.rpmnew}
-	mv -f %{php_sysconfdir}/php-apache.ini.rpmsave %{php_sysconfdir}/php-apache2handler.ini
+if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
+	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
+	mv -f %{_sysconfdir}/php-apache.ini.rpmsave %{_sysconfdir}/php-apache2handler.ini
 fi
 %endif
 
@@ -2214,175 +2214,175 @@ fi
 %extension_scripts zlib
 
 %triggerun bcmath -- %{name}-bcmath < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bcmath\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bcmath\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun bzip2 -- %{name}-bzip2 < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bzip2\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bzip2\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun calendar -- %{name}-calendar < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*calendar\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*calendar\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ctype -- %{name}-ctype < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ctype\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ctype\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun curl -- %{name}-curl < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*curl\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*curl\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dba -- %{name}-dba < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dba\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dba\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dbase -- %{name}-dbase < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dbase\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dbase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun dom -- %{name}-dom < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dom\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dom\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun exif -- %{name}-exif < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*exif\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*exif\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun fdf -- %{name}-fdf < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*fdf\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*fdf\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ftp -- %{name}-ftp < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ftp\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ftp\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun gd -- %{name}-gd < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gd\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gd\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun gettext -- %{name}-gettext < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gettext\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gettext\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun gmp -- %{name}-gmp < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gmp\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gmp\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun iconv -- %{name}-iconv < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*iconv\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*iconv\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun imap -- %{name}-imap < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*imap\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*imap\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun interbase -- %{name}-interbase < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*interbase\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*interbase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ldap -- %{name}-ldap < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ldap\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ldap\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mbstring -- %{name}-mbstring < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mbstring\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mbstring\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mcrypt -- %{name}-mcrypt < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mcrypt\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mcrypt\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mhash -- %{name}-mhash < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mime_magic -- %{name}-mime_magic < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mime_magic\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mime_magic\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ming -- %{name}-ming < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mssql -- %{name}-mssql < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mssql\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mssql\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun mysql -- %{name}-mysql < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysql\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysql\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ncurses -- %{name}-ncurses < 4:5.1.2-9.5
-if [ -f %{php_sysconfdir}/php-cgi.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{php_sysconfdir}/php-cgi.ini
+if [ -f %{_sysconfdir}/php-cgi.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cgi.ini
 fi
-if [ -f %{php_sysconfdir}/php-cli.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{php_sysconfdir}/php-cli.ini
+if [ -f %{_sysconfdir}/php-cli.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
 %triggerun mysqli -- %{name}-mysqli < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysqli\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysqli\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun oci8 -- %{name}-oci8 < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*oci8\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*oci8\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun odbc -- %{name}-odbc < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*odbc\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*odbc\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun openssl -- %{name}-openssl < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*openssl\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*openssl\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun pcntl -- %{name}-pcntl < 4:5.1.2-9.5
-if [ -f %{php_sysconfdir}/php-cgi.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{php_sysconfdir}/php-cgi.ini
+if [ -f %{_sysconfdir}/php-cgi.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cgi.ini
 fi
-if [ -f %{php_sysconfdir}/php-cli.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{php_sysconfdir}/php-cli.ini
+if [ -f %{_sysconfdir}/php-cli.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
 %triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun posix -- %{name}-posix < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*posix\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*posix\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun pspell -- %{name}-pspell < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pspell\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pspell\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun readline -- %{name}-readline < 4:5.1.2-9.5
-if [ -f %{php_sysconfdir}/php-cgi.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{php_sysconfdir}/php-cgi.ini
+if [ -f %{_sysconfdir}/php-cgi.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{_sysconfdir}/php-cgi.ini
 fi
-if [ -f %{php_sysconfdir}/php-cli.ini ]; then
-	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{php_sysconfdir}/php-cli.ini
+if [ -f %{_sysconfdir}/php-cli.ini ]; then
+	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
 %triggerun recode -- %{name}-recode < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun snmp -- %{name}-snmp < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*snmp\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*snmp\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun soap -- %{name}-soap < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*soap\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*soap\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sockets -- %{name}-sockets < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sockets\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sockets\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sqlite -- %{name}-sqlite < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sqlite\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sqlite\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sybase -- %{name}-sybase < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sybase-ct -- %{name}-sybase-ct < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase-ct\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase-ct\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sysvmsg -- %{name}-sysvmsg < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvmsg\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvmsg\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sysvsem -- %{name}-sysvsem < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvsem\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvsem\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun sysvshm -- %{name}-sysvshm < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvshm\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvshm\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun tidy -- %{name}-tidy < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*tidy\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*tidy\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun wddx -- %{name}-wddx < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*wddx\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*wddx\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun xml -- %{name}-xml < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xml\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xml\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun xmlrpc -- %{name}-xmlrpc < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xmlrpc\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xmlrpc\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun xsl -- %{name}-xsl < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xsl\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xsl\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun zlib -- %{name}-zlib < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*zlib\.so/d' %{php_sysconfdir}/php.ini
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*zlib\.so/d' %{_sysconfdir}/php.ini
 
 %if %{with apache1}
 %files -n apache1-mod_php

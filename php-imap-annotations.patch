@@ -1,0 +1,267 @@
+Provides get/set ANNOTATIONS support to PHP. [Version: 5.2.6]
+
+diff -r 4f78d3c907b7 ext/imap/php_imap.c
+--- a/ext/imap/php_imap.c	Fri May 02 11:21:11 2008 +0200
++++ b/ext/imap/php_imap.c	Mon Jun 09 10:35:56 2008 +0200
+@@ -129,6 +129,7 @@
+ 	PHP_FE(imap_binary,								NULL)
+ 	PHP_FE(imap_utf8,								NULL)
+ 	PHP_FE(imap_status,								NULL)
++	PHP_FE(imap_status_current,							NULL)
+ 	PHP_FE(imap_mailboxmsginfo,						NULL)
+ 	PHP_FE(imap_setflag_full,						NULL)
+ 	PHP_FE(imap_clearflag_full,						NULL)
+@@ -155,6 +156,10 @@
+ 	PHP_FE(imap_setacl,								NULL)
+ 	PHP_FE(imap_getacl,								NULL)
+ #endif
++#if defined(HAVE_IMAP2005)
++ 	PHP_FE(imap_setannotation,							NULL)
++ 	PHP_FE(imap_getannotation,							NULL)
++#endif
+ 
+ 	PHP_FE(imap_mail,								NULL)
+ 
+@@ -416,6 +421,30 @@
+ #endif
+ 
+ 
++#if defined(HAVE_IMAP2005)
++/* {{{ mail_getannotation
++ *
++ * Mail GET_ANNOTATION callback
++ * Called via the mail_parameter function in c-client:src/c-client/mail.c
++ */
++void mail_getannotation(MAILSTREAM *stream, ANNOTATION *alist)
++{
++        ANNOTATION_VALUES *cur;
++        
++	TSRMLS_FETCH();
++
++	/* walk through the ANNOTATION_VALUES */
++        
++	for(cur = alist->values; cur; cur = cur->next) {
++	    if (cur->value)
++		add_assoc_stringl(IMAPG(imap_annotation_list), cur->attr, cur->value, strlen(cur->value), 1);
++	    else
++		add_assoc_stringl(IMAPG(imap_annotation_list), cur->attr, "", 0, 1);
++	}
++}
++/* }}} */
++#endif
++
+ /* {{{ PHP_GINIT_FUNCTION
+  */
+ static PHP_GINIT_FUNCTION(imap)
+@@ -441,6 +470,7 @@
+ #if defined(HAVE_IMAP2000) || defined(HAVE_IMAP2001)
+ 	imap_globals->quota_return = NIL;
+ 	imap_globals->imap_acl_list = NIL;
++	imap_globals->imap_annotation_list = NIL;
+ #endif
+ 	imap_globals->gets_stream = NIL;
+ }
+@@ -1097,6 +1127,117 @@
+ 
+ #endif /* HAVE_IMAP2000 || HAVE_IMAP2001 */
+ 
++#if defined(HAVE_IMAP2005)
++
++/* {{{ proto bool imap_setannotation(resource stream_id, string mailbox, string entry, string attr, string value)
++	Sets an annotation for a given mailbox */
++PHP_FUNCTION(imap_setannotation)
++{
++	zval **streamind, **mailbox, **entry, **attr, **value;
++	pils *imap_le_struct;
++        long ret;
++	
++        // TODO: Use zend_parse_parameters here
++	if (ZEND_NUM_ARGS() != 5 || zend_get_parameters_ex(5, &streamind, &mailbox, &entry, &attr, &value) == FAILURE) {
++		ZEND_WRONG_PARAM_COUNT();
++	}
++
++	ZEND_FETCH_RESOURCE(imap_le_struct, pils *, streamind, -1, "imap", le_imap);
++
++	convert_to_string_ex(mailbox);
++	convert_to_string_ex(entry);
++	convert_to_string_ex(attr);
++	convert_to_string_ex(value);
++
++        // create annotation object
++        ANNOTATION *annotation = mail_newannotation();
++        if (!annotation)
++            RETURN_FALSE;
++        annotation->values = mail_newannotationvalue();
++        if (!annotation->values) {
++            mail_free_annotation(&annotation);
++            RETURN_FALSE;
++        }
++        
++        // fill in annotation values
++        annotation->mbox = Z_STRVAL_PP(mailbox);
++        annotation->entry = Z_STRVAL_PP(entry);
++        annotation->values->attr = Z_STRVAL_PP(attr);
++        annotation->values->value = Z_STRVAL_PP(value);
++        
++        ret = imap_setannotation(imap_le_struct->imap_stream, annotation);
++                
++        // make sure mail_free_annotation doesn't free our variables
++        annotation->mbox = NULL;
++        annotation->entry = NULL;
++        annotation->values->attr = NULL;
++        annotation->values->value = NULL;
++        mail_free_annotation(&annotation);
++        
++        RETURN_BOOL(ret);
++}
++/* }}} */
++
++/* {{{ proto array imap_getannotation(resource stream_id, string mailbox, string entry, string attr)
++	Gets the ACL for a given mailbox */
++PHP_FUNCTION(imap_getannotation)
++{
++	zval **streamind, **mailbox, **entry, **attr;
++	pils *imap_le_struct;
++        long ret;
++
++	if(ZEND_NUM_ARGS() != 4 || zend_get_parameters_ex(4, &streamind, &mailbox, &entry, &attr) == FAILURE) {
++		ZEND_WRONG_PARAM_COUNT();
++	}
++
++	ZEND_FETCH_RESOURCE(imap_le_struct, pils *, streamind, -1, "imap", le_imap);
++
++	convert_to_string_ex(mailbox);
++	convert_to_string_ex(entry);
++	convert_to_string_ex(attr);
++
++	/* initializing the special array for the return values */
++	if (array_init(return_value) == FAILURE) {
++		RETURN_FALSE;
++	}
++
++        // fillup calling parameters
++        STRINGLIST *entries = mail_newstringlist();
++        if (!entries)
++            RETURN_FALSE;
++        
++        STRINGLIST *cur = entries;
++        cur->text.data = (unsigned char *)cpystr(Z_STRVAL_PP(entry));
++        cur->text.size = Z_STRLEN_PP(entry);
++        cur->next = NIL;
++        
++        STRINGLIST *attributes = mail_newstringlist();
++        if (!attributes)
++            RETURN_FALSE;
++        cur = attributes;
++        cur->text.data = (unsigned char *)cpystr (Z_STRVAL_PP(attr));
++        cur->text.size = Z_STRLEN_PP(attr);
++        cur->next = NIL;
++        
++        IMAPG(imap_annotation_list) = return_value;
++        
++        /* set the callback for the GET_ANNOTATION function */
++	mail_parameters(NIL, SET_ANNOTATION, (void *) mail_getannotation);
++        ret = imap_getannotation(imap_le_struct->imap_stream, Z_STRVAL_PP(mailbox), entries, attributes);
++        
++        mail_free_stringlist(&entries);
++        mail_free_stringlist(&attributes);
++        
++        if (!ret) {
++            zval_dtor(return_value);
++            RETURN_FALSE;
++        }
++        
++	IMAPG(imap_annotation_list) = NIL;
++}
++/* }}} */
++
++#endif /* HAVE_IMAP2005 */
+ 
+ /* {{{ proto bool imap_expunge(resource stream_id)
+    Permanently delete all messages marked for deletion */
+@@ -2707,6 +2848,42 @@
+ }
+ /* }}} */
+ 
++/* {{{ proto object imap_status_current(resource stream_id, int options)
++   Get (cached) status info from current mailbox */
++PHP_FUNCTION(imap_status_current)
++{
++ 	zval **streamind, **pflags;
++	pils *imap_le_struct;
++	long flags = 0L;
++
++ 	if (ZEND_NUM_ARGS() != 2 || zend_get_parameters_ex(2, &streamind, &pflags) == FAILURE) {
++ 		ZEND_WRONG_PARAM_COUNT();
++ 	}
++
++	ZEND_FETCH_RESOURCE(imap_le_struct, pils *, streamind, -1, "imap", le_imap);
++
++	convert_to_long_ex(pflags);
++	flags = Z_LVAL_PP(pflags);
++
++	if (object_init(return_value) == FAILURE) {
++		RETURN_FALSE;
++	}
++
++	if (flags & SA_MESSAGES) {
++		add_property_long(return_value, "messages", imap_le_struct->imap_stream->nmsgs);
++	}
++	if (flags & SA_RECENT) {
++		add_property_long(return_value, "recent", imap_le_struct->imap_stream->recent);
++	}
++	if (flags & SA_UIDNEXT) {
++		add_property_long(return_value, "uidnext", imap_le_struct->imap_stream->uid_last+1);
++	}
++	if (flags & SA_UIDVALIDITY) {
++		add_property_long(return_value, "uidvalidity", imap_le_struct->imap_stream->uid_validity);
++	}
++}
++/* }}} */
++
+ /* {{{ proto object imap_status(resource stream_id, string mailbox, int options)
+    Get status info from a mailbox */
+ PHP_FUNCTION(imap_status)
+diff -r 4f78d3c907b7 ext/imap/php_imap.h
+--- a/ext/imap/php_imap.h	Fri May 02 11:21:11 2008 +0200
++++ b/ext/imap/php_imap.h	Mon Jun 09 10:35:56 2008 +0200
+@@ -152,6 +152,7 @@
+ PHP_FUNCTION(imap_lsub_full);
+ PHP_FUNCTION(imap_create);
+ PHP_FUNCTION(imap_rename);
++PHP_FUNCTION(imap_status_current);
+ PHP_FUNCTION(imap_status);
+ PHP_FUNCTION(imap_bodystruct);
+ PHP_FUNCTION(imap_fetch_overview);
+@@ -168,6 +169,9 @@
+ PHP_FUNCTION(imap_thread);
+ PHP_FUNCTION(imap_timeout);
+ 
++// TODO: Needs fixing in configure in
++#define HAVE_IMAP2005 1
++
+ #if defined(HAVE_IMAP2000) || defined(HAVE_IMAP2001)
+ PHP_FUNCTION(imap_get_quota);
+ PHP_FUNCTION(imap_get_quotaroot);
+@@ -175,7 +179,10 @@
+ PHP_FUNCTION(imap_setacl);
+ PHP_FUNCTION(imap_getacl);
+ #endif
+-
++#if defined(HAVE_IMAP2005)
++PHP_FUNCTION(imap_setannotation);
++PHP_FUNCTION(imap_getannotation);
++#endif
+ 
+ ZEND_BEGIN_MODULE_GLOBALS(imap)
+ 	char *imap_user;
+@@ -206,6 +213,9 @@
+ 	zval **quota_return;
+ 	zval *imap_acl_list;
+ #endif
++#if defined(HAVE_IMAP2005)
++        zval *imap_annotation_list;
++#endif
+ 	/* php_stream for php_mail_gets() */
+ 	php_stream *gets_stream;
+ ZEND_END_MODULE_GLOBALS(imap)

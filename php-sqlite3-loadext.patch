@@ -17,7 +17,7 @@
  		return;
  	}
  
-+#ifdef HAVE_SQLITE3_LOAD_EXTENSION
++#ifndef HAVE_SQLITE3_LOAD_EXTENSION
 +	php_error_docref(NULL TSRMLS_CC, E_WARNING, "Your version of SQLite doesn't support loading extensions");
 +	RETURN_FALSE;
 +#else

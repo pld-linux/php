@@ -151,8 +151,6 @@ BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
-BuildRequires:	mysql-devel >= 4.0.0
-%{?with_mysqli:BuildRequires:	mysql-devel >= 4.1.0}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
@@ -814,7 +812,6 @@ Summary:	MySQLi module for PHP
 Summary(pl.UTF-8):	Moduł MySQLi dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	mysql-libs >= 4.1.0
 Provides:	php(mysqli)
 
 %description mysqli

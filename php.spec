@@ -83,7 +83,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 3
+%define		rel 4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -156,6 +156,8 @@ Patch42:	%{name}-fpm-initdir.patch
 # drop when http://bugs.php.net/bug.php?id=45996 solved
 Patch43:	%{name}-xml-force-expat.patch
 Patch44:	%{name}-include_path.patch
+Patch45:	%{name}-imap-annotations.patch
+Patch46:	%{name}-imap-myrights.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -186,7 +188,7 @@ BuildRequires:	gd-devel(imagerotate) = 5.2.0
 %endif
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
-%{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
+%{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
@@ -1682,6 +1684,8 @@ done
 
 %patch43 -p1
 %patch44 -p1
+%patch45 -p1
+%patch46 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

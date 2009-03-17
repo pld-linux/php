@@ -12,24 +12,22 @@
 # - modularize session, standard (output from pure php -m)?
 # - sapi/cgi has fastcgi always built in, ie -fcgi and -cgi packages are the same
 # - lib64 patch obsolete by $PHP_LIBDIR ?
+# - php-sapi-ini-file.patch broken? (/etc/php/cli.d not read for php-cli!)
+# - move mysqlnd out of libphp-common.so?
+# - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
+#   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.
+#   make it runtime dep and add Suggests (or php warning messages)
 # - some mods should be shared:
 #$ php -m
+# [PHP Modules]
 #+Core
 # date
 #+ereg
-#+fileinfo
-#+hash
 # libxml
 #+mysqlnd
 # pcre
 # Reflection
 # session
-# SimpleXML
-# SPL
-#+sqlite3
-
-
-
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -79,8 +77,8 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define		rel		0.25
-%define		snap	200903161730
+%define		rel		0.28
+%define		snap	200903170730
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -94,7 +92,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}5.3-%{snap}.tar.bz2
-# Source0-md5:	e89fa842889c4cb6a15d2aeddc83ba91
+# Source0-md5:	81d73b78769a0731b98ce8218e817313
 Source3:	%{name}-mod_%{name}.conf
 Source4:	%{name}-cgi-fcgi.ini
 Source5:	%{name}-cgi.ini
@@ -127,7 +125,6 @@ Patch29:	%{name}-config-dir.patch
 Patch31:	%{name}-fcgi-graceful.patch
 Patch38:	%{name}-tds.patch
 Patch43:	%{name}-use-prog_sendmail.patch
-Patch44:	%{name}-sqlite3-loadext.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -371,7 +368,6 @@ Provides:	php(overload)
 Provides:	php(pcre)
 Provides:	php(reflection)
 Provides:	php(session)
-Provides:	php(simplexml)
 Provides:	php(spl)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
@@ -1572,7 +1568,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 cp php.ini-dist php.ini
 #%patch10 -p1
-%patch12 -p1
+#%patch12 -p1
 %patch14 -p1
 %patch15 -p1
 %patch17 -p1
@@ -1590,7 +1586,6 @@ cp php.ini-dist php.ini
 #%patch38 -p1
 
 %patch43 -p1
-%patch44 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1725,7 +1720,7 @@ for sapi in $sapis; do
 	--enable-session \
 	--enable-shared \
 	--enable-shmop=shared \
-	--enable-simplexml \
+	--enable-simplexml=shared \
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
@@ -2560,15 +2555,10 @@ fi
 %attr(755,root,root) %{php_extensiondir}/recode.so
 %endif
 
-%if 0
-# simplexml is needed by spl, and spl can't be built shared as of now (5.2.0)
-# simplexml can be built shared, but SPL startup fails
-# we could add R: -simplexml to -common...
 %files simplexml
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
-%endif
 
 %files shmop
 %defattr(644,root,root,755)

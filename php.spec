@@ -83,7 +83,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 4
+%define		rel 5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -182,7 +182,7 @@ BuildRequires:	flex
 BuildRequires:	freetds-devel
 %endif
 BuildRequires:	freetype-devel >= 2.0
-%if %{without system_gd}
+%if %{with system_gd}
 BuildRequires:	gd-devel >= 2.0.28-4
 BuildRequires:	gd-devel(imagerotate) = 5.2.0
 %endif
@@ -694,7 +694,7 @@ Summary:	GD extension module for PHP
 Summary(pl.UTF-8):	Moduł GD dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%if %{without system_gd}
+%if %{with system_gd}
 Requires:	gd >= 2.0.28-4
 Requires:	gd(gif)
 Requires:	gd(imagerotate) = 5.2.0
@@ -1638,7 +1638,9 @@ cp php.ini-dist php.ini
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
+%if %{with system_gd}
 %patch19 -p1
+%endif
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
@@ -1866,7 +1868,7 @@ for sapi in $sapis; do
 	--with-iconv=shared \
 	--with-freetype-dir=shared \
 	--with-gettext=shared \
-	--with-gd=shared%{!?with_system_gd:,/usr} \
+	--with-gd=shared%{?with_system_gd:,/usr} \
 	--with-gdbm \
 	--with-gmp=shared \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \

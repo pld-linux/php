@@ -541,8 +541,7 @@ diff -Nru php-5.2.8.vanilla/libevent/strlcpy-internal.h php-5.2.8.fpm/libevent/s
  	if (is_initialized) {
  		zend_hash_destroy(&fcgi_mgmt_vars);
  	}
--	is_fastcgi = 0;
-+	is_fastcgi = 1;
+ 	is_fastcgi = 0;
 +
 +	if (allowed_clients) {
 +		free(allowed_clients);

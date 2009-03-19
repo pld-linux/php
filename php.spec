@@ -84,7 +84,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 7
+%define		rel 8
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -404,7 +404,6 @@ URL:		http://php-fpm.anight.org/
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libevent >= 1.4.7-3
-Requires:	logrotate
 Requires:	rc-scripts
 Provides:	webserver(php) = %{version}
 

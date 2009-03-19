@@ -18,6 +18,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
+%bcond_with	gd_jis_conv	# causes imagettfbbox(): any2eucjp(): invalid code in input string when internal gd used
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
@@ -83,7 +84,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 5
+%define		rel 6
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -1811,7 +1812,7 @@ for sapi in $sapis; do
 	--enable-exif=shared \
 	--enable-ftp=shared \
 	--enable-gd-native-ttf \
-	--enable-gd-jis-conv \
+	%{?with_gd_jis_conv:--enable-gd-jis-conv} \
 	--enable-libxml \
 	--enable-magic-quotes \
 	--enable-mbstring=shared,all \

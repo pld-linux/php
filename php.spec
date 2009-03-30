@@ -84,7 +84,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel 8
+%define		rel 9
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -154,8 +154,6 @@ Patch39:	%{name}-use-prog_sendmail.patch
 Patch40:	%{name}-fpm.patch
 Patch41:	%{name}-fpm-config.patch
 Patch42:	%{name}-fpm-initdir.patch
-# drop when http://bugs.php.net/bug.php?id=45996 solved
-Patch43:	%{name}-xml-force-expat.patch
 Patch44:	%{name}-include_path.patch
 Patch45:	%{name}-imap-annotations.patch
 Patch46:	%{name}-imap-myrights.patch
@@ -170,8 +168,6 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
-# until php bug#45996 is solved
-BuildRequires:	expat-devel
 %if %{with xmlrpc}
 BuildRequires:	expat-devel
 %{?with_system_xmlrpc_epi:BuildRequires:    xmlrpc-epi-devel}
@@ -1684,7 +1680,6 @@ done
 %patch42 -p1
 %endif
 
-%patch43 -p1
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1
@@ -1860,9 +1855,9 @@ for sapi in $sapis; do
 	--with-db4 \
 	--enable-dbase=shared \
 %if %{with xmlrpc}
-	--with-libexpat-dir=shared,/usr \
+	--with-expat-dir=shared,/usr \
 %else
-	--without-libexpat-dir \
+	--without-expat-dir \
 %endif
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \

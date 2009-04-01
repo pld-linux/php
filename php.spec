@@ -10,7 +10,6 @@
 #   dbase, mhash, mime_magic, ming, ncurses, sybase
 # - make additional headers and checking added by mail patch configurable
 # - modularize session, standard (output from pure php -m)?
-# - sapi/cgi has fastcgi always built in, ie -fcgi and -cgi packages are the same
 # - lib64 patch obsolete by $PHP_LIBDIR ?
 # - php-sapi-ini-file.patch broken? (/etc/php/cli.d not read for php-cli!)
 # - move mysqlnd out of libphp-common.so?
@@ -56,7 +55,6 @@
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	apache1		# disable building apache 1.3.x module
 %bcond_without	apache2		# disable building apache 2.x module
-%bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable experimental-zts
 %bcond_with	tests		# default off; test process very often hangs on buildersl; perform "make test"
 
@@ -77,8 +75,8 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define		rel		0.28
-%define		snap	200903170730
+%define		rel		0.29
+%define		snap	200904010630
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -92,12 +90,8 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}5.3-%{snap}.tar.bz2
-# Source0-md5:	81d73b78769a0731b98ce8218e817313
+# Source0-md5:	1e4406a94afedb816f4faf4de12c4798
 Source3:	%{name}-mod_%{name}.conf
-Source4:	%{name}-cgi-fcgi.ini
-Source5:	%{name}-cgi.ini
-Source6:	%{name}-apache.ini
-Source7:	%{name}-cli.ini
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source9:	%{name}_browscap.ini
 Patch0:		%{name}-shared.patch
@@ -109,7 +103,6 @@ Patch5:		%{name}-filter-shared.patch
 Patch6:		%{name}-build_modules.patch
 Patch7:		%{name}-sapi-ini-file.patch
 Patch9:		%{name}-sh.patch
-Patch10:	%{name}-ini.patch
 Patch12:	%{name}-threads-acfix.patch
 Patch14:	%{name}-no_pear_install.patch
 Patch15:	%{name}-zlib.patch
@@ -139,7 +132,7 @@ BuildRequires:	elfutils-devel
 %if %{with xmlrpc}
 BuildRequires:	expat-devel
 %endif
-%{?with_fcgi:BuildRequires:	fcgi-devel}
+Requires:	fcgi-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase_ct}
@@ -299,31 +292,20 @@ PHP as DSO module for apache 2.x.
 %description -n apache-mod_php -l pl.UTF-8
 php jako moduł DSO (Dynamic Shared Object) dla apache 2.x.
 
-%package fcgi
-Summary:	php as FastCGI program
-Summary(pl.UTF-8):	php jako program FastCGI
-Group:		Development/Languages/PHP
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	webserver(php) = %{version}
-
-%description fcgi
-php as FastCGI program.
-
-%description fcgi -l pl.UTF-8
-php jako program FastCGI.
-
 %package cgi
 Summary:	php as CGI program
 Summary(pl.UTF-8):	php jako program CGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
+Provides:	php(fcgi)
+Obsoletes:	php-fcgi
 
 %description cgi
-php as CGI program.
+php as CGI or FastCGI program.
 
 %description cgi -l pl.UTF-8
-php jako program CGI.
+php jako program CGI lub FastCGI.
 
 %package cli
 Summary:	php as CLI interpreter
@@ -1383,6 +1365,19 @@ Shared Memory support.
 %description sysvshm -l pl.UTF-8
 Moduł PHP umożliwiający korzystanie z pamięci dzielonej SysV.
 
+%package tests
+Summary:	Contains unit test files for PHP and extensions
+Summary(pl.UTF-8):	Zawiera pliki testów jednostkowych dla PHP i rozszerzeń
+Group:		Libraries
+URL:		http://qa.php.net/
+Requires:	%{name}-cli
+
+%description tests
+This package contains unit tests for PHP and it's extensions.
+
+%description tests -l pl.UTF-8
+Ten pakiet zawiera pliki testów jednostkowych dla PHP i rozszerzeń
+
 %package tidy
 Summary:	Tidy extension module for PHP
 Summary(pl.UTF-8):	Moduł Tidy dla PHP
@@ -1566,7 +1561,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 ####%patch7 -p1 UPDATE
 %patch9 -p1
 
-cp php.ini-dist php.ini
+cp php.ini-production php.ini
 #%patch10 -p1
 #%patch12 -p1
 %patch14 -p1
@@ -1627,7 +1622,7 @@ fi
 
 export EXTENSION_DIR="%{php_extensiondir}"
 if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
-	rm -f Makefile.{fcgi,cgi,cli,apxs{1,2}} # now remove Makefile copies
+	rm -f Makefile.{cgi,cli,apxs{1,2}} # now remove Makefile copies
 	%{__libtoolize}
 	%{__aclocal}
 	cp -f /usr/share/automake/config.* .
@@ -1638,9 +1633,6 @@ export PROG_SENDMAIL="/usr/lib/sendmail"
 export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP"
 
 sapis="
-%if %{with fcgi}
-fcgi
-%endif
 cgi cli
 %if %{with apache1}
 apxs1
@@ -1660,9 +1652,6 @@ for sapi in $sapis; do
 	;;
 	cli)
 		sapi_args='--disable-cgi'
-	;;
-	fcgi)
-		sapi_args=''
 	;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
@@ -1794,15 +1783,6 @@ done
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
 %endif
 
-# FCGI
-%if %{with fcgi}
-cp -af php_config.h.fcgi main/php_config.h
-rm -rf sapi/cgi/.libs sapi/cgi/*.lo
-%{__make} sapi/cgi/php-cgi -f Makefile.fcgi
-cp -r sapi/cgi sapi/fcgi
-[ "$(echo '<?php echo php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
-%endif
-
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
@@ -1851,11 +1831,7 @@ sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_lib
 
 # install CGI
 libtool --silent --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
-
-# install FCGI
-%if %{with fcgi}
-libtool --silent --mode=install install sapi/fcgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
-%endif
+ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
 
 # install CLI
 libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
@@ -1865,23 +1841,22 @@ echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
-%if %{with fcgi}
-install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
-%endif
-install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
-install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+
+install -d $RPM_BUILD_ROOT%{_sysconfdir}
+cp php.ini-production $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+cp php.ini-production $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
 install %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
-rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
+cp php.ini-production $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+ln -sf $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
-install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
-rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
+cp php.ini-production $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+ln -sf $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
 cp -f Zend/LICENSE{,.Zend}
@@ -1904,7 +1879,7 @@ generate_inifiles() {
 generate_inifiles
 
 # per SAPI ini directories
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,apache,apache2handler}.d
 
 # for CLI SAPI only
 mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{pcntl,readline}.ini,cli.d}
@@ -1929,6 +1904,11 @@ install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pc
 # for php-pecl-mailparse
 install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
+
+#tests
+install -d $RPM_BUILD_ROOT/usr/share/php/tests
+cp run-tests.php $RPM_BUILD_ROOT/usr/share/php/tests/run-tests.php
+cp -r  tests/* $RPM_BUILD_ROOT/usr/share/php/tests
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -2232,20 +2212,12 @@ fi
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
 %endif
 
-%if %{with fcgi}
-%files fcgi
-%defattr(644,root,root,755)
-%doc sapi/cgi/README.FastCGI sapi/cgi/CHANGES
-%dir %{_sysconfdir}/cgi-fcgi.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
-%attr(755,root,root) %{_bindir}/php.fcgi
-%endif
-
 %files cgi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi.ini
 %attr(755,root,root) %{_bindir}/php.cgi
+%{_bindir}/php.fcgi
 
 %files cli
 %defattr(644,root,root,755)
@@ -2619,6 +2591,36 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sysvshm.ini
 %attr(755,root,root) %{php_extensiondir}/sysvshm.so
+
+%files tests
+%defattr(644,root,root,755)
+%dir /usr/share/php/tests
+/usr/share/php/tests/quicktester.inc
+/usr/share/php/tests/run-tests.php
+
+%dir /usr/share/php/tests/basic
+/usr/share/php/tests/basic/*
+
+%dir /usr/share/php/tests/classes
+/usr/share/php/tests/classes/*
+
+%dir /usr/share/php/tests/func
+/usr/share/php/tests/func/*
+
+%dir /usr/share/php/tests/lang
+/usr/share/php/tests/lang/*
+
+%dir /usr/share/php/tests/output
+/usr/share/php/tests/output/*
+
+%dir /usr/share/php/tests/run-test
+/usr/share/php/tests/run-test/*
+
+%dir /usr/share/php/tests/security
+/usr/share/php/tests/security/*
+
+%dir /usr/share/php/tests/strings
+/usr/share/php/tests/strings/*
 
 %if %{with tidy}
 %files tidy

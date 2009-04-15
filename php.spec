@@ -76,7 +76,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define		rel		0.29
-%define		snap	200904010630
+%define		snap	200904152030
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -90,7 +90,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://snaps.php.net/%{name}5.3-%{snap}.tar.bz2
-# Source0-md5:	1e4406a94afedb816f4faf4de12c4798
+# Source0-md5:	643edcf615d4d7423b5d709ad6ea670d
 Source3:	%{name}-mod_%{name}.conf
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source9:	%{name}_browscap.ini
@@ -299,6 +299,7 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
 Provides:	php(fcgi)
+Provides:	webserver(php)
 Obsoletes:	php-fcgi
 
 %description cgi
@@ -2596,7 +2597,7 @@ fi
 %defattr(644,root,root,755)
 %dir /usr/share/php/tests
 /usr/share/php/tests/quicktester.inc
-/usr/share/php/tests/run-tests.php
+%attr(755,root,root) /usr/share/php/tests/run-tests.php
 
 %dir /usr/share/php/tests/basic
 /usr/share/php/tests/basic/*

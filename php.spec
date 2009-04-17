@@ -16,6 +16,7 @@
 # - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
 #   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.
 #   make it runtime dep and add Suggests (or php warning messages)
+# - fix merging sapi configs with php.ini (lost in r1.688.2.28)
 # - some mods should be shared:
 #$ php -m
 # [PHP Modules]
@@ -132,9 +133,9 @@ BuildRequires:	elfutils-devel
 %if %{with xmlrpc}
 BuildRequires:	expat-devel
 %endif
-Requires:	fcgi-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
+Requires:	fcgi-devel
 %if %{with mssql} || %{with sybase_ct}
 BuildRequires:	freetds-devel >= 0.82
 %endif
@@ -334,7 +335,7 @@ Package providing /usr/bin/php symlink to PHP CLI.
 Pakiet dostarczający dowiązanie symboliczne /usr/bin/php do PHP CLI.
 
 %package common
-Summary:	Common files needed by both apache module and CGI
+Summary:	Common files needed by both Apache modules and CGI/CLI SAPI-s.
 Summary(pl.UTF-8):	Wspólne pliki dla modułu apache'a i programu CGI
 Summary(ru.UTF-8):	Разделяемые библиотеки для php
 Summary(uk.UTF-8):	Бібліотеки спільного використання для php
@@ -343,7 +344,6 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	php(date)
-Provides:	php(fileinfo)
 Provides:	php(hash)
 Provides:	php(libxml)
 Provides:	php(modules_api) = %{php_api_version}
@@ -360,13 +360,12 @@ Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-mhash
 Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
-Obsoletes:	php-pecl-fileinfo
 Obsoletes:	php-session < 3:4.2.1-2
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 
 %description common
-Common files needed by both apache module and CGI.
+Common files needed by both Apache modules and CGI/CLI SAPI-s.
 
 %description common -l pl.UTF-8
 Wspólne pliki dla modułu apacha i programu CGI.
@@ -866,9 +865,9 @@ Summary:	Oracle 8+ database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych Oracle 8+ dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.oci8.php
-AutoReq:	false
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(oci8)
+AutoReq:	false
 
 %description oci8
 This is a dynamic shared object (DSO) for PHP that will add Oracle 7,
@@ -1906,10 +1905,10 @@ install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pc
 install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 
-#tests
-install -d $RPM_BUILD_ROOT/usr/share/php/tests
-cp run-tests.php $RPM_BUILD_ROOT/usr/share/php/tests/run-tests.php
-cp -r  tests/* $RPM_BUILD_ROOT/usr/share/php/tests
+# tests
+install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
+install run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
+cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -2218,7 +2217,7 @@ fi
 %dir %{_sysconfdir}/cgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi.ini
 %attr(755,root,root) %{_bindir}/php.cgi
-%{_bindir}/php.fcgi
+%attr(755,root,root) %{_bindir}/php.fcgi
 
 %files cli
 %defattr(644,root,root,755)
@@ -2595,33 +2594,17 @@ fi
 
 %files tests
 %defattr(644,root,root,755)
-%dir /usr/share/php/tests
-/usr/share/php/tests/quicktester.inc
-%attr(755,root,root) /usr/share/php/tests/run-tests.php
-
-%dir /usr/share/php/tests/basic
-/usr/share/php/tests/basic/*
-
-%dir /usr/share/php/tests/classes
-/usr/share/php/tests/classes/*
-
-%dir /usr/share/php/tests/func
-/usr/share/php/tests/func/*
-
-%dir /usr/share/php/tests/lang
-/usr/share/php/tests/lang/*
-
-%dir /usr/share/php/tests/output
-/usr/share/php/tests/output/*
-
-%dir /usr/share/php/tests/run-test
-/usr/share/php/tests/run-test/*
-
-%dir /usr/share/php/tests/security
-/usr/share/php/tests/security/*
-
-%dir /usr/share/php/tests/strings
-/usr/share/php/tests/strings/*
+%dir %{php_data_dir}/tests/php
+%{php_data_dir}/tests/php/basic
+%{php_data_dir}/tests/php/classes
+%{php_data_dir}/tests/php/func
+%{php_data_dir}/tests/php/lang
+%{php_data_dir}/tests/php/output
+%{php_data_dir}/tests/php/run-test
+%{php_data_dir}/tests/php/security
+%{php_data_dir}/tests/php/strings
+%{php_data_dir}/tests/php/quicktester.inc
+%attr(755,root,root) %{php_data_dir}/tests/php/run-tests.php
 
 %if %{with tidy}
 %files tidy

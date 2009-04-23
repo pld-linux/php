@@ -1705,6 +1705,7 @@ for sapi in $sapis; do
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
+	--enable-mysqlnd-threading \
 	--enable-posix=shared \
 	--enable-session \
 	--enable-shared \

@@ -1,0 +1,1 @@
+- rel 9; back to using libxml2 instead of expat since bug 45996 is fixed in 5.2.9 release

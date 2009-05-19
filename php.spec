@@ -1612,6 +1612,9 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q
+# for suhosin patch
+%{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
+
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1

@@ -48,6 +48,7 @@
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable Zend Thread Safety
 %bcond_without	fpm		# fpm patches from http://php-fpm.anight.org/
+%bcond_with	suhosin		# with suhosin patch
 %bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
@@ -156,6 +157,7 @@ Patch42:	%{name}-fpm-initdir.patch
 Patch44:	%{name}-include_path.patch
 Patch45:	%{name}-imap-annotations.patch
 Patch46:	%{name}-imap-myrights.patch
+Patch47:	suhosin.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1682,6 +1684,9 @@ done
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1
+%if %{with suhosin}
+%patch47 -p1
+%endif
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1796,6 +1801,7 @@ for sapi in $sapis; do
 	--with-exec-dir=%{_bindir} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
+	%{?with_suhosin:--enable-suhosin} \
 	--enable-inline-optimization \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \

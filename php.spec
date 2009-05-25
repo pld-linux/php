@@ -93,7 +93,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.9
-Release:	10
+Release:	11
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -1019,18 +1019,14 @@ Provides:	php(openssl)
 This is a dynamic shared object (DSO) for PHP that will add OpenSSL
 support.
 
-Warning: this is an experimental module.
-
 %description openssl -l pl.UTF-8
 Moduł PHP umożliwiający korzystanie z biblioteki OpenSSL.
-
-Uwaga: to jest moduł eksperymentalny.
 
 %package pcntl
 Summary:	Process Control extension module for PHP
 Summary(pl.UTF-8):	Moduł Process Control dla PHP
 Group:		Libraries
-Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pcntl)
 
 %description pcntl
@@ -1038,15 +1034,9 @@ This is a dynamic shared object (DSO) for PHP that will add process
 spawning and control support. It supports functions like fork(),
 waitpid(), signal() etc.
 
-Warning: this is an experimental module. Also, don't use it in
-webserver environment!
-
 %description pcntl -l pl.UTF-8
 Moduł PHP umożliwiający tworzenie nowych procesów i kontrolę nad nimi.
 Obsługuje funkcje takie jak fork(), waitpid(), signal() i podobne.
-
-Uwaga: to jest moduł eksperymentalny. Ponadto nie jest przeznaczony do
-używania z serwerem WWW - nie próbuj tego!
 
 %package pdo
 Summary:	PHP Data Objects (PDO)
@@ -1270,12 +1260,8 @@ Provides:	php(shmop)
 This is a dynamic shared object (DSO) for PHP that will add Shared
 Memory Operations support.
 
-Warning: this is an experimental module.
-
 %description shmop -l pl.UTF-8
 Moduł PHP umożliwiający korzystanie z pamięci dzielonej.
-
-Uwaga: to jest moduł eksperymentalny.
 
 %package simplexml
 Summary:	Simple XML extension module for PHP
@@ -1331,12 +1317,8 @@ Provides:	php(sockets)
 This is a dynamic shared object (DSO) for PHP that will add sockets
 support.
 
-Warning: this is an experimental module.
-
 %description sockets -l pl.UTF-8
 Moduł PHP dodający obsługę gniazdek.
-
-Uwaga: to jest moduł eksperymentalny.
 
 %package sqlite
 Summary:	SQLite extension module for PHP
@@ -1538,12 +1520,8 @@ Provides:	php(xmlrpc)
 This is a dynamic shared object (DSO) for PHP that will add XMLRPC
 support.
 
-Warning: this is an experimental module.
-
 %description xmlrpc -l pl.UTF-8
 Moduł PHP dodający obsługę XMLRPC.
-
-Uwaga: to jest moduł eksperymentalny.
 
 %package xmlwriter
 Summary:	Fast, non-cached, forward-only means to write XML data
@@ -2059,7 +2037,7 @@ generate_inifiles
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
 
 # for CLI SAPI only
-mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{ncurses,pcntl,readline}.ini,cli.d}
+mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{ncurses,readline}.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 %if "%{pld_release}" != "ac"
@@ -2679,7 +2657,7 @@ fi
 
 %files pcntl
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/pcntl.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
 
 %files pdo

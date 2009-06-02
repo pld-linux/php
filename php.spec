@@ -93,7 +93,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.9
-Release:	11
+Release:	12
 Epoch:		4
 License:	PHP
 Group:		Libraries

@@ -19,6 +19,7 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	gd_jis_conv	# causes imagettfbbox(): any2eucjp(): invalid code in input string when internal gd used
+%bcond_with	zend_multibyte		# enable zend multibyte, mbstring can't be shared then anymore
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
@@ -418,6 +419,7 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	php(date)
 Provides:	php(libxml)
+%{?with_zend_multibyte:Provides:	php(mbstring)}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
 %{?with_pcre:Provides:	php(pcre)}
@@ -428,7 +430,8 @@ Provides:	php(spl)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
-%{?with_pcre:Provides:	php-pcre}
+%{?with_zend_multibyte:Provides:	php-mbstring = %{epoch}:%{version}-%{release}}
+%{?with_pcre:Provides:	php-pcre = %{epoch}:%{version}-%{release}}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pcre < 4:5.2.0
@@ -1783,7 +1786,7 @@ for sapi in $sapis; do
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	%{?with_suhosin:--enable-suhosin} \
-	--enable-zend-multibyte \
+	%{?with_zend_multibyte:--enable-zend-multibyte} \
 	--enable-inline-optimization \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
@@ -1796,7 +1799,7 @@ for sapi in $sapis; do
 	%{?with_gd_jis_conv:--enable-gd-jis-conv} \
 	--enable-libxml \
 	--enable-magic-quotes \
-	--enable-mbstring=shared,all \
+	--enable-mbstring=%{?!with_zend_multibyte:shared,}all \
 	--enable-mbregex \
 	--enable-pcntl=shared \
 	--enable-pdo=shared \
@@ -2580,10 +2583,12 @@ fi
 %attr(755,root,root) %{php_extensiondir}/ldap.so
 %endif
 
+%if %{without zend_multibyte}
 %files mbstring
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{php_extensiondir}/mbstring.so
+%endif
 
 %files mcrypt
 %defattr(644,root,root,755)

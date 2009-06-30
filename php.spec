@@ -122,6 +122,7 @@ Patch43:	%{name}-use-prog_sendmail.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
+BuildRequires:  before merge to HEAD: php-sapi-ini-file.patch broken? (/etc/php/cli.d not read for php-cli!), HEAD like SAPI.ini + common.ini syle lost (see r1.688.2.28), -cgi -> -fcgi needs to be retought
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison

@@ -33,6 +33,7 @@
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
+%bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
@@ -76,8 +77,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define		rel		0.29
-%define		snap	200904152030
+%define		rel		0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -86,12 +86,12 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.3.0
-Release:	%{rel}@%{snap}
+Release:	%{rel}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://snaps.php.net/%{name}5.3-%{snap}.tar.bz2
-# Source0-md5:	643edcf615d4d7423b5d709ad6ea670d
+Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+# Source0-md5:	846760cd655c98dfd86d6d97c3d964b0
 Source3:	%{name}-mod_%{name}.conf
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source9:	%{name}_browscap.ini
@@ -140,8 +140,10 @@ Requires:	fcgi-devel
 BuildRequires:	freetds-devel >= 0.82
 %endif
 BuildRequires:	freetype-devel >= 2.0
+%if %{with system_gd}
 BuildRequires:	gd-devel >= 2.0.28-4
 BuildRequires:	gd-devel(imagerotate) = 5.2.0
+%endif
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
@@ -195,9 +197,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20041225
-%define		zend_module_api		20090115
-%define		zend_extension_api	220090115
+%define		php_api_version		20090626
+%define		zend_module_api		20090626
+%define		zend_extension_api	220090626
+
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
 
@@ -628,9 +631,11 @@ Summary(pl.UTF-8):	Moduł GD dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.image.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+%if %{with system_gd}
 Requires:	gd >= 2.0.28-4
 Requires:	gd(gif)
 Requires:	gd(imagerotate) = 5.2.0
+%endif
 Provides:	php(gd)
 
 %description gd
@@ -1550,7 +1555,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}5.3-%{snap}
+%setup -q
 %patch0 -p1
 %patch1 -p1
 #%patch2 -p1
@@ -1568,7 +1573,9 @@ cp php.ini-production php.ini
 %patch15 -p1
 %patch17 -p1
 %patch18 -p1
+%if %{with system_gd}
 %patch19 -p1
+%endif
 %patch20 -p1
 %patch21 -p1
 
@@ -1648,7 +1655,7 @@ for sapi in $sapis; do
 	sapi_args=''
 	case $sapi in
 	cgi)
-		sapi_args='--enable-discard-path --enable-force-cgi-redirect'
+		sapi_args=''
 	;;
 	cli)
 		sapi_args='--disable-cgi'
@@ -1684,6 +1691,7 @@ for sapi in $sapis; do
 	--enable-fileinfo=shared \
 	--enable-ftp=shared \
 	--enable-gd-native-ttf \
+	--enable-intl=shared \
 	--enable-libxml \
 	--enable-magic-quotes \
 	--enable-mbstring=shared,all \
@@ -1729,7 +1737,7 @@ for sapi in $sapis; do
 	--with-iconv=shared \
 	--with-freetype-dir=shared \
 	--with-gettext=shared \
-	--with-gd=shared \
+	--with-gd=shared%{?with_system_gd:,/usr} \
 	--with-gdbm \
 	--with-gmp=shared \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
@@ -2237,7 +2245,7 @@ fi
 %doc php.ini-*
 %doc CREDITS Zend/ZEND_CHANGES
 %doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
-%doc README.PHP4-TO-PHP5-THIN-CHANGES README.UPDATE_5_2
+%doc README.PHP4-TO-PHP5-THIN-CHANGES
 %doc README.namespaces
 
 %dir %{_sysconfdir}

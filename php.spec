@@ -59,6 +59,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	zts		# disable experimental-zts
 %bcond_with	tests		# default off; test process very often hangs on buildersl; perform "make test"
+%bcond_with	type_hints	# experimental support for strict typing/casting
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -86,7 +87,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.3.0
-Release:	%{rel}
+Release:	%{rel}%{?with_type_hints:th}
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -119,6 +120,9 @@ Patch29:	%{name}-config-dir.patch
 Patch31:	%{name}-fcgi-graceful.patch
 Patch38:	%{name}-tds.patch
 Patch43:	%{name}-use-prog_sendmail.patch
+%if %{with type_hints}
+Patch50:	http://ilia.ws/patch/type_hint_53_v2.txt
+%endif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -746,6 +750,24 @@ and Firebird database support.
 
 %description interbase -l pl.UTF-8
 Moduł PHP umożliwiający dostęp do baz danych InterBase i Firebird.
+
+%package intl
+Summary:	Internationalization extension (ICU wrapper)
+Summary(pl.UTF-8):	Rozszerzenie do internacjonalizacji (wrapper ICU)
+Group:		Libraries
+URL:		http://www.php.net/manual/en/book.ibase.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(intl)
+
+%description intl
+Internationalization extension (further is referred as Intl) is a wrapper 
+for ICU library, enabling PHP programmers to perform UCA-conformant 
+collation and date/time/number/currency formatting in their scripts.
+
+%description intl -l pl.UTF-8
+Rozszerzenie do internacjonalizacji (dalej nazywane Intl) jest wrapperem
+biblioteki ICU, pozwalającym programistom PHP na wykonywanie w skryptach
+porównań zdgodnych z UCA oraz formatowań daty/czasu/walut.
 
 %package json
 Summary:	PHP C extension for JSON serialization
@@ -1557,6 +1579,11 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q
+
+%if %{with type_hints}
+%patch50 -p0
+%endif
+
 %patch0 -p1
 %patch1 -p1
 #%patch2 -p1
@@ -2011,6 +2038,7 @@ fi
 %extension_scripts iconv
 %extension_scripts imap
 %extension_scripts interbase
+%extension_scripts intl
 %extension_scripts json
 %extension_scripts ldap
 %extension_scripts mbstring
@@ -2100,6 +2128,9 @@ fi
 
 %triggerun interbase -- %{name}-interbase < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*interbase\.so/d' %{_sysconfdir}/php.ini
+
+%triggerun intl -- %{name}-intl < 4:5.0.4-9.1
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*intl\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ldap -- %{name}-ldap < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ldap\.so/d' %{_sysconfdir}/php.ini
@@ -2379,6 +2410,11 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/interbase.ini
 %attr(755,root,root) %{php_extensiondir}/interbase.so
 %endif
+
+%files intl
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/intl.ini
+%attr(755,root,root) %{php_extensiondir}/intl.so
 
 %files json
 %defattr(644,root,root,755)

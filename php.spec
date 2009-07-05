@@ -755,7 +755,7 @@ Moduł PHP umożliwiający dostęp do baz danych InterBase i Firebird.
 Summary:	Internationalization extension (ICU wrapper)
 Summary(pl.UTF-8):	Rozszerzenie do internacjonalizacji (wrapper ICU)
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.ibase.php
+URL:		http://www.php.net/intl
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(intl)
 

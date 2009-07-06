@@ -108,7 +108,6 @@ Patch7:		%{name}-config-file-scan-dir.patch
 Patch8:		%{name}-sapi-ini-file.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
-Patch12:	%{name}-threads-acfix.patch
 Patch14:	%{name}-no_pear_install.patch
 Patch15:	%{name}-zlib.patch
 Patch17:	%{name}-readline.patch
@@ -1600,7 +1599,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 cp php.ini-production php.ini
 %patch10 -p1
-%patch12 -p1
+
 %patch14 -p1
 %patch15 -p1
 %patch17 -p1

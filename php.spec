@@ -11,12 +11,10 @@
 # - make additional headers and checking added by mail patch configurable
 # - modularize session, standard (output from pure php -m)?
 # - lib64 patch obsolete by $PHP_LIBDIR ?
-# - php-sapi-ini-file.patch broken? (/etc/php/cli.d not read for php-cli!)
 # - move mysqlnd out of libphp-common.so?
 # - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
 #   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.
 #   make it runtime dep and add Suggests (or php warning messages)
-# - fix merging sapi configs with php.ini (lost in r1.688.2.28)
 # - some mods should be shared:
 #$ php -m
 # [PHP Modules]

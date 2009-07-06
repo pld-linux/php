@@ -12,6 +12,7 @@
 # - make additional headers and checking added by mail patch configurable
 # - modularize session, standard (output from pure php -m)?
 # - http://forum.lighttpd.net/topic/34454
+# - ttyname_r() missdetected http://bugs.php.net/bug.php?id=48820
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -39,8 +40,7 @@
 %bcond_without	recode		# without recode extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
-%bcond_without	sybase		# without Sybase extension module
-%bcond_without	sybase_ct	# without Sybase-CT extension module
+%bcond_with	sybase		# without Sybase extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
@@ -1761,10 +1761,10 @@ for sapi in $sapis; do
 		sapi_args='--disable-cgi'
 		;;
 	fcgi)
-		sapi_args='--disable-cli --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
+		sapi_args='--disable-cli --enable-fastcgi --enable-force-cgi-redirect'
 		;;
 	fpm)
-		sapi_args='--disable-cli --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect --enable-fpm'
+		sapi_args='--disable-cli --enable-fastcgi --enable-force-cgi-redirect --enable-fpm'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
@@ -1833,7 +1833,6 @@ for sapi in $sapis; do
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
-	--enable-trans-sid \
 	--enable-safe-mode \
 	--enable-soap=shared \
 	--enable-sockets=shared \
@@ -1847,9 +1846,9 @@ for sapi in $sapis; do
 	--with-db4 \
 	--enable-dbase=shared \
 %if %{with xmlrpc}
-	--with-expat-dir=shared,/usr \
+	--with-libexpat-dir=shared,/usr \
 %else
-	--without-expat-dir \
+	--without-libexpat-dir \
 %endif
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \

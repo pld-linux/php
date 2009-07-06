@@ -1,11 +1,12 @@
---- php-5.2.7/configure.in~	2008-12-05 13:00:48.000000000 +0200
-+++ php-5.2.7/configure.in	2008-12-05 13:02:07.458670585 +0200
-@@ -1328,7 +1328,7 @@
- CXXFLAGS="$CXXFLAGS $standard_libtool_flag"
+diff -ur php5.3-200807242030/configure.in mod/configure.in
+--- php5.3-200807242030/configure.in	2008-07-21 10:34:20.000000000 +0000
++++ mod/configure.in	2008-07-25 07:34:45.430571275 +0000
+@@ -1385,7 +1385,7 @@
+ fi;
  
- all_targets="$lcov_target \$(OVERALL_TARGET) \$(PHP_MODULES) \$(PHP_ZEND_EX) \$(PHP_CLI_TARGET)"
--install_targets="$install_modules install-build install-headers install-programs $install_pear"
-+install_targets="$install_modules install-build install-headers install-programs"
+ all_targets="$lcov_target \$(OVERALL_TARGET) \$(PHP_MODULES) \$(PHP_ZEND_EX) \$(PHP_CLI_TARGET) $pharcmd"
+-install_targets="$install_modules install-build install-headers install-programs $install_pear $pharcmd_install"
++install_targets="$install_modules install-build install-headers install-programs $pharcmd_install"
  
  case $PHP_SAPI in
    cli)

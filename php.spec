@@ -40,7 +40,7 @@
 %bcond_without	recode		# without recode extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
-%bcond_with	sybase		# without Sybase extension module
+%bcond_without	sybase		# without Sybase extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module

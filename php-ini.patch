@@ -1,0 +1,175 @@
+--- php-5.3.0/php.ini.orig	2009-07-06 21:50:34.212939491 +0200
++++ php-5.3.0/php.ini	2009-07-06 21:54:46.076247404 +0200
+@@ -428,7 +428,7 @@
+ ; threat in any way, but it makes it possible to determine whether you use PHP
+ ; on your server or not.
+ ; http://php.net/expose-php
+-expose_php = On
++expose_php = Off
+ 
+ ;;;;;;;;;;;;;;;;;;;
+ ; Resource Limits ;
+@@ -583,7 +583,7 @@
+ ; Development Value: On
+ ; Production Value: Off
+ ; http://php.net/track-errors
+-track_errors = Off
++track_errors = On
+ 
+ ; Turn off normal error reporting and emit XML-RPC error XML
+ ; http://php.net/xmlrpc-errors
+@@ -808,7 +808,7 @@
+ 
+ ; Directory in which the loadable extensions (modules) reside.
+ ; http://php.net/extension-dir
+-; extension_dir = "./"
++extension_dir = "/usr/lib/php"
+ ; On windows:
+ ; extension_dir = "ext"
+ 
+@@ -818,53 +818,6 @@
+ ; http://php.net/enable-dl
+ enable_dl = Off
+ 
+-; cgi.force_redirect is necessary to provide security running PHP as a CGI under
+-; most web servers.  Left undefined, PHP turns this on by default.  You can
+-; turn it off here AT YOUR OWN RISK
+-; **You CAN safely turn this off for IIS, in fact, you MUST.**
+-; http://php.net/cgi.force-redirect
+-;cgi.force_redirect = 1
+-
+-; if cgi.nph is enabled it will force cgi to always sent Status: 200 with
+-; every request. PHP's default behavior is to disable this feature.
+-;cgi.nph = 1
+-
+-; if cgi.force_redirect is turned on, and you are not running under Apache or Netscape
+-; (iPlanet) web servers, you MAY need to set an environment variable name that PHP
+-; will look for to know it is OK to continue execution.  Setting this variable MAY
+-; cause security issues, KNOW WHAT YOU ARE DOING FIRST.
+-; http://php.net/cgi.redirect-status-env
+-;cgi.redirect_status_env = ;
+-
+-; cgi.fix_pathinfo provides *real* PATH_INFO/PATH_TRANSLATED support for CGI.  PHP's
+-; previous behaviour was to set PATH_TRANSLATED to SCRIPT_FILENAME, and to not grok
+-; what PATH_INFO is.  For more information on PATH_INFO, see the cgi specs.  Setting
+-; this to 1 will cause PHP CGI to fix its paths to conform to the spec.  A setting
+-; of zero causes PHP to behave as before.  Default is 1.  You should fix your scripts
+-; to use SCRIPT_FILENAME rather than PATH_TRANSLATED.
+-; http://php.net/cgi.fix-pathinfo
+-;cgi.fix_pathinfo=1
+-
+-; FastCGI under IIS (on WINNT based OS) supports the ability to impersonate
+-; security tokens of the calling client.  This allows IIS to define the
+-; security context that the request runs under.  mod_fastcgi under Apache
+-; does not currently support this feature (03/17/2002)
+-; Set to 1 if running under IIS.  Default is zero.
+-; http://php.net/fastcgi.impersonate
+-;fastcgi.impersonate = 1;
+-
+-; Disable logging through FastCGI connection. PHP's default behavior is to enable
+-; this feature.
+-;fastcgi.logging = 0
+-
+-; cgi.rfc2616_headers configuration option tells PHP what type of headers to
+-; use when sending HTTP response code. If it's set 0 PHP sends Status: header that
+-; is supported by Apache. When this option is set to 1 PHP will send
+-; RFC2616 compliant header.
+-; Default is zero.
+-; http://php.net/cgi.rfc2616-headers
+-;cgi.rfc2616_headers = 0
+-
+ ;;;;;;;;;;;;;;;;
+ ; File Uploads ;
+ ;;;;;;;;;;;;;;;;
+@@ -939,53 +892,6 @@
+ ; If you only provide the name of the extension, PHP will look for it in its
+ ; default extension directory.
+ ;
+-; Windows Extensions
+-; Note that ODBC support is built in, so no dll is needed for it.
+-; Note that many DLL files are located in the extensions/ (PHP 4) ext/ (PHP 5)
+-; extension folders as well as the separate PECL DLL download (PHP 5).
+-; Be sure to appropriately set the extension_dir directive.
+-; 
+-;extension=php_bz2.dll
+-;extension=php_curl.dll
+-;extension=php_dba.dll
+-;extension=php_exif.dll
+-;extension=php_fileinfo.dll
+-;extension=php_gd2.dll
+-;extension=php_gettext.dll
+-;extension=php_gmp.dll
+-;extension=php_intl.dll
+-;extension=php_imap.dll
+-;extension=php_interbase.dll
+-;extension=php_ldap.dll
+-;extension=php_mbstring.dll
+-;extension=php_ming.dll
+-;extension=php_mssql.dll
+-;extension=php_mysql.dll
+-;extension=php_mysqli.dll
+-;extension=php_oci8.dll      ; Use with Oracle 10gR2 Instant Client
+-;extension=php_oci8_11g.dll  ; Use with Oracle 11g Instant Client
+-;extension=php_openssl.dll
+-;extension=php_pdo_firebird.dll
+-;extension=php_pdo_mssql.dll
+-;extension=php_pdo_mysql.dll
+-;extension=php_pdo_oci.dll
+-;extension=php_pdo_odbc.dll
+-;extension=php_pdo_pgsql.dll
+-;extension=php_pdo_sqlite.dll
+-;extension=php_pgsql.dll
+-;extension=php_phar.dll
+-;extension=php_pspell.dll
+-;extension=php_shmop.dll
+-;extension=php_snmp.dll
+-;extension=php_soap.dll
+-;extension=php_sockets.dll
+-;extension=php_sqlite.dll
+-;extension=php_sqlite3.dll
+-;extension=php_sybase_ct.dll
+-;extension=php_tidy.dll
+-;extension=php_xmlrpc.dll
+-;extension=php_xsl.dll
+-;extension=php_zip.dll
+ 
+ ;;;;;;;;;;;;;;;;;;;
+ ; Module Settings ;
+@@ -1232,6 +1138,9 @@
+ ; http://php.net/mysql.connect-timeout
+ mysql.connect_timeout = 60
+ 
++; The name of the character set to use as the default character set.
++;mysql.connect_charset=utf8
++
+ ; Trace mode. When trace_mode is active (=On), warnings for table/index scans and
+ ; SQL-Errors will be displayed.
+ ; http://php.net/mysql.trace-mode
+@@ -1271,6 +1180,9 @@
+ ; http://php.net/mysqli.default-socket
+ mysqli.default_socket =
+ 
++; The name of the character set to use as the default character set.
++;mysqli.connect_charset=utf8
++
+ ; Default host for mysql_connect() (doesn't apply in safe mode).
+ ; http://php.net/mysqli.default-host
+ mysqli.default_host =
+@@ -1437,7 +1349,7 @@
+ 
+ [browscap]
+ ; http://php.net/browscap
+-;browscap = extra/browscap.ini
++browscap = /etc/php/browscap.ini
+ 
+ [Session]
+ ; Handler used to store/retrieve data.
+@@ -1857,7 +1769,7 @@
+ 
+ ; Sets the directory name where SOAP extension will put cache files.
+ ; http://php.net/soap.wsdl-cache-dir
+-soap.wsdl_cache_dir="/tmp"
++soap.wsdl_cache_dir="/var/run/php"
+ 
+ ; (time to live) Sets the number of second while cached file will be used 
+ ; instead of original one.

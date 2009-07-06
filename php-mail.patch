@@ -79,6 +79,6 @@
 +			}
 +		}
 +
- 		if (headers != NULL) {
- 			fprintf(sendmail, "%s\n", headers);
+ 		if (hdr != NULL) {
+ 			fprintf(sendmail, "%s\n", hdr);
  		}

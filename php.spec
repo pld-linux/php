@@ -78,7 +78,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define		rel		0.1
+%define		rel		0.3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -106,7 +106,8 @@ Patch3:		%{name}-link-libs.patch
 Patch4:		%{name}-libpq_fs_h_path.patch
 Patch5:		%{name}-filter-shared.patch
 Patch6:		%{name}-build_modules.patch
-Patch7:		%{name}-sapi-ini-file.patch
+Patch7:		%{name}-config-file-scan-dir.patch
+Patch8:		%{name}-sapi-ini-file.patch
 Patch9:		%{name}-sh.patch
 Patch12:	%{name}-threads-acfix.patch
 Patch14:	%{name}-no_pear_install.patch
@@ -1594,7 +1595,8 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
-####%patch7 -p1 UPDATE
+%patch7 -p1
+%patch8 -p1
 %patch9 -p1
 
 cp php.ini-production php.ini

@@ -1616,7 +1616,7 @@ cp php.ini-production php.ini
 
 %patch29 -p1
 %patch31 -p1
-#%patch38 -p1
+%patch38 -p1
 
 %patch43 -p1
 

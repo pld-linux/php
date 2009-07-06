@@ -93,7 +93,10 @@ License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
 # Source0-md5:	846760cd655c98dfd86d6d97c3d964b0
-Source3:	%{name}-mod_%{name}.conf
+Source2:	%{name}-mod_%{name}.conf
+Source3:	%{name}-cgi-fcgi.ini
+Source4:	%{name}-apache.ini
+Source5:	%{name}-cli.ini
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source9:	%{name}_browscap.ini
 Patch0:		%{name}-shared.patch
@@ -126,7 +129,6 @@ Patch50:	http://ilia.ws/patch/type_hint_53_v2.txt
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
-BuildRequires:  before merge to HEAD: php-sapi-ini-file.patch broken? (/etc/php/cli.d not read for php-cli!), HEAD like SAPI.ini + common.ini syle lost (see r1.688.2.28), -cgi -> -fcgi needs to be retought
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison
@@ -302,14 +304,15 @@ PHP as DSO module for apache 2.x.
 php jako moduł DSO (Dynamic Shared Object) dla apache 2.x.
 
 %package cgi
-Summary:	php as CGI program
-Summary(pl.UTF-8):	php jako program CGI
+Summary:	php as CGI/FastCGI program
+Summary(pl.UTF-8):	php jako program CGI/FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
 Provides:	php(fcgi)
 Provides:	webserver(php)
-Obsoletes:	php-fcgi
+Provides:	%{name}-fcgi = %{epoch}:%{version}-%{release}
+Obsoletes:	php-fcgi < 4:5.3.0
 
 %description cgi
 php as CGI or FastCGI program.
@@ -1657,7 +1660,7 @@ fi
 
 export EXTENSION_DIR="%{php_extensiondir}"
 if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
-	rm -f Makefile.{cgi,cli,apxs{1,2}} # now remove Makefile copies
+	rm -f Makefile.{cgi-fcgi,cli,apxs{1,2}} # now remove Makefile copies
 	%{__libtoolize}
 	%{__aclocal}
 	cp -f /usr/share/automake/config.* .
@@ -1668,7 +1671,7 @@ export PROG_SENDMAIL="/usr/lib/sendmail"
 export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP"
 
 sapis="
-cgi cli
+cgi-fcgi cli
 %if %{with apache1}
 apxs1
 %endif
@@ -1682,7 +1685,7 @@ for sapi in $sapis; do
 
 	sapi_args=''
 	case $sapi in
-	cgi)
+	cgi-fcgi)
 		sapi_args=''
 	;;
 	cli)
@@ -1821,15 +1824,15 @@ done
 %endif
 
 # CGI
-cp -af php_config.h.cgi main/php_config.h
+cp -af php_config.h.cgi-fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
-%{__make} sapi/cgi/php-cgi -f Makefile.cgi
+%{__make} sapi/cgi/php-cgi -f Makefile.cgi-fcgi
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
-[ "$(echo '<?php echo php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
@@ -1880,20 +1883,20 @@ ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}
-cp php.ini-production $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-cp php.ini-production $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
+install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 install %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-cp php.ini-production $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
-ln -sf $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
+install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
-cp php.ini-production $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
-ln -sf $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
+install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
 cp -f Zend/LICENSE{,.Zend}
@@ -1916,7 +1919,7 @@ generate_inifiles() {
 generate_inifiles
 
 # per SAPI ini directories
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,apache,apache2handler}.d
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
 
 # for CLI SAPI only
 mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{pcntl,readline}.ini,cli.d}
@@ -2255,8 +2258,8 @@ fi
 
 %files cgi
 %defattr(644,root,root,755)
-%dir %{_sysconfdir}/cgi.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi.ini
+%dir %{_sysconfdir}/cgi-fcgi.d
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 %attr(755,root,root) %{_bindir}/php.cgi
 %attr(755,root,root) %{_bindir}/php.fcgi
 

@@ -157,6 +157,8 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
+# otherwise check for "xxx-pld-linux-g++ static flag -static" fails
+BuildRequires:  libstdc++-static
 BuildRequires:	libtiff-devel
 %if "%{pld_release}" != "ac"
 BuildRequires:	libtool >= 2:2.2

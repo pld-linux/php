@@ -12,6 +12,7 @@
 # - make additional headers and checking added by mail patch configurable
 # - modularize session, standard (output from pure php -m)?
 # - http://forum.lighttpd.net/topic/34454
+# - ttyname_r() missdetected http://bugs.php.net/bug.php?id=48820
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -19,6 +20,7 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	gd_jis_conv	# causes imagettfbbox(): any2eucjp(): invalid code in input string when internal gd used
+%bcond_with	zend_multibyte		# enable zend multibyte, mbstring can't be shared then anymore
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
@@ -39,7 +41,6 @@
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
 %bcond_without	sybase		# without Sybase extension module
-%bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
@@ -93,7 +94,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.10
-Release:	3
+Release:	9
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -154,10 +155,12 @@ Patch39:	%{name}-use-prog_sendmail.patch
 Patch40:	%{name}-fpm.patch
 Patch41:	%{name}-fpm-config.patch
 Patch42:	%{name}-fpm-initdir.patch
+Patch43:	%{name}-silent-session-cleanup.patch
 Patch44:	%{name}-include_path.patch
 Patch45:	%{name}-imap-annotations.patch
 Patch46:	%{name}-imap-myrights.patch
 Patch47:	suhosin.patch
+Patch48:	%{name}-bug-48697.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -418,6 +421,7 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	php(date)
 Provides:	php(libxml)
+%{?with_zend_multibyte:Provides:	php(mbstring)}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
 %{?with_pcre:Provides:	php(pcre)}
@@ -428,7 +432,8 @@ Provides:	php(spl)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
-%{?with_pcre:Provides:	php-pcre}
+%{?with_zend_multibyte:Provides:	php-mbstring = %{epoch}:%{version}-%{release}}
+%{?with_pcre:Provides:	php-pcre = %{epoch}:%{version}-%{release}}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pcre < 4:5.2.0
@@ -1662,12 +1667,14 @@ done
 %patch42 -p1
 %endif
 
+%patch43 -p1
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1
 %if %{with suhosin}
 %patch47 -p1
 %endif
+%patch48 -R -p3
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1756,10 +1763,10 @@ for sapi in $sapis; do
 		sapi_args='--disable-cgi'
 		;;
 	fcgi)
-		sapi_args='--disable-cli --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
+		sapi_args='--disable-cli --enable-fastcgi --enable-force-cgi-redirect'
 		;;
 	fpm)
-		sapi_args='--disable-cli --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect --enable-fpm'
+		sapi_args='--disable-cli --enable-fastcgi --enable-force-cgi-redirect --enable-fpm'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
@@ -1783,7 +1790,7 @@ for sapi in $sapis; do
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	%{?with_suhosin:--enable-suhosin} \
-	--enable-zend-multibyte \
+	%{?with_zend_multibyte:--enable-zend-multibyte} \
 	--enable-inline-optimization \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
@@ -1796,7 +1803,7 @@ for sapi in $sapis; do
 	%{?with_gd_jis_conv:--enable-gd-jis-conv} \
 	--enable-libxml \
 	--enable-magic-quotes \
-	--enable-mbstring=shared,all \
+	--enable-mbstring=%{?!with_zend_multibyte:shared,}all \
 	--enable-mbregex \
 	--enable-pcntl=shared \
 	--enable-pdo=shared \
@@ -1828,7 +1835,6 @@ for sapi in $sapis; do
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
-	--enable-trans-sid \
 	--enable-safe-mode \
 	--enable-soap=shared \
 	--enable-sockets=shared \
@@ -1842,9 +1848,9 @@ for sapi in $sapis; do
 	--with-db4 \
 	--enable-dbase=shared \
 %if %{with xmlrpc}
-	--with-expat-dir=shared,/usr \
+	--with-libexpat-dir=shared,/usr \
 %else
-	--without-expat-dir \
+	--without-libexpat-dir \
 %endif
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \
@@ -2580,10 +2586,12 @@ fi
 %attr(755,root,root) %{php_extensiondir}/ldap.so
 %endif
 
+%if %{without zend_multibyte}
 %files mbstring
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{php_extensiondir}/mbstring.so
+%endif
 
 %files mcrypt
 %defattr(644,root,root,755)

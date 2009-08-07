@@ -119,6 +119,7 @@ Patch23:	%{name}-both-apxs.patch
 Patch24:	%{name}-builddir.patch
 Patch25:	%{name}-zlib-for-getimagesize.patch
 Patch29:	%{name}-config-dir.patch
+Patch30:	%{name}-silent-session-cleanup.patch
 Patch31:	%{name}-fcgi-graceful.patch
 Patch38:	%{name}-tds.patch
 Patch43:	%{name}-use-prog_sendmail.patch
@@ -1615,6 +1616,7 @@ cp php.ini-production php.ini
 %patch25 -p1
 
 %patch29 -p1
+%patch30 -p1
 %patch31 -p1
 %patch38 -p1
 

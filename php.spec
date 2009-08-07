@@ -155,6 +155,7 @@ Patch39:	%{name}-use-prog_sendmail.patch
 Patch40:	%{name}-fpm.patch
 Patch41:	%{name}-fpm-config.patch
 Patch42:	%{name}-fpm-initdir.patch
+Patch43:	%{name}-silent-session-cleanup.patch
 Patch44:	%{name}-include_path.patch
 Patch45:	%{name}-imap-annotations.patch
 Patch46:	%{name}-imap-myrights.patch
@@ -1666,6 +1667,7 @@ done
 %patch42 -p1
 %endif
 
+%patch43 -p1
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1

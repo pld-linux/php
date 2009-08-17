@@ -886,7 +886,7 @@ Summary:	mime_magic extension module for PHP
 Summary(pl.UTF-8):	Moduł mime_magic dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	/usr/share/file/magic.mime
+Requires:	/usr/share/misc/magic.mime
 Provides:	php(mime_magic)
 
 %description mime_magic
@@ -1865,7 +1865,7 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
-	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic.mime}%{!?with_mime_magic:--disable-mime-magic} \
+	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/misc/magic.mime}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \

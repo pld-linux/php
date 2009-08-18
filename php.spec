@@ -121,6 +121,7 @@ Patch25:	%{name}-zlib-for-getimagesize.patch
 Patch29:	%{name}-config-dir.patch
 Patch30:	%{name}-silent-session-cleanup.patch
 Patch31:	%{name}-fcgi-graceful.patch
+Patch32:	%{name}-m4-divert.patch
 Patch38:	%{name}-tds.patch
 Patch43:	%{name}-use-prog_sendmail.patch
 %if %{with type_hints}
@@ -1618,6 +1619,7 @@ cp php.ini-production php.ini
 %patch29 -p1
 %patch30 -p1
 %patch31 -p1
+%patch32 -p1
 %patch38 -p1
 
 %patch43 -p1

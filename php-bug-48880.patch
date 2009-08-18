@@ -1,0 +1,12 @@
+diff -urN php-5.3.0/main/fopen_wrappers.c mod/main/fopen_wrappers.c
+--- php-5.3.0/main/fopen_wrappers.c	2009-06-18 08:38:30.000000000 +0200
++++ mod/main/fopen_wrappers.c	2009-08-18 18:56:55.647272948 +0200
+@@ -93,7 +93,7 @@
+ 
+ 	p = (char **) (base + (size_t) mh_arg1);
+ 
+-	if (stage == PHP_INI_STAGE_STARTUP || stage == PHP_INI_STAGE_SHUTDOWN) {
++	if (stage == PHP_INI_STAGE_STARTUP || stage == PHP_INI_STAGE_SHUTDOWN || stage == PHP_INI_STAGE_ACTIVATE || stage == PHP_INI_STAGE_DEACTIVATE) {
+ 		/* We're in a PHP_INI_SYSTEM context, no restrictions */
+ 		*p = new_value;
+ 		return SUCCESS;

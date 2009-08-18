@@ -76,7 +76,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define		rel		0.3
+%define		rel		0.4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -124,6 +124,7 @@ Patch31:	%{name}-fcgi-graceful.patch
 Patch32:	%{name}-m4-divert.patch
 Patch38:	%{name}-tds.patch
 Patch43:	%{name}-use-prog_sendmail.patch
+Patch44:	%{name}-bug-48880.patch
 %if %{with type_hints}
 Patch50:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
@@ -1587,6 +1588,8 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %if %{with type_hints}
 %patch50 -p0
 %endif
+
+%patch44 -p1
 
 %patch0 -p1
 %patch1 -p1

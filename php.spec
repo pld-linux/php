@@ -86,6 +86,12 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
+%if "%{pld_release}" == "ac"
+%define		magic_mime	/usr/share/misc/magic.mime
+%else
+%define		magic_mime	/usr/share/file/magic.mime
+%endif
+
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -888,7 +894,7 @@ Summary:	mime_magic extension module for PHP
 Summary(pl.UTF-8):	Moduł mime_magic dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	/usr/share/misc/magic.mime
+Requires:	%{magic_mime}
 Provides:	php(mime_magic)
 
 %description mime_magic
@@ -1869,7 +1875,7 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
-	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/misc/magic.mime}%{!?with_mime_magic:--disable-mime-magic} \
+	%{?with_mime_magic:--with-mime-magic=shared,%{magic_mime}}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \

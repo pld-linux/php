@@ -139,9 +139,6 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
-%if %{with xmlrpc}
-BuildRequires:	expat-devel
-%endif
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
 Requires:	fcgi-devel
@@ -1755,6 +1752,7 @@ for sapi in $sapis; do
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
+	--without-libexpat-dir \
 	--enable-mysqlnd-threading \
 	--enable-posix=shared \
 	--enable-session \

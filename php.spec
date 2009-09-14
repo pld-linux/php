@@ -100,7 +100,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.10
-Release:	12
+Release:	13
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -181,7 +181,6 @@ BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %if %{with xmlrpc}
-BuildRequires:	expat-devel
 %{?with_system_xmlrpc_epi:BuildRequires:    xmlrpc-epi-devel}
 %endif
 %{?with_fcgi:BuildRequires:	fcgi-devel}
@@ -1857,11 +1856,7 @@ for sapi in $sapis; do
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	--with-db4 \
 	--enable-dbase=shared \
-%if %{with xmlrpc}
-	--with-libexpat-dir=shared,/usr \
-%else
 	--without-libexpat-dir \
-%endif
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \
 	--with-freetype-dir=shared \

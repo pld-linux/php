@@ -7,7 +7,7 @@
 #   - removed from php 5.2:
 #   filepro, hw
 #   - removed from php 5.3:
-#   dbase, mhash, mime_magic, ming, ncurses, sybase
+#   dbase, mime_magic, ming, ncurses, sybase
 # - make additional headers and checking added by mail patch configurable
 # - modularize session, standard (output from pure php -m)?
 # - lib64 patch obsolete by $PHP_LIBDIR ?
@@ -308,10 +308,10 @@ Summary:	php as CGI/FastCGI program
 Summary(pl.UTF-8):	php jako program CGI/FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	%{name}-fcgi = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
 Provides:	php(fcgi)
 Provides:	webserver(php)
-Provides:	%{name}-fcgi = %{epoch}:%{version}-%{release}
 Obsoletes:	php-fcgi < 4:5.3.0
 
 %description cgi
@@ -346,7 +346,7 @@ Package providing /usr/bin/php symlink to PHP CLI.
 Pakiet dostarczający dowiązanie symboliczne /usr/bin/php do PHP CLI.
 
 %package common
-Summary:	Common files needed by both Apache modules and CGI/CLI SAPI-s.
+Summary:	Common files needed by both Apache modules and CGI/CLI SAPI-s
 Summary(pl.UTF-8):	Wspólne pliki dla modułu apache'a i programu CGI
 Summary(ru.UTF-8):	Разделяемые библиотеки для php
 Summary(uk.UTF-8):	Бібліотеки спільного використання для php
@@ -368,7 +368,6 @@ Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
-Obsoletes:	php-mhash
 Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-session < 3:4.2.1-2
@@ -692,6 +691,8 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.gmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(hash)
+Provides:	php(mhash)
+Obsoletes:	php-mhash
 Obsoletes:	php-pecl-hash
 
 %description hash
@@ -763,14 +764,15 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(intl)
 
 %description intl
-Internationalization extension (further is referred as Intl) is a wrapper 
-for ICU library, enabling PHP programmers to perform UCA-conformant 
-collation and date/time/number/currency formatting in their scripts.
+Internationalization extension (further is referred as Intl) is a
+wrapper for ICU library, enabling PHP programmers to perform
+UCA-conformant collation and date/time/number/currency formatting in
+their scripts.
 
 %description intl -l pl.UTF-8
-Rozszerzenie do internacjonalizacji (dalej nazywane Intl) jest wrapperem
-biblioteki ICU, pozwalającym programistom PHP na wykonywanie w skryptach
-porównań zdgodnych z UCA oraz formatowań daty/czasu/walut.
+Rozszerzenie do internacjonalizacji (dalej nazywane Intl) jest
+wrapperem biblioteki ICU, pozwalającym programistom PHP na wykonywanie
+w skryptach porównań zdgodnych z UCA oraz formatowań daty/czasu/walut.
 
 %package json
 Summary:	PHP C extension for JSON serialization

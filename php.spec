@@ -14,6 +14,16 @@
 # - http://forum.lighttpd.net/topic/34454
 # - ttyname_r() missdetected http://bugs.php.net/bug.php?id=48820
 #
+# To see optional extension deps:
+# $ grep -r PHP_ADD_EXTENSION_DEP.*,.*,.* .
+#./ext/pdo/config.m4:    PHP_ADD_EXTENSION_DEP(pdo, spl, true)
+#./ext/spl/config.m4:  PHP_ADD_EXTENSION_DEP(spl, pcre, true)
+#./ext/session/config.m4:  PHP_ADD_EXTENSION_DEP(session, hash, true)
+#./ext/sqlite/config.m4:  PHP_ADD_EXTENSION_DEP(sqlite, spl, true)
+#./ext/sqlite/config.m4:  PHP_ADD_EXTENSION_DEP(sqlite, pdo, true)
+#./ext/simplexml/config.m4:  PHP_ADD_EXTENSION_DEP(simplexml, spl, true)
+#./ext/xmlreader/config.m4:    PHP_ADD_EXTENSION_DEP(xmlreader, dom, true)
+#
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
@@ -167,6 +177,7 @@ Patch45:	%{name}-imap-annotations.patch
 Patch46:	%{name}-imap-myrights.patch
 Patch47:	suhosin.patch
 Patch49:	%{name}-m4-divert.patch
+Patch50:	extension-shared-optional-dep.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -425,7 +436,6 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	php(date)
-Provides:	php(hash)
 Provides:	php(libxml)
 %{?with_zend_multibyte:Provides:	php(mbstring)}
 Provides:	php(modules_api) = %{php_api_version}
@@ -442,10 +452,8 @@ Provides:	php(zend_module_api) = %{zend_module_api}
 %{?with_pcre:Provides:	php-pcre = %{epoch}:%{version}-%{release}}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
-Obsoletes:	php-hash
 Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
-Obsoletes:	php-pecl-hash
 Obsoletes:	php-session < 3:4.2.1-2
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
@@ -747,6 +755,22 @@ length number support with GNU MP library.
 %description gmp -l pl.UTF-8
 Moduł PHP umożliwiający korzystanie z biblioteki gmp do obliczeń na
 liczbach o dowolnej długości.
+
+%package hash
+Summary:	HASH Message Digest Framework
+Summary(pl.UTF-8):	Szkielet do obliczania skrótów wiadomości
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(hash)
+Obsoletes:	php-pecl-hash
+
+%description hash
+Native implementations of common message digest algorithms using a
+generic factory method.
+
+%description hash -l pl.UTF-8
+Natywne implementacje popularnych algorytmów obliczania skrótów
+wiadomości przy użyciu wspólnego interfejsu.
 
 %package iconv
 Summary:	iconv extension module for PHP
@@ -1667,6 +1691,7 @@ done
 %patch47 -p1
 %endif
 %patch49 -p1
+%patch50 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1800,7 +1825,7 @@ for sapi in $sapis; do
 	--enable-pcntl=shared \
 	--enable-pdo=shared \
 	--enable-json=shared \
-	--enable-hash \
+	--enable-hash=shared \
 	--enable-xmlwriter=shared \
 %if %{with fpm}
 	--with-fpm-conf=%{_sysconfdir}/fpm.conf \
@@ -2152,6 +2177,7 @@ fi
 %extension_scripts gd
 %extension_scripts gettext
 %extension_scripts gmp
+%extension_scripts hash
 %extension_scripts iconv
 %extension_scripts imap
 %extension_scripts interbase
@@ -2536,6 +2562,11 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{php_extensiondir}/gmp.so
+
+%files hash
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/hash.ini
+%attr(755,root,root) %{php_extensiondir}/hash.so
 
 %files iconv
 %defattr(644,root,root,755)

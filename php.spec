@@ -432,6 +432,7 @@ Summary(pl.UTF-8):	Wspólne pliki dla modułu apache'a i programu CGI
 Summary(ru.UTF-8):	Разделяемые библиотеки для php
 Summary(uk.UTF-8):	Бібліотеки спільного використання для php
 Group:		Libraries
+Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
@@ -442,7 +443,6 @@ Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
 %{?with_pcre:Provides:	php(pcre)}
 Provides:	php(reflection)
-Provides:	php(simplexml)
 Provides:	php(spl)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
@@ -1860,7 +1860,7 @@ for sapi in $sapis; do
 	--enable-shared \
 	--enable-session=shared \
 	--enable-shmop=shared \
-	--enable-simplexml \
+	--enable-simplexml=shared \
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
@@ -1940,16 +1940,17 @@ done
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
 %endif
 
+test_args="-dextension_dir=modules -dextension=simplexml.so"
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn $test_args)" = cgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n $test_args)" = cli ] || exit 1
 
 # FCGI
 %if %{with fcgi}
@@ -1957,7 +1958,7 @@ cp -af php_config.h.fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn $test_args)" = cgi-fcgi ] || exit 1
 %endif
 
 %if %{with fpm}
@@ -1965,7 +1966,7 @@ cp -af php_config.h.fpm main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fpm
 cp -r sapi/cgi sapi/fpm
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn $test_args)" = cgi-fcgi ] || exit 1
 %endif
 
 %if %{with tests}
@@ -2779,10 +2780,6 @@ fi
 %attr(755,root,root) %{php_extensiondir}/recode.so
 %endif
 
-%if 0
-# simplexml is needed by spl, and spl can't be built shared as of now (5.2.0)
-# simplexml can be built shared, but SPL startup fails
-# we could add R: -simplexml to -common...
 %files simplexml
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini

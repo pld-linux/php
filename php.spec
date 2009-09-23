@@ -110,7 +110,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	2
+Release:	3
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -442,7 +442,6 @@ Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
 %{?with_pcre:Provides:	php(pcre)}
 Provides:	php(reflection)
-Provides:	php(session)
 Provides:	php(simplexml)
 Provides:	php(spl)
 Provides:	php(standard)
@@ -454,7 +453,6 @@ Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
-Obsoletes:	php-session < 3:4.2.1-2
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 
@@ -1270,6 +1268,20 @@ support.
 Moduł PHP dodający możliwość konwersji kodowania plików (poprzez
 bibliotekę recode).
 
+%package session
+Summary:	session extension module for PHP
+Summary(pl.UTF-8):	Moduł session dla PHP
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(session)
+
+%description session
+This is a dynamic shared object (DSO) for PHP that will add session
+support.
+
+%description session -l pl.UTF-8
+Moduł PHP dodający obsługę sesji.
+
 %package shmop
 Summary:	Shared Memory Operations extension module for PHP
 Summary(pl.UTF-8):	Moduł shmop dla PHP
@@ -1482,7 +1494,7 @@ Summary:	wddx extension module for PHP
 Summary(pl.UTF-8):	Moduł wddx dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(wddx)
 
@@ -1845,8 +1857,8 @@ for sapi in $sapis; do
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--enable-posix=shared \
 	--enable-reflection \
-	--enable-session \
 	--enable-shared \
+	--enable-session=shared \
 	--enable-shmop=shared \
 	--enable-simplexml \
 	--enable-sysvmsg=shared \
@@ -2204,6 +2216,7 @@ fi
 %extension_scripts posix
 %extension_scripts pspell
 %extension_scripts recode
+%extension_scripts session
 %extension_scripts shmop
 %extension_scripts snmp
 %extension_scripts soap
@@ -2348,6 +2361,9 @@ fi
 %triggerun recode -- %{name}-recode < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{_sysconfdir}/php.ini
 
+%triggerun session -- %{name}-session < 4:5.0.4-9.1
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*session\.so/d' %{_sysconfdir}/php.ini
+
 %triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{_sysconfdir}/php.ini
 
@@ -2463,8 +2479,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/browscap.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
-
-%doc ext/session/mod_files.sh
 
 %files devel
 %defattr(644,root,root,755)
@@ -2774,6 +2788,12 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
 %endif
+
+%files session
+%defattr(644,root,root,755)
+%doc ext/session/mod_files.sh
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/session.ini
+%attr(755,root,root) %{php_extensiondir}/session.so
 
 %files shmop
 %defattr(644,root,root,755)

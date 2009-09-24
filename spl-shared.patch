@@ -9,32 +9,57 @@
    PHP_INSTALL_HEADERS([ext/spl], [php_spl.h spl_array.h spl_directory.h spl_engine.h spl_exceptions.h spl_functions.h spl_iterators.h spl_observer.h spl_sxe.h])
    PHP_ADD_EXTENSION_DEP(spl, pcre, true)
  fi
---- php-5.2.11/ext/standard/array.c	2009-09-23 16:37:08.248891644 +0300
-+++ php-5.2.11/ext/standard/array.c	2009-09-23 16:58:07.478775818 +0300
-@@ -48,6 +48,10 @@
+--- php-5.2.11/ext/spl/spl_iterators.c~	2009-09-23 17:57:06.000000000 +0300
++++ php-5.2.11/ext/spl/spl_iterators.c	2009-09-23 17:57:09.025079005 +0300
+@@ -57,7 +57,13 @@
+ PHPAPI zend_class_entry *spl_ce_AppendIterator;
+ PHPAPI zend_class_entry *spl_ce_RegexIterator;
+ PHPAPI zend_class_entry *spl_ce_RecursiveRegexIterator;
++#if COMPILE_DL_SPL
++#undef spl_ce_Countable
++zend_class_entry *spl_ce_Countable; // real instance
++extern PHPAPI zend_class_entry *spl_ce_Countable_p; // external one
++#else
+ PHPAPI zend_class_entry *spl_ce_Countable;
++#endif
+ 
+ zend_function_entry spl_funcs_RecursiveIterator[] = {
+ 	SPL_ABSTRACT_ME(RecursiveIterator, hasChildren,  NULL)
+@@ -2950,6 +2956,10 @@
+ 	REGISTER_SPL_STD_CLASS_EX(EmptyIterator, NULL, spl_funcs_EmptyIterator);
+ 	REGISTER_SPL_ITERATOR(EmptyIterator);
+ 
++#if COMPILE_DL_SPL
++	spl_ce_Countable_p = spl_ce_Countable;
++#endif
++
+ 	return SUCCESS;
+ }
+ /* }}} */
+--- php-5.2.11/ext/spl/spl_iterators.h	2009-09-23 17:57:59.898412166 +0300
++++ php-5.2.11/ext/spl/spl_iterators.h	2009-09-23 18:04:45.518458679 +0300
+@@ -50,7 +50,12 @@
+ extern PHPAPI zend_class_entry *spl_ce_AppendIterator;
+ extern PHPAPI zend_class_entry *spl_ce_RegexIterator;
+ extern PHPAPI zend_class_entry *spl_ce_RecursiveRegexIterator;
++#if COMPILE_DL_SPL
++#define spl_ce_Countable spl_ce_Countable_p
++extern PHPAPI zend_class_entry *spl_ce_Countable_p;
++#else
+ extern PHPAPI zend_class_entry *spl_ce_Countable;
++#endif
+ 
+ PHP_MINIT_FUNCTION(spl_iterators);
+ 
+--- php-5.2.11/ext/standard/array.c~	2009-08-14 09:18:47.000000000 +0300
++++ php-5.2.11/ext/standard/array.c	2009-09-24 16:40:24.630430291 +0300
+@@ -48,6 +48,9 @@
  #include "php_smart_str.h"
  #ifdef HAVE_SPL
  #include "ext/spl/spl_array.h"
-+#ifdef COMPILE_DL_SPL
-+#define spl_ce_Countable spl_ce_Countable_p
-+zend_class_entry *spl_ce_Countable_p = NULL;
++#if COMPILE_DL_SPL
++PHPAPI zend_class_entry *spl_ce_Countable_p = NULL; // external one
 +#endif
  #endif
  
  /* {{{ defines */
-@@ -132,6 +136,15 @@
- 
- 	REGISTER_LONG_CONSTANT("COUNT_NORMAL", COUNT_NORMAL, CONST_CS | CONST_PERSISTENT);
- 	REGISTER_LONG_CONSTANT("COUNT_RECURSIVE", COUNT_RECURSIVE, CONST_CS | CONST_PERSISTENT);
-+
-+#ifdef HAVE_SPL && COMPILE_DL_SPL
-+	/* get spl_ce_Countable via weak ref */
-+	zend_class_entry **pce;
-+
-+	if (zend_hash_find(CG(class_table), "countable", sizeof("Countable"), (void **) &pce) != FAILURE) {
-+		spl_ce_Countable = *pce;
-+	}
-+#endif
- 	
- 	return SUCCESS;
- }

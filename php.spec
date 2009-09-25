@@ -110,7 +110,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	3
+Release:	3.16
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -178,6 +178,7 @@ Patch46:	%{name}-imap-myrights.patch
 Patch47:	suhosin.patch
 Patch49:	%{name}-m4-divert.patch
 Patch50:	extension-shared-optional-dep.patch
+Patch51:	spl-shared.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -432,7 +433,6 @@ Summary(pl.UTF-8):	Wspólne pliki dla modułu apache'a i programu CGI
 Summary(ru.UTF-8):	Разделяемые библиотеки для php
 Summary(uk.UTF-8):	Бібліотеки спільного використання для php
 Group:		Libraries
-Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
@@ -443,7 +443,6 @@ Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
 %{?with_pcre:Provides:	php(pcre)}
 Provides:	php(reflection)
-Provides:	php(spl)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
@@ -899,8 +898,8 @@ Moduł PHP udostępniający funkcje mieszające z biblioteki mhash.
 Summary:	mime_magic extension module for PHP
 Summary(pl.UTF-8):	Moduł mime_magic dla PHP
 Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{magic_mime}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mime_magic)
 
 %description mime_magic
@@ -965,6 +964,7 @@ Summary:	MySQLi module for PHP
 Summary(pl.UTF-8):	Moduł MySQLi dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Requires:	mysql-libs >= 4.1.0
 Provides:	php(mysqli)
 
@@ -1062,6 +1062,7 @@ Summary:	PHP Data Objects (PDO)
 Summary(pl.UTF-8):	Obsługa PHP Data Objects (PDO)
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(pdo)
 Obsoletes:	php-pecl-PDO
 
@@ -1301,6 +1302,7 @@ Summary:	Simple XML extension module for PHP
 Summary(pl.UTF-8):	Moduł prostego rozszerzenia XML dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
 
 %description simplexml
@@ -1351,6 +1353,22 @@ This is a dynamic shared object (DSO) for PHP that will add sockets
 support.
 
 %description sockets -l pl.UTF-8
+Moduł PHP dodający obsługę gniazdek.
+
+%package spl
+Summary:	Standard PHP Library module for PHP
+Summary(pl.UTF-8):	Moduł SPL dla PHP
+Group:		Libraries
+URL:		http://www.php.net/~helly/php/ext/spl/
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
+Provides:	php(spl)
+
+%description spl
+This is a dynamic shared object (DSO) for PHP that will add Standard
+PHP Library support.
+
+%description spl -l pl.UTF-8
 Moduł PHP dodający obsługę gniazdek.
 
 %package sqlite
@@ -1704,6 +1722,7 @@ done
 %endif
 %patch49 -p1
 %patch50 -p1
+%patch51 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1732,7 +1751,7 @@ rm -rf ext/xmlrpc/libxmlrpc
 mv ext/standard/tests/general_functions/bug39322.phpt{,.broken}
 %endif
 
-cp -f Zend/LICENSE{,.Zend}
+cp -af Zend/LICENSE{,.Zend}
 
 %build
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
@@ -1861,6 +1880,7 @@ for sapi in $sapis; do
 	--enable-session=shared \
 	--enable-shmop=shared \
 	--enable-simplexml=shared \
+	--enable-spl=shared \
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
@@ -2057,6 +2077,8 @@ generate_inifiles() {
 		conf="%{_sysconfdir}/conf.d/$mod.ini"
 		# xml needs to be loaded before wddx
 		[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_$mod.ini"
+		# spl needs to be loaded before mysqli
+		[ "$mod" = "spl" ] && conf="%{_sysconfdir}/conf.d/SPL.ini"
 		echo "+ $conf"
 		cat > $RPM_BUILD_ROOT$conf <<-EOF
 			; Enable $mod extension module
@@ -2222,6 +2244,7 @@ fi
 %extension_scripts snmp
 %extension_scripts soap
 %extension_scripts sockets
+%extension_scripts spl
 %extension_scripts sqlite
 %extension_scripts sybase
 %extension_scripts sybase-ct
@@ -2784,7 +2807,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
-%endif
 
 %files session
 %defattr(644,root,root,755)
@@ -2813,6 +2835,13 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sockets.ini
 %attr(755,root,root) %{php_extensiondir}/sockets.so
+
+%files spl
+%defattr(644,root,root,755)
+%doc ext/spl/{CREDITS,README,TODO}
+%doc ext/spl/examples
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
+%attr(755,root,root) %{php_extensiondir}/spl.so
 
 %if %{with sqlite}
 %files sqlite

@@ -59,7 +59,7 @@
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable Zend Thread Safety
 %bcond_without	fpm		# fpm patches from http://php-fpm.anight.org/
-%bcond_with	suhosin		# with suhosin patch
+%bcond_without	suhosin		# with suhosin patch
 %bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
@@ -110,7 +110,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	4
+Release:	5
 Epoch:		4
 License:	PHP
 Group:		Libraries

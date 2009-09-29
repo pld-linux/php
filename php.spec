@@ -1074,7 +1074,7 @@ Summary:	PHP Data Objects (PDO)
 Summary(pl.UTF-8):	Obsługa PHP Data Objects (PDO)
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(pdo)
 Obsoletes:	php-pecl-PDO
 
@@ -1286,7 +1286,7 @@ Summary:	session extension module for PHP
 Summary(pl.UTF-8):	Moduł session dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-hash = %{epoch}:%{version}-%{release}
 Provides:	php(session)
 
 %description session
@@ -1315,8 +1315,7 @@ Summary:	Simple XML extension module for PHP
 Summary(pl.UTF-8):	Moduł prostego rozszerzenia XML dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
 
 %description simplexml
@@ -1390,8 +1389,8 @@ Summary:	SQLite extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite)
 
 %description sqlite
@@ -1560,8 +1559,7 @@ Summary:	XML Reader extension module for PHP
 Summary(pl.UTF-8):	Moduł XML Reader dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-dom = %{epoch}:%{version}-%{release}
 Provides:	php(xmlreader)
 
 %description xmlreader

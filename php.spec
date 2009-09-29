@@ -441,16 +441,13 @@ Provides:	php(libxml)
 %{?with_zend_multibyte:Provides:	php(mbstring)}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
-%{?with_pcre:Provides:	php(pcre)}
 Provides:	php(reflection)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
 %{?with_zend_multibyte:Provides:	php-mbstring = %{epoch}:%{version}-%{release}}
-%{?with_pcre:Provides:	php-pcre = %{epoch}:%{version}-%{release}}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
-Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
@@ -1057,6 +1054,21 @@ waitpid(), signal() etc.
 Moduł PHP umożliwiający tworzenie nowych procesów i kontrolę nad nimi.
 Obsługuje funkcje takie jak fork(), waitpid(), signal() i podobne.
 
+%package pcre
+Summary:	PCRE extension module for PHP
+Summary(pl.UTF-8):	Moduł PCRE dla PHP
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(pcre)
+
+%description pcre
+This is a dynamic shared object (DSO) for PHP that will add Perl
+Compatible Regular Expression support.
+
+%description pcre -l pl.UTF-8
+Moduł PHP umożliwiający korzystanie z perlowych wyrażeń regularnych
+(Perl Compatible Regular Expressions)
+
 %package pdo
 Summary:	PHP Data Objects (PDO)
 Summary(pl.UTF-8):	Obsługa PHP Data Objects (PDO)
@@ -1274,6 +1286,7 @@ Summary:	session extension module for PHP
 Summary(pl.UTF-8):	Moduł session dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(session)
 
 %description session
@@ -1302,6 +1315,7 @@ Summary:	Simple XML extension module for PHP
 Summary(pl.UTF-8):	Moduł prostego rozszerzenia XML dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
 
@@ -1361,7 +1375,7 @@ Summary(pl.UTF-8):	Moduł SPL dla PHP
 Group:		Libraries
 URL:		http://php.net/manual/en/book.spl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(spl)
 
 %description spl
@@ -1376,6 +1390,7 @@ Summary:	SQLite extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite)
 
@@ -1546,6 +1561,7 @@ Summary(pl.UTF-8):	Moduł XML Reader dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(xmlreader)
 
 %description xmlreader
@@ -1921,7 +1937,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
-	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=/usr} \
+	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared,/usr} \
 	%{!?with_filter:--disable-filter}%{?with_filter:--enable-filter=shared} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
@@ -2229,6 +2245,7 @@ fi
 %extension_scripts oci8
 %extension_scripts odbc
 %extension_scripts openssl
+%extension_scripts pcre
 %extension_scripts pdo-dblib
 %extension_scripts pdo-firebird
 %extension_scripts pdo-mysql
@@ -2364,6 +2381,9 @@ fi
 if [ -f %{_sysconfdir}/php-cli.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cli.ini
 fi
+
+%triggerun pcre -- %{name}-pcre < 4:5.0.4-9.1
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcre\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{_sysconfdir}/php.ini
@@ -2719,6 +2739,13 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
+
+%if %{with pcre}
+%files pcre
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcre.ini
+%attr(755,root,root) %{php_extensiondir}/pcre.so
+%endif
 
 %files pdo
 %defattr(644,root,root,755)

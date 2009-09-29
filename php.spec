@@ -110,7 +110,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	3.16
+Release:	4
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -1359,7 +1359,7 @@ Moduł PHP dodający obsługę gniazdek.
 Summary:	Standard PHP Library module for PHP
 Summary(pl.UTF-8):	Moduł SPL dla PHP
 Group:		Libraries
-URL:		http://www.php.net/~helly/php/ext/spl/
+URL:		http://php.net/manual/en/book.spl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	php(spl)

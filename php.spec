@@ -12,6 +12,17 @@
 # - make additional headers and checking added by mail patch configurable
 # - modularize session, standard (output from pure php -m)?
 # - http://forum.lighttpd.net/topic/34454
+# - ttyname_r() missdetected http://bugs.php.net/bug.php?id=48820
+#
+# To see optional extension deps:
+# $ grep -r PHP_ADD_EXTENSION_DEP.*,.*,.* .
+#./ext/pdo/config.m4:    PHP_ADD_EXTENSION_DEP(pdo, spl, true)
+#./ext/spl/config.m4:  PHP_ADD_EXTENSION_DEP(spl, pcre, true)
+#./ext/session/config.m4:  PHP_ADD_EXTENSION_DEP(session, hash, true)
+#./ext/sqlite/config.m4:  PHP_ADD_EXTENSION_DEP(sqlite, spl, true)
+#./ext/sqlite/config.m4:  PHP_ADD_EXTENSION_DEP(sqlite, pdo, true)
+#./ext/simplexml/config.m4:  PHP_ADD_EXTENSION_DEP(simplexml, spl, true)
+#./ext/xmlreader/config.m4:    PHP_ADD_EXTENSION_DEP(xmlreader, dom, true)
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -19,6 +30,7 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	gd_jis_conv	# causes imagettfbbox(): any2eucjp(): invalid code in input string when internal gd used
+%bcond_with	zend_multibyte		# enable zend multibyte, mbstring can't be shared then anymore
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
@@ -39,7 +51,6 @@
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
 %bcond_without	sybase		# without Sybase extension module
-%bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
@@ -48,7 +59,7 @@
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable Zend Thread Safety
 %bcond_without	fpm		# fpm patches from http://php-fpm.anight.org/
-%bcond_with	suhosin		# with suhosin patch
+%bcond_without	suhosin		# with suhosin patch
 %bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	versioning	# build with experimental versioning (to load php4/php5 into same apache)
@@ -85,6 +96,12 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
+%if "%{pld_release}" == "ac"
+%define		magic_mime	/usr/share/misc/magic.mime
+%else
+%define		magic_mime	/usr/share/file/magic.mime
+%endif
+
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -92,13 +109,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.2.9
-Release:	12
+Version:	5.2.11
+Release:	5
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	280d6cda7f72a4fc6de42fda21ac2db7
+# Source0-md5:	286bf34630f5643c25ebcedfec5e0a09
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-cgi.ini
@@ -111,6 +128,7 @@ Source8:	%{name}_browscap.ini
 ## Source9-md5:	d67f23f5e69664e06fce89b064d5bbab
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
+Source12:	%{name}-branch.sh
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -154,10 +172,14 @@ Patch39:	%{name}-use-prog_sendmail.patch
 Patch40:	%{name}-fpm.patch
 Patch41:	%{name}-fpm-config.patch
 Patch42:	%{name}-fpm-initdir.patch
+Patch43:	%{name}-silent-session-cleanup.patch
 Patch44:	%{name}-include_path.patch
 Patch45:	%{name}-imap-annotations.patch
 Patch46:	%{name}-imap-myrights.patch
 Patch47:	suhosin.patch
+Patch49:	%{name}-m4-divert.patch
+Patch50:	extension-shared-optional-dep.patch
+Patch51:	spl-shared.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -170,7 +192,6 @@ BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %if %{with xmlrpc}
-BuildRequires:	expat-devel
 %{?with_system_xmlrpc_epi:BuildRequires:    xmlrpc-epi-devel}
 %endif
 %{?with_fcgi:BuildRequires:	fcgi-devel}
@@ -219,7 +240,7 @@ BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
-BuildRequires:	rpmbuild(macros) >= 1.238
+BuildRequires:	rpmbuild(macros) >= 1.519
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 %{?with_sqlite:BuildRequires:	sqlite3-devel}
 BuildRequires:	t1lib-devel
@@ -418,22 +439,17 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	php(date)
 Provides:	php(libxml)
+%{?with_zend_multibyte:Provides:	php(mbstring)}
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
-%{?with_pcre:Provides:	php(pcre)}
 Provides:	php(reflection)
-Provides:	php(session)
-Provides:	php(simplexml)
-Provides:	php(spl)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
-%{?with_pcre:Provides:	php-pcre}
+%{?with_zend_multibyte:Provides:	php-mbstring = %{epoch}:%{version}-%{release}}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
-Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
-Obsoletes:	php-session < 3:4.2.1-2
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 
@@ -880,8 +896,8 @@ Moduł PHP udostępniający funkcje mieszające z biblioteki mhash.
 Summary:	mime_magic extension module for PHP
 Summary(pl.UTF-8):	Moduł mime_magic dla PHP
 Group:		Libraries
+Requires:	%{magic_mime}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	/usr/share/file/magic.mime
 Provides:	php(mime_magic)
 
 %description mime_magic
@@ -946,6 +962,7 @@ Summary:	MySQLi module for PHP
 Summary(pl.UTF-8):	Moduł MySQLi dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Requires:	mysql-libs >= 4.1.0
 Provides:	php(mysqli)
 
@@ -1038,11 +1055,27 @@ waitpid(), signal() etc.
 Moduł PHP umożliwiający tworzenie nowych procesów i kontrolę nad nimi.
 Obsługuje funkcje takie jak fork(), waitpid(), signal() i podobne.
 
+%package pcre
+Summary:	PCRE extension module for PHP
+Summary(pl.UTF-8):	Moduł PCRE dla PHP
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(pcre)
+
+%description pcre
+This is a dynamic shared object (DSO) for PHP that will add Perl
+Compatible Regular Expression support.
+
+%description pcre -l pl.UTF-8
+Moduł PHP umożliwiający korzystanie z perlowych wyrażeń regularnych
+(Perl Compatible Regular Expressions)
+
 %package pdo
 Summary:	PHP Data Objects (PDO)
 Summary(pl.UTF-8):	Obsługa PHP Data Objects (PDO)
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(pdo)
 Obsoletes:	php-pecl-PDO
 
@@ -1249,6 +1282,21 @@ support.
 Moduł PHP dodający możliwość konwersji kodowania plików (poprzez
 bibliotekę recode).
 
+%package session
+Summary:	session extension module for PHP
+Summary(pl.UTF-8):	Moduł session dla PHP
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-hash = %{epoch}:%{version}-%{release}
+Provides:	php(session)
+
+%description session
+This is a dynamic shared object (DSO) for PHP that will add session
+support.
+
+%description session -l pl.UTF-8
+Moduł PHP dodający obsługę sesji.
+
 %package shmop
 Summary:	Shared Memory Operations extension module for PHP
 Summary(pl.UTF-8):	Moduł shmop dla PHP
@@ -1268,6 +1316,7 @@ Summary:	Simple XML extension module for PHP
 Summary(pl.UTF-8):	Moduł prostego rozszerzenia XML dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
 
 %description simplexml
@@ -1320,12 +1369,29 @@ support.
 %description sockets -l pl.UTF-8
 Moduł PHP dodający obsługę gniazdek.
 
+%package spl
+Summary:	Standard PHP Library module for PHP
+Summary(pl.UTF-8):	Moduł SPL dla PHP
+Group:		Libraries
+URL:		http://php.net/manual/en/book.spl.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Provides:	php(spl)
+
+%description spl
+This is a dynamic shared object (DSO) for PHP that will add Standard
+PHP Library support.
+
+%description spl -l pl.UTF-8
+Moduł PHP dodający obsługę gniazdek.
+
 %package sqlite
 Summary:	SQLite extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite)
 
 %description sqlite
@@ -1461,7 +1527,7 @@ Summary:	wddx extension module for PHP
 Summary(pl.UTF-8):	Moduł wddx dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(wddx)
 
@@ -1494,7 +1560,7 @@ Summary:	XML Reader extension module for PHP
 Summary(pl.UTF-8):	Moduł XML Reader dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-dom = %{epoch}:%{version}-%{release}
 Provides:	php(xmlreader)
 
 %description xmlreader
@@ -1662,12 +1728,16 @@ done
 %patch42 -p1
 %endif
 
+%patch43 -p1
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1
 %if %{with suhosin}
 %patch47 -p1
 %endif
+%patch49 -p1
+%patch50 -p1
+%patch51 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1696,7 +1766,7 @@ rm -rf ext/xmlrpc/libxmlrpc
 mv ext/standard/tests/general_functions/bug39322.phpt{,.broken}
 %endif
 
-cp -f Zend/LICENSE{,.Zend}
+cp -af Zend/LICENSE{,.Zend}
 
 %build
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
@@ -1756,10 +1826,10 @@ for sapi in $sapis; do
 		sapi_args='--disable-cgi'
 		;;
 	fcgi)
-		sapi_args='--disable-cli --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect'
+		sapi_args='--disable-cli --enable-fastcgi --enable-force-cgi-redirect'
 		;;
 	fpm)
-		sapi_args='--disable-cli --enable-fastcgi --with-fastcgi=/usr --enable-force-cgi-redirect --enable-fpm'
+		sapi_args='--disable-cli --enable-fastcgi --enable-force-cgi-redirect --enable-fpm'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
@@ -1783,6 +1853,7 @@ for sapi in $sapis; do
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	%{?with_suhosin:--enable-suhosin} \
+	%{?with_zend_multibyte:--enable-zend-multibyte} \
 	--enable-inline-optimization \
 	--enable-bcmath=shared \
 	--enable-calendar=shared \
@@ -1795,7 +1866,7 @@ for sapi in $sapis; do
 	%{?with_gd_jis_conv:--enable-gd-jis-conv} \
 	--enable-libxml \
 	--enable-magic-quotes \
-	--enable-mbstring=shared,all \
+	--enable-mbstring=%{?!with_zend_multibyte:shared,}all \
 	--enable-mbregex \
 	--enable-pcntl=shared \
 	--enable-pdo=shared \
@@ -1820,14 +1891,14 @@ for sapi in $sapis; do
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--enable-posix=shared \
 	--enable-reflection \
-	--enable-session \
 	--enable-shared \
+	--enable-session=shared \
 	--enable-shmop=shared \
-	--enable-simplexml \
+	--enable-simplexml=shared \
+	--enable-spl=shared \
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
-	--enable-trans-sid \
 	--enable-safe-mode \
 	--enable-soap=shared \
 	--enable-sockets=shared \
@@ -1840,11 +1911,7 @@ for sapi in $sapis; do
 	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
 	--with-db4 \
 	--enable-dbase=shared \
-%if %{with xmlrpc}
-	--with-expat-dir=shared,/usr \
-%else
-	--without-expat-dir \
-%endif
+	--without-libexpat-dir \
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \
 	--with-freetype-dir=shared \
@@ -1858,7 +1925,7 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	--with-mcrypt=shared \
 	%{?with_mhash:--with-mhash=shared} \
-	%{?with_mime_magic:--with-mime-magic=shared,/usr/share/file/magic.mime}%{!?with_mime_magic:--disable-mime-magic} \
+	%{?with_mime_magic:--with-mime-magic=shared,%{magic_mime}}%{!?with_mime_magic:--disable-mime-magic} \
 	%{?with_ming:--with-ming=shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
@@ -1869,7 +1936,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
-	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=/usr} \
+	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared,/usr} \
 	%{!?with_filter:--disable-filter}%{?with_filter:--enable-filter=shared} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
@@ -1908,16 +1975,17 @@ done
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
 %endif
 
+test_args="-dextension_dir=modules -dextension=simplexml.so"
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn $test_args)" = cgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n $test_args)" = cli ] || exit 1
 
 # FCGI
 %if %{with fcgi}
@@ -1925,7 +1993,7 @@ cp -af php_config.h.fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn $test_args)" = cgi-fcgi ] || exit 1
 %endif
 
 %if %{with fpm}
@@ -1933,7 +2001,7 @@ cp -af php_config.h.fpm main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fpm
 cp -r sapi/cgi sapi/fpm
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn $test_args)" = cgi-fcgi ] || exit 1
 %endif
 
 %if %{with tests}
@@ -2024,6 +2092,8 @@ generate_inifiles() {
 		conf="%{_sysconfdir}/conf.d/$mod.ini"
 		# xml needs to be loaded before wddx
 		[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_$mod.ini"
+		# spl needs to be loaded before mysqli
+		[ "$mod" = "spl" ] && conf="%{_sysconfdir}/conf.d/SPL.ini"
 		echo "+ $conf"
 		cat > $RPM_BUILD_ROOT$conf <<-EOF
 			; Enable $mod extension module
@@ -2174,6 +2244,7 @@ fi
 %extension_scripts oci8
 %extension_scripts odbc
 %extension_scripts openssl
+%extension_scripts pcre
 %extension_scripts pdo-dblib
 %extension_scripts pdo-firebird
 %extension_scripts pdo-mysql
@@ -2184,10 +2255,12 @@ fi
 %extension_scripts posix
 %extension_scripts pspell
 %extension_scripts recode
+%extension_scripts session
 %extension_scripts shmop
 %extension_scripts snmp
 %extension_scripts soap
 %extension_scripts sockets
+%extension_scripts spl
 %extension_scripts sqlite
 %extension_scripts sybase
 %extension_scripts sybase-ct
@@ -2308,6 +2381,9 @@ if [ -f %{_sysconfdir}/php-cli.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
+%triggerun pcre -- %{name}-pcre < 4:5.0.4-9.1
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcre\.so/d' %{_sysconfdir}/php.ini
+
 %triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{_sysconfdir}/php.ini
 
@@ -2327,6 +2403,9 @@ fi
 
 %triggerun recode -- %{name}-recode < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{_sysconfdir}/php.ini
+
+%triggerun session -- %{name}-session < 4:5.0.4-9.1
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*session\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{_sysconfdir}/php.ini
@@ -2443,8 +2522,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/browscap.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
-
-%doc ext/session/mod_files.sh
 
 %files devel
 %defattr(644,root,root,755)
@@ -2579,10 +2656,12 @@ fi
 %attr(755,root,root) %{php_extensiondir}/ldap.so
 %endif
 
+%if %{without zend_multibyte}
 %files mbstring
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{php_extensiondir}/mbstring.so
+%endif
 
 %files mcrypt
 %defattr(644,root,root,755)
@@ -2659,6 +2738,13 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
+
+%if %{with pcre}
+%files pcre
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcre.ini
+%attr(755,root,root) %{php_extensiondir}/pcre.so
+%endif
 
 %files pdo
 %defattr(644,root,root,755)
@@ -2743,15 +2829,16 @@ fi
 %attr(755,root,root) %{php_extensiondir}/recode.so
 %endif
 
-%if 0
-# simplexml is needed by spl, and spl can't be built shared as of now (5.2.0)
-# simplexml can be built shared, but SPL startup fails
-# we could add R: -simplexml to -common...
 %files simplexml
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
-%endif
+
+%files session
+%defattr(644,root,root,755)
+%doc ext/session/mod_files.sh
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/session.ini
+%attr(755,root,root) %{php_extensiondir}/session.so
 
 %files shmop
 %defattr(644,root,root,755)
@@ -2774,6 +2861,13 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sockets.ini
 %attr(755,root,root) %{php_extensiondir}/sockets.so
+
+%files spl
+%defattr(644,root,root,755)
+%doc ext/spl/{CREDITS,README,TODO}
+%doc ext/spl/examples
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
+%attr(755,root,root) %{php_extensiondir}/spl.so
 
 %if %{with sqlite}
 %files sqlite

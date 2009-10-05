@@ -128,6 +128,7 @@ Source8:	%{name}_browscap.ini
 ## Source9-md5:	d67f23f5e69664e06fce89b064d5bbab
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
+Source12:	%{name}-branch.sh
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch

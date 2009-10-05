@@ -1,15 +1,24 @@
 #!/bin/sh
-tag=php_5_2_10
+set -e
+svn=http://svn.php.net/repository/php/php-src
+tag=php_5_2_11
 branch=PHP_5_2
 
-if [ ! -d $tag ]; then
-	cvs -d :pserver:cvsread@cvs.php.net:/repository checkout -r $tag -d $tag php5
-fi
-if [ ! -d $branch ]; then
-	cvs -d :pserver:cvsread@cvs.php.net:/repository checkout -r $branch -d $branch php5
-fi
+d=$-
+filter() {
+	set -$d
+	# remove revno's for smaller diffs
+	sed -e 's,^\([-+]\{3\} .*\)\t(revision [0-9]\+)$,\1,'
+}
 
-cd $tag && cvs up -d && cd ..
-cd $branch && cvs up -d && cd ..
+old=$svn/tags/$tag
+new=$svn/branches/$branch
+echo >&2 "Running diff: $old -> $new"
+LC_ALL=C svn diff --old=$old --new=$new | filter > php-branch.diff.tmp
 
-diff -ur -x CVS $tag $branch > php-branch.diff
+if cmp -s php-branch.diff{,.tmp}; then
+	echo >&2 "No new diffs..."
+	rm -f php-branch.diff.tmp
+	exit 0
+fi
+mv -f php-branch.diff{.tmp,}

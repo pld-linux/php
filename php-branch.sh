@@ -3,6 +3,7 @@ set -e
 svn=http://svn.php.net/repository/php/php-src
 tag=php_5_2_11
 branch=PHP_5_2
+out=php-branch.diff
 
 d=$-
 filter() {
@@ -14,11 +15,11 @@ filter() {
 old=$svn/tags/$tag
 new=$svn/branches/$branch
 echo >&2 "Running diff: $old -> $new"
-LC_ALL=C svn diff --old=$old --new=$new | filter > php-branch.diff.tmp
+LC_ALL=C svn diff --old=$old --new=$new | filter > $out.tmp
 
-if cmp -s php-branch.diff{,.tmp}; then
+if cmp -s $out{,.tmp}; then
 	echo >&2 "No new diffs..."
-	rm -f php-branch.diff.tmp
+	rm -f $out.tmp
 	exit 0
 fi
-mv -f php-branch.diff{.tmp,}
+mv -f $out{.tmp,}

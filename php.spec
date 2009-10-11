@@ -97,9 +97,9 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %if "%{pld_release}" == "ac"
-%define		magic_mime	/usr/share/misc/magic.mime
-%else
 %define		magic_mime	/usr/share/file/magic.mime
+%else
+%define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
 Summary:	PHP: Hypertext Preprocessor
@@ -110,7 +110,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	5
+Release:	6
 Epoch:		4
 License:	PHP
 Group:		Libraries

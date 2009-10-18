@@ -110,7 +110,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	6
+Release:	7
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -1075,7 +1075,7 @@ Summary:	PHP Data Objects (PDO)
 Summary(pl.UTF-8):	Obsługa PHP Data Objects (PDO)
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(pdo)
 Obsoletes:	php-pecl-PDO
 
@@ -1375,7 +1375,7 @@ Summary(pl.UTF-8):	Moduł SPL dla PHP
 Group:		Libraries
 URL:		http://php.net/manual/en/book.spl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(spl)
 
 %description spl

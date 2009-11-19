@@ -76,7 +76,7 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define		rel		0.4
+%define		rel		1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -84,13 +84,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.0
+Version:	5.3.1
 Release:	%{rel}%{?with_type_hints:th}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	846760cd655c98dfd86d6d97c3d964b0
+# Source0-md5:	63e97ad450f0f7259e785100b634c797
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -108,6 +108,7 @@ Patch7:		%{name}-config-file-scan-dir.patch
 Patch8:		%{name}-sapi-ini-file.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
+Patch11:	extension-shared-optional-dep.patch
 Patch14:	%{name}-no_pear_install.patch
 Patch15:	%{name}-zlib.patch
 Patch17:	%{name}-readline.patch
@@ -124,7 +125,6 @@ Patch31:	%{name}-fcgi-graceful.patch
 Patch32:	%{name}-m4-divert.patch
 Patch38:	%{name}-tds.patch
 Patch43:	%{name}-use-prog_sendmail.patch
-Patch44:	%{name}-bug-48880.patch
 %if %{with type_hints}
 Patch50:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
@@ -1589,8 +1589,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch50 -p0
 %endif
 
-%patch44 -p1
-
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1605,6 +1603,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 cp php.ini-production php.ini
 %patch10 -p1
 
+%patch11 -p1
 %patch14 -p1
 %patch15 -p1
 %patch17 -p1

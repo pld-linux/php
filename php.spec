@@ -1898,13 +1898,13 @@ install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 install %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
 install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif

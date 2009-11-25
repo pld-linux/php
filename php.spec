@@ -55,7 +55,8 @@
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	apache1		# disable building apache 1.3.x module
 %bcond_without	apache2		# disable building apache 2.x module
-%bcond_without	zts		# disable experimental-zts
+%bcond_without	zts		# disable Zend Thread Safety
+%bcond_without	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on buildersl; perform "make test"
 %bcond_with	type_hints	# experimental support for strict typing/casting
 
@@ -125,6 +126,7 @@ Patch31:	%{name}-fcgi-graceful.patch
 Patch32:	%{name}-m4-divert.patch
 Patch38:	%{name}-tds.patch
 Patch43:	%{name}-use-prog_sendmail.patch
+Patch47:	suhosin.patch
 %if %{with type_hints}
 Patch50:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
@@ -1585,6 +1587,9 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %prep
 %setup -q
 
+# for suhosin patch
+%{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
+
 %if %{with type_hints}
 %patch50 -p0
 %endif
@@ -1625,6 +1630,10 @@ cp php.ini-production php.ini
 %patch38 -p1
 
 %patch43 -p1
+
+%if %{with suhosin}
+%patch47 -p1
+%endif
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

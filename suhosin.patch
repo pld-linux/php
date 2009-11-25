@@ -4426,17 +4426,16 @@ diff -Nura php-5.3.1RC1/main/php_logos.c suhosin-patch-5.3.1RC1-0.9.8/main/php_l
  int php_init_info_logos(void)
  {
  	if(zend_hash_init(&phpinfo_logo_hash, 0, NULL, NULL, 1)==FAILURE) 
-@@ -58,7 +62,9 @@
- 	php_register_info_logo(PHP_LOGO_GUID    , "image/gif", php_logo    , sizeof(php_logo));
+@@ -63,6 +63,9 @@
  	php_register_info_logo(PHP_EGG_LOGO_GUID, "image/gif", php_egg_logo, sizeof(php_egg_logo));
  	php_register_info_logo(ZEND_LOGO_GUID   , "image/gif", zend_logo   , sizeof(zend_logo));
--
+ 	php_register_info_logo(PLD_LOGO_GUID    , "image/png", pld_logo    , sizeof(pld_logo));
 +#if SUHOSIN_PATCH
-+	php_register_info_logo(SUHOSIN_LOGO_GUID, "image/jpeg", suhosin_logo   , sizeof(suhosin_logo));
++ 	php_register_info_logo(SUHOSIN_LOGO_GUID, "image/jpeg", suhosin_logo   , sizeof(suhosin_logo));
 +#endif
+ 
  	return SUCCESS;
  }
- 
 diff -Nura php-5.3.1RC1/main/snprintf.c suhosin-patch-5.3.1RC1-0.9.8/main/snprintf.c
 --- php-5.3.1RC1/main/snprintf.c	2008-12-31 12:15:49.000000000 +0100
 +++ suhosin-patch-5.3.1RC1-0.9.8/main/snprintf.c	2009-09-27 19:04:06.000000000 +0200

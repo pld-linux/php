@@ -1644,6 +1644,7 @@ rm -rf ext/sqlite3/libsqlite
 #rm -rf ext/bcmath/libbcmath
 #rm -rf ext/date/lib
 #rm -rf ext/dba/libcdb
+cp -af Zend/LICENSE{,.Zend}
 #rm -rf ext/dba/libflatfile
 #rm -rf ext/dba/libinifile
 #rm -rf ext/gd/libgd
@@ -1917,8 +1918,6 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
-
-cp -f Zend/LICENSE{,.Zend}
 
 # Generate stub .ini files for each subpackage
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d

@@ -125,6 +125,7 @@ Patch30:	%{name}-silent-session-cleanup.patch
 Patch31:	%{name}-fcgi-graceful.patch
 Patch32:	%{name}-m4-divert.patch
 Patch38:	%{name}-tds.patch
+Patch39:	%{name}-stupidapache_version.patch
 Patch43:	%{name}-use-prog_sendmail.patch
 Patch47:	suhosin.patch
 %if %{with type_hints}
@@ -1628,6 +1629,7 @@ cp php.ini-production php.ini
 %patch31 -p1
 %patch32 -p1
 %patch38 -p1
+%patch39 -p1
 
 %patch43 -p1
 
@@ -1712,11 +1714,11 @@ for sapi in $sapis; do
 	;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
-		sapi_args="--with-apxs=%{apxs1}"
+		sapi_args="--with-apxs=%{apxs1} --with-apache-version=$ver"
 	;;
 	apxs2)
 		ver=$(rpm -q --qf '%{V}' apache-devel)
-		sapi_args="--with-apxs2=%{apxs2}"
+		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	esac
 

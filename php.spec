@@ -1316,7 +1316,6 @@ Summary:	Simple XML extension module for PHP
 Summary(pl.UTF-8):	Moduł prostego rozszerzenia XML dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
 
 %description simplexml

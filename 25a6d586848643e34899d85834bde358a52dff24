@@ -1,0 +1,5 @@
+- up to snap 2008.11.08 21:30
+- Patch38 (tds) obsolete, already upstream
+- dropped mime_magic, finaly fully dropped from upstream
+- NfFY (Not fully Functional Yet ;-) ) - work in progress
+  compiles --without ming, sybase_ct, xmlrpc

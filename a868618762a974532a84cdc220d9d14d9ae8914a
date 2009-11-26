@@ -1,0 +1,8 @@
+- updated to snap: 2008.07.08 08:30
+- drop patch35: already in mainstream
+- remove extensions:
+  - ncurses (moved to pecl)
+  - sybase (dropped; use sybase_ct now)
+- PHP bug #45079 fixed, unquoted browscap values not required anymore.
+- TODO: adapt to build with freetds 0.82 (missing tds.h required by
+        configure)

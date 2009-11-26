@@ -2170,9 +2170,6 @@ fi
 %triggerun interbase -- %{name}-interbase < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*interbase\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun intl -- %{name}-intl < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*intl\.so/d' %{_sysconfdir}/php.ini
-
 %triggerun ldap -- %{name}-ldap < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ldap\.so/d' %{_sysconfdir}/php.ini
 
@@ -2210,9 +2207,6 @@ fi
 
 %triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun phar -- %{name}-phar < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*phar\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun posix -- %{name}-posix < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*posix\.so/d' %{_sysconfdir}/php.ini

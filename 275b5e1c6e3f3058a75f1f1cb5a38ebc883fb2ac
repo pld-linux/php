@@ -1,0 +1,13 @@
+- up to 2009040101 (post RC1)
+- unify CGI and FastCGI packages
+  This AIN'T tested for smooth updates yet.
+   - drop php-fcgi
+   - php-cgi provides php(fcgi)
+   - php-cgi obsoletes php-fcgi
+   - php-cgi has symlink php.cgi -> php.fcgi
+- use "new ini files"
+   - php.ini-production as new base config
+   - full copies for sapi configs
+      cofiguration isn't merged with base php.ini
+- package .phpt unit tests and run-tests.php script into
+  new php-tests package

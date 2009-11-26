@@ -1,0 +1,18 @@
+- update to snap 2009.02.24 15:30 (beta2 status)
+- update zend_module_api to 20090115
+- update zend_extension_api to 220090115
+- remove unrecognized configure options:
+   --with-apache-version, --enable-memory-limit, --with-inifile,
+   --with-flatfile, --enable-gd-jus-conf, --enable-track-vars,
+   --enable-trans-sid, --with-expat-dir, --without-sablot-js,
+   --with-tiff-dir
+   --enable-reflection
+   --enable-fastcgi, --with-fastcgi, --enable-force-cgi-redirect
+   (fastcgi and reflection are always enabled)
+- drop gcc2 patch (gcc2 and php 5.3? please... and it would require maintaing
+  php 5.3+ branch as it doesn't apply to current sources)
+- drop hardening patch and bcond: unavailable for php 5.3 and dropped on MAIN
+- drop versioning patch and bcond: unmaintained
+- preserve ORACLE_HOME env var if oci8 bcond is on (from MAIN)
+- add php-use-prog_sendmail.patch (from MAIN)
+- still doesn't build with sybase_ct

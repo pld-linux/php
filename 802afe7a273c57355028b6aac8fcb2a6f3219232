@@ -1,0 +1,2 @@
+- adapter has no brains, you should have it (revert crap caused by adapter and
+  commiter not looking what it did)

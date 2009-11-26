@@ -1,4 +1,23 @@
 # TODO
+# - lost patches:
+#   +Patch11:	%{name}-acam.patch
+#   +Patch12:	%{name}-threads-acfix.patch
+#   +Patch13:	%{name}-tsrmlsfetchgcc2.patch
+#   +Patch16:	%{name}-sybase-fix.patch
+#   +Patch26:	%{name}-pear.patch
+#   +Patch28:	%{name}-bug-42952.patch
+#   +Patch30:	%{name}-apr-apu.patch
+#   +Patch31:	%{name}-fcgi-error_log-no-newlines.patch
+#   +Patch32:	%{name}-curl-limit-speed.patch
+#   +Patch33:	%{name}-mime_magic.patch
+#   +Patch34:	%{name}-libtool.patch
+#   +Patch36:	%{name}-mysql-charsetphpini.patch
+#   +Patch37:	%{name}-mysqli-charsetphpini.patch
+#   +Patch38:	%{name}-pdo_mysql-charsetphpini.patch
+#   +Patch44:	%{name}-include_path.patch
+#   +Patch45:	%{name}-imap-annotations.patch
+#   +Patch46:	%{name}-imap-myrights.patch
+#   +Patch51:	spl-shared.patch
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
@@ -58,7 +77,7 @@
 %bcond_without	zts		# disable Zend Thread Safety
 %bcond_without	fpm		# fpm patches from http://www.php-fpm.org/
 %bcond_without	suhosin		# with suhosin patch
-%bcond_with	tests		# default off; test process very often hangs on buildersl; perform "make test"
+%bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
 %bcond_with	type_hints	# experimental support for strict typing/casting
 
 %define apxs1		/usr/sbin/apxs1
@@ -113,11 +132,10 @@ Patch3:		%{name}-link-libs.patch
 Patch4:		%{name}-libpq_fs_h_path.patch
 Patch5:		%{name}-filter-shared.patch
 Patch6:		%{name}-build_modules.patch
-Patch7:		%{name}-config-file-scan-dir.patch
-Patch8:		%{name}-sapi-ini-file.patch
+Patch7:		%{name}-sapi-ini-file.patch
+Patch8:		%{name}-config-file-scan-dir.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
-Patch11:	extension-shared-optional-dep.patch
 Patch14:	%{name}-no_pear_install.patch
 Patch15:	%{name}-zlib.patch
 Patch17:	%{name}-readline.patch
@@ -125,22 +143,23 @@ Patch18:	%{name}-nohttpd.patch
 Patch19:	%{name}-gd_imagerotate_enable.patch
 Patch20:	%{name}-uint32_t.patch
 Patch21:	%{name}-dba-link.patch
-Patch23:	%{name}-both-apxs.patch
-Patch24:	%{name}-builddir.patch
-Patch25:	%{name}-zlib-for-getimagesize.patch
-Patch29:	%{name}-config-dir.patch
-Patch30:	%{name}-silent-session-cleanup.patch
-Patch31:	%{name}-fcgi-graceful.patch
-Patch32:	%{name}-m4-divert.patch
-Patch38:	%{name}-tds.patch
-Patch39:	%{name}-stupidapache_version.patch
+Patch22:	%{name}-both-apxs.patch
+Patch23:	%{name}-builddir.patch
+Patch24:	%{name}-zlib-for-getimagesize.patch
+Patch25:	%{name}-stupidapache_version.patch
+Patch27:	%{name}-config-dir.patch
+Patch29:	%{name}-fcgi-graceful.patch
+Patch35:	%{name}-tds.patch
+Patch39:	%{name}-use-prog_sendmail.patch
 Patch40:	%{name}-fpm.patch
 Patch41:	%{name}-fpm-config.patch
 Patch42:	%{name}-fpm-shared.patch
-Patch43:	%{name}-use-prog_sendmail.patch
+Patch43:	%{name}-silent-session-cleanup.patch
 Patch47:	suhosin.patch
+Patch49:	%{name}-m4-divert.patch
+Patch50:	extension-shared-optional-dep.patch
 %if %{with type_hints}
-Patch50:	http://ilia.ws/patch/type_hint_53_v2.txt
+Patch52:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1620,7 +1639,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
 
 %if %{with type_hints}
-%patch50 -p0
+%patch52 -p0
 %endif
 
 %patch0 -p1
@@ -1630,14 +1649,11 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%patch7 -p1
 %patch8 -p1
+%patch7 -p1
 %patch9 -p1
-
 cp php.ini-production php.ini
 %patch10 -p1
-
-%patch11 -p1
 %patch14 -p1
 %patch15 -p1
 %patch17 -p1
@@ -1647,16 +1663,13 @@ cp php.ini-production php.ini
 %endif
 %patch20 -p1
 %patch21 -p1
-
+%patch22 -p1
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
-
+%patch27 -p1
 %patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-%patch38 -p1
+%patch35 -p1
 %patch39 -p1
 %if %{with fpm}
 %patch40 -p1
@@ -1664,10 +1677,11 @@ cp php.ini-production php.ini
 %patch42 -p1
 %endif
 %patch43 -p1
-
 %if %{with suhosin}
 %patch47 -p1
 %endif
+%patch49 -p1
+%patch50 -p1
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

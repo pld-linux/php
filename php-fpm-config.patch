@@ -1,5 +1,5 @@
---- php-5.3.1/sapi/fpm/conf/php-fpm.conf.in~	2009-11-26 23:48:35.000000000 +0200
-+++ php-5.3.1/sapi/fpm/conf/php-fpm.conf.in	2009-11-26 23:49:50.761930204 +0200
+--- php-5.3.1/sapi/fpm/conf/php-fpm.conf.in	2009-11-26 23:49:50.761930204 +0200
++++ php-5.3.1/sapi/fpm/conf/php-fpm.conf.in	2009-11-27 00:01:38.545190815 +0200
 @@ -38,7 +38,7 @@
  
  			Address to accept fastcgi requests on.
@@ -9,6 +9,15 @@
  
  			<value name="listen_options">
  
+@@ -110,7 +110,7 @@
+ 			<value name="request_slowlog_timeout">0s</value>
+ 
+ 			The log file for slow requests
+-			<value name="slowlog">@php_fpm_log_path@.slow</value>
++			<value name="slowlog">/var/log/fpm-slow.log</value>
+ 
+ 			Set open file desc rlimit
+ 			<value name="rlimit_files">1024</value>
 @@ -129,7 +129,7 @@
  			Useful to work around memory leaks in 3rd party libraries.
  			For endless request processing please specify 0

@@ -1,27 +1,14 @@
---- php-5.2.6/sapi/cgi/fpm/conf/php-fpm.conf.in	2008-11-16 17:30:12.321010353 +0200
-+++ php-5.2.9/sapi/cgi/fpm/conf/php-fpm.conf.in	2009-06-12 10:24:54.843655130 +0300
+--- php-5.3.1/sapi/fpm/conf/php-fpm.conf.in~	2009-11-26 23:48:35.000000000 +0200
++++ php-5.3.1/sapi/fpm/conf/php-fpm.conf.in	2009-11-26 23:49:50.761930204 +0200
 @@ -38,7 +38,7 @@
  
  			Address to accept fastcgi requests on.
  			Valid syntax is 'ip.ad.re.ss:port' or just 'port' or '/path/to/unix/socket'
--			<value name="listen_address">127.0.0.1:9000</value>
+-			<value name="listen_address">127.0.0.1:@php_fpm_port@</value>
 +			<value name="listen_address">/var/run/php/fpm.sock</value>
  
  			<value name="listen_options">
  
-@@ -60,10 +60,10 @@
- 			</value>
- 
- 			Unix user of processes
--		<!--	<value name="user">nobody</value>				-->
-+			<value name="user">http</value>
- 
- 			Unix group of processes
--		<!--	<value name="group">@php_fpm_group@</value>		-->
-+			<value name="group">http</value>
- 
- 			Process manager settings
- 			<value name="pm">
 @@ -129,7 +129,7 @@
  			Useful to work around memory leaks in 3rd party libraries.
  			For endless request processing please specify 0

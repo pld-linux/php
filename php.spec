@@ -135,10 +135,9 @@ Patch32:	%{name}-m4-divert.patch
 Patch38:	%{name}-tds.patch
 Patch39:	%{name}-stupidapache_version.patch
 Patch40:	%{name}-fpm.patch
-#Patch41:	%{name}-fpm-config.patch
-#Patch42:	%{name}-fpm-initdir.patch
+Patch41:	%{name}-fpm-config.patch
+Patch42:	%{name}-fpm-shared.patch
 Patch43:	%{name}-use-prog_sendmail.patch
-Patch44:	%{name}-fpm-shared.patch
 Patch47:	suhosin.patch
 %if %{with type_hints}
 Patch50:	http://ilia.ws/patch/type_hint_53_v2.txt
@@ -1661,11 +1660,9 @@ cp php.ini-production php.ini
 %patch39 -p1
 %if %{with fpm}
 %patch40 -p1
-#%patch41 -p1
-#%patch42 -p1
-%patch44 -p1
+%patch41 -p1
+%patch42 -p1
 %endif
-
 %patch43 -p1
 
 %if %{with suhosin}
@@ -1885,7 +1882,7 @@ for sapi in $sapis; do
 	--with-zlib-dir=shared,/usr \
 	--enable-zip=shared,/usr \
 
-	# safe for debug
+	# save for debug
 	cp -f Makefile Makefile.$sapi
 	cp -f main/php_config.h php_config.h.$sapi
 	cp -f config.log config.log.$sapi

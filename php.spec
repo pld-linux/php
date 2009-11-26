@@ -110,7 +110,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	9
+Release:	10
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -2092,6 +2092,8 @@ generate_inifiles() {
 		conf="%{_sysconfdir}/conf.d/$mod.ini"
 		# xml needs to be loaded before wddx
 		[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_$mod.ini"
+		# pre needs to be loaded before SPL
+		[ "$mod" = "pcre" ] && conf="%{_sysconfdir}/conf.d/PCRE.ini"
 		# spl needs to be loaded before mysqli
 		[ "$mod" = "spl" ] && conf="%{_sysconfdir}/conf.d/SPL.ini"
 		echo "+ $conf"
@@ -2742,7 +2744,7 @@ fi
 %if %{with pcre}
 %files pcre
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcre.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/PCRE.ini
 %attr(755,root,root) %{php_extensiondir}/pcre.so
 %endif
 

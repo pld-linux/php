@@ -1,0 +1,3 @@
+- Up to snap 2008.07.26 06:30
+- remove no-metaccld patch (no longer needed)
+- closures now available in PHP

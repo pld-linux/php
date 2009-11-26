@@ -56,6 +56,7 @@
 %bcond_without	apache1		# disable building apache 1.3.x module
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	zts		# disable Zend Thread Safety
+%bcond_without	fpm		# fpm patches from http://www.php-fpm.org/
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on buildersl; perform "make test"
 %bcond_with	type_hints	# experimental support for strict typing/casting
@@ -71,6 +72,11 @@
 %ifnarch %{ix86} %{x8664} sparc sparcv9 alpha
 # ppc disabled (broken on th-ppc)
 %undefine	with_interbase
+%endif
+
+%ifnarch %{ix86} %{x8664}
+# unsupported, see sapi/cgi/fpm/fpm_atomic.h
+%undefine	with_fpm
 %endif
 
 %if %{without apache1} && %{without apache2}
@@ -126,6 +132,9 @@ Patch31:	%{name}-fcgi-graceful.patch
 Patch32:	%{name}-m4-divert.patch
 Patch38:	%{name}-tds.patch
 Patch39:	%{name}-stupidapache_version.patch
+Patch40:	%{name}-fpm.patch
+#Patch41:	%{name}-fpm-config.patch
+#Patch42:	%{name}-fpm-initdir.patch
 Patch43:	%{name}-use-prog_sendmail.patch
 Patch47:	suhosin.patch
 %if %{with type_hints}
@@ -307,8 +316,8 @@ PHP as DSO module for apache 2.x.
 php jako moduł DSO (Dynamic Shared Object) dla apache 2.x.
 
 %package cgi
-Summary:	php as CGI/FastCGI program
-Summary(pl.UTF-8):	php jako program CGI/FastCGI
+Summary:	PHP as CGI/FastCGI program
+Summary(pl.UTF-8):	PHP jako program CGI/FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	%{name}-fcgi = %{epoch}:%{version}-%{release}
@@ -318,22 +327,22 @@ Provides:	webserver(php)
 Obsoletes:	php-fcgi < 4:5.3.0
 
 %description cgi
-php as CGI or FastCGI program.
+PHP as CGI or FastCGI program.
 
 %description cgi -l pl.UTF-8
-php jako program CGI lub FastCGI.
+PHP jako program CGI lub FastCGI.
 
 %package cli
-Summary:	php as CLI interpreter
-Summary(pl.UTF-8):	php jako interpreter działający z linii poleceń
+Summary:	PHP as CLI interpreter
+Summary(pl.UTF-8):	PHP jako interpreter działający z linii poleceń
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description cli
-php as CLI interpreter.
+PHP as CLI interpreter.
 
 %description cli -l pl.UTF-8
-php jako interpreter działający z linii poleceń.
+PHP jako interpreter działający z linii poleceń.
 
 %package program
 Summary:	/usr/bin/php symlink
@@ -1630,6 +1639,11 @@ cp php.ini-production php.ini
 %patch32 -p1
 %patch38 -p1
 %patch39 -p1
+%if %{with fpm}
+%patch40 -p1
+#%patch41 -p1
+#%patch42 -p1
+%endif
 
 %patch43 -p1
 
@@ -1833,7 +1847,11 @@ for sapi in $sapis; do
 	cp -f config.log config.log.$sapi
 done
 
-# must make this first, so modules can link against it.
+# as we build each SAPI in own make, adjust php-config.in forehead
+sapis=$(awk '/^PHP_SAPI = /{print $3}' Makefile.* | sort -u | xargs)
+sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
+
+# must make libphp_common first, so modules can link against it.
 %{__make} libphp_common.la
 %{__make} build-modules
 

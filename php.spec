@@ -74,7 +74,7 @@
 %undefine	with_interbase
 %endif
 
-%ifnarch %{ix86} %{x8664}
+%ifnarch %{ix86} %{x8664} sparc sparcv9
 # unsupported, see sapi/cgi/fpm/fpm_atomic.h
 %undefine	with_fpm
 %endif
@@ -104,6 +104,8 @@ Source4:	%{name}-apache.ini
 Source5:	%{name}-cli.ini
 # Taken from: http://browsers.garykeith.com/downloads.asp
 Source9:	%{name}_browscap.ini
+Source10:	%{name}-fpm.init
+Source11:	%{name}-fpm.logrotate
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -136,6 +138,7 @@ Patch40:	%{name}-fpm.patch
 #Patch41:	%{name}-fpm-config.patch
 #Patch42:	%{name}-fpm-initdir.patch
 Patch43:	%{name}-use-prog_sendmail.patch
+Patch44:	%{name}-fpm-shared.patch
 Patch47:	suhosin.patch
 %if %{with type_hints}
 Patch50:	http://ilia.ws/patch/type_hint_53_v2.txt
@@ -208,6 +211,10 @@ BuildRequires:	apache1-devel
 BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
+%endif
+%if %{with fpm}
+BuildRequires:	judy-devel
+BuildRequires:	libevent-devel >= 1.4.7-3
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -356,6 +363,19 @@ Package providing /usr/bin/php symlink to PHP CLI.
 
 %description program -l pl.UTF-8
 Pakiet dostarczający dowiązanie symboliczne /usr/bin/php do PHP CLI.
+
+%package fpm
+Summary:	PHP FastCGI Process Manager
+Group:		Development/Languages/PHP
+URL:		http://www.php-fpm.org/
+Requires(post,preun):	/sbin/chkconfig
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	libevent >= 1.4.7-3
+Requires:	rc-scripts
+Provides:	webserver(php) = %{version}
+
+%description fpm
+PHP FastCGI Process Manager.
 
 %package common
 Summary:	Common files needed by both Apache modules and CGI/CLI SAPI-s
@@ -1643,6 +1663,7 @@ cp php.ini-production php.ini
 %patch40 -p1
 #%patch41 -p1
 #%patch42 -p1
+%patch44 -p1
 %endif
 
 %patch43 -p1
@@ -1650,6 +1671,9 @@ cp php.ini-production php.ini
 %if %{with suhosin}
 %patch47 -p1
 %endif
+
+# cleanup backups after patching
+find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1660,7 +1684,6 @@ rm -rf ext/sqlite3/libsqlite
 #rm -rf ext/bcmath/libbcmath
 #rm -rf ext/date/lib
 #rm -rf ext/dba/libcdb
-cp -af Zend/LICENSE{,.Zend}
 #rm -rf ext/dba/libflatfile
 #rm -rf ext/dba/libinifile
 #rm -rf ext/gd/libgd
@@ -1670,6 +1693,8 @@ rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
 rm -rf ext/xmlrpc/libxmlrpc
+
+cp -af Zend/LICENSE{,.Zend}
 
 # breaks build
 sed -i -e 's#-fvisibility=hidden##g' configure*
@@ -1694,8 +1719,10 @@ if [ $API != %{zend_extension_api} ]; then
 fi
 
 export EXTENSION_DIR="%{php_extensiondir}"
-if [ ! -f _built-conf ]; then # configure once (for faster debugging purposes)
-	rm -f Makefile.{cgi-fcgi,cli,apxs{1,2}} # now remove Makefile copies
+# configure once (for faster debugging purposes)
+if [ ! -f _built-conf ]; then
+	# now remove Makefile copies
+	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs{1,2}}
 	%{__libtoolize}
 	%{__aclocal}
 	cp -f /usr/share/automake/config.* .
@@ -1707,6 +1734,9 @@ export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP"
 
 sapis="
 cgi-fcgi cli
+%if %{with fpm}
+fpm
+%endif
 %if %{with apache1}
 apxs1
 %endif
@@ -1716,23 +1746,27 @@ apxs2
 "
 for sapi in $sapis; do
 	: SAPI $sapi
-	[ -f Makefile.$sapi ] && continue # skip if already configured (for faster debugging purposes)
+	# skip if already configured (for faster debugging purposes)
+	[ -f Makefile.$sapi ] && continue
 
 	sapi_args=''
 	case $sapi in
 	cgi-fcgi)
-		sapi_args=''
+		sapi_args='--disable-cli'
 	;;
 	cli)
 		sapi_args='--disable-cgi'
 	;;
+	fpm)
+		sapi_args='--disable-cli --with-fpm'
+		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
-		sapi_args="--with-apxs=%{apxs1} --with-apache-version=$ver"
+		sapi_args="--disable-cli --with-apxs=%{apxs1} --with-apache-version=$ver"
 	;;
 	apxs2)
 		ver=$(rpm -q --qf '%{V}' apache-devel)
-		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
+		sapi_args="--disable-cli --with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	esac
 
@@ -1767,6 +1801,15 @@ for sapi in $sapis; do
 	--enable-json=shared \
 	--enable-hash=shared \
 	--enable-xmlwriter=shared \
+%if %{with fpm}
+	--with-libevent=shared \
+	--with-fpm-conf=%{_sysconfdir}/fpm.conf \
+	--with-fpm-log=/var/log/fpm.log \
+	--with-fpm-pid=/var/run/php/fpm.pid \
+	--with-fpm-port=9000 \
+	--with-fpm-user=http \
+	--with-fpm-group=http \
+%endif
 %if %{with mssql} || %{with sybase_ct}
 	--with-pdo-dblib=shared \
 %endif
@@ -1842,6 +1885,7 @@ for sapi in $sapis; do
 	--with-zlib-dir=shared,/usr \
 	--enable-zip=shared,/usr \
 
+	# safe for debug
 	cp -f Makefile Makefile.$sapi
 	cp -f main/php_config.h php_config.h.$sapi
 	cp -f config.log config.log.$sapi
@@ -1863,16 +1907,21 @@ sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
 %endif
 
-# CGI
+# CGI/FCGI
 cp -af php_config.h.cgi-fcgi main/php_config.h
-rm -rf sapi/cgi/.libs sapi/cgi/*.lo
-%{__make} sapi/cgi/php-cgi -f Makefile.cgi-fcgi
+%{__make} -f Makefile.cgi-fcgi
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
-%{__make} sapi/cli/php -f Makefile.cli
+%{__make} -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
+
+%if %{with fpm}
+cp -af php_config.h.fpm main/php_config.h
+%{__make} -f Makefile.fpm
+ ./sapi/fpm/php-fpm -qn -m > /dev/null
+%endif
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
@@ -1909,33 +1958,43 @@ sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_c
 # better solution?
 sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
-# install CGI
+# install CGI/FCGI
 libtool --silent --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
 ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+
+# install FCGI PM
+%if %{with fpm}
+libtool --silent --mode=install install sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_bindir}/php.fpm
+cp -a sapi/fpm/php-fpm.1 $RPM_BUILD_ROOT%{_mandir}/man1/php-fpm.1
+cp -a sapi/fpm/php_fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}/fpm.conf
+install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
+install -d $RPM_BUILD_ROOT/etc/logrotate.d
+cp -a %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
+%endif
 
 # install CLI
 libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
 install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
-
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}
-install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
-install %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
+cp -a %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+cp -a %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
+cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
-install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
+cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
@@ -1985,7 +2044,7 @@ cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstri
 
 # tests
 install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
-install run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
+install -p run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
 cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
 %clean
@@ -2009,6 +2068,16 @@ fi
 %postun -n apache-mod_php
 if [ "$1" = "0" ]; then
 	%service -q httpd restart
+fi
+
+%post fpm
+/sbin/chkconfig --add php-fpm
+%service php-fpm restart
+
+%preun fpm
+if [ "$1" = 0 ]; then
+	%service php-fpm stop
+	/sbin/chkconfig --del php-fpm
 fi
 
 %post	common -p /sbin/ldconfig
@@ -2306,6 +2375,18 @@ fi
 %files program
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php
+
+%if %{with fpm}
+%files fpm
+%defattr(644,root,root,755)
+%doc %lang(ru) sapi/fpm/readme-ru.markdown
+%doc sapi/fpm/nginx-site-conf.sample
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fpm.conf
+%attr(755,root,root) %{_bindir}/php.fpm
+%{_mandir}/man1/php-fpm.1*
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/php-fpm
+%attr(754,root,root) /etc/rc.d/init.d/php-fpm
+%endif
 
 %files common
 %defattr(644,root,root,755)

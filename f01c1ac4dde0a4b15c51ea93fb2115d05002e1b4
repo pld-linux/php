@@ -1,0 +1,10 @@
+- updated to work with current snaps
+- up to snap: 200805231030
+- added phar extension (now enabled by default)
+- build in hash extension (can't get it to link properly when shared)
+- commented out php_sapi_name() tests: it SEGVs in build root but works
+  after install (dunno); see http://bugs.php.net/bug.php?id=45079
+- fixed building --without sqlite
+- removed obsolete patch for bug #42952
+- removed posibility to build w/o pcre (pcre must be available)
+- works for me on x86_64 --without apache1 fcgi ming

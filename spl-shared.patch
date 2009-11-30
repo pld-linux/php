@@ -80,7 +80,7 @@
  		if test "x$(PHP_MODULES)" != "x"; then \
  		$(top_srcdir)/build/shtool echo -n -- " -d extension_dir=$(top_builddir)/modules"; \
 -		for i in bz2 zlib phar; do \
-+		for i in spl bz2 zlib phar; do \
++		for i in pcre spl bz2 zlib phar; do \
  			if test -f "$(top_builddir)/modules/$$i.la"; then \
  				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
  			fi; \

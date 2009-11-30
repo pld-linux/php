@@ -1,7 +1,6 @@
 # TODO
 # - lost patches:
 #   +Patch11:	%{name}-acam.patch
-#   +Patch12:	%{name}-threads-acfix.patch
 #   +Patch13:	%{name}-tsrmlsfetchgcc2.patch
 #   +Patch16:	%{name}-sybase-fix.patch
 #   +Patch26:	%{name}-pear.patch
@@ -17,7 +16,6 @@
 #   +Patch44:	%{name}-include_path.patch
 #   +Patch45:	%{name}-imap-annotations.patch
 #   +Patch46:	%{name}-imap-myrights.patch
-#   +Patch51:	spl-shared.patch
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
@@ -28,9 +26,9 @@
 #   - removed from php 5.3:
 #   dbase, mime_magic, ming, ncurses, sybase
 # - make additional headers and checking added by mail patch configurable
-# - modularize session, standard (output from pure php -m)?
+# - modularize standard (output from pure php -m)?
 # - lib64 patch obsolete by $PHP_LIBDIR ?
-# - move mysqlnd out of libphp-common.so?
+# - move mysqlnd out of libphp-common.so, or link again with mysql-devel?
 # - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
 #   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.
 #   make it runtime dep and add Suggests (or php warning messages)
@@ -42,9 +40,7 @@
 #+ereg
 # libxml
 #+mysqlnd
-# pcre
 # Reflection
-# session
 #
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
@@ -61,6 +57,7 @@
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
+%bcond_without	pcre		# without PCRE extension module
 %bcond_without	pgsql		# without PostgreSQL extension module
 %bcond_without	phar		# without phar extension module
 %bcond_without	pspell		# without pspell extension module
@@ -102,7 +99,12 @@
 ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
-%define		rel		1
+# filter depends on pcre
+%if %{without pcre}
+%undefine	with_filter
+%endif
+
+%define		rel		1.10
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -136,6 +138,9 @@ Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-config-file-scan-dir.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
+%if %{with type_hints}
+Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
+%endif
 Patch14:	%{name}-no_pear_install.patch
 Patch15:	%{name}-zlib.patch
 Patch17:	%{name}-readline.patch
@@ -158,9 +163,8 @@ Patch43:	%{name}-silent-session-cleanup.patch
 Patch47:	suhosin.patch
 Patch49:	%{name}-m4-divert.patch
 Patch50:	extension-shared-optional-dep.patch
-%if %{with type_hints}
-Patch52:	http://ilia.ws/patch/type_hint_53_v2.txt
-%endif
+Patch51:	spl-shared.patch
+Patch52:	pcre-shared.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -207,7 +211,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 BuildRequires:	pam-devel
-BuildRequires:	pcre-devel >= 6.6
+%{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -409,18 +413,13 @@ Provides:	php(hash)
 Provides:	php(libxml)
 Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
-Provides:	php(pcre)
 Provides:	php(reflection)
-Provides:	php(session)
-Provides:	php(spl)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
-Obsoletes:	php-pcre < 4:5.2.0
 Obsoletes:	php-pecl-domxml
-Obsoletes:	php-session < 3:4.2.1-2
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 
@@ -448,8 +447,12 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf
 Requires:	automake
+%if "%{pld_release}" != "ac"
+Requires:	libtool >= 2:2.2
+%else
 Requires:	libtool
-Requires:	pcre-devel >= 6.6
+%endif
+%{?with_pcre:Requires:	pcre-devel >= 6.6}
 Requires:	shtool
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel
@@ -931,6 +934,7 @@ Summary(pl.UTF-8):	Moduł MySQLi dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.mysqli.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(mysqli)
 
 %description mysqli
@@ -1012,12 +1016,28 @@ waitpid(), signal() etc.
 Moduł PHP umożliwiający tworzenie nowych procesów i kontrolę nad nimi.
 Obsługuje funkcje takie jak fork(), waitpid(), signal() i podobne.
 
+%package pcre
+Summary:	PCRE extension module for PHP
+Summary(pl.UTF-8):	Moduł PCRE dla PHP
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(pcre)
+
+%description pcre
+This is a dynamic shared object (DSO) for PHP that will add Perl
+Compatible Regular Expression support.
+
+%description pcre -l pl.UTF-8
+Moduł PHP umożliwiający korzystanie z perlowych wyrażeń regularnych
+(Perl Compatible Regular Expressions)
+
 %package pdo
 Summary:	PHP Data Objects (PDO)
 Summary(pl.UTF-8):	Obsługa PHP Data Objects (PDO)
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.pdo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(pdo)
 Obsoletes:	php-pecl-PDO
 
@@ -1178,6 +1198,7 @@ Summary(pl.UTF-8):	Moduł phar dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(phar)
 
 %description phar
@@ -1250,6 +1271,21 @@ support.
 %description recode -l pl.UTF-8
 Moduł PHP dodający możliwość konwersji kodowania plików (poprzez
 bibliotekę recode).
+
+%package session
+Summary:	session extension module for PHP
+Summary(pl.UTF-8):	Moduł session dla PHP
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-hash = %{epoch}:%{version}-%{release}
+Provides:	php(session)
+
+%description session
+This is a dynamic shared object (DSO) for PHP that will add session
+support.
+
+%description session -l pl.UTF-8
+Moduł PHP dodający obsługę sesji.
 
 %package shmop
 Summary:	Shared Memory Operations extension module for PHP
@@ -1327,14 +1363,31 @@ support.
 %description sockets -l pl.UTF-8
 Moduł PHP dodający obsługę gniazdek.
 
+%package spl
+Summary:	Standard PHP Library module for PHP
+Summary(pl.UTF-8):	Moduł SPL dla PHP
+Group:		Libraries
+URL:		http://php.net/manual/en/book.spl.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
+Provides:	php(spl)
+
+%description spl
+This is a dynamic shared object (DSO) for PHP that will add Standard
+PHP Library support.
+
+%description spl -l pl.UTF-8
+Moduł PHP dodający obsługę gniazdek.
+
 %package sqlite
 Summary:	SQLite extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-# sqlite ext extends spl and pdo
-Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite)
 
 %description sqlite
@@ -1498,7 +1551,7 @@ Summary(pl.UTF-8):	Moduł wddx dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.wddx.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(wddx)
 
@@ -1533,7 +1586,7 @@ Summary(pl.UTF-8):	Moduł XML Reader dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.xmlreader.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-dom = %{epoch}:%{version}-%{release}
 Provides:	php(xmlreader)
 
 %description xmlreader
@@ -1634,14 +1687,8 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q
-
-# for suhosin patch
+# prep for suhosin patch
 %{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
-
-%if %{with type_hints}
-%patch52 -p0
-%endif
-
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1654,6 +1701,9 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch9 -p1
 cp php.ini-production php.ini
 %patch10 -p1
+%if %{with type_hints}
+%patch12 -p0
+%endif
 %patch14 -p1
 %patch15 -p1
 %patch17 -p1
@@ -1682,6 +1732,8 @@ cp php.ini-production php.ini
 %endif
 %patch49 -p1
 %patch50 -p1
+%patch51 -p1
+%patch52 -p1
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
@@ -1836,10 +1888,11 @@ for sapi in $sapis; do
 	--without-libexpat-dir \
 	--enable-mysqlnd-threading \
 	--enable-posix=shared \
-	--enable-session \
 	--enable-shared \
+	--enable-session=shared \
 	--enable-shmop=shared \
 	--enable-simplexml=shared \
+	--enable-spl=shared \
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
@@ -1873,7 +1926,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
-	--with-pcre-regex=/usr \
+	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=/usr} \
 	%{!?with_filter:--disable-filter}%{?with_filter:--enable-filter=shared} \
 	--with-pear=%{php_pear_dir} \
 	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
@@ -2017,6 +2070,10 @@ generate_inifiles() {
 		conf="%{_sysconfdir}/conf.d/$mod.ini"
 		# xml needs to be loaded before wddx
 		[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_$mod.ini"
+		# pre needs to be loaded before SPL
+		[ "$mod" = "pcre" ] && conf="%{_sysconfdir}/conf.d/PCRE.ini"
+		# spl needs to be loaded before mysqli
+		[ "$mod" = "spl" ] && conf="%{_sysconfdir}/conf.d/SPL.ini"
 		echo "+ $conf"
 		cat > $RPM_BUILD_ROOT$conf <<-EOF
 			; Enable $mod extension module
@@ -2170,6 +2227,7 @@ fi
 %extension_scripts oci8
 %extension_scripts odbc
 %extension_scripts openssl
+%extension_scripts pcre
 %extension_scripts pdo-dblib
 %extension_scripts pdo-firebird
 %extension_scripts pdo-mysql
@@ -2181,10 +2239,12 @@ fi
 %extension_scripts posix
 %extension_scripts pspell
 %extension_scripts recode
+%extension_scripts session
 %extension_scripts shmop
 %extension_scripts snmp
 %extension_scripts soap
 %extension_scripts sockets
+%extension_scripts spl
 %extension_scripts sqlite
 %extension_scripts sqlite3
 %extension_scripts sybase-ct
@@ -2285,6 +2345,9 @@ if [ -f %{_sysconfdir}/php-cli.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
+%triggerun pcre -- %{name}-pcre < 4:5.0.4-9.1
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcre\.so/d' %{_sysconfdir}/php.ini
+
 %triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{_sysconfdir}/php.ini
 
@@ -2304,6 +2367,9 @@ fi
 
 %triggerun recode -- %{name}-recode < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{_sysconfdir}/php.ini
+
+%triggerun session -- %{name}-session < 4:5.0.4-9.1
+%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*session\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{_sysconfdir}/php.ini
@@ -2610,6 +2676,13 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
 
+%if %{with pcre}
+%files pcre
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/PCRE.ini
+%attr(755,root,root) %{php_extensiondir}/pcre.so
+%endif
+
 %files pdo
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
@@ -2705,6 +2778,12 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
 
+%files session
+%defattr(644,root,root,755)
+%doc ext/session/mod_files.sh
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/session.ini
+%attr(755,root,root) %{php_extensiondir}/session.so
+
 %files shmop
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/shmop.ini
@@ -2726,6 +2805,13 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sockets.ini
 %attr(755,root,root) %{php_extensiondir}/sockets.so
+
+%files spl
+%defattr(644,root,root,755)
+%doc ext/spl/{CREDITS,README,TODO}
+%doc ext/spl/examples
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
+%attr(755,root,root) %{php_extensiondir}/spl.so
 
 %if %{with sqlite}
 %files sqlite

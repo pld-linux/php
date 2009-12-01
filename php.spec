@@ -90,7 +90,7 @@
 %undefine	with_interbase
 %endif
 
-%ifnarch %{ix86} %{x8664} sparc sparcv9
+%ifnarch %{ix86} %{x8664}
 # unsupported, see sapi/cgi/fpm/fpm_atomic.h
 %undefine	with_fpm
 %endif
@@ -104,7 +104,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		1.10
+%define		rel		1.11
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP

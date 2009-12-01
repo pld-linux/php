@@ -58,7 +58,7 @@
 %bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable Zend Thread Safety
-%bcond_without	fpm		# fpm patches from http://php-fpm.anight.org/
+%bcond_without	fpm		# fpm patches from http://www.php-fpm.org/
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
@@ -110,7 +110,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	10
+Release:	11
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -418,11 +418,15 @@ Pakiet dostarczający dowiązanie symboliczne /usr/bin/php do PHP CLI.
 %package fpm
 Summary:	PHP FastCGI Process Manager
 Group:		Development/Languages/PHP
-URL:		http://php-fpm.anight.org/
+URL:		http://www.php-fpm.org/
 Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libevent >= 1.4.7-3
 Requires:	rc-scripts
+Provides:	user(http)
 Provides:	webserver(php) = %{version}
 
 %description fpm
@@ -2155,6 +2159,9 @@ if [ "$1" = "0" ]; then
 	%service -q httpd restart
 fi
 
+%pre fpm
+%useradd -u 51 -r -s /bin/false -c "HTTP User" -g http http
+
 %post fpm
 /sbin/chkconfig --add php-fpm
 %service php-fpm restart
@@ -2163,6 +2170,11 @@ fi
 if [ "$1" = 0 ]; then
 	%service php-fpm stop
 	/sbin/chkconfig --del php-fpm
+fi
+
+%postun fpm
+if [ "$1" = "0" ]; then
+	%userremove http
 fi
 
 %post	common -p /sbin/ldconfig

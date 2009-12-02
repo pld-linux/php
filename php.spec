@@ -1,4 +1,5 @@
 # TODO
+# - wddx: restore session support (not compiled in due DL extension check)
 # - fix -threads-acfix.patch
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
@@ -110,7 +111,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	11
+Release:	12
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -129,6 +130,7 @@ Source8:	%{name}_browscap.ini
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
 Source12:	%{name}-branch.sh
+Source13:	dep-tests.sh
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -675,6 +677,7 @@ Summary:	Extension for safely dealing with input parameters
 Summary(pl.UTF-8):	Rozszerzenie do bezpiecznej obsługi danych wejściowych
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(filter)
 Obsoletes:	php-pecl-filter
 
@@ -1394,8 +1397,8 @@ Summary:	SQLite extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Suggests:	%{name}-pdo = %{epoch}:%{version}-%{release}
-Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite)
 
 %description sqlite
@@ -1531,7 +1534,10 @@ Summary:	wddx extension module for PHP
 Summary(pl.UTF-8):	Moduł wddx dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+# - wddx doesn't require session as it's disabled at compile time:
+#   if HAVE_PHP_SESSION && !defined(COMPILE_DL_SESSION)
+#   see also php.spec#rev1.120.2.22
+#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(wddx)
 
@@ -1771,6 +1777,7 @@ mv ext/standard/tests/general_functions/bug39322.phpt{,.broken}
 %endif
 
 cp -af Zend/LICENSE{,.Zend}
+install -p %{SOURCE13} dep-tests.sh
 
 %build
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
@@ -1967,6 +1974,10 @@ for sapi in $sapis; do
 	cp -f config.log config.log.$sapi
 done
 
+# as we build each SAPI in own make, adjust php-config.in forehead
+sapis=$(awk '/^PHP_SAPI = /{print $3}' Makefile.* | sort -u | xargs)
+sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
+
 # must make this first, so modules can link against it.
 %{__make} libphp_common.la
 %{__make} build-modules
@@ -1979,17 +1990,23 @@ done
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
 %endif
 
-test_args="-dextension_dir=modules -dextension=simplexml.so"
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn $test_args)" = cgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi ] || exit 1
 
 # CLI
 cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n $test_args)" = cli ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
+
+# Check that the module inner-dependencies are intact
+PHP=./sapi/cli/php EXTENSION_DIR=modules ./dep-tests.sh > dep-tests.log
+if grep -v OK dep-tests.log; then
+	echo >&2 "The results above were not expected"
+	exit 1
+fi
 
 # FCGI
 %if %{with fcgi}
@@ -1997,7 +2014,7 @@ cp -af php_config.h.fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn $test_args)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
 
 %if %{with fpm}
@@ -2005,7 +2022,7 @@ cp -af php_config.h.fpm main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fpm
 cp -r sapi/cgi sapi/fpm
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn $test_args)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
 
 %if %{with tests}

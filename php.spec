@@ -16,6 +16,7 @@
 #   +Patch44:	%{name}-include_path.patch
 #   +Patch45:	%{name}-imap-annotations.patch
 #   +Patch46:	%{name}-imap-myrights.patch
+# - php CLI has safe mode enabled off the box
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom

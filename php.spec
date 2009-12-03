@@ -111,7 +111,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	12
+Release:	13
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -443,6 +443,7 @@ Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
+Requires:	rpm-whiteout >= 1.28
 Provides:	php(date)
 Provides:	php(libxml)
 %{?with_zend_multibyte:Provides:	php(mbstring)}
@@ -2042,7 +2043,7 @@ generate_inifiles() {
 generate_inifiles
 
 # Check that the module inner-dependencies are intact
-PHP=./sapi/cli/php EXTENSION_DIR=modules CONFDIR=conf.d ./dep-tests.sh > dep-tests.log
+PHP=./sapi/cli/php EXTENSION_DIR=modules CONFIG_DIR=conf.d ./dep-tests.sh > dep-tests.log
 if grep -v OK dep-tests.log; then
 	echo >&2 "The results above were not expected"
 	exit 1

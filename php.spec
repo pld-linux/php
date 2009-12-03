@@ -2001,13 +2001,6 @@ cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
 
-# Check that the module inner-dependencies are intact
-PHP=./sapi/cli/php EXTENSION_DIR=modules ./dep-tests.sh > dep-tests.log
-if grep -v OK dep-tests.log; then
-	echo >&2 "The results above were not expected"
-	exit 1
-fi
-
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
@@ -2024,6 +2017,36 @@ rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 cp -r sapi/cgi sapi/fpm
 [ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
+
+# Generate stub .ini files for each extension
+rm -rf conf.d
+install -d conf.d
+generate_inifiles() {
+	for so in modules/*.so; do
+		mod=$(basename $so .so)
+		conf="$mod.ini"
+		# xml needs to be loaded before wddx
+		[ "$mod" = "wddx" ] && conf="xml_$mod.ini"
+		# pre needs to be loaded before SPL
+		[ "$mod" = "pcre" ] && conf="PCRE.ini"
+		# spl needs to be loaded before mysqli
+		[ "$mod" = "spl" ] && conf="SPL.ini"
+		echo "+ $conf"
+		cat > conf.d/$conf <<-EOF
+			; Enable $mod extension module
+			extension=$mod.so
+		EOF
+	done
+}
+generate_inifiles
+
+# Check that the module inner-dependencies are intact
+PHP=./sapi/cli/php EXTENSION_DIR=modules CONFDIR=conf.d ./dep-tests.sh > dep-tests.log
+if grep -v OK dep-tests.log; then
+	echo >&2 "The results above were not expected"
+	exit 1
+fi
+
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
@@ -2105,26 +2128,8 @@ install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
-# Generate stub .ini files for each subpackage
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
-generate_inifiles() {
-	for so in modules/*.so; do
-		mod=$(basename $so .so)
-		conf="%{_sysconfdir}/conf.d/$mod.ini"
-		# xml needs to be loaded before wddx
-		[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_$mod.ini"
-		# pre needs to be loaded before SPL
-		[ "$mod" = "pcre" ] && conf="%{_sysconfdir}/conf.d/PCRE.ini"
-		# spl needs to be loaded before mysqli
-		[ "$mod" = "spl" ] && conf="%{_sysconfdir}/conf.d/SPL.ini"
-		echo "+ $conf"
-		cat > $RPM_BUILD_ROOT$conf <<-EOF
-			; Enable $mod extension module
-			extension=$mod.so
-		EOF
-	done
-}
-generate_inifiles
+cp -a conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 
 # per SAPI ini directories
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d

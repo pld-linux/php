@@ -445,6 +445,7 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Requires:	rpm-whiteout >= 1.28
 Provides:	php(date)
+Provides:	php(ereg)
 Provides:	php(libxml)
 %{?with_zend_multibyte:Provides:	php(mbstring)}
 Provides:	php(modules_api) = %{php_api_version}

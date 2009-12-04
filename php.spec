@@ -457,6 +457,13 @@ Provides:	php(zend_module_api) = %{zend_module_api}
 %{?with_zend_multibyte:Provides:	php-mbstring = %{epoch}:%{version}-%{release}}
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
+# ensure backward compatibility for Titanium
+# to be dropped in future but ask Titanium RM before doing so
+%if "%{pld_release}" == "ti"
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+%endif
 Obsoletes:	php-pecl-domxml
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2

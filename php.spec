@@ -111,7 +111,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.11
-Release:	13
+Release:	14
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -460,6 +460,11 @@ Provides:	php5(thread-safety) = %{zend_zts}
 # ensure backward compatibility for Titanium
 # to be dropped in future but ask Titanium RM before doing so
 %if "%{pld_release}" == "ti"
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+%endif
+%if "%{pld_release}" == "ac"
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}

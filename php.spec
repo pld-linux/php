@@ -105,7 +105,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		1.11
+%define		rel		1.12
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -139,6 +139,8 @@ Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-config-file-scan-dir.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
+# untill 5.3.2 when this gets released
+Patch11:	%{name}-bug-50458.patch
 %if %{with type_hints}
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
@@ -1735,6 +1737,8 @@ cp php.ini-production php.ini
 %patch50 -p1
 %patch51 -p1
 %patch52 -p1
+
+%patch11 -p4
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

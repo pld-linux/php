@@ -26,6 +26,6 @@
  
 -CC=$old_CC
 -
- dnl Finish the Darwin hack
- if test "$php_did_darwin9_cheat" -eq 1; then
-   if test "$PHP_DEBUG" = "yes"; then
+ PHP_CONFIGURE_PART(Generating files)
+ 
+ CXXFLAGS_CLEAN=$CXXFLAGS

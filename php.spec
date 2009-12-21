@@ -111,7 +111,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.12
-Release:	1
+Release:	2
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -455,7 +455,12 @@ Provides:	php(reflection)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
+Provides:	php-date
+Provides:	php-ereg
 %{?with_zend_multibyte:Provides:	php-mbstring = %{epoch}:%{version}-%{release}}
+Provides:	php-overload
+Provides:	php-reflection
+Provides:	php-standard
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 # ensure backward compatibility for Titanium

@@ -179,9 +179,10 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
+BuildRequires:	fcgi-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
 BuildRequires:	flex
-Requires:	fcgi-devel
+BuildRequires:	pkgconfig
 %if %{with mssql} || %{with sybase_ct}
 BuildRequires:	freetds-devel >= 0.82
 %endif

@@ -2049,7 +2049,7 @@ libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUIL
 
 # install litespeed sapi
 %if %{with litespeed}
-libtool --silent --mode=install install sapi/litespeed/php $RPM_BUILD_ROOT%{_bindir}/php.litespeed
+libtool --silent --mode=install install sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/php.litespeed
 %endif
 
 libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
@@ -2473,7 +2473,7 @@ fi
 %if %{with litespeed}
 %files litespeed
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/php.litespeed
+%attr(755,root,root) %{_sbindir}/php.litespeed
 %endif
 
 %files cgi

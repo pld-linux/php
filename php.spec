@@ -360,8 +360,8 @@ Provides:	webserver(php) = %{version}
 %description litespeed
 PHP for litespeed http server.
 
-%description -n apache-mod_php -l pl.UTF-8
-php jako moduł DSO (Dynamic Shared Object) dla apache 2.x.
+%description litespeed -l pl.UTF-8
+PHP dla serwera http litespeed.
 
 %package cgi
 Summary:	PHP as CGI/FastCGI program

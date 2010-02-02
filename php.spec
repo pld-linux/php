@@ -48,6 +48,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
+%bcond_with	litespeed	# build litespeed module
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
@@ -344,6 +345,20 @@ Obsoletes:	phpfi
 
 %description -n apache-mod_php
 PHP as DSO module for apache 2.x.
+
+%description -n apache-mod_php -l pl.UTF-8
+php jako moduł DSO (Dynamic Shared Object) dla apache 2.x.
+
+%package litespeed
+Summary:	PHP for litespeed http server
+Summary(pl.UTF-8):	PHP dla serwera http litespeed
+Group:		Development/Languages/PHP
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	litespeed
+Provides:	webserver(php) = %{version}
+
+%description litespeed
+PHP for litespeed http server.
 
 %description -n apache-mod_php -l pl.UTF-8
 php jako moduł DSO (Dynamic Shared Object) dla apache 2.x.
@@ -1812,6 +1827,9 @@ apxs1
 %if %{with apache2}
 apxs2
 %endif
+%if %{with litespeed}
+litespeed
+%endif
 "
 for sapi in $sapis; do
 	: SAPI $sapi
@@ -1836,6 +1854,9 @@ for sapi in $sapis; do
 	apxs2)
 		ver=$(rpm -q --qf '%{V}' apache-devel)
 		sapi_args="--disable-cli --with-apxs2=%{apxs2} --with-apache-version=$ver"
+	;;
+	litespeed)
+		sapi_args='--with-litespeed'
 	;;
 	esac
 
@@ -1977,6 +1998,10 @@ sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
 %endif
 
+%if %{with litespeed}
+%{__make} -f Makefile.litespeed
+%endif
+
 # CGI/FCGI
 cp -af php_config.h.cgi-fcgi main/php_config.h
 %{__make} -f Makefile.cgi-fcgi
@@ -2020,6 +2045,11 @@ libtool --silent --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{
 # install apache2 DSO module
 %if %{with apache2}
 libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
+%endif
+
+# install litespeed sapi
+%if %{with litespeed}
+libtool --silent --mode=install install sapi/litespeed/php $RPM_BUILD_ROOT%{_bindir}/php.litespeed
 %endif
 
 libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
@@ -2438,6 +2468,12 @@ fi
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
+%endif
+
+%if %{with litespeed}
+%files litespeed
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/php.litespeed
 %endif
 
 %files cgi

@@ -180,9 +180,9 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
-BuildRequires:	fcgi-devel
+#BuildRequires:	fcgi-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
-BuildRequires:	flex
+#BuildRequires:	flex
 BuildRequires:	pkgconfig
 %if %{with mssql} || %{with sybase_ct}
 BuildRequires:	freetds-devel >= 0.82
@@ -200,13 +200,13 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
-BuildRequires:	libtiff-devel
+#BuildRequires:	libtiff-devel
 %if "%{pld_release}" != "ac"
 BuildRequires:	libtool >= 2:2.2
 %else
 BuildRequires:	libtool >= 1.4.3
 %endif
-BuildRequires:	libwrap-devel
+#BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
@@ -223,7 +223,7 @@ BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
-BuildRequires:	rpmbuild(macros) >= 1.519
+BuildRequires:	rpmbuild(macros) >= 1.527
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 %{?with_sqlite3:BuildRequires:	sqlite3-devel >= 3.3.9}
 BuildRequires:	t1lib-devel
@@ -240,7 +240,7 @@ BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
 %endif
 %if %{with fpm}
-BuildRequires:	judy-devel
+#BuildRequires:	judy-devel
 BuildRequires:	libevent-devel >= 1.4.7-3
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -1756,6 +1756,8 @@ cp php.ini-production php.ini
 
 %patch11 -p4
 
+sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
+
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 
@@ -1776,7 +1778,7 @@ rm -rf ext/sqlite3/libsqlite
 rm -rf ext/pcre/pcrelib
 rm -rf ext/pdo_sqlite/sqlite
 #rm -rf ext/soap/interop
-rm -rf ext/xmlrpc/libxmlrpc
+rm -r ext/xmlrpc/libxmlrpc
 
 cp -af Zend/LICENSE{,.Zend}
 
@@ -1814,7 +1816,8 @@ if [ ! -f _built-conf ]; then
 	touch _built-conf
 fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
-export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP"
+export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
+	-I%{_includedir}/xmlrpc-epi"
 
 sapis="
 cgi-fcgi cli
@@ -1932,7 +1935,7 @@ for sapi in $sapis; do
 	--enable-xml=shared \
 	--enable-xmlreader=shared \
 	--with-bz2=shared \
-	%{!?with_curl:--without-curl}%{?with_curl:--with-curl=shared} \
+	%{__with_without curl curl shared} \
 	--with-db4 \
 	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \
@@ -1953,11 +1956,11 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
-	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=/usr} \
-	%{!?with_filter:--disable-filter}%{?with_filter:--enable-filter=shared} \
+	%{__with_without pcre pcre-regex /usr} \
+	%{__enable_disable filter filter shared} \
 	--with-pear=%{php_pear_dir} \
-	%{!?with_pgsql:--without-pgsql}%{?with_pgsql:--with-pgsql=shared,/usr} \
-	%{!?with_phar:--disable-phar}%{?with_phar:--enable-phar=shared} \
+	%{__with_without pgsql pgsql shared,/usr} \
+	%{__enable_disable phar phar shared} \
 	--with-png-dir=/usr \
 	%{?with_pspell:--with-pspell=shared} \
 	--with-readline=shared \
@@ -1966,11 +1969,11 @@ for sapi in $sapis; do
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	%{!?with_sqlite:--without-sqlite --without-pdo-sqlite}%{?with_sqlite:--with-sqlite=shared,/usr --enable-sqlite-utf8} \
-	%{!?with_sqlite3:--without-sqlite3}%{?with_sqlite3:--with-sqlite3=shared,/usr} \
+	%{__with_without sqlite3 sqlite3 shared,/usr} \
 	--with-t1lib=shared \
 	%{?with_tidy:--with-tidy=shared} \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
-	%{!?with_xmlrpc:--without-xmlrpc}%{?with_xmlrpc:--with-xmlrpc=shared,/usr} \
+	%{__with_without xmlrpc xmlrpc shared,/usr} \
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \

@@ -354,7 +354,6 @@ Summary:	PHP for litespeed HTTP server
 Summary(pl.UTF-8):	PHP dla serwera HTTP litespeed
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	litespeed
 Provides:	webserver(php) = %{version}
 
 %description litespeed

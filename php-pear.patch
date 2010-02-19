@@ -1,5 +1,5 @@
---- php-5.2.0/configure.in	2006-11-03 01:46:52.697656608 +0200
-+++ php-5.2.6/configure.in	2008-11-20 19:11:27.231805230 +0200
+--- php-5.3.1/configure.in~	2010-02-19 23:26:13.000000000 +0200
++++ php-5.3.1/configure.in	2010-02-19 23:27:58.273207305 +0200
 @@ -934,11 +934,6 @@
    with_pear=no
  fi
@@ -12,29 +12,23 @@
  PHP_ARG_WITH(pear, [whether to install PEAR],
  [  --with-pear=DIR         Install PEAR in DIR [PREFIX/lib/php]
    --without-pear          Do not install PEAR], DEFAULT, yes)
-@@ -955,14 +950,14 @@
+@@ -1023,11 +1023,11 @@
    dnl
    dnl PEAR dependancies
    dnl
--  if test "$PHP_PCRE_REGEX" = "no"; then
--    pear_error_msg="$pear_error_msg 
--                    PEAR requires PCRE to be enabled.    Add --with-pcre-regex to the configure line. (or --without-pear)"
--  fi
 -  if test "$PHP_XML" = "no"; then
 -    pear_error_msg="$pear_error_msg 
 -                    PEAR requires XML to be enabled.     Add --enable-xml to the configure line. (or --without-pear)"
 -  fi
-+dnl  if test "$PHP_PCRE_REGEX" = "no"; then
-+dnl    pear_error_msg="$pear_error_msg 
-+dnl                    PEAR requires PCRE to be enabled.    Add --with-pcre-regex to the configure line. (or --without-pear)"
-+dnl  fi
+-
 +dnl  if test "$PHP_XML" = "no"; then
 +dnl    pear_error_msg="$pear_error_msg 
 +dnl                    PEAR requires XML to be enabled.     Add --enable-xml to the configure line. (or --without-pear)"
 +dnl  fi
- 
++dnl
  dnl
  dnl  if test "$PHP_XMLRPC" = "no"; then
+ dnl    pear_error_msg="$pear_error_msg 
 --- php-5.2.6/sapi/cli/config.m4~	2008-11-16 18:35:31.000000000 +0200
 +++ php-5.2.6/sapi/cli/config.m4	2008-11-20 19:04:12.585061299 +0200
 @@ -4,7 +4,7 @@

@@ -1,37 +1,13 @@
---- ext/mysqli/mysqli_api.c	2006-12-01 16:30:36.000000000 +0100
-+++ ext/mysqli/mysqli_api.c	2006-12-01 16:39:32.000000000 +0100
-@@ -1395,7 +1395,7 @@
- PHP_FUNCTION(mysqli_real_connect)
- {
- 	MY_MYSQL 		*mysql;
--	char 			*hostname = NULL, *username=NULL, *passwd=NULL, *dbname=NULL, *socket=NULL;
-+	char 			*hostname = NULL, *username=NULL, *passwd=NULL, *dbname=NULL, *socket=NULL, *connect_charset=NULL;
- 	unsigned int 	hostname_len = 0, username_len = 0, passwd_len = 0, dbname_len = 0, socket_len = 0;
- 	unsigned long 	port=0, flags=0;
- 	zval			*mysql_link;
-@@ -1436,6 +1436,12 @@
- 		socket = MyG(default_socket);
- 	}
- 
-+	connect_charset = MyG(connect_charset);
-+
-+	if (connect_charset != NULL) {
-+		mysql_options(mysql->mysql, MYSQL_SET_CHARSET_NAME, connect_charset);
-+	}
-+
- 	if (mysql_real_connect(mysql->mysql,hostname,username,passwd,dbname,port,socket,flags) == NULL) {
- 		php_mysqli_set_error(mysql_errno(mysql->mysql), (char *) mysql_error(mysql->mysql) TSRMLS_CC);
- 		php_mysqli_throw_sql_exception( mysql->mysql->net.sqlstate, mysql->mysql->net.last_errno TSRMLS_CC,
---- ext/mysqli/mysqli.c	2006-12-01 16:30:36.000000000 +0100
-+++ ext/mysqli/mysqli.c	2006-12-01 16:38:01.000000000 +0100
-@@ -459,6 +459,7 @@
- 	STD_PHP_INI_ENTRY("mysqli.default_pw",				NULL,	PHP_INI_ALL,		OnUpdateString,		default_pw,			zend_mysqli_globals,		mysqli_globals)
- 	STD_PHP_INI_ENTRY("mysqli.default_port",			"3306",	PHP_INI_ALL,		OnUpdateLong,		default_port,		zend_mysqli_globals,		mysqli_globals)
+--- php-5.3.1/ext/mysqli/mysqli.c~	2010-02-20 00:58:34.000000000 +0200
++++ php-5.3.1/ext/mysqli/mysqli.c	2010-02-20 01:00:22.459111311 +0200
+@@ -602,6 +602,7 @@
+ #else
  	STD_PHP_INI_ENTRY("mysqli.default_socket",			NULL,	PHP_INI_ALL,		OnUpdateStringUnempty,	default_socket,	zend_mysqli_globals,		mysqli_globals)
+ #endif
 +	STD_PHP_INI_ENTRY("mysqli.connect_charset",			NULL,	PHP_INI_ALL,		OnUpdateString,		connect_charset,	zend_mysqli_globals,		mysqli_globals)
  	STD_PHP_INI_BOOLEAN("mysqli.reconnect",				"0",	PHP_INI_SYSTEM,		OnUpdateLong,		reconnect,			zend_mysqli_globals,		mysqli_globals)
- PHP_INI_END()
- 
+ 	STD_PHP_INI_BOOLEAN("mysqli.allow_local_infile",	"1",	PHP_INI_SYSTEM,		OnUpdateLong,		allow_local_infile,	zend_mysqli_globals,		mysqli_globals)
+ #ifdef MYSQLI_USE_MYSQLND
 @@ -475,6 +476,7 @@
  	mysqli_globals->default_user = NULL;
  	mysqli_globals->default_pw = NULL;
@@ -40,20 +16,20 @@
  	mysqli_globals->reconnect = 0;
  	mysqli_globals->report_mode = 0;
  	mysqli_globals->report_ht = 0;
---- ext/mysqli/mysqli_nonapi.c	2006-12-01 16:30:36.000000000 +0100
-+++ ext/mysqli/mysqli_nonapi.c	2006-12-01 16:40:29.000000000 +0100
-@@ -36,7 +36,7 @@
- 	MY_MYSQL 			*mysql;
- 	MYSQLI_RESOURCE 	*mysqli_resource;
- 	zval  				*object = getThis();
--	char 				*hostname = NULL, *username=NULL, *passwd=NULL, *dbname=NULL, *socket=NULL;
-+	char 				*hostname = NULL, *username=NULL, *passwd=NULL, *dbname=NULL, *socket=NULL, *connect_charset=NULL;
- 	unsigned int 		hostname_len = 0, username_len = 0, passwd_len = 0, dbname_len = 0, socket_len = 0;
- 	long				port=0;
- 
-@@ -88,6 +88,12 @@
- 		socket = MyG(default_socket);
+--- php-5.3.1/ext/mysqli/mysqli_nonapi.c~	2009-11-12 19:48:36.000000000 +0200
++++ php-5.3.1/ext/mysqli/mysqli_nonapi.c	2010-02-20 01:02:24.838907461 +0200
+@@ -60,7 +60,7 @@
+ 	MY_MYSQL			*mysql = NULL;
+ 	MYSQLI_RESOURCE		*mysqli_resource = NULL;
+ 	zval				*object = getThis();
+-	char				*hostname = NULL, *username=NULL, *passwd=NULL, *dbname=NULL, *socket=NULL;
++	char				*hostname = NULL, *username=NULL, *passwd=NULL, *dbname=NULL, *socket=NULL, *connect_charset=NULL;
+ 	unsigned int		hostname_len = 0, username_len = 0, passwd_len = 0, dbname_len = 0, socket_len = 0;
+ 	zend_bool			persistent = FALSE;
+ 	long				port = 0, flags = 0;
+@@ -241,6 +241,12 @@
  	}
+ #endif
  
 +	connect_charset = MyG(connect_charset);
 +
@@ -61,16 +37,16 @@
 +		mysql_options(mysql->mysql, MYSQL_SET_CHARSET_NAME, connect_charset);
 +	}
 +
- 	if (mysql_real_connect(mysql->mysql,hostname,username,passwd,dbname,port,socket,CLIENT_MULTI_RESULTS) == NULL) {
- 		/* Save error messages */
- 
---- ext/mysqli/php_mysqli.h	2006-12-01 16:30:36.000000000 +0100
-+++ ext/mysqli/php_mysqli.h	2006-12-01 16:36:23.000000000 +0100
-@@ -433,6 +433,7 @@
+ #if !defined(MYSQLI_USE_MYSQLND)
+ 	if (mysql_real_connect(mysql->mysql, hostname, username, passwd, dbname, port, socket, CLIENT_MULTI_RESULTS) == NULL)
+ #else
+--- php-5.3.1/ext/mysqli/php_mysqli_structs.h~	2009-10-14 16:51:25.000000000 +0300
++++ php-5.3.1/ext/mysqli/php_mysqli_structs.h	2010-02-20 01:04:56.512214846 +0200
+@@ -358,6 +358,7 @@
  	char			*default_user;
  	char			*default_socket;
- 	char            *default_pw;
+ 	char			*default_pw;
 +	char			*connect_charset;
- 	int				reconnect;
- 	int				strict;
- 	long			error_no;
+ 	long			reconnect;
+ 	long			allow_local_infile;
+ 	long			strict;

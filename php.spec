@@ -1,18 +1,8 @@
 # TODO
 # - lost patches:
-#   +Patch11:	%{name}-acam.patch
-#   +Patch13:	%{name}-tsrmlsfetchgcc2.patch
-#   +Patch16:	%{name}-sybase-fix.patch
-#   +Patch26:	%{name}-pear.patch
-#   +Patch28:	%{name}-bug-42952.patch
-#   +Patch30:	%{name}-apr-apu.patch
-#   +Patch31:	%{name}-fcgi-error_log-no-newlines.patch
-#   +Patch32:	%{name}-curl-limit-speed.patch
-#   +Patch33:	%{name}-mime_magic.patch
-#   +Patch34:	%{name}-libtool.patch
-#   +Patch36:	%{name}-mysql-charsetphpini.patch
-#   +Patch37:	%{name}-mysqli-charsetphpini.patch
-#   +Patch38:	%{name}-pdo_mysql-charsetphpini.patch
+#Patch36:	%{name}-mysql-charsetphpini.patch
+#Patch37:	%{name}-mysqli-charsetphpini.patch
+#Patch38:	%{name}-pdo_mysql-charsetphpini.patch
 #   +Patch44:	%{name}-include_path.patch
 #   +Patch45:	%{name}-imap-annotations.patch
 #   +Patch46:	%{name}-imap-myrights.patch
@@ -106,7 +96,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		1.12
+%define		rel		1.13
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -140,8 +130,8 @@ Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-config-file-scan-dir.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
-# untill 5.3.2 when this gets released
-Patch11:	%{name}-bug-50458.patch
+# until 5.3.2 when this gets released
+Patch111:	%{name}-bug-50458.patch
 %if %{with type_hints}
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
@@ -156,8 +146,12 @@ Patch22:	%{name}-both-apxs.patch
 Patch23:	%{name}-builddir.patch
 Patch24:	%{name}-zlib-for-getimagesize.patch
 Patch25:	%{name}-stupidapache_version.patch
+Patch26:	%{name}-pear.patch
 Patch27:	%{name}-config-dir.patch
 Patch29:	%{name}-fcgi-graceful.patch
+Patch31:	%{name}-fcgi-error_log-no-newlines.patch
+Patch32:	%{name}-curl-limit-speed.patch
+Patch34:	%{name}-libtool.patch
 Patch35:	%{name}-tds.patch
 Patch39:	%{name}-use-prog_sendmail.patch
 Patch40:	%{name}-fpm.patch
@@ -1735,8 +1729,12 @@ cp php.ini-production php.ini
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
+%patch26 -p1
 %patch27 -p1
 %patch29 -p1
+%patch31 -p1
+%patch32 -p1
+%patch34 -p1
 %patch35 -p1
 %patch39 -p1
 %if %{with fpm}
@@ -1753,7 +1751,7 @@ cp php.ini-production php.ini
 %patch51 -p1
 %patch52 -p1
 
-%patch11 -p4
+%patch111 -p4
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -1916,6 +1914,7 @@ for sapi in $sapis; do
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--without-libexpat-dir \
 	--enable-mysqlnd-threading \
+	--enable-overload=shared \
 	--enable-posix=shared \
 	--enable-shared \
 	--enable-session=shared \

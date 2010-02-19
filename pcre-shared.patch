@@ -30,7 +30,7 @@
 -    PHP_NEW_EXTENSION(pcre, php_pcre.c, no)
 +    PHP_NEW_EXTENSION(pcre, php_pcre.c, $ext_shared)
      PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h])
-+	EXTRA_LIBS="$EXTRA_LIBS -lpcre"
++    EXTRA_LIBS="$EXTRA_LIBS -lpcre"
    else
      AC_MSG_CHECKING([for PCRE library to use])
      AC_MSG_RESULT([bundled])

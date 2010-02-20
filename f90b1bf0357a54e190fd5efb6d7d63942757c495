@@ -1,0 +1,11 @@
+- revised some patches:
+  - drop acam.patch - ac2.53b/am1.6b patch no longer needed
+  - drop tsrmlsfetchgcc2.patch - we no longer support gcc 2
+  - drop sybase-fix.patch - sybase ext is dropped
+  - drop bug-42952.patch -- solved upstream
+  - drop apr-apu.patch - outdated, apxs -q APR_CONFIG/-q APU_CONFIG work ok
+  - drop mime_magic.patch - mime_magic ext is dropped
+  - restored pear.patch
+  - restored fcgi-error_log-no-newlines.patch
+  - restored curl-limit-speed.patch
+  - restored libtool.patch

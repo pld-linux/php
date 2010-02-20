@@ -1,5 +1,7 @@
 # TODO
 # - php CLI has safe mode enabled in default config (!!!), recheck default .ini configs?
+#   main php.ini is not loaded at all (at least for cli):
+#   strace -efile php -m 2>&1 | grep /etc/php/php.ini
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom

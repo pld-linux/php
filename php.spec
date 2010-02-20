@@ -1759,7 +1759,9 @@ cp php.ini-production php.ini
 
 %patch111 -p4
 
+%if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
+%endif
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

@@ -88,7 +88,7 @@
 -; Default is zero.
 -; http://php.net/cgi.rfc2616-headers
 -;cgi.rfc2616_headers = 0
-+enable_dl = On
++enable_dl = Off
  
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;

@@ -1811,7 +1811,7 @@ export EXTENSION_DIR="%{php_extensiondir}"
 # configure once (for faster debugging purposes)
 if [ ! -f _built-conf ]; then
 	# now remove Makefile copies
-	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs{1,2}}
+	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs1,apxs2,litespeed}
 	%{__libtoolize}
 	%{__aclocal}
 	cp -f /usr/share/automake/config.* .

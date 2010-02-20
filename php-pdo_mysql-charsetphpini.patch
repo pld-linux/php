@@ -1,5 +1,10 @@
---- ext/pdo_mysql/mysql_driver.c	2006-12-02 17:26:53.000000000 +0100
-+++ ext/pdo_mysql/mysql_driver.c	2006-12-02 17:27:12.000000000 +0100
+This is damn ugly patch if you need to update it, see PHP_5_2 branch version to
+understand what this patch is supposed to do as in 5.3 the ini section is
+enabled only if mysqlnd driver is enabled which makes the contexts really
+small.
+
+--- php-5.3.1/ext/pdo_mysql/mysql_driver.c~	2010-02-20 01:08:04.000000000 +0200
++++ php-5.3.1/ext/pdo_mysql/mysql_driver.c	2010-02-20 01:08:52.982186037 +0200
 @@ -436,6 +436,7 @@
  	pdo_mysql_db_handle *H;
  	int i, ret = 0;
@@ -8,104 +13,143 @@
  	unsigned int port = 3306;
  	char *dbname;
  	struct pdo_data_src_parser vars[] = {
-@@ -546,6 +547,13 @@
- 	if (vars[2].optval && !strcmp("localhost", vars[2].optval)) {
- 		unix_socket = vars[4].optval;  
+@@ -731,6 +731,12 @@
+ 		password_len = strlen(dbh->password);
  	}
-+
-+	connect_charset = PDOMYSQLG(connect_charset);
+ 
++	connect_charset = PDO_MYSQL_G(connect_charset);
 +
 +	if (connect_charset != NULL) {
 +		mysql_options(H->server, MYSQL_SET_CHARSET_NAME, connect_charset);
 +	}
 +
- 	if (mysql_real_connect(H->server, host, dbh->username, dbh->password, dbname, port, unix_socket, connect_opts) == NULL) {
- 		pdo_mysql_error(dbh);
- 		goto cleanup;
---- ext/pdo_mysql/pdo_mysql.c	2006-12-02 17:26:53.000000000 +0100
-+++ ext/pdo_mysql/pdo_mysql.c	2006-12-02 17:27:12.000000000 +0100
-@@ -30,6 +30,9 @@
- #include "php_pdo_mysql.h"
- #include "php_pdo_mysql_int.h"
+ 	if (mysqlnd_connect(H->server, host, dbh->username, dbh->password, password_len, dbname, dbname_len,
+ 						port, unix_socket, connect_opts, PDO_MYSQL_G(mysqlnd_thd_zval_cache) TSRMLS_CC) == NULL) {
+ #else
+--- php-5.3.1/ext/pdo_mysql/pdo_mysql.c	2010-02-20 02:06:52.781846977 +0200
++++ php-5.3.1/ext/pdo_mysql/pdo_mysql.c	2010-02-20 02:06:52.781846977 +0200
+@@ -44,10 +44,13 @@
+ # endif
+ #endif
  
-+ZEND_DECLARE_MODULE_GLOBALS(pdo_mysql)
-+static PHP_GINIT_FUNCTION(pdo_mysql);
++#endif /* PDO_USE_MYSQLND */
 +
+ 
+ /* {{{ PHP_INI_BEGIN
+ */
+ PHP_INI_BEGIN()
++#if PDO_USE_MYSQLND
+ #ifndef PHP_WIN32
+ 	STD_PHP_INI_ENTRY("pdo_mysql.default_socket", PDO_MYSQL_UNIX_ADDR, PHP_INI_SYSTEM, OnUpdateString, default_socket, zend_pdo_mysql_globals, pdo_mysql_globals)
+ #endif
+@@ -55,9 +58,10 @@
+ 	STD_PHP_INI_ENTRY("pdo_mysql.debug",	NULL, PHP_INI_SYSTEM, OnUpdateString, debug, zend_pdo_mysql_globals, pdo_mysql_globals)
+ #endif
+ 	STD_PHP_INI_ENTRY("pdo_mysql.cache_size",			"2000",	PHP_INI_SYSTEM,		OnUpdateLong,		cache_size,			zend_pdo_mysql_globals,		pdo_mysql_globals)
++#endif
++	STD_PHP_INI_ENTRY("pdo_mysql.connect_charset",	NULL,	PHP_INI_ALL,	OnUpdateString,	connect_charset,	zend_pdo_mysql_globals,	pdo_mysql_globals)
+ PHP_INI_END()
+ /* }}} */
+-#endif
+ 
+ /* true global environment */
+ #ifdef PDO_USE_MYSQLND
+@@ -69,9 +73,7 @@
+  */
+ static PHP_MINIT_FUNCTION(pdo_mysql)
+ {
+-#if PDO_USE_MYSQLND
+ 	REGISTER_INI_ENTRIES();
+-#endif
+ 
+ 	REGISTER_PDO_CLASS_CONST_LONG("MYSQL_ATTR_USE_BUFFERED_QUERY", (long)PDO_MYSQL_ATTR_USE_BUFFERED_QUERY);
+ 	REGISTER_PDO_CLASS_CONST_LONG("MYSQL_ATTR_LOCAL_INFILE", (long)PDO_MYSQL_ATTR_LOCAL_INFILE);	
+@@ -101,8 +103,8 @@
+ 	php_pdo_unregister_driver(&pdo_mysql_driver);
+ #if PDO_USE_MYSQLND
+ 	mysqlnd_palloc_free_cache(pdo_mysqlnd_zval_cache);
+-	UNREGISTER_INI_ENTRIES();
+ #endif
++	UNREGISTER_INI_ENTRIES();
+ 
+ 	return SUCCESS;
+ }
+@@ -133,9 +135,7 @@
+ #endif
+ 	php_info_print_table_end();
+ 
+-#ifdef PDO_USE_MYSQLND
+ 	DISPLAY_INI_ENTRIES();
+-#endif
+ }
+ /* }}} */
+ 
+@@ -182,11 +182,14 @@
+ }
+ /* }}} */
+ 
++#endif /* PDO_USE_MYSQLND */
++
+ 
+ /* {{{ PHP_GINIT_FUNCTION
+  */
+ static PHP_GINIT_FUNCTION(pdo_mysql)
+ {
++#if PDO_USE_MYSQLND
+ 	pdo_mysql_globals->mysqlnd_thd_zval_cache = NULL; /* zval cache */
+ 	pdo_mysql_globals->cache_size = 0;
+ #ifndef PHP_WIN32
+@@ -196,10 +199,10 @@
+ 	pdo_mysql_globals->debug = NULL;	/* The actual string */
+ 	pdo_mysql_globals->dbg = NULL;	/* The DBG object*/
+ #endif
++#endif /* PDO_USE_MYSQLND */
++	pdo_mysql_globals->connect_charset = NULL;
+ }
+ /* }}} */
+-#endif
+-
+ 
  /* {{{ pdo_mysql_functions[] */
- zend_function_entry pdo_mysql_functions[] = {
- 	{NULL, NULL, NULL}
-@@ -61,7 +64,11 @@
- 	NULL,
+ const zend_function_entry pdo_mysql_functions[] = {
+@@ -242,15 +245,11 @@
+ #endif
  	PHP_MINFO(pdo_mysql),
  	"1.0.2",
+-#if PDO_USE_MYSQLND
+ 	PHP_MODULE_GLOBALS(pdo_mysql),
+ 	PHP_GINIT(pdo_mysql),
+ 	NULL,
+ 	NULL,
+ 	STANDARD_MODULE_PROPERTIES_EX
+-#else
 -	STANDARD_MODULE_PROPERTIES
-+	PHP_MODULE_GLOBALS(pdo_mysql),
-+	PHP_GINIT(pdo_mysql),
-+	NULL,
-+	NULL,
-+	STANDARD_MODULE_PROPERTIES_EX
+-#endif
  };
  /* }}} */
  
-@@ -69,12 +76,23 @@
- ZEND_GET_MODULE(pdo_mysql)
+--- php-5.3.1/ext/pdo_mysql/php_pdo_mysql_int.h~	2009-10-14 16:51:25.000000000 +0300
++++ php-5.3.1/ext/pdo_mysql/php_pdo_mysql_int.h	2010-02-20 02:04:48.918516081 +0200
+@@ -61,8 +61,8 @@
+ #include "ext/mysqlnd/mysqlnd_debug.h"
  #endif
  
-+PHP_INI_BEGIN()
-+	STD_PHP_INI_ENTRY("pdo_mysql.connect_charset",	NULL,	PHP_INI_ALL,	OnUpdateString,	connect_charset,	zend_pdo_mysql_globals,	pdo_mysql_globals)
-+PHP_INI_END()
-+
-+static PHP_GINIT_FUNCTION(pdo_mysql)
-+{
-+	pdo_mysql_globals->connect_charset = NULL;
-+}
-+
- /* true global environment */
+-#ifdef PDO_USE_MYSQLND
+ ZEND_BEGIN_MODULE_GLOBALS(pdo_mysql)
++#ifdef PDO_USE_MYSQLND
+ 	MYSQLND_THD_ZVAL_PCACHE *mysqlnd_thd_zval_cache;
+ 	long          cache_size;
+ #ifndef PHP_WIN32
+@@ -72,10 +72,11 @@
+ 	char          *debug; /* The actual string */
+ 	MYSQLND_DEBUG *dbg;	/* The DBG object */
+ #endif
++#endif /* PDO_USE_MYSQLND */
++	char          *connect_charset;
+ ZEND_END_MODULE_GLOBALS(pdo_mysql)
  
- /* {{{ PHP_MINIT_FUNCTION
-  */
- PHP_MINIT_FUNCTION(pdo_mysql)
- {
-+	REGISTER_INI_ENTRIES();
-+
- 	REGISTER_PDO_CLASS_CONST_LONG("MYSQL_ATTR_USE_BUFFERED_QUERY", (long)PDO_MYSQL_ATTR_USE_BUFFERED_QUERY);
- 	REGISTER_PDO_CLASS_CONST_LONG("MYSQL_ATTR_LOCAL_INFILE", (long)PDO_MYSQL_ATTR_LOCAL_INFILE);
- 	REGISTER_PDO_CLASS_CONST_LONG("MYSQL_ATTR_INIT_COMMAND", (long)PDO_MYSQL_ATTR_INIT_COMMAND);
-@@ -91,6 +109,7 @@
-  */
- PHP_MSHUTDOWN_FUNCTION(pdo_mysql)
- {
-+	UNREGISTER_INI_ENTRIES();
- 	php_pdo_unregister_driver(&pdo_mysql_driver);
- 	return SUCCESS;
- }
-@@ -103,6 +122,8 @@
- 	php_info_print_table_start();
- 	php_info_print_table_header(2, "PDO Driver for MySQL, client library version", mysql_get_client_info());
- 	php_info_print_table_end();
-+
-+	DISPLAY_INI_ENTRIES();
- }
- /* }}} */
+ ZEND_EXTERN_MODULE_GLOBALS(pdo_mysql);
+-#endif
  
---- ext/pdo_mysql/php_pdo_mysql.h	2006-12-02 17:26:53.000000000 +0100
-+++ ext/pdo_mysql/php_pdo_mysql.h	2006-12-02 17:28:49.000000000 +0100
-@@ -40,6 +40,18 @@
- PHP_RSHUTDOWN_FUNCTION(pdo_mysql);
- PHP_MINFO_FUNCTION(pdo_mysql);
- 
-+ZEND_BEGIN_MODULE_GLOBALS(pdo_mysql)
-+	char	*connect_charset;
-+ZEND_END_MODULE_GLOBALS(pdo_mysql)
-+
-+#ifdef ZTS
-+# define PDOMYSQLG(v) TSRMG(pdo_mysql_globals_id, zend_pdo_mysql_globals *, v)
-+#else
-+# define PDOMYSQLG(v) (pdo_mysql_globals.v)
-+#endif
-+
-+ZEND_EXTERN_MODULE_GLOBALS(pdo_mysql)
-+
- #endif	/* PHP_PDO_MYSQL_H */
- 
- 
+ #ifdef ZTS
+ #define PDO_MYSQL_G(v) TSRMG(pdo_mysql_globals_id, zend_pdo_mysql_globals *, v)

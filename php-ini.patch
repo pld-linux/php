@@ -1,5 +1,14 @@
---- php-5.3.1/php.ini~	2010-02-20 16:22:57.026908000 +0200
-+++ php-5.3.1/php.ini	2010-02-20 16:23:03.343575520 +0200
+--- php-5.3.1/php.ini	2010-02-20 16:23:03.343575520 +0200
++++ php-5.3.1/php.ini	2010-02-20 16:19:19.737335390 +0200
+@@ -223,7 +223,7 @@
+ ; Development Value: Off
+ ; Production Value: Off
+ ; http://php.net/short-open-tag
+-short_open_tag = Off
++short_open_tag = On
+ 
+ ; Allow ASP-style <% %> tags.
+ ; http://php.net/asp-tags
 @@ -428,7 +428,7 @@
  ; threat in any way, but it makes it possible to determine whether you use PHP
  ; on your server or not.
@@ -27,10 +36,12 @@
  ; On windows:
  ; extension_dir = "ext"
  
-@@ -814,53 +814,6 @@
+@@ -812,54 +812,7 @@
+ ; properly in multithreaded servers, such as IIS or Zeus, and is automatically
+ ; disabled on them.
  ; http://php.net/enable-dl
- enable_dl = Off
- 
+-enable_dl = Off
+-
 -; cgi.force_redirect is necessary to provide security running PHP as a CGI under
 -; most web servers.  Left undefined, PHP turns this on by default.  You can
 -; turn it off here AT YOUR OWN RISK
@@ -77,10 +88,10 @@
 -; Default is zero.
 -; http://php.net/cgi.rfc2616-headers
 -;cgi.rfc2616_headers = 0
--
++enable_dl = On
+ 
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
- ;;;;;;;;;;;;;;;;
 @@ -938,54 +891,6 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.

@@ -40,7 +40,7 @@
  			}
 +
 +			if (connect_charset != NULL)
-+				mysql_options(&mysql->conn, MYSQL_SET_CHARSET_NAME, connect_charset);
++				mysql_options(mysql->conn, MYSQL_SET_CHARSET_NAME, connect_charset);
 +
  #ifndef MYSQL_USE_MYSQLND
  			if (mysql_real_connect(mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL)
@@ -59,7 +59,7 @@
  				mysql_options(mysql->conn, MYSQL_OPT_CONNECT_TIMEOUT, (const char *)&connect_timeout);
  
 +		if (connect_charset != NULL)
-+			mysql_options(&mysql->conn, MYSQL_SET_CHARSET_NAME, connect_charset);
++			mysql_options(mysql->conn, MYSQL_SET_CHARSET_NAME, connect_charset);
 +
  #ifndef MYSQL_USE_MYSQLND
  		if (mysql_real_connect(mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL) 

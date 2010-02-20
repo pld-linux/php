@@ -1,8 +1,4 @@
 # TODO
-# - lost patches:
-#   +Patch44:	%{name}-include_path.patch
-#   +Patch45:	%{name}-imap-annotations.patch
-#   +Patch46:	%{name}-imap-myrights.patch
 # - php CLI has safe mode enabled in default config (!!!), recheck default .ini configs?
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
@@ -159,6 +155,9 @@ Patch40:	%{name}-fpm.patch
 Patch41:	%{name}-fpm-config.patch
 Patch42:	%{name}-fpm-shared.patch
 Patch43:	%{name}-silent-session-cleanup.patch
+Patch44:	%{name}-include_path.patch
+Patch45:	%{name}-imap-annotations.patch
+Patch46:	%{name}-imap-myrights.patch
 Patch47:	suhosin.patch
 Patch49:	%{name}-m4-divert.patch
 Patch50:	extension-shared-optional-dep.patch
@@ -1747,6 +1746,9 @@ cp php.ini-production php.ini
 %patch42 -p1
 %endif
 %patch43 -p1
+%patch44 -p1
+%patch45 -p1
+%patch46 -p1
 %if %{with suhosin}
 %patch47 -p1
 %endif

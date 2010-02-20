@@ -1,12 +1,9 @@
 # TODO
 # - lost patches:
-#Patch36:	%{name}-mysql-charsetphpini.patch
-#Patch37:	%{name}-mysqli-charsetphpini.patch
-#Patch38:	%{name}-pdo_mysql-charsetphpini.patch
 #   +Patch44:	%{name}-include_path.patch
 #   +Patch45:	%{name}-imap-annotations.patch
 #   +Patch46:	%{name}-imap-myrights.patch
-# - php CLI has safe mode enabled off the box
+# - php CLI has safe mode enabled in default config (!!!), recheck default .ini configs?
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
@@ -19,7 +16,8 @@
 # - make additional headers and checking added by mail patch configurable
 # - modularize standard (output from pure php -m)?
 # - lib64 patch obsolete by $PHP_LIBDIR ?
-# - move mysqlnd out of libphp-common.so, or link again with mysql-devel?
+# - move mysqlnd out of libphp-common.so, or link again with mysql-devel? (!!!)
+#   make mysqlnd as subpkg like pdo is base for all pdo drivers
 # - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
 #   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.
 #   make it runtime dep and add Suggests (or php warning messages)
@@ -153,6 +151,9 @@ Patch31:	%{name}-fcgi-error_log-no-newlines.patch
 Patch32:	%{name}-curl-limit-speed.patch
 Patch34:	%{name}-libtool.patch
 Patch35:	%{name}-tds.patch
+Patch36:	%{name}-mysql-charsetphpini.patch
+Patch37:	%{name}-mysqli-charsetphpini.patch
+Patch38:	%{name}-pdo_mysql-charsetphpini.patch
 Patch39:	%{name}-use-prog_sendmail.patch
 Patch40:	%{name}-fpm.patch
 Patch41:	%{name}-fpm-config.patch
@@ -1736,6 +1737,9 @@ cp php.ini-production php.ini
 %patch32 -p1
 %patch34 -p1
 %patch35 -p1
+%patch36 -p1
+%patch37 -p1
+%patch38 -p1
 %patch39 -p1
 %if %{with fpm}
 %patch40 -p1

@@ -1736,7 +1736,9 @@ cp php.ini-production php.ini
 %patch29 -p1
 %patch31 -p1
 %patch32 -p1
+%if "%{pld_release}" != "ac"
 %patch34 -p1
+%endif
 %patch35 -p1
 %patch36 -p1
 %patch37 -p1

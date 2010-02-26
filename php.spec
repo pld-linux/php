@@ -92,7 +92,8 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		1.13
+%define		subver	RC3
+%define		rel		0.14
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -100,13 +101,14 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.1
+Version:	5.3.2
 Release:	%{rel}%{?with_type_hints:th}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	63e97ad450f0f7259e785100b634c797
+#Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+Source0:	http://downloads.php.net/johannes/%{name}-%{version}%{subver}.tar.bz2
+# Source0-md5:	7d9a716e5c18763572f214dcac216be0
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -126,8 +128,6 @@ Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-config-file-scan-dir.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
-# until 5.3.2 when this gets released
-Patch111:	%{name}-bug-50458.patch
 %if %{with type_hints}
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
@@ -1700,7 +1700,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{subver}
 # prep for suhosin patch
 %{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1
@@ -1760,8 +1760,6 @@ cp php.ini-production php.ini
 %patch50 -p1
 %patch51 -p1
 %patch52 -p1
-
-%patch111 -p4
 
 %if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4

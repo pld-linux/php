@@ -26,56 +26,28 @@ small.
  	if (mysqlnd_connect(H->server, host, dbh->username, dbh->password, password_len, dbname, dbname_len,
  						port, unix_socket, connect_opts, PDO_MYSQL_G(mysqlnd_thd_zval_cache) TSRMLS_CC) == NULL) {
  #else
---- php-5.3.1/ext/pdo_mysql/pdo_mysql.c	2010-02-20 02:06:52.781846977 +0200
-+++ php-5.3.1/ext/pdo_mysql/pdo_mysql.c	2010-02-20 02:06:52.781846977 +0200
-@@ -44,10 +44,13 @@
- # endif
- #endif
- 
-+#endif /* PDO_USE_MYSQLND */
-+
- 
- /* {{{ PHP_INI_BEGIN
- */
- PHP_INI_BEGIN()
-+#if PDO_USE_MYSQLND
- #ifndef PHP_WIN32
- 	STD_PHP_INI_ENTRY("pdo_mysql.default_socket", PDO_MYSQL_UNIX_ADDR, PHP_INI_SYSTEM, OnUpdateString, default_socket, zend_pdo_mysql_globals, pdo_mysql_globals)
- #endif
-@@ -55,9 +58,10 @@
+--- php-5.3.2RC3/ext/pdo_mysql/pdo_mysql.c~	2010-02-04 11:37:38.000000000 +0200
++++ php-5.3.2RC3/ext/pdo_mysql/pdo_mysql.c	2010-02-26 19:09:36.784902389 +0200
+@@ -56,6 +56,7 @@
+ #if PDO_DBG_ENABLED
  	STD_PHP_INI_ENTRY("pdo_mysql.debug",	NULL, PHP_INI_SYSTEM, OnUpdateString, debug, zend_pdo_mysql_globals, pdo_mysql_globals)
  #endif
- 	STD_PHP_INI_ENTRY("pdo_mysql.cache_size",			"2000",	PHP_INI_SYSTEM,		OnUpdateLong,		cache_size,			zend_pdo_mysql_globals,		pdo_mysql_globals)
-+#endif
 +	STD_PHP_INI_ENTRY("pdo_mysql.connect_charset",	NULL,	PHP_INI_ALL,	OnUpdateString,	connect_charset,	zend_pdo_mysql_globals,	pdo_mysql_globals)
  PHP_INI_END()
  /* }}} */
--#endif
  
- /* true global environment */
- #ifdef PDO_USE_MYSQLND
-@@ -69,9 +73,7 @@
-  */
- static PHP_MINIT_FUNCTION(pdo_mysql)
+@@ -89,9 +90,7 @@
+ static PHP_MSHUTDOWN_FUNCTION(pdo_mysql)
  {
--#if PDO_USE_MYSQLND
- 	REGISTER_INI_ENTRIES();
--#endif
- 
- 	REGISTER_PDO_CLASS_CONST_LONG("MYSQL_ATTR_USE_BUFFERED_QUERY", (long)PDO_MYSQL_ATTR_USE_BUFFERED_QUERY);
- 	REGISTER_PDO_CLASS_CONST_LONG("MYSQL_ATTR_LOCAL_INFILE", (long)PDO_MYSQL_ATTR_LOCAL_INFILE);	
-@@ -101,8 +103,8 @@
  	php_pdo_unregister_driver(&pdo_mysql_driver);
- #if PDO_USE_MYSQLND
- 	mysqlnd_palloc_free_cache(pdo_mysqlnd_zval_cache);
--	UNREGISTER_INI_ENTRIES();
- #endif
-+	UNREGISTER_INI_ENTRIES();
+-#if PDO_USE_MYSQLND
+ 	UNREGISTER_INI_ENTRIES();
+-#endif
  
  	return SUCCESS;
  }
-@@ -133,9 +135,7 @@
- #endif
+@@ -108,9 +107,7 @@
+ 
  	php_info_print_table_end();
  
 -#ifdef PDO_USE_MYSQLND
@@ -84,22 +56,21 @@ small.
  }
  /* }}} */
  
-@@ -182,11 +182,14 @@
- }
+@@ -154,10 +151,13 @@
  /* }}} */
+ 
  
 +#endif /* PDO_USE_MYSQLND */
 +
- 
  /* {{{ PHP_GINIT_FUNCTION
   */
  static PHP_GINIT_FUNCTION(pdo_mysql)
  {
-+#if PDO_USE_MYSQLND
- 	pdo_mysql_globals->mysqlnd_thd_zval_cache = NULL; /* zval cache */
- 	pdo_mysql_globals->cache_size = 0;
++#ifdef PDO_USE_MYSQLND
  #ifndef PHP_WIN32
-@@ -196,10 +199,10 @@
+ 	pdo_mysql_globals->default_socket = NULL;
+ #endif
+@@ -165,10 +165,10 @@
  	pdo_mysql_globals->debug = NULL;	/* The actual string */
  	pdo_mysql_globals->dbg = NULL;	/* The DBG object*/
  #endif
@@ -112,7 +83,7 @@ small.
  
  /* {{{ pdo_mysql_functions[] */
  const zend_function_entry pdo_mysql_functions[] = {
-@@ -242,15 +245,11 @@
+@@ -205,15 +205,11 @@
  #endif
  	PHP_MINFO(pdo_mysql),
  	"1.0.2",
@@ -128,28 +99,13 @@ small.
  };
  /* }}} */
  
---- php-5.3.1/ext/pdo_mysql/php_pdo_mysql_int.h~	2009-10-14 16:51:25.000000000 +0300
-+++ php-5.3.1/ext/pdo_mysql/php_pdo_mysql_int.h	2010-02-20 02:04:48.918516081 +0200
-@@ -61,8 +61,8 @@
- #include "ext/mysqlnd/mysqlnd_debug.h"
- #endif
- 
--#ifdef PDO_USE_MYSQLND
- ZEND_BEGIN_MODULE_GLOBALS(pdo_mysql)
-+#ifdef PDO_USE_MYSQLND
- 	MYSQLND_THD_ZVAL_PCACHE *mysqlnd_thd_zval_cache;
- 	long          cache_size;
- #ifndef PHP_WIN32
-@@ -72,10 +72,11 @@
+--- php-5.3.2RC3/ext/pdo_mysql/php_pdo_mysql_int.h~	2010-02-04 11:37:38.000000000 +0200
++++ php-5.3.2RC3/ext/pdo_mysql/php_pdo_mysql_int.h	2010-02-26 19:11:47.484055898 +0200
+@@ -69,6 +69,7 @@
  	char          *debug; /* The actual string */
  	MYSQLND_DEBUG *dbg;	/* The DBG object */
  #endif
-+#endif /* PDO_USE_MYSQLND */
 +	char          *connect_charset;
- ZEND_END_MODULE_GLOBALS(pdo_mysql)
- 
- ZEND_EXTERN_MODULE_GLOBALS(pdo_mysql);
--#endif
- 
- #ifdef ZTS
- #define PDO_MYSQL_G(v) TSRMG(pdo_mysql_globals_id, zend_pdo_mysql_globals *, v)
+ #if defined(PHP_WIN32) && !PDO_DBG_ENABLED
+ 	/* dummy member so we get at least one member in the struct
+ 	 * and avoids build errors.

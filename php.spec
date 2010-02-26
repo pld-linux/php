@@ -405,9 +405,13 @@ Summary:	PHP FastCGI Process Manager
 Group:		Development/Languages/PHP
 URL:		http://www.php-fpm.org/
 Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libevent >= 1.4.7-3
 Requires:	rc-scripts
+Provides:	user(http)
 Provides:	webserver(php) = %{version}
 
 %description fpm

@@ -56,8 +56,8 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-%bcond_without	apache1		# disable building apache 1.3.x module
-%bcond_without	apache2		# disable building apache 2.x module
+%bcond_without	apache1		# disable building Apache 1.3.x module
+%bcond_without	apache2		# disable building Apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable Zend Thread Safety
 %bcond_without	fpm		# fpm patches from http://www.php-fpm.org/
@@ -290,7 +290,7 @@ non-commercial database management systems, so writing a
 database-enabled web page with PHP is fairly simple. The most common
 use of PHP coding is probably as a replacement for CGI scripts. The
 mod_php module enables the Apache web server to understand and process
-the embedded PHP language in web pages. This package contains php
+the embedded PHP language in web pages. This package contains PHP
 version %{version}.
 
 %description -l fr.UTF-8
@@ -301,8 +301,8 @@ systemes de gestion de bases de donnees commerciaux et
 non-connerciaux, qui rent facile la creation de pages web liees avec
 des bases de donnees. L'utilisation la plus commune de PHP est
 probablement en remplacement de scripts CGI. Le module mod_php permet
-au serveur web apache de comprendre et de traiter le langage PHP
-integre dans des pages web. Ce package contient php version
+au serveur web Apache de comprendre et de traiter le langage PHP
+integre dans des pages web. Ce package contient PHP version
 %{version}.
 
 %description -l pl.UTF-8
@@ -313,7 +313,7 @@ danych dla kilku komercyjnych i niekomercyjnych systemów baz danych,
 co czyni tworzenie stron korzystających z baz danych w miarę łatwym.
 Najczęściej PHP jest używany prawdopodobnie jako zamiennik skryptów
 CGI. Moduł mod_php pozwala serwerowi WWW Apache rozumieć i przetwarzać
-język PHP osadzony w stronach. Ten pakiet zawiera php w wersji
+język PHP osadzony w stronach. Ten pakiet zawiera PHP w wersji
 %{version}.
 
 %description -l pt_BR.UTF-8
@@ -336,8 +336,8 @@ PHP - це мова написання скриптів, що вбудовуют
 використання PHP - заміна для CGI скриптів.
 
 %package -n apache1-mod_php
-Summary:	PHP DSO module for apache 1.3.x
-Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) php dla apache 1.3.x
+Summary:	PHP DSO module for Apache 1.3.x
+Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 1.3.x
 Group:		Development/Languages/PHP
 Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -348,14 +348,14 @@ Obsoletes:	apache-mod_php < 1:4.1.1
 Obsoletes:	phpfi
 
 %description -n apache1-mod_php
-PHP as DSO module for apache 1.3.x.
+PHP as DSO module for Apache 1.3.x.
 
 %description -n apache1-mod_php -l pl.UTF-8
-php jako moduł DSO (Dynamic Shared Object) dla apache 1.3.x.
+PHP jako moduł DSO (Dynamic Shared Object) dla Apache 1.3.x.
 
 %package -n apache-mod_php
-Summary:	PHP DSO module for apache 2.x
-Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) php dla apache 2.x
+Summary:	PHP DSO module for Apache 2.x
+Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 2.x
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache(modules-api) = %{apache_modules_api}
@@ -364,10 +364,10 @@ Provides:	webserver(php) = %{version}
 Obsoletes:	phpfi
 
 %description -n apache-mod_php
-PHP as DSO module for apache 2.x.
+PHP as DSO module for Apache 2.x.
 
 %description -n apache-mod_php -l pl.UTF-8
-php jako moduł DSO (Dynamic Shared Object) dla apache 2.x.
+PHP jako moduł DSO (Dynamic Shared Object) dla Apache 2.x.
 
 %package fcgi
 Summary:	php as FastCGI program
@@ -439,9 +439,9 @@ PHP FastCGI Process Manager.
 
 %package common
 Summary:	Common files needed by both apache module and CGI
-Summary(pl.UTF-8):	Wspólne pliki dla modułu apache'a i programu CGI
-Summary(ru.UTF-8):	Разделяемые библиотеки для php
-Summary(uk.UTF-8):	Бібліотеки спільного використання для php
+Summary(pl.UTF-8):	Wspólne pliki dla modułu Apache'a i programu CGI
+Summary(ru.UTF-8):	Разделяемые библиотеки для PHP
+Summary(uk.UTF-8):	Бібліотеки спільного використання для PHP
 Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
@@ -485,15 +485,15 @@ Conflicts:	rpm < 4.4.2-0.2
 Common files needed by both apache module and CGI.
 
 %description common -l pl.UTF-8
-Wspólne pliki dla modułu apacha i programu CGI.
+Wspólne pliki dla modułu Apache'a i programu CGI.
 
 %description common -l ru.UTF-8
 Этот пакет содержит общие файлы для разных вариантов реализации PHP
-(самодостаточной и в качестве модуля apache).
+(самодостаточной и в качестве модуля Apache).
 
 %description common -l uk.UTF-8
 Цей пакет містить спільні файли для різних варіантів реалізації PHP
-(самодостатньої та в якості модуля apache).
+(самодостатньої та в якості модуля Apache).
 
 %package devel
 Summary:	Files for PHP modules development
@@ -518,14 +518,14 @@ Obsoletes:	php4-devel
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.
 Included here is the source for the PHP extensions. Instead of
-recompiling the whole php binary to add support for, say, oracle,
+recompiling the whole PHP binary to add support for, say, oracle,
 install this package and use the new self-contained extensions
 support. For more information, read the file
 README.SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l pl.UTF-8
 Ten pakiet zawiera pliki potrzebne do kompilacji modułów PHP. Zamiast
-rekompilować całe php aby dodać obsługę np. oracle, można przy użyciu
+rekompilować całe PHP aby dodać obsługę np. oracle, można przy użyciu
 tego pakietu skompilować samodzielne rozszerzenie. Więcej informacji o
 samodzielnych rozszerzeniach można znaleźć w pliku
 README.SELF-CONTAINED-EXTENSIONS.
@@ -537,14 +537,14 @@ módulos PHP.
 %description devel -l ru.UTF-8
 Пакет php-devel дает возможность компилировать динамические расширения
 PHP. Пакет включает исходный код этих расширений. Вместо повторной
-компиляции бинарного файла php для добавления, например, поддержки
+компиляции бинарного файла PHP для добавления, например, поддержки
 oracle, установите этот пакет для компилирования отдельных расширений.
 Подробности - в файле README.SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l uk.UTF-8
 Пакет php-devel дає можливість компілювати динамічні розширення PHP.
 До пакету включено вихідний код для розширень. Замість повторної
-компіляції бінарного файлу php для додання, наприклад, підтримки
+компіляції бінарного файлу PHP для додання, наприклад, підтримки
 oracle, встановіть цей пакет для компіляції окремих розширень.
 Детальніша інформація - в файлі README.SELF-CONTAINED-EXTENSIONS.
 
@@ -2087,16 +2087,16 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
-# install the apache modules' files
+# install the Apache modules' files
 %{__make} install-headers install-build install-modules install-programs \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
-# install apache1 DSO module
+# install Apache1 DSO module
 %if %{with apache1}
 libtool --silent --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
 %endif
 
-# install apache2 DSO module
+# install Apache2 DSO module
 %if %{with apache2}
 libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
 %endif

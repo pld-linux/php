@@ -427,6 +427,7 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Provides:	php(date)
+Provides:	php(ereg)
 Provides:	php(hash)
 Provides:	php(libxml)
 Provides:	php(modules_api) = %{php_api_version}
@@ -435,6 +436,11 @@ Provides:	php(reflection)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
+Provides:	php-date
+Provides:	php-ereg
+Provides:	php-overload
+Provides:	php-reflection
+Provides:	php-standard
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 Obsoletes:	php-pecl-domxml

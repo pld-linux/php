@@ -383,8 +383,8 @@ php as FastCGI program.
 php jako program FastCGI.
 
 %package cgi
-Summary:	php as CGI program
-Summary(pl.UTF-8):	php jako program CGI
+Summary:	PHP as CGI/FastCGI program
+Summary(pl.UTF-8):	PHP jako program CGI/FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
@@ -396,16 +396,16 @@ php as CGI program.
 php jako program CGI.
 
 %package cli
-Summary:	php as CLI interpreter
-Summary(pl.UTF-8):	php jako interpreter działający z linii poleceń
+Summary:	PHP as CLI interpreter
+Summary(pl.UTF-8):	PHP jako interpreter działający z linii poleceń
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description cli
-php as CLI interpreter.
+PHP as CLI interpreter.
 
 %description cli -l pl.UTF-8
-php jako interpreter działający z linii poleceń.
+PHP jako interpreter działający z linii poleceń.
 
 %package program
 Summary:	/usr/bin/php symlink
@@ -438,7 +438,7 @@ Provides:	webserver(php) = %{version}
 PHP FastCGI Process Manager.
 
 %package common
-Summary:	Common files needed by both apache module and CGI
+Summary:	Common files needed by both Apache modules and CGI/CLI SAPI-s
 Summary(pl.UTF-8):	Wspólne pliki dla modułu Apache'a i programu CGI
 Summary(ru.UTF-8):	Разделяемые библиотеки для PHP
 Summary(uk.UTF-8):	Бібліотеки спільного використання для PHP
@@ -482,7 +482,7 @@ Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 
 %description common
-Common files needed by both apache module and CGI.
+Common files needed by both Apache modules and CGI/CLI SAPI-s.
 
 %description common -l pl.UTF-8
 Wspólne pliki dla modułu Apache'a i programu CGI.

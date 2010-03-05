@@ -112,7 +112,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.13
-Release:	1
+Release:	2
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -478,6 +478,7 @@ Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 %endif
 Obsoletes:	php-pecl-domxml
+Conflicts:	php-pecl-memcache < 3.0.4-2
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 

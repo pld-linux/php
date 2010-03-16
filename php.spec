@@ -116,6 +116,7 @@ Source5:	%{name}-cli.ini
 Source9:	%{name}_browscap.ini
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
+Source12:	%{name}-branch.sh
 Source13:	dep-tests.sh
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch

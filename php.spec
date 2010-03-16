@@ -2083,11 +2083,6 @@ rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi ] || exit 1
 
-# CLI
-cp -af php_config.h.cli main/php_config.h
-%{__make} sapi/cli/php -f Makefile.cli
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
-
 # FCGI
 %if %{with fcgi}
 cp -af php_config.h.fcgi main/php_config.h
@@ -2104,6 +2099,11 @@ rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 cp -r sapi/cgi sapi/fpm
 [ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
+
+# CLI
+cp -af php_config.h.cli main/php_config.h
+%{__make} sapi/cli/php -f Makefile.cli
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
 
 # Generate stub .ini files for each extension
 rm -rf conf.d
@@ -2137,6 +2137,8 @@ fi
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
+cp -af php_config.h.cli main/php_config.h
+cp -af Makefile.cli Makefile
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
 unset TZ LANG LC_ALL || :
 %{__make} test

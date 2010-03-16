@@ -1299,7 +1299,7 @@ Summary:	session extension module for PHP
 Summary(pl.UTF-8):	Moduł session dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires(hint):	%{name}-hash = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-hash = %{epoch}:%{version}-%{release}
 Provides:	php(session)
 
 %description session
@@ -1408,8 +1408,8 @@ Summary(pl.UTF-8):	Moduł SQLite dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires(hint):	%{name}-pdo = %{epoch}:%{version}-%{release}
-Requires(hint):	%{name}-spl = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite)
 
 %description sqlite
@@ -1608,7 +1608,7 @@ Summary(pl.UTF-8):	Moduł XML Reader dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.xmlreader.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires(hint):	%{name}-dom = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-dom = %{epoch}:%{version}-%{release}
 Provides:	php(xmlreader)
 
 %description xmlreader

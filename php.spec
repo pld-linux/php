@@ -213,6 +213,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
+BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -426,6 +427,7 @@ Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
+Requires:	rpm-whiteout >= 1.28
 Provides:	php(date)
 Provides:	php(ereg)
 Provides:	php(hash)
@@ -1333,6 +1335,7 @@ Summary(pl.UTF-8):	Moduł prostego rozszerzenia XML dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.simplexml.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
 
 %description simplexml
@@ -2068,7 +2071,7 @@ generate_inifiles() {
 generate_inifiles
 
 # Check that the module inner-dependencies are intact
-PHP=./sapi/cli/php EXTENSION_DIR=modules CONFDIR=conf.d ./dep-tests.sh > dep-tests.log
+PHP=./sapi/cli/php EXTENSION_DIR=modules CONFIG_DIR=conf.d ./dep-tests.sh > dep-tests.log
 if grep -v OK dep-tests.log; then
 	echo >&2 "The results above were not expected"
 	exit 1

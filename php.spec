@@ -2031,6 +2031,7 @@ cp -af php_config.h.cli main/php_config.h
 %{__make} -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
 
+# PHP FPM
 %if %{with fpm}
 cp -af php_config.h.fpm main/php_config.h
 %{__make} -f Makefile.fpm
@@ -2039,6 +2040,8 @@ cp -af php_config.h.fpm main/php_config.h
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
+cp -af php_config.h.cli main/php_config.h
+cp -af Makefile.cli Makefile
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
 unset TZ LANG LC_ALL || :
 %{__make} test

@@ -1031,7 +1031,7 @@ Summary:	Process Control extension module for PHP
 Summary(pl.UTF-8):	Moduł Process Control dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.pcntl.php
-Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pcntl)
 
 %description pcntl
@@ -2165,7 +2165,7 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 cp -a conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 
 # for CLI SAPI only
-mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{pcntl,readline}.ini,cli.d}
+mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 %if "%{pld_release}" != "ac"
@@ -2795,7 +2795,7 @@ fi
 
 %files pcntl
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/pcntl.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
 
 %if %{with pcre}

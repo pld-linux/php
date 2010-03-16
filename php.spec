@@ -2194,6 +2194,9 @@ if [ "$1" = "0" ]; then
 	%service -q httpd restart
 fi
 
+%pre fpm
+%useradd -u 51 -r -s /bin/false -c "HTTP User" -g http http
+
 %post fpm
 /sbin/chkconfig --add php-fpm
 %service php-fpm restart
@@ -2202,6 +2205,11 @@ fi
 if [ "$1" = 0 ]; then
 	%service php-fpm stop
 	/sbin/chkconfig --del php-fpm
+fi
+
+%postun fpm
+if [ "$1" = "0" ]; then
+	%userremove http
 fi
 
 %post	common -p /sbin/ldconfig

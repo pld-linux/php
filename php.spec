@@ -2,6 +2,7 @@
 # - php CLI has safe mode enabled in default config (!!!), recheck default .ini configs?
 #   main php.ini is not loaded at all (at least for cli):
 #   strace -efile php -m 2>&1 | grep /etc/php/php.ini
+# - wddx: restore session support (not compiled in due DL extension check)
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
 #   db, hyperwave, java, mcal, overload, qtdom
@@ -115,6 +116,7 @@ Source5:	%{name}-cli.ini
 Source9:	%{name}_browscap.ini
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
+Source13:	dep-tests.sh
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -675,6 +677,7 @@ Summary(pl.UTF-8):	Rozszerzenie do bezpiecznej obsługi danych wejściowych
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.filter.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(filter)
 Obsoletes:	php-pecl-filter
 
@@ -1408,8 +1411,8 @@ Summary(pl.UTF-8):	Moduł SQLite dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Suggests:	%{name}-pdo = %{epoch}:%{version}-%{release}
-Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite)
 
 %description sqlite
@@ -1573,7 +1576,10 @@ Summary(pl.UTF-8):	Moduł wddx dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.wddx.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+# - wddx doesn't require session as it's disabled at compile time:
+#   if HAVE_PHP_SESSION && !defined(COMPILE_DL_SESSION)
+#   see also php.spec#rev1.120.2.22
+#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(wddx)
 
@@ -1796,6 +1802,7 @@ rm -rf ext/pdo_sqlite/sqlite
 rm -r ext/xmlrpc/libxmlrpc
 
 cp -af Zend/LICENSE{,.Zend}
+install -p %{SOURCE13} dep-tests.sh
 
 # breaks build
 sed -i -e 's#-fvisibility=hidden##g' configure*
@@ -2026,17 +2033,24 @@ cp -af php_config.h.cgi-fcgi main/php_config.h
 %{__make} -f Makefile.cgi-fcgi
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 
-# CLI
-cp -af php_config.h.cli main/php_config.h
-%{__make} -f Makefile.cli
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
-
 # PHP FPM
 %if %{with fpm}
 cp -af php_config.h.fpm main/php_config.h
 %{__make} -f Makefile.fpm
  ./sapi/fpm/php-fpm -qn -m > /dev/null
 %endif
+
+# CLI
+cp -af php_config.h.cli main/php_config.h
+%{__make} -f Makefile.cli
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
+
+# Check that the module inner-dependencies are intact
+PHP=./sapi/cli/php EXTENSION_DIR=modules ./dep-tests.sh > dep-tests.log
+if grep -v OK dep-tests.log; then
+	echo >&2 "The results above were not expected"
+	exit 1
+fi
 
 %if %{with tests}
 # Run tests, using the CLI SAPI

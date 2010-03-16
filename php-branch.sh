@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 svn=http://svn.php.net/repository/php/php-src
-tag=php_5_3_1
+tag=php_5_3_2
 branch=PHP_5_3
 out=php-branch.diff
 

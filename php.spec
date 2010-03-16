@@ -663,6 +663,7 @@ Summary:	libmagic bindings
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.fileinfo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(fileinfo)
 Obsoletes:	php-pecl-fileinfo
 
@@ -808,6 +809,7 @@ Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam IMAP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.imap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(imap)
 
 %description imap

@@ -2146,26 +2146,28 @@ ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
-# per SAPI ini directories
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
-cp -a %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/cli.d/php-cli.ini
-cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/cgi-fcgi.d/php-cgi-fcgi.ini
+install -d $RPM_BUILD_ROOT%{_sysconfdir}
+cp -a %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 cp -a %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
 cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/apache.d/php-apache.ini
+cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
 cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
-cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/apache2handler.d/php-apache2handler.ini
+cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 cp -a conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
+
+# per SAPI ini directories
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
 
 # for CLI SAPI only
 mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
@@ -2261,13 +2263,6 @@ sed -i -e '
 	/^\(Add\|Load\)Module.*php5\.\(so\|c\)/d
 ' /etc/apache/apache.conf
 %service -q apache restart
-
-%triggerpostun -n apache1-mod_php -- apache1-mod_php < 4:5.3.2-0.15
-# rescue configs.
-if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
-	mv -f %{_sysconfdir}/apache.d/php-apache.ini{,.rpmnew}
-	mv -f %{_sysconfdir}/php-apache.ini.rpmsave %{_sysconfdir}/apache.d/php-apache.ini
-fi
 %endif
 
 %if %{with apache2}
@@ -2277,30 +2272,7 @@ if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
 	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
 	mv -f %{_sysconfdir}/php-apache.ini.rpmsave %{_sysconfdir}/php-apache2handler.ini
 fi
-
-%triggerpostun -n apache-mod_php -- apache-mod_php < 4:5.3.2-0.15
-# rescue configs.
-if [ -f %{_sysconfdir}/php-apache2handler.ini.rpmsave ]; then
-	mv -f %{_sysconfdir}/php-apache2handler.d/php-apache2handler.ini{,.rpmnew}
-	mv -f %{_sysconfdir}/php-apache2handler.ini.rpmsave %{_sysconfdir}/php-apache2handler.d/php-apache2handler.ini
-fi
 %endif
-
-%triggerpostun cgi -- php-cgi < 4:5.3.2-0.15
-# rescue configs.
-for f in php-cgi.ini php-cgi-fcgi.ini ; do
-	if [ -f %{_sysconfdir}/$f.rpmsave ]; then
-		mv -f %{_sysconfdir}/cgi-fcgi.d/$f{,.rpmnew}
-		mv -f %{_sysconfdir}/$f.rpmsave %{_sysconfdir}/cgi-fcgi.d/$f
-	fi
-done
-
-%triggerpostun cli -- php-cli < 4:5.3.2-0.15
-# rescue configs.
-if [ -f %{_sysconfdir}/php-cli.ini.rpmsave ]; then
-	mv -f %{_sysconfdir}/cli.d/php-cli.ini{,.rpmnew}
-	mv -f %{_sysconfdir}/php-cli.ini.rpmsave %{_sysconfdir}/cli.d/php-cli.ini
-fi
 
 # common macros called at extension post/postun scriptlet
 %define	extension_scripts() \
@@ -2540,7 +2512,7 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.d/php-apache.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
 %attr(755,root,root) %{_libdir}/apache1/libphp5.so
 %endif
 
@@ -2549,7 +2521,7 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache2handler.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache2handler.d/php-apache2handler.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
 %endif
 
@@ -2562,14 +2534,14 @@ fi
 %files cgi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cgi-fcgi.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cgi-fcgi.d/php-cgi-fcgi.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 %attr(755,root,root) %{_bindir}/php.cgi
 %attr(755,root,root) %{_bindir}/php.fcgi
 
 %files cli
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cli.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/php-cli.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
 %attr(755,root,root) %{_bindir}/php.cli
 %{_mandir}/man1/php.1*
 %{_mandir}/man1/php.cli.1*

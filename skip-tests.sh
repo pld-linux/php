@@ -394,3 +394,11 @@ mv sapi/cli/tests/006.phpt{,.skip}
 mv sapi/cli/tests/016.phpt{,.skip}
 # CLI php -m
 mv sapi/cli/tests/018.phpt{,.skip}
+# Test open_basedir configuration
+mv tests/security/open_basedir_fileinode.phpt{,.skip}
+# Test fileinode() function: Variations
+mv ext/standard/tests/file/fileinode_variation.phpt{,.skip}
+# Test lstat() and stat() functions: usage variations - dir/file name stored in object
+mv ext/standard/tests/file/lstat_stat_variation18.phpt{,.skip}
+: Test lstat() and stat() functions: usage variations - dir/file names in array
+mv ext/standard/tests/file/lstat_stat_variation19.phpt{,.skip}

@@ -1,0 +1,46 @@
+--- php-5.3.2/configure.in~	2010-03-16 12:16:56.000000000 +0200
++++ php-5.3.2/configure.in	2010-03-16 16:13:24.926435546 +0200
+@@ -1224,6 +1224,11 @@
+ PHP_SUBST(PHP_CLI_OBJS)
+ PHP_SUBST(PHP_GLOBAL_OBJS)
+ 
++# shift so that pcre, spl, ... are loaded first
++PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/xml.la \),\2\1,')
++PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/spl.la \),\2\1,')
++PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/pcre.la \),\2\1,')
++
+ PHP_SUBST(PHP_MODULES)
+ PHP_SUBST(PHP_ZEND_EX)
+ 
+--- php-5.3.2/Makefile.global	2010-03-16 16:14:24.340804566 +0200
++++ php-5.3.2/Makefile.global	2010-03-16 16:31:36.972576955 +0200
+@@ -77,7 +77,7 @@
+ 		done; \
+ 	fi
+ 
+-PHP_TEST_SETTINGS = -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1'
++PHP_TEST_SETTINGS = -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' -d 'safe_mode=0'
+ PHP_TEST_SHARED_EXTENSIONS =  ` \
+ 	if test "x$(PHP_MODULES)" != "x"; then \
+ 		for i in $(PHP_MODULES)""; do \
+@@ -92,7 +92,7 @@
+ PHP_DEPRECATED_DIRECTIVES_REGEX = '^(define_syslog_variables|register_(globals|long_arrays)?|safe_mode|magic_quotes_(gpc|runtime|sybase)?|(zend_)?extension(_debug)?(_ts)?)[\t\ ]*='
+ 
+ test: all
+-	-@if test ! -z "$(PHP_EXECUTABLE)" && test -x "$(PHP_EXECUTABLE)"; then \
++	-@if test ! -z "$(PHP_EXECUTABLE)" && test -x "$(PHP_EXECUTABLE)"; then \
+ 		INI_FILE=`$(PHP_EXECUTABLE) -d 'display_errors=stderr' -r 'echo php_ini_loaded_file();' 2> /dev/null`; \
+ 		if test "$$INI_FILE"; then \
+ 			$(EGREP) -h -v $(PHP_DEPRECATED_DIRECTIVES_REGEX) "$$INI_FILE" > $(top_builddir)/tmp-php.ini; \
+@@ -320,7 +320,10 @@
+ 		TEST_PHP_EXECUTABLE=$(PHP_EXECUTABLE) \
+ 		TEST_PHP_SRCDIR=$(top_srcdir) \
+ 		CC="$(CC)" \
+-			$(PHP_EXECUTABLE) -n -c $(top_builddir)/tmp-php.ini $(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini -d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) $(TESTS); \
++			$(PHP_EXECUTABLE) -n -c $(top_builddir)/tmp-php.ini \
++			-d extension_dir=$(top_builddir)/modules/ -d extension=pcre.so \
++			$(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini \
++			-d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) $(RUN_TESTS_ARGS) $(TESTS); \
+ 	else \
+ 		echo "ERROR: Cannot run tests without CLI sapi."; \
+ 	fi

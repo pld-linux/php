@@ -204,3 +204,5 @@ mv ext/standard/tests/file/fileinode_variation.phpt{,.skip}
 mv ext/standard/tests/file/lstat_stat_variation18.phpt{,.skip}
 # Test lstat() and stat() functions: usage variations - dir/file names in array
 mv ext/standard/tests/file/lstat_stat_variation19.phpt{,.skip}
+# Test fileinode() function: usage variations - diff. path notations
+mv ext/standard/tests/file/fileinode_variation3.phpt{,.skip}

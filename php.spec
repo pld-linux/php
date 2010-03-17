@@ -93,7 +93,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		0.16
+%define		rel		0.17
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -1820,7 +1820,7 @@ sed -i -e 's#-fvisibility=hidden##g' configure*
 # says just "Terminated" twice and fails
 mv sapi/cli/tests/022.phpt{,.broken}
 
-sh %{_sourcedir}/skip-tests.sh
+sh -xe %{_sourcedir}/skip-tests.sh
 
 %build
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
@@ -2100,13 +2100,14 @@ unset TZ LANG LC_ALL || :
 unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 
 # collect failed tests into cleanup script used in prep.
-sed -ne '/FAILED TEST SUMMARY/,/^===/p' test.log | sed -e '/^===/,$d' | \
-sed -ne '/\[.*\]/{s/\(.*\) \[\(.*\)\]/: \1\nmv \2{,.skip}/p}' \
-	> %{_sourcedir}/skip-tests.sh
+sed -ne '/FAILED TEST SUMMARY/,/^===/p' test.log | sed -e '1,/^---/d;/^===/,$d' > tests-failed.log
+sed -ne '/\[.*\]/{s/\(.*\) \[\(.*\)\]/# \1\nmv \2{,.skip}/p}' tests-failed.log \
+	>> %{_sourcedir}/skip-tests.sh
 
-# TODO:
-# check if tests have failed
-# think how to keep in skip-tests.sh only with failed tests (repeative run discards earlier values)
+failed=$(wc -l < tests-failed.log)
+if [ "$failed" ! = 0 ]; then
+	exit 1
+fi
 %endif
 
 %install

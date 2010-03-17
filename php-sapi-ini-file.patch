@@ -1,6 +1,18 @@
---- php-5.3.0/main/php_ini.c.org	2009-07-06 17:32:30.309904482 +0200
-+++ php-5.3.0/main/php_ini.c	2009-07-06 17:36:45.529879052 +0200
-@@ -474,6 +480,24 @@
+--- php-5.3.0/main/php_ini.c	2009-07-06 17:36:45.529879052 +0200
++++ php-5.3.2/main/php_ini.c	2010-03-17 17:55:16.800313459 +0200
+@@ -358,6 +358,11 @@
+ }
+ /* }}} */
+ 
++static int php_csort(const struct dirent **a, const struct dirent **b)
++{
++	return strcmp((*a)->d_name,(*b)->d_name);
++}
++
+ /* {{{ php_init_config
+  */
+ int php_init_config(TSRMLS_D)
+@@ -480,6 +485,24 @@
  				}
  			}
  		}
@@ -25,7 +37,7 @@
  
  		/* Otherwise search for php-%sapi-module-name%.ini file in search path */
  		if (!fh.handle.fp) {
-@@ -486,14 +510,6 @@
+@@ -492,14 +515,6 @@
  				fh.filename = php_ini_opened_path;
  			}
  		}
@@ -40,7 +52,7 @@
  	}
  
  	if (free_ini_search_path) {
-@@ -620,12 +620,14 @@
+@@ -610,12 +625,14 @@
  		zend_llist scanned_ini_list;
  		zend_llist_element *element;
  		int l, total_l = 0;
@@ -56,3 +68,12 @@
  		ini_path  = php_strtok_r(path_copy, paths_separator, &last);
  
  		while (ini_path != NULL) {
+@@ -636,7 +653,7 @@
+ 			struct dirent **namelist;
+ 			int ini_path_len = strlen(ini_path);
+ 
+-			if ((ndir = php_scandir(ini_path, &namelist, 0, php_alphasort)) > 0) {
++			if ((ndir = php_scandir(ini_path, &namelist, 0, php_csort)) > 0) {
+ 				memset(&fh, 0, sizeof(fh));
+ 
+ 				for (i = 0; i < ndir; i++) {

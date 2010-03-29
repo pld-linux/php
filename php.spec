@@ -39,7 +39,7 @@
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	mime_magic	# without mime-magic module
-%bcond_without	ming		# without ming extension module
+%bcond_with	ming		# with ming extension module
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
@@ -112,7 +112,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.13
-Release:	5
+Release:	6
 Epoch:		4
 License:	PHP
 Group:		Libraries

@@ -93,7 +93,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		0.17
+%define		rel		0.18
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2105,7 +2105,7 @@ sed -ne '/\[.*\]/{s/\(.*\) \[\(.*\)\]/# \1\nmv \2{,.skip}/p}' tests-failed.log \
 	>> %{_sourcedir}/skip-tests.sh
 
 failed=$(wc -l < tests-failed.log)
-if [ "$failed" ! = 0 ]; then
+if [ "$failed" != 0 ]; then
 	exit 1
 fi
 %endif

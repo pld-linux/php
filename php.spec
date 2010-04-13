@@ -112,7 +112,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.13
-Release:	9
+Release:	10
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -185,6 +185,7 @@ Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	%{name}-libpng.patch
 Patch53:	%{name}-gmp.patch
+Patch54:	%{name}-bug-51192.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1837,6 +1838,7 @@ done
 %patch51 -p1
 %patch52 -p1
 %patch53 -p1
+%patch54 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

@@ -225,7 +225,7 @@ BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libtool
 %endif
 BuildRequires:	libwrap-devel
-BuildRequires:	libxml2-devel >= 2.5.10
+BuildRequires:	libxml2-devel >= 1:2.7.6-4
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mhash:BuildRequires:	mhash-devel}
 %{?with_ming:BuildRequires:	ming-devel >= 0.3}
@@ -1103,8 +1103,8 @@ Moduł PHP umożliwiający korzystanie z biblioteki OpenSSL.
 Summary:	Process Control extension module for PHP
 Summary(pl.UTF-8):	Moduł Process Control dla PHP
 Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 URL:		http://www.php.net/manual/en/book.pcntl.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pcntl)
 
 %description pcntl

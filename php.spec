@@ -2109,6 +2109,9 @@ cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
 
+# check for stupid xml parse breakage where &lt; and &gt; just get lost in parse result
+./sapi/cli/php -n -dextension_dir=modules -dextension=xml.so -r '$p = xml_parser_create(); xml_parse_into_struct($p, "<x>&lt;</x>", $vals, $index); exit(empty($vals[0]["value"]));'
+
 # Generate stub .ini files for each extension
 rm -rf conf.d
 install -d conf.d

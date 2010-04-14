@@ -203,7 +203,7 @@ BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libtool >= 1.4.3
 %endif
 #BuildRequires:	libwrap-devel
-BuildRequires:	libxml2-devel >= 2.5.10
+BuildRequires:	libxml2-devel >= 1:2.7.6-4
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
@@ -986,8 +986,8 @@ Summary(pl.UTF-8):	Moduł MySQLi dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.mysqli.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 %{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(mysqli)
 
 %description mysqli
@@ -1142,8 +1142,8 @@ Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą MySQL-a
 Group:		Libraries
 URL:		http://www.php.net/manual/en/ref.pdo-mysql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 %{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
+Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-mysql)
 Obsoletes:	php-pecl-PDO_MYSQL
 
@@ -2082,6 +2082,9 @@ cp -af php_config.h.fpm main/php_config.h
 cp -af php_config.h.cli main/php_config.h
 %{__make} -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
+
+# check for stupid xml parse breakage where &lt; and &gt; just get lost in parse result
+./sapi/cli/php -n -dextension_dir=modules -dextension=xml.so -r '$p = xml_parser_create(); xml_parse_into_struct($p, "<x>&lt;</x>", $vals, $index); exit((int )empty($vals[0]["value"]));'
 
 # Generate stub .ini files for each extension
 rm -rf conf.d

@@ -1,7 +1,5 @@
 # TODO
-# - php CLI has safe mode enabled in default config (!!!), recheck default .ini configs?
-#   main php.ini is not loaded at all (at least for cli):
-#   strace -efile php -m 2>&1 | grep /etc/php/php.ini
+# - NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # - wddx: restore session support (not compiled in due DL extension check)
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
@@ -91,7 +89,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		0.18
+%define		rel		0.19
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP

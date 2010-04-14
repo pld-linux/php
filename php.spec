@@ -15,8 +15,6 @@
 # - make additional headers and checking added by mail patch configurable
 # - modularize standard (output from pure php -m)?
 # - lib64 patch obsolete by $PHP_LIBDIR ?
-# - move mysqlnd out of libphp-common.so, or link again with mysql-devel? (!!!)
-#   make mysqlnd as subpkg like pdo is base for all pdo drivers
 # - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
 #   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.
 #   make it runtime dep and add Suggests (or php warning messages)
@@ -27,7 +25,6 @@
 # date
 #+ereg
 # libxml
-#+mysqlnd
 # Reflection
 #
 # Conditional build:
@@ -43,6 +40,7 @@
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
+%bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
@@ -168,6 +166,7 @@ Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
+Patch54:	mysqlnd-shared.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -941,6 +940,28 @@ databases support through FreeTDS library.
 Moduł PHP dodający obsługę baz danych MS SQL poprzez bibliotekę
 FreeTDS.
 
+%package mysqlnd
+Summary:	MySQL Native Client Driver for PHP
+Group:		Libraries
+URL:		http://www.php.net/manual/en/book.mysqlnd.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(mysqlnd)
+
+%description mysqlnd
+MySQL Native Driver is a replacement for the MySQL Client Library
+(libmysql).
+
+Because MySQL Native Driver is written as a PHP extension, it is
+tightly coupled to the workings of PHP. This leads to gains in
+efficiency, especially when it comes to memory usage, as the driver
+uses the PHP memory management system. It also supports the PHP memory
+limit. Using MySQL Native Driver leads to comparable or better
+performance than using MySQL Client Library, it always ensures the
+most efficient use of memory. One example of the memory efficiency is
+the fact that when using the MySQL Client Library, each row is stored
+in memory twice, whereas with the MySQL Native Driver each row is only
+stored once in memory.
+
 %package mysql
 Summary:	MySQL database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych MySQL dla PHP
@@ -948,6 +969,7 @@ Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam bancos de dados 
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.mysql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+%{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Provides:	php(mysql)
 
 %description mysql
@@ -967,6 +989,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.mysqli.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+%{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Provides:	php(mysqli)
 
 %description mysqli
@@ -1122,6 +1145,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/ref.pdo-mysql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+%{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Provides:	php(pdo-mysql)
 Obsoletes:	php-pecl-PDO_MYSQL
 
@@ -1783,6 +1807,7 @@ cp php.ini-production php.ini
 %patch51 -p1
 %patch52 -p1
 %patch53 -p1
+%patch54 -p1
 
 %if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
@@ -1947,13 +1972,12 @@ for sapi in $sapis; do
 	--with-pdo-firebird=shared,/usr \
 %endif
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
-	--with-pdo-mysql=shared,mysqlnd \
+	--with-pdo-mysql=shared%{?with_mysqlnd:,mysqlnd} \
 	%{?with_oci8:--with-pdo-oci=shared} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--without-libexpat-dir \
-	--enable-mysqlnd-threading \
 	--enable-overload=shared \
 	--enable-posix=shared \
 	--enable-shared \
@@ -1989,8 +2013,9 @@ for sapi in $sapis; do
 	--with-mcrypt=shared \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
-	--with-mysql=shared,mysqlnd \
-	%{?with_mysqli:--with-mysqli=shared,mysqlnd} \
+	%{?with_mysqlnd:--with-mysqlnd=shared} \
+	--with-mysql=shared%{?with_mysqlnd:,mysqlnd} \
+	%{?with_mysqli:--with-mysqli=shared%{?with_mysqlnd:,mysqlnd}} \
 	%{?with_oci8:--with-oci8=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
@@ -2073,6 +2098,8 @@ generate_inifiles() {
 		[ "$mod" = "pcre" ] && conf="PCRE.ini"
 		# spl needs to be loaded before mysqli
 		[ "$mod" = "spl" ] && conf="SPL.ini"
+		# mysqlnd needs to be loaded before mysql,mysqli,pdo_mysqli
+		[ "$mod" = "mysqlnd" ] && conf="MySQLND.ini"
 		echo "+ $conf"
 		cat > conf.d/$conf <<-EOF
 			; Enable $mod extension module
@@ -2332,6 +2359,7 @@ fi
 %extension_scripts mbstring
 %extension_scripts mcrypt
 %extension_scripts mssql
+%extension_scripts mysqlnd
 %extension_scripts mysql
 %extension_scripts mysqli
 %extension_scripts oci8
@@ -2752,6 +2780,13 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mssql.ini
 %attr(755,root,root) %{php_extensiondir}/mssql.so
+%endif
+
+%if %{with mysqlnd}
+%files mysqlnd
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/MySQLND.ini
+%attr(755,root,root) %{php_extensiondir}/mysqlnd.so
 %endif
 
 %files mysql

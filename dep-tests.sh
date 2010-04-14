@@ -1,10 +1,13 @@
 #!/bin/sh
 # inter-dependencies checker.
 
+with_mysqlnd=mysqlnd
+
 dep_spl="pcre simplexml"
 dep_filter='pcre'
 dep_eaccelerator='session'
-dep_mysqli="$dep_spl spl"
+dep_mysql="$with_mysqlnd"
+dep_mysqli="$dep_spl spl $with_mysqlnd"
 dep_pdo="$dep_spl spl"
 dep_pdo_sqlite="$dep_pdo pdo"
 dep_pdo_pgsql="$dep_pdo pdo"
@@ -12,7 +15,7 @@ dep_pdo_oci="$dep_pdo pdo"
 dep_pdo_odbc="$dep_pdo pdo"
 dep_pdo_firebird="$dep_pdo pdo"
 dep_pdo_dblib="$dep_pdo pdo"
-dep_pdo_mysql="$dep_pdo pdo"
+dep_pdo_mysql="$dep_pdo pdo $with_mysqlnd"
 dep_simplexml="$dep_spl spl"
 dep_imap="pcre"
 dep_phar="$dep_spl spl"
@@ -29,13 +32,13 @@ conf_dir=${CONFIG_DIR:-$(php-config --sysconfdir)/conf.d $(php-config --sysconfd
 tmpini=$(mktemp)
 
 # poldek --sn ac-ready -u php-*
-for ext in $ext_dir/*.so; do
+for ext in $ext_dir/spl.so; do
 	[ -f $ext ] || continue
 	ext=${ext##*/}; ext=${ext%.so}
 
 	deps=$(eval echo \$dep_$ext)
 	# add ext itself, if already not in list (spl case)
-	[[ $deps = *$ext* ]] || deps="$deps $ext"
+	[[ $deps = *\ $ext\ * ]] || deps="$deps $ext"
 
 	echo -n "$ext (deps: ${deps# })..."
 

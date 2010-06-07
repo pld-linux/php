@@ -43,7 +43,7 @@
  		CC="$(CC)" \
 -			$(PHP_EXECUTABLE) -n -c $(top_builddir)/tmp-php.ini $(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini -d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) $(TESTS); \
 +			$(PHP_EXECUTABLE) -n -c $(top_builddir)/tmp-php.ini \
-+			-d extension_dir=$(top_builddir)/modules/ -d 'extension=pcre.$(SHLIB_DL_SUFFIX_NAME)' \
++			-d extension_dir=$(top_builddir)/modules/ -d 'extension=$(EXTENSION_DIR)/pcre.$(SHLIB_DL_SUFFIX_NAME)' \
 +			$(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini \
 +			-d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) $(RUN_TESTS_SETTINGS) $(TESTS); \
  	else \

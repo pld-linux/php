@@ -2126,7 +2126,7 @@ cp -af php_config.h.cli main/php_config.h
 cp -af Makefile.cli Makefile
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
 unset TZ LANG LC_ALL || :
-%{__make} test RUN_TESTS_ARGS="-s test.log"
+%{__make} test RUN_TESTS_SETTINGS="-s test.log"
 unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 
 # collect failed tests into cleanup script used in prep.

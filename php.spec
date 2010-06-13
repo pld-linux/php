@@ -61,6 +61,7 @@
 %bcond_without	fpm		# fpm patches from http://www.php-fpm.org/
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
+%bcond_with	gcov		# Enable Code coverage reporting
 %bcond_with	type_hints	# experimental support for strict typing/casting
 
 %define apxs1		/usr/sbin/apxs1
@@ -211,6 +212,7 @@ BuildRequires:	libxslt-devel >= 1.1.0
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
+%{?with_gcov:BuildRequires:	lcov}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
@@ -254,6 +256,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
+
+%if %{with gcov}
+%undefine	with_ccache
+%endif
 
 %if %{with oci8}
 # ORACLE_HOME is required for oci8 ext to build
@@ -446,8 +452,8 @@ Provides:	php-reflection
 Provides:	php-standard
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
-Obsoletes:	php-pecl-domxml
 %{!?with_mysqlnd:Obsoletes:	php-mysqlnd}
+Obsoletes:	php-pecl-domxml
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 
@@ -1907,7 +1913,7 @@ for sapi in $sapis; do
 		sapi_args='--disable-cli'
 	;;
 	cli)
-		sapi_args='--disable-cgi'
+		sapi_args='--disable-cgi %{?with_gcov:--enable-gcov}'
 	;;
 	fpm)
 		sapi_args='--disable-cli --with-fpm'
@@ -2126,7 +2132,7 @@ cp -af php_config.h.cli main/php_config.h
 cp -af Makefile.cli Makefile
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
 unset TZ LANG LC_ALL || :
-%{__make} test RUN_TESTS_SETTINGS="-s test.log"
+%{__make} test RUN_TESTS_SETTINGS="-s test.log" PHP_TEST_SHARED_SYSTEM_EXTENSIONS=
 unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 
 # collect failed tests into cleanup script used in prep.

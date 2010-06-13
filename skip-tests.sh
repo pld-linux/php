@@ -206,3 +206,35 @@ mv ext/standard/tests/file/lstat_stat_variation18.phpt{,.skip}
 mv ext/standard/tests/file/lstat_stat_variation19.phpt{,.skip}
 # Test fileinode() function: usage variations - diff. path notations
 mv ext/standard/tests/file/fileinode_variation3.phpt{,.skip}
+# curl_error() function - basic test for curl_error using a fake url
+mv ext/curl/tests/curl_error_basic.phpt{,.skip}
+# gmp_nextprime()
+mv ext/gmp/tests/gmp_nextprime.phpt{,.skip}
+# datefmt_format_code() and datefmt_parse_code()
+mv ext/intl/tests/dateformat_format_parse.phpt{,.skip}
+# datefmt_get_pattern_code and datefmt_set_pattern_code()
+mv ext/intl/tests/dateformat_get_set_pattern.phpt{,.skip}
+# numfmt_get/set_attribute()
+mv ext/intl/tests/formatter_get_set_attribute.phpt{,.skip}
+# grapheme()
+mv ext/intl/tests/grapheme.phpt{,.skip}
+# Bug #28382 (openssl_x509_parse extensions support)
+mv ext/openssl/tests/bug28382.phpt{,.skip}
+# Bug #47828 (segfaults when a UTF-8 conversion fails openssl_x509_parse())
+mv ext/openssl/tests/bug47828.phpt{,.skip}
+# openssl_x509_parse() basic test
+mv ext/openssl/tests/openssl_x509_parse_basic.phpt{,.skip}
+# MySQL PDO->__construct(), libmysql only options
+mv ext/pdo_mysql/tests/pdo_mysql___construct_options_libmysql.phpt{,.skip}
+# Test function getservbyport() by calling it more than or less than its expected arguments
+mv ext/standard/tests/general_functions/getservbyname_basic.phpt{,.skip}
+# Test var_dump() function
+mv ext/standard/tests/general_functions/var_dump_64bit.phpt{,.skip}
+# time_sleep_until() function - basic test for time_sleep_until()
+mv ext/standard/tests/misc/time_sleep_until_basic.phpt{,.skip}
+# getmxrr() test
+mv ext/standard/tests/network/getmxrr.phpt{,.skip}
+# Bug #40576 (double values are truncated to 6 decimal digits when encoding)
+mv ext/xmlrpc/tests/bug40576_64bit.phpt{,.skip}
+# Bug #45555 (Segfault with invalid non-string as register_introspection_callback)
+mv ext/xmlrpc/tests/bug45555.phpt{,.skip}

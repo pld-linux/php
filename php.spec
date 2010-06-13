@@ -1,5 +1,4 @@
 # TODO
-# - wddx: restore session support (not compiled in due DL extension check)
 # - fix -threads-acfix.patch
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
@@ -39,7 +38,7 @@
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	mime_magic	# without mime-magic module
-%bcond_with	ming		# with ming extension module
+%bcond_without	ming		# without ming extension module
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
@@ -52,15 +51,14 @@
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
 %bcond_without	sybase		# without Sybase extension module
-%bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-%bcond_without	apache1		# disable building Apache 1.3.x module
-%bcond_without	apache2		# disable building Apache 2.x module
+%bcond_without	apache1		# disable building apache 1.3.x module
+%bcond_without	apache2		# disable building apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
 %bcond_without	zts		# disable Zend Thread Safety
-%bcond_without	fpm		# fpm patches from http://www.php-fpm.org/
+%bcond_without	fpm		# fpm patches from http://php-fpm.anight.org/
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
 %bcond_with	tests		# default off; test process very often hangs on builders; perform "make test"
@@ -111,13 +109,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.2.13
-Release:	13
+Version:	5.2.11
+Release:	8
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	eb4d0766dc4fb9667f05a68b6041e7d1
+# Source0-md5:	286bf34630f5643c25ebcedfec5e0a09
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-cgi.ini
@@ -131,8 +129,6 @@ Source8:	%{name}_browscap.ini
 Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
 Source12:	%{name}-branch.sh
-Source13:	dep-tests.sh
-Source14:	skip-tests.sh
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -184,10 +180,6 @@ Patch47:	suhosin.patch
 Patch49:	%{name}-m4-divert.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
-Patch52:	%{name}-libpng.patch
-Patch53:	%{name}-gmp.patch
-Patch54:	%{name}-bug-51192.patch
-Patch55:	fix-test-run.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -227,7 +219,7 @@ BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libtool
 %endif
 BuildRequires:	libwrap-devel
-BuildRequires:	libxml2-devel >= 1:2.7.6-4
+BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mhash:BuildRequires:	mhash-devel}
 %{?with_ming:BuildRequires:	ming-devel >= 0.3}
@@ -240,10 +232,8 @@ BuildRequires:	ncurses-ext-devel
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
-%{?with_snmp:%{?with_tests:mibs-net-snmp}}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
-BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -295,7 +285,7 @@ non-commercial database management systems, so writing a
 database-enabled web page with PHP is fairly simple. The most common
 use of PHP coding is probably as a replacement for CGI scripts. The
 mod_php module enables the Apache web server to understand and process
-the embedded PHP language in web pages. This package contains PHP
+the embedded PHP language in web pages. This package contains php
 version %{version}.
 
 %description -l fr.UTF-8
@@ -306,8 +296,8 @@ systemes de gestion de bases de donnees commerciaux et
 non-connerciaux, qui rent facile la creation de pages web liees avec
 des bases de donnees. L'utilisation la plus commune de PHP est
 probablement en remplacement de scripts CGI. Le module mod_php permet
-au serveur web Apache de comprendre et de traiter le langage PHP
-integre dans des pages web. Ce package contient PHP version
+au serveur web apache de comprendre et de traiter le langage PHP
+integre dans des pages web. Ce package contient php version
 %{version}.
 
 %description -l pl.UTF-8
@@ -318,7 +308,7 @@ danych dla kilku komercyjnych i niekomercyjnych systemów baz danych,
 co czyni tworzenie stron korzystających z baz danych w miarę łatwym.
 Najczęściej PHP jest używany prawdopodobnie jako zamiennik skryptów
 CGI. Moduł mod_php pozwala serwerowi WWW Apache rozumieć i przetwarzać
-język PHP osadzony w stronach. Ten pakiet zawiera PHP w wersji
+język PHP osadzony w stronach. Ten pakiet zawiera php w wersji
 %{version}.
 
 %description -l pt_BR.UTF-8
@@ -341,8 +331,8 @@ PHP - це мова написання скриптів, що вбудовуют
 використання PHP - заміна для CGI скриптів.
 
 %package -n apache1-mod_php
-Summary:	PHP DSO module for Apache 1.3.x
-Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 1.3.x
+Summary:	PHP DSO module for apache 1.3.x
+Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) php dla apache 1.3.x
 Group:		Development/Languages/PHP
 Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -353,14 +343,14 @@ Obsoletes:	apache-mod_php < 1:4.1.1
 Obsoletes:	phpfi
 
 %description -n apache1-mod_php
-PHP as DSO module for Apache 1.3.x.
+PHP as DSO module for apache 1.3.x.
 
 %description -n apache1-mod_php -l pl.UTF-8
-PHP jako moduł DSO (Dynamic Shared Object) dla Apache 1.3.x.
+php jako moduł DSO (Dynamic Shared Object) dla apache 1.3.x.
 
 %package -n apache-mod_php
-Summary:	PHP DSO module for Apache 2.x
-Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 2.x
+Summary:	PHP DSO module for apache 2.x
+Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) php dla apache 2.x
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache(modules-api) = %{apache_modules_api}
@@ -369,10 +359,10 @@ Provides:	webserver(php) = %{version}
 Obsoletes:	phpfi
 
 %description -n apache-mod_php
-PHP as DSO module for Apache 2.x.
+PHP as DSO module for apache 2.x.
 
 %description -n apache-mod_php -l pl.UTF-8
-PHP jako moduł DSO (Dynamic Shared Object) dla Apache 2.x.
+php jako moduł DSO (Dynamic Shared Object) dla apache 2.x.
 
 %package fcgi
 Summary:	php as FastCGI program
@@ -388,12 +378,11 @@ php as FastCGI program.
 php jako program FastCGI.
 
 %package cgi
-Summary:	PHP as CGI/FastCGI program
-Summary(pl.UTF-8):	PHP jako program CGI/FastCGI
+Summary:	php as CGI program
+Summary(pl.UTF-8):	php jako program CGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
-Provides:	webserver(php) = %{version}
 
 %description cgi
 php as CGI program.
@@ -402,16 +391,16 @@ php as CGI program.
 php jako program CGI.
 
 %package cli
-Summary:	PHP as CLI interpreter
-Summary(pl.UTF-8):	PHP jako interpreter działający z linii poleceń
+Summary:	php as CLI interpreter
+Summary(pl.UTF-8):	php jako interpreter działający z linii poleceń
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description cli
-PHP as CLI interpreter.
+php as CLI interpreter.
 
 %description cli -l pl.UTF-8
-PHP jako interpreter działający z linii poleceń.
+php jako interpreter działający z linii poleceń.
 
 %package program
 Summary:	/usr/bin/php symlink
@@ -429,32 +418,26 @@ Pakiet dostarczający dowiązanie symboliczne /usr/bin/php do PHP CLI.
 %package fpm
 Summary:	PHP FastCGI Process Manager
 Group:		Development/Languages/PHP
-URL:		http://www.php-fpm.org/
+URL:		http://php-fpm.anight.org/
 Requires(post,preun):	/sbin/chkconfig
-Requires(postun):	/usr/sbin/userdel
-Requires(pre):	/bin/id
-Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libevent >= 1.4.7-3
 Requires:	rc-scripts
-Provides:	user(http)
 Provides:	webserver(php) = %{version}
 
 %description fpm
 PHP FastCGI Process Manager.
 
 %package common
-Summary:	Common files needed by both Apache modules and CGI/CLI SAPI-s
-Summary(pl.UTF-8):	Wspólne pliki dla modułu Apache'a i programu CGI
-Summary(ru.UTF-8):	Разделяемые библиотеки для PHP
-Summary(uk.UTF-8):	Бібліотеки спільного використання для PHP
+Summary:	Common files needed by both apache module and CGI
+Summary(pl.UTF-8):	Wspólne pliki dla modułu apache'a i programu CGI
+Summary(ru.UTF-8):	Разделяемые библиотеки для php
+Summary(uk.UTF-8):	Бібліотеки спільного використання для php
 Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
-Requires:	rpm-whiteout >= 1.28
 Provides:	php(date)
-Provides:	php(ereg)
 Provides:	php(libxml)
 %{?with_zend_multibyte:Provides:	php(mbstring)}
 Provides:	php(modules_api) = %{php_api_version}
@@ -463,44 +446,26 @@ Provides:	php(reflection)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
-Provides:	php-date
-Provides:	php-ereg
 %{?with_zend_multibyte:Provides:	php-mbstring = %{epoch}:%{version}-%{release}}
-Provides:	php-overload
-Provides:	php-reflection
-Provides:	php-standard
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
-# ensure backward compatibility for Titanium
-# to be dropped in future but ask Titanium RM before doing so
-%if "%{pld_release}" == "ti"
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Requires:	%{name}-session = %{epoch}:%{version}-%{release}
-Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
-%endif
-%if "%{pld_release}" == "ac"
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Requires:	%{name}-session = %{epoch}:%{version}-%{release}
-Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
-%endif
 Obsoletes:	php-pecl-domxml
-Conflicts:	php-pecl-memcache < 3.0.4-2
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 
 %description common
-Common files needed by both Apache modules and CGI/CLI SAPI-s.
+Common files needed by both apache module and CGI.
 
 %description common -l pl.UTF-8
-Wspólne pliki dla modułu Apache'a i programu CGI.
+Wspólne pliki dla modułu apacha i programu CGI.
 
 %description common -l ru.UTF-8
 Этот пакет содержит общие файлы для разных вариантов реализации PHP
-(самодостаточной и в качестве модуля Apache).
+(самодостаточной и в качестве модуля apache).
 
 %description common -l uk.UTF-8
 Цей пакет містить спільні файли для різних варіантів реалізації PHP
-(самодостатньої та в якості модуля Apache).
+(самодостатньої та в якості модуля apache).
 
 %package devel
 Summary:	Files for PHP modules development
@@ -525,14 +490,14 @@ Obsoletes:	php4-devel
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.
 Included here is the source for the PHP extensions. Instead of
-recompiling the whole PHP binary to add support for, say, oracle,
+recompiling the whole php binary to add support for, say, oracle,
 install this package and use the new self-contained extensions
 support. For more information, read the file
 README.SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l pl.UTF-8
 Ten pakiet zawiera pliki potrzebne do kompilacji modułów PHP. Zamiast
-rekompilować całe PHP aby dodać obsługę np. oracle, można przy użyciu
+rekompilować całe php aby dodać obsługę np. oracle, można przy użyciu
 tego pakietu skompilować samodzielne rozszerzenie. Więcej informacji o
 samodzielnych rozszerzeniach można znaleźć w pliku
 README.SELF-CONTAINED-EXTENSIONS.
@@ -544,14 +509,14 @@ módulos PHP.
 %description devel -l ru.UTF-8
 Пакет php-devel дает возможность компилировать динамические расширения
 PHP. Пакет включает исходный код этих расширений. Вместо повторной
-компиляции бинарного файла PHP для добавления, например, поддержки
+компиляции бинарного файла php для добавления, например, поддержки
 oracle, установите этот пакет для компилирования отдельных расширений.
 Подробности - в файле README.SELF-CONTAINED-EXTENSIONS.
 
 %description devel -l uk.UTF-8
 Пакет php-devel дає можливість компілювати динамічні розширення PHP.
 До пакету включено вихідний код для розширень. Замість повторної
-компіляції бінарного файлу PHP для додання, наприклад, підтримки
+компіляції бінарного файлу php для додання, наприклад, підтримки
 oracle, встановіть цей пакет для компіляції окремих розширень.
 Детальніша інформація - в файлі README.SELF-CONTAINED-EXTENSIONS.
 
@@ -559,7 +524,6 @@ oracle, встановіть цей пакет для компіляції ок�
 Summary:	bcmath extension module for PHP
 Summary(pl.UTF-8):	Moduł bcmath dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.bc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(bcmath)
 
@@ -575,7 +539,6 @@ matematycznych takich jak w programie bc.
 Summary:	Bzip2 extension module for PHP
 Summary(pl.UTF-8):	Moduł bzip2 dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.bzip2.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(bzip2)
 
@@ -590,7 +553,6 @@ Moduł PHP umożliwiający używanie kompresji bzip2.
 Summary:	Calendar extension module for PHP
 Summary(pl.UTF-8):	Moduł funkcji kalendarza dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.calendar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(calendar)
 
@@ -605,7 +567,6 @@ Moduł PHP dodający wsparcie dla kalendarza.
 Summary:	ctype extension module for PHP
 Summary(pl.UTF-8):	Moduł ctype dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.ctype.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ctype)
 
@@ -620,7 +581,6 @@ Moduł PHP umożliwiający korzystanie z funkcji ctype.
 Summary:	curl extension module for PHP
 Summary(pl.UTF-8):	Moduł curl dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.curl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(curl)
 
@@ -635,7 +595,6 @@ Moduł PHP umożliwiający korzystanie z biblioteki curl.
 Summary:	DBA extension module for PHP
 Summary(pl.UTF-8):	Moduł DBA dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.dba.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dba)
 
@@ -665,7 +624,6 @@ Moduł PHP ze wsparciem dla DBase.
 Summary:	DOM extension module for PHP
 Summary(pl.UTF-8):	Moduł DOM dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.dom.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dom)
 # it has some compatibility functions
@@ -683,7 +641,6 @@ Moduł PHP dodający nową obsługę DOM.
 Summary:	exif extension module for PHP
 Summary(pl.UTF-8):	Moduł exif dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.exif.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(exif)
 
@@ -698,7 +655,6 @@ Moduł PHP dodający obsługę znaczników EXIF w plikach obrazków.
 Summary:	FDF extension module for PHP
 Summary(pl.UTF-8):	Moduł FDF dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.fdf.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(fdf)
 
@@ -714,9 +670,7 @@ FDFTK.
 Summary:	Extension for safely dealing with input parameters
 Summary(pl.UTF-8):	Rozszerzenie do bezpiecznej obsługi danych wejściowych
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.filter.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(filter)
 Obsoletes:	php-pecl-filter
 
@@ -738,7 +692,6 @@ mogą bezpiecznie używać do dostępu do danych.
 Summary:	FTP extension module for PHP
 Summary(pl.UTF-8):	Moduł FTP dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.ftp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ftp)
 
@@ -753,7 +706,6 @@ Moduł PHP dodający obsługę protokołu FTP.
 Summary:	GD extension module for PHP
 Summary(pl.UTF-8):	Moduł GD dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.image.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %if %{with system_gd}
 Requires:	gd >= 2.0.28-4
@@ -774,7 +726,6 @@ tworzenie i obróbkę obrazków.
 Summary:	gettext extension module for PHP
 Summary(pl.UTF-8):	Moduł gettext dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.gettext.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(gettext)
 
@@ -789,7 +740,6 @@ Moduł PHP dodający obsługę lokalizacji przez gettext.
 Summary:	gmp extension module for PHP
 Summary(pl.UTF-8):	Moduł gmp dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.gmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(gmp)
 
@@ -805,7 +755,6 @@ liczbach o dowolnej długości.
 Summary:	HASH Message Digest Framework
 Summary(pl.UTF-8):	Szkielet do obliczania skrótów wiadomości
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.gmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(hash)
 Obsoletes:	php-pecl-hash
@@ -822,7 +771,6 @@ wiadomości przy użyciu wspólnego interfejsu.
 Summary:	iconv extension module for PHP
 Summary(pl.UTF-8):	Moduł iconv dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.iconv.php
 Requires:	%{_libdir}/gconv
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	iconv
@@ -840,7 +788,6 @@ Summary:	IMAP extension module for PHP
 Summary(pl.UTF-8):	Moduł IMAP dla PHP
 Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam IMAP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.imap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(imap)
 
@@ -858,7 +805,6 @@ Um módulo para aplicações PHP que usam IMAP.
 Summary:	InterBase/Firebird database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych InterBase/Firebird dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.ibase.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(interbase)
 %{?with_interbase_inst:Autoreq:	false}
@@ -874,7 +820,6 @@ Moduł PHP umożliwiający dostęp do baz danych InterBase i Firebird.
 Summary:	PHP C extension for JSON serialization
 Summary(pl.UTF-8):	Rozszerzenie C PHP dla serializacji JSON
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.json.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(json)
 Obsoletes:	php-pecl-json
@@ -892,7 +837,6 @@ Summary:	LDAP extension module for PHP
 Summary(pl.UTF-8):	Moduł LDAP dla PHP
 Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam LDAP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.ldap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ldap)
 
@@ -910,7 +854,6 @@ Um módulo para aplicações PHP que usam LDAP.
 Summary:	mbstring extension module for PHP
 Summary(pl.UTF-8):	Moduł mbstring dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.mbstring.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mbstring)
 
@@ -925,7 +868,6 @@ Moduł PHP dodający obsługę ciągów znaków wielobajtowych.
 Summary:	mcrypt extension module for PHP
 Summary(pl.UTF-8):	Moduł mcrypt dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.mcrypt.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mcrypt)
 
@@ -986,7 +928,6 @@ ming.
 Summary:	MS SQL extension module for PHP
 Summary(pl.UTF-8):	Moduł MS SQL dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.mssql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mssql)
 
@@ -1003,7 +944,6 @@ Summary:	MySQL database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych MySQL dla PHP
 Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam bancos de dados MySQL
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.mysql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mysql)
 
@@ -1021,7 +961,6 @@ Um módulo para aplicações PHP que usam bancos de dados MySQL.
 Summary:	MySQLi module for PHP
 Summary(pl.UTF-8):	Moduł MySQLi dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.mysqli.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Requires:	mysql-libs >= 4.1.0
@@ -1055,10 +994,9 @@ Moduł PHP dodający obsługę funkcji ncurses (tylko do SAPI cli i cgi).
 Summary:	Oracle 8+ database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych Oracle 8+ dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.oci8.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(oci8)
-AutoReq:	false
+Autoreq:	false
 
 %description oci8
 This is a dynamic shared object (DSO) for PHP that will add Oracle 7,
@@ -1073,7 +1011,6 @@ Summary:	ODBC extension module for PHP
 Summary(pl.UTF-8):	Moduł ODBC dla PHP
 Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam bases de dados ODBC
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.uodbc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	unixODBC >= 2.1.1-3
 Provides:	php(odbc)
@@ -1092,7 +1029,6 @@ Um módulo para aplicações PHP que usam ODBC.
 Summary:	OpenSSL extension module for PHP
 Summary(pl.UTF-8):	Moduł OpenSSL dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.openssl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(openssl)
 
@@ -1107,7 +1043,6 @@ Moduł PHP umożliwiający korzystanie z biblioteki OpenSSL.
 Summary:	Process Control extension module for PHP
 Summary(pl.UTF-8):	Moduł Process Control dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.pcntl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pcntl)
 
@@ -1139,7 +1074,6 @@ Moduł PHP umożliwiający korzystanie z perlowych wyrażeń regularnych
 Summary:	PHP Data Objects (PDO)
 Summary(pl.UTF-8):	Obsługa PHP Data Objects (PDO)
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.pdo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(pdo)
@@ -1156,7 +1090,6 @@ Moduł PHP dodający obsługę PDO (PHP Data Objects).
 Summary:	PHP Data Objects (PDO) FreeTDS support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą FreeTDS
 Group:		Libraries
-URL:		http://www.php.net/manual/en/ref.pdo-dblib.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(dblib)
@@ -1173,7 +1106,6 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) Firebird support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą Firebirda
 Group:		Libraries
-URL:		http://www.php.net/manual/en/ref.pdo-firebird.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-firebird)
@@ -1191,7 +1123,6 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) MySQL support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą MySQL-a
 Group:		Libraries
-URL:		http://www.php.net/manual/en/ref.pdo-mysql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-mysql)
@@ -1209,7 +1140,6 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) Oracle support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą Oracle'a
 Group:		Libraries
-URL:		http://www.php.net/manual/en/ref.pdo-oci.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-oci)
@@ -1227,7 +1157,6 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) ODBC support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą ODBC
 Group:		Libraries
-URL:		http://www.php.net/manual/en/ref.pdo-odbc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-odbc)
@@ -1245,7 +1174,6 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) PostgreSQL support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą PostgreSQL-a
 Group:		Libraries
-URL:		http://www.php.net/manual/en/ref.pdo-pgsql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-pgsql)
@@ -1264,7 +1192,6 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) SQLite support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą SQLite
 Group:		Libraries
-URL:		http://www.php.net/manual/en/ref.pdo-sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-sqlite)
@@ -1282,7 +1209,6 @@ interfejsu PDO.
 Summary:	PostgreSQL database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych PostgreSQL dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.pgsql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pgsql)
 
@@ -1300,7 +1226,6 @@ Um módulo para aplicações PHP que usam bancos de dados postgresql.
 Summary:	POSIX extension module for PHP
 Summary(pl.UTF-8):	Moduł POSIX dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.posix.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(posix)
 
@@ -1315,7 +1240,6 @@ Moduł PHP umożliwiający korzystanie z funkcji POSIX.
 Summary:	pspell extension module for PHP
 Summary(pl.UTF-8):	Moduł pspell dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.pspell.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pspell)
 
@@ -1332,7 +1256,6 @@ sprawdzanie pisowni słowa i sugerowanie poprawek.
 Summary:	readline extension module for PHP
 Summary(pl.UTF-8):	Moduł readline dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.readline.php
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Provides:	php(readline)
 
@@ -1347,7 +1270,6 @@ Moduł PHP dodający obsługę funkcji readline (tylko do SAPI cli i cgi).
 Summary:	recode extension module for PHP
 Summary(pl.UTF-8):	Moduł recode dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.recode.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	recode >= 3.5d-3
 Provides:	php(recode)
@@ -1379,7 +1301,6 @@ Moduł PHP dodający obsługę sesji.
 Summary:	Shared Memory Operations extension module for PHP
 Summary(pl.UTF-8):	Moduł shmop dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.shmop.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(shmop)
 
@@ -1394,9 +1315,8 @@ Moduł PHP umożliwiający korzystanie z pamięci dzielonej.
 Summary:	Simple XML extension module for PHP
 Summary(pl.UTF-8):	Moduł prostego rozszerzenia XML dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.simplexml.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
 
 %description simplexml
@@ -1410,7 +1330,6 @@ Moduł PHP dodający obsługę prostego XML-a.
 Summary:	SNMP extension module for PHP
 Summary(pl.UTF-8):	Moduł SNMP dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.snmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-sockets = %{epoch}:%{version}-%{release}
 Provides:	php(snmp)
@@ -1426,7 +1345,6 @@ Moduł PHP dodający obsługę SNMP.
 Summary:	soap extension module for PHP
 Summary(pl.UTF-8):	Moduł soap dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.soap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(soap)
 
@@ -1441,7 +1359,6 @@ Moduł PHP dodający obsługę SOAP/WSDL.
 Summary:	sockets extension module for PHP
 Summary(pl.UTF-8):	Moduł socket dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.sockets.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sockets)
 
@@ -1458,8 +1375,8 @@ Summary(pl.UTF-8):	Moduł SPL dla PHP
 Group:		Libraries
 URL:		http://php.net/manual/en/book.spl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(spl)
 
 %description spl
@@ -1473,10 +1390,9 @@ Moduł PHP dodający obsługę gniazdek.
 Summary:	SQLite extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
-Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite)
 
 %description sqlite
@@ -1523,7 +1439,6 @@ Zaleca się używanie modułu Sybase-CT.
 Summary:	Sybase-CT extension module for PHP
 Summary(pl.UTF-8):	Moduł Sybase-CT dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.sybase.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sybase-ct)
 Obsoletes:	php-sybase
@@ -1541,7 +1456,6 @@ CT-lib.
 Summary:	SysV msg extension module for PHP
 Summary(pl.UTF-8):	Moduł SysV msg dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.sem.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvmsg)
 
@@ -1556,7 +1470,6 @@ Moduł PHP umożliwiający korzystanie z kolejek komunikatów SysV.
 Summary:	SysV sem extension module for PHP
 Summary(pl.UTF-8):	Moduł SysV sem dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.sem.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvsem)
 
@@ -1571,7 +1484,6 @@ Moduł PHP umożliwiający korzystanie z semaforów SysV.
 Summary:	SysV shm extension module for PHP
 Summary(pl.UTF-8):	Moduł SysV shm dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.shmop.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvshm)
 
@@ -1582,24 +1494,10 @@ Shared Memory support.
 %description sysvshm -l pl.UTF-8
 Moduł PHP umożliwiający korzystanie z pamięci dzielonej SysV.
 
-%package tests
-Summary:	Contains unit test files for PHP and extensions
-Summary(pl.UTF-8):	Zawiera pliki testów jednostkowych dla PHP i rozszerzeń
-Group:		Libraries
-URL:		http://qa.php.net/
-Requires:	%{name}-cli
-
-%description tests
-This package contains unit tests for PHP and it's extensions.
-
-%description tests -l pl.UTF-8
-Ten pakiet zawiera pliki testów jednostkowych dla PHP i rozszerzeń
-
 %package tidy
 Summary:	Tidy extension module for PHP
 Summary(pl.UTF-8):	Moduł Tidy dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.tidy.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	tidy
 Provides:	php(tidy)
@@ -1615,7 +1513,6 @@ Moduł PHP umożliwiający korzystanie z tidy.
 Summary:	tokenizer extension module for PHP
 Summary(pl.UTF-8):	Moduł rozszerzenia tokenizer dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.tokenizer.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(tokenizer)
 
@@ -1630,12 +1527,8 @@ Moduł PHP dodający obsługę tokenizera do PHP.
 Summary:	wddx extension module for PHP
 Summary(pl.UTF-8):	Moduł wddx dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.wddx.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-# - wddx doesn't require session as it's disabled at compile time:
-#   if HAVE_PHP_SESSION && !defined(COMPILE_DL_SESSION)
-#   see also php.spec#rev1.120.2.22
-#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
+Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(wddx)
 
@@ -1650,7 +1543,6 @@ Moduł PHP umożliwiający korzystanie z wddx.
 Summary:	XML extension module for PHP
 Summary(pl.UTF-8):	Moduł XML dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.xml.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xml)
 
@@ -1668,7 +1560,6 @@ następnie definiować procedury obsługi dla różnych zdarzeń XML.
 Summary:	XML Reader extension module for PHP
 Summary(pl.UTF-8):	Moduł XML Reader dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.xmlreader.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Suggests:	%{name}-dom = %{epoch}:%{version}-%{release}
 Provides:	php(xmlreader)
@@ -1688,7 +1579,6 @@ zatrzymujący się na każdym węźle po drodze.
 Summary:	xmlrpc extension module for PHP
 Summary(pl.UTF-8):	Moduł xmlrpc dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.xmlrpc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(xmlrpc)
@@ -1704,7 +1594,6 @@ Moduł PHP dodający obsługę XMLRPC.
 Summary:	Fast, non-cached, forward-only means to write XML data
 Summary(pl.UTF-8):	Szybka, nie cachowana metoda zapisu danych w formacie XML
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.xmlwriter.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xmlwriter)
 Obsoletes:	php-pecl-xmlwriter
@@ -1723,7 +1612,6 @@ plików zawierających dane XML.
 Summary:	xsl extension module for PHP
 Summary(pl.UTF-8):	Moduł xsl dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.xsl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
@@ -1742,7 +1630,6 @@ Moduł PHP dodający nową obsługę XSLT (przy użyciu libxslt).
 Summary:	Zip management extension
 Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zip)
 Obsoletes:	php-pecl-zip
@@ -1758,7 +1645,6 @@ odczyt archiwów zip.
 Summary:	Zlib extension module for PHP
 Summary(pl.UTF-8):	Moduł zlib dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.zlib.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zlib)
 
@@ -1853,10 +1739,6 @@ done
 %patch49 -p1
 %patch50 -p1
 %patch51 -p1
-%patch52 -p1
-%patch53 -p1
-%patch54 -p1
-%patch55 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1886,13 +1768,6 @@ mv ext/standard/tests/general_functions/bug39322.phpt{,.broken}
 %endif
 
 cp -af Zend/LICENSE{,.Zend}
-install -p %{SOURCE13} dep-tests.sh
-
-# disable broken tests
-# says just "Terminated" twice and fails
-mv sapi/cli/tests/022.phpt{,.broken}
-
-sh -xe %{_sourcedir}/skip-tests.sh
 
 %build
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
@@ -2089,10 +1964,6 @@ for sapi in $sapis; do
 	cp -f config.log config.log.$sapi
 done
 
-# as we build each SAPI in own make, adjust php-config.in forehead
-sapis=$(awk '/^PHP_SAPI = /{print $3}' Makefile.* | sort -u | xargs)
-sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
-
 # must make this first, so modules can link against it.
 %{__make} libphp_common.la
 %{__make} build-modules
@@ -2105,11 +1976,17 @@ sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
 %endif
 
+test_args="-dextension_dir=modules -dextension=simplexml.so"
 # CGI
 cp -af php_config.h.cgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.cgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn $test_args)" = cgi ] || exit 1
+
+# CLI
+cp -af php_config.h.cli main/php_config.h
+%{__make} sapi/cli/php -f Makefile.cli
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n $test_args)" = cli ] || exit 1
 
 # FCGI
 %if %{with fcgi}
@@ -2117,7 +1994,7 @@ cp -af php_config.h.fcgi main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fcgi
 cp -r sapi/cgi sapi/fcgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fcgi/php-cgi -qn $test_args)" = cgi-fcgi ] || exit 1
 %endif
 
 %if %{with fpm}
@@ -2125,75 +2002,15 @@ cp -af php_config.h.fpm main/php_config.h
 rm -rf sapi/cgi/.libs sapi/cgi/*.lo
 %{__make} sapi/cgi/php-cgi -f Makefile.fpm
 cp -r sapi/cgi sapi/fpm
-[ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/fpm/php-cgi -qn $test_args)" = cgi-fcgi ] || exit 1
 %endif
-
-# CLI
-cp -af php_config.h.cli main/php_config.h
-%{__make} sapi/cli/php -f Makefile.cli
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
-
-# check for stupid xml parse breakage where &lt; and &gt; just get lost in parse result
-./sapi/cli/php -n -dextension_dir=modules -dextension=xml.so -r '$p = xml_parser_create(); xml_parse_into_struct($p, "<x>&lt;</x>", $vals, $index); exit((int )empty($vals[0]["value"]));'
-
-# Generate stub .ini files for each extension
-rm -rf conf.d
-install -d conf.d
-generate_inifiles() {
-	for so in modules/*.so; do
-		mod=$(basename $so .so)
-		conf="$mod.ini"
-		# xml needs to be loaded before wddx
-		[ "$mod" = "wddx" ] && conf="xml_$mod.ini"
-		# pre needs to be loaded before SPL
-		[ "$mod" = "pcre" ] && conf="PCRE.ini"
-		# spl needs to be loaded before mysqli
-		[ "$mod" = "spl" ] && conf="SPL.ini"
-		echo "+ $conf"
-		cat > conf.d/$conf <<-EOF
-			; Enable $mod extension module
-			extension=$mod.so
-		EOF
-	done
-}
-generate_inifiles
-
-# Check that the module inner-dependencies are intact
-PHP=./sapi/cli/php EXTENSION_DIR=modules CONFIG_DIR=conf.d ./dep-tests.sh > dep-tests.log
-if grep -v OK dep-tests.log; then
-	echo >&2 "The results above were not expected"
-	exit 1
-fi
-
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
-cp -af php_config.h.cli main/php_config.h
-cp -af Makefile.cli Makefile
-# sybase modules collide, remove one
-%{__sed} -i -e '/^PHP_MODULES/s,\$(phplibdir)/sybase_ct.la,,' Makefile
-
-cat <<'EOF' > run-tests.sh
-#!/bin/sh
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
 unset TZ LANG LC_ALL || :
-%{__make} test \
-	EXTENSION_DIR=. \
-	PHP_TEST_SHARED_SYSTEM_EXTENSIONS= \
-	RUN_TESTS_SETTINGS="-q $*"
-EOF
-chmod +x run-tests.sh
-./run-tests.sh -w failed.log -s test.log
-
-# collect failed tests into cleanup script used in prep.
-sed -ne '/FAILED TEST SUMMARY/,/^===/p' test.log | sed -e '1,/^---/d;/^===/,$d' > tests-failed.log
-sed -ne '/\[.*\]/{s/\(.*\) \[\(.*\)\]/# \1\nmv \2{,.skip}/p}' tests-failed.log \
-	>> %{_sourcedir}/skip-tests.sh
-
-failed=$(wc -l < tests-failed.log)
-if [ "$failed" != 0 ]; then
-	exit 1
-fi
+%{__make} test
+unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 %endif
 
 %install
@@ -2203,16 +2020,16 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
-# install the Apache modules' files
+# install the apache modules' files
 %{__make} install-headers install-build install-modules install-programs \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
-# install Apache1 DSO module
+# install apache1 DSO module
 %if %{with apache1}
 libtool --silent --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
 %endif
 
-# install Apache2 DSO module
+# install apache2 DSO module
 %if %{with apache2}
 libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
 %endif
@@ -2268,8 +2085,24 @@ install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
+# Generate stub .ini files for each subpackage
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
-cp -a conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
+generate_inifiles() {
+	for so in modules/*.so; do
+		mod=$(basename $so .so)
+		conf="%{_sysconfdir}/conf.d/$mod.ini"
+		# xml needs to be loaded before wddx
+		[ "$mod" = "wddx" ] && conf="%{_sysconfdir}/conf.d/xml_$mod.ini"
+		# spl needs to be loaded before mysqli
+		[ "$mod" = "spl" ] && conf="%{_sysconfdir}/conf.d/SPL.ini"
+		echo "+ $conf"
+		cat > $RPM_BUILD_ROOT$conf <<-EOF
+			; Enable $mod extension module
+			extension=$mod.so
+		EOF
+	done
+}
+generate_inifiles
 
 # per SAPI ini directories
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d
@@ -2298,11 +2131,6 @@ install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pc
 install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 
-# tests
-install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
-install -p run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
-cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -2326,9 +2154,6 @@ if [ "$1" = "0" ]; then
 	%service -q httpd restart
 fi
 
-%pre fpm
-%useradd -u 51 -r -s /bin/false -c "HTTP User" -g http http
-
 %post fpm
 /sbin/chkconfig --add php-fpm
 %service php-fpm restart
@@ -2337,11 +2162,6 @@ fi
 if [ "$1" = 0 ]; then
 	%service php-fpm stop
 	/sbin/chkconfig --del php-fpm
-fi
-
-%postun fpm
-if [ "$1" = "0" ]; then
-	%userremove http
 fi
 
 %post	common -p /sbin/ldconfig
@@ -2923,7 +2743,7 @@ fi
 %if %{with pcre}
 %files pcre
 %defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/PCRE.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcre.ini
 %attr(755,root,root) %{php_extensiondir}/pcre.so
 %endif
 
@@ -3085,20 +2905,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sysvshm.ini
 %attr(755,root,root) %{php_extensiondir}/sysvshm.so
-
-%files tests
-%defattr(644,root,root,755)
-%dir %{php_data_dir}/tests/php
-%{php_data_dir}/tests/php/basic
-%{php_data_dir}/tests/php/classes
-%{php_data_dir}/tests/php/func
-%{php_data_dir}/tests/php/lang
-%{php_data_dir}/tests/php/output
-%{php_data_dir}/tests/php/run-test
-%{php_data_dir}/tests/php/security
-%{php_data_dir}/tests/php/strings
-%{php_data_dir}/tests/php/quicktester.inc
-%attr(755,root,root) %{php_data_dir}/tests/php/run-tests.php
 
 %if %{with tidy}
 %files tidy

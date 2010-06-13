@@ -1,0 +1,41 @@
+commit 1740db5a7045fe406dbf9de6c07caf7c944fbd85
+Author: aharvey <aharvey@c90b9560-bf6c-de11-be94-00142212c4b1>
+Date:   Wed Mar 3 09:25:50 2010 +0000
+
+    Fix for bug #51192 (FILTER_VALIDATE_URL will invalidate a hostname that includes '-'). Original patch by solar@azrael.ws.
+    
+    
+    git-svn-id: http://svn.php.net/repository/php/php-src/branches/PHP_5_2@295773 c90b9560-bf6c-de11-be94-00142212c4b1
+
+diff --git a/ext/filter/logical_filters.c b/ext/filter/logical_filters.c
+index 0b27a64..52dcb50 100644
+--- a/ext/filter/logical_filters.c
++++ b/ext/filter/logical_filters.c
+@@ -467,7 +467,7 @@ void php_filter_validate_url(PHP_INPUT_FILTER_PARAM_DECL) /* {{{ */
+ 		s = url->host;
+ 
+ 		while (s < e) {
+-			if (!isalnum((int)*(unsigned char *)s) && *s != '_' && *s != '.') {
++			if (!isalnum((int)*(unsigned char *)s) && *s != '-' && *s != '.') {
+ 				goto bad_url;
+ 			}
+ 			s++;
+diff --git a/ext/filter/tests/bug51192.phpt b/ext/filter/tests/bug51192.phpt
+new file mode 100644
+index 0000000..96c67ea
+--- /dev/null
++++ b/ext/filter/tests/bug51192.phpt
+@@ -0,0 +1,13 @@
++--TEST--
++bug 51192, FILTER_VALIDATE_URL will invalidate a hostname that includes '-'
++--SKIPIF--
++<?php if (!extension_loaded("filter")) die("skip"); ?>
++--FILE--
++<?php
++var_dump(filter_var('http://example.com/path', FILTER_VALIDATE_URL));
++var_dump(filter_var('http://exa-mple.com/path', FILTER_VALIDATE_URL));
++var_dump(filter_var('http://exa_mple.com/path', FILTER_VALIDATE_URL));
++--EXPECT--	
++string(23) "http://example.com/path"
++string(24) "http://exa-mple.com/path"
++bool(false)

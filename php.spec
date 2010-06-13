@@ -112,7 +112,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.13
-Release:	13
+Release:	8
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -132,7 +132,6 @@ Source10:	%{name}-fpm.init
 Source11:	%{name}-fpm.logrotate
 Source12:	%{name}-branch.sh
 Source13:	dep-tests.sh
-Source14:	skip-tests.sh
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -186,8 +185,6 @@ Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	%{name}-libpng.patch
 Patch53:	%{name}-gmp.patch
-Patch54:	%{name}-bug-51192.patch
-Patch55:	fix-test-run.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -227,7 +224,7 @@ BuildRequires:	libtool >= 2:2.2
 BuildRequires:	libtool
 %endif
 BuildRequires:	libwrap-devel
-BuildRequires:	libxml2-devel >= 1:2.7.6-4
+BuildRequires:	libxml2-devel >= 2.5.10
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mhash:BuildRequires:	mhash-devel}
 %{?with_ming:BuildRequires:	ming-devel >= 0.3}
@@ -240,7 +237,6 @@ BuildRequires:	ncurses-ext-devel
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
-%{?with_snmp:%{?with_tests:mibs-net-snmp}}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
 BuildRequires:	pkgconfig
@@ -393,7 +389,6 @@ Summary(pl.UTF-8):	PHP jako program CGI/FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
-Provides:	webserver(php) = %{version}
 
 %description cgi
 php as CGI program.
@@ -1107,8 +1102,8 @@ Moduł PHP umożliwiający korzystanie z biblioteki OpenSSL.
 Summary:	Process Control extension module for PHP
 Summary(pl.UTF-8):	Moduł Process Control dla PHP
 Group:		Libraries
-URL:		http://www.php.net/manual/en/book.pcntl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+URL:		http://www.php.net/manual/en/book.pcntl.php
 Provides:	php(pcntl)
 
 %description pcntl
@@ -1582,19 +1577,6 @@ Shared Memory support.
 %description sysvshm -l pl.UTF-8
 Moduł PHP umożliwiający korzystanie z pamięci dzielonej SysV.
 
-%package tests
-Summary:	Contains unit test files for PHP and extensions
-Summary(pl.UTF-8):	Zawiera pliki testów jednostkowych dla PHP i rozszerzeń
-Group:		Libraries
-URL:		http://qa.php.net/
-Requires:	%{name}-cli
-
-%description tests
-This package contains unit tests for PHP and it's extensions.
-
-%description tests -l pl.UTF-8
-Ten pakiet zawiera pliki testów jednostkowych dla PHP i rozszerzeń
-
 %package tidy
 Summary:	Tidy extension module for PHP
 Summary(pl.UTF-8):	Moduł Tidy dla PHP
@@ -1855,8 +1837,6 @@ done
 %patch51 -p1
 %patch52 -p1
 %patch53 -p1
-%patch54 -p1
-%patch55 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -1887,12 +1867,6 @@ mv ext/standard/tests/general_functions/bug39322.phpt{,.broken}
 
 cp -af Zend/LICENSE{,.Zend}
 install -p %{SOURCE13} dep-tests.sh
-
-# disable broken tests
-# says just "Terminated" twice and fails
-mv sapi/cli/tests/022.phpt{,.broken}
-
-sh -xe %{_sourcedir}/skip-tests.sh
 
 %build
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
@@ -2133,9 +2107,6 @@ cp -af php_config.h.cli main/php_config.h
 %{__make} sapi/cli/php -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -n)" = cli ] || exit 1
 
-# check for stupid xml parse breakage where &lt; and &gt; just get lost in parse result
-./sapi/cli/php -n -dextension_dir=modules -dextension=xml.so -r '$p = xml_parser_create(); xml_parse_into_struct($p, "<x>&lt;</x>", $vals, $index); exit((int )empty($vals[0]["value"]));'
-
 # Generate stub .ini files for each extension
 rm -rf conf.d
 install -d conf.d
@@ -2170,30 +2141,10 @@ fi
 # Run tests, using the CLI SAPI
 cp -af php_config.h.cli main/php_config.h
 cp -af Makefile.cli Makefile
-# sybase modules collide, remove one
-%{__sed} -i -e '/^PHP_MODULES/s,\$(phplibdir)/sybase_ct.la,,' Makefile
-
-cat <<'EOF' > run-tests.sh
-#!/bin/sh
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
 unset TZ LANG LC_ALL || :
-%{__make} test \
-	EXTENSION_DIR=. \
-	PHP_TEST_SHARED_SYSTEM_EXTENSIONS= \
-	RUN_TESTS_SETTINGS="-q $*"
-EOF
-chmod +x run-tests.sh
-./run-tests.sh -w failed.log -s test.log
-
-# collect failed tests into cleanup script used in prep.
-sed -ne '/FAILED TEST SUMMARY/,/^===/p' test.log | sed -e '1,/^---/d;/^===/,$d' > tests-failed.log
-sed -ne '/\[.*\]/{s/\(.*\) \[\(.*\)\]/# \1\nmv \2{,.skip}/p}' tests-failed.log \
-	>> %{_sourcedir}/skip-tests.sh
-
-failed=$(wc -l < tests-failed.log)
-if [ "$failed" != 0 ]; then
-	exit 1
-fi
+%{__make} test
+unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 %endif
 
 %install
@@ -2297,11 +2248,6 @@ install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pc
 # for php-pecl-mailparse
 install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
-
-# tests
-install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
-install -p run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
-cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -3085,20 +3031,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sysvshm.ini
 %attr(755,root,root) %{php_extensiondir}/sysvshm.so
-
-%files tests
-%defattr(644,root,root,755)
-%dir %{php_data_dir}/tests/php
-%{php_data_dir}/tests/php/basic
-%{php_data_dir}/tests/php/classes
-%{php_data_dir}/tests/php/func
-%{php_data_dir}/tests/php/lang
-%{php_data_dir}/tests/php/output
-%{php_data_dir}/tests/php/run-test
-%{php_data_dir}/tests/php/security
-%{php_data_dir}/tests/php/strings
-%{php_data_dir}/tests/php/quicktester.inc
-%attr(755,root,root) %{php_data_dir}/tests/php/run-tests.php
 
 %if %{with tidy}
 %files tidy

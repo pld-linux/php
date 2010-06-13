@@ -240,6 +240,7 @@ BuildRequires:	ncurses-ext-devel
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
+%{?with_snmp:%{?with_tests:mibs-net-snmp}}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
 BuildRequires:	pkgconfig
@@ -2171,8 +2172,6 @@ cp -af php_config.h.cli main/php_config.h
 cp -af Makefile.cli Makefile
 # sybase modules collide, remove one
 %{__sed} -i -e '/^PHP_MODULES/s,\$(phplibdir)/sybase_ct.la,,' Makefile
-# snmp cries about missibg mib.
-%{__sed} -i -e '/^PHP_MODULES/s,\$(phplibdir)/snmp.la,,' Makefile
 
 cat <<'EOF' > run-tests.sh
 #!/bin/sh

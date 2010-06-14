@@ -67,8 +67,8 @@
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
 
-# some problems with apache 2.x
-%if %{with apache2}
+# mm is not thread safe
+%if %{with zts}
 %undefine	with_mm
 %endif
 

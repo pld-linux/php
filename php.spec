@@ -379,6 +379,7 @@ Summary:	php as FastCGI program
 Summary(pl.UTF-8):	php jako program FastCGI
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(fcgi)
 Provides:	webserver(php) = %{version}
 
 %description fcgi

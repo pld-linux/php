@@ -55,9 +55,10 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-%bcond_without	apache1		# disable building Apache 1.3.x module
-%bcond_without	apache2		# disable building Apache 2.x module
+%bcond_without	apache1		# disable building Apache 1.3.x SAPI
+%bcond_without	apache2		# disable building Apache 2.x SAPI
 %bcond_without	zts		# disable Zend Thread Safety
+%bcond_without	cgi			# disable CGI/FCGI SAPI
 %bcond_without	fpm		# fpm patches from http://www.php-fpm.org/
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
@@ -66,6 +67,14 @@
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
+
+# disable all sapis
+%if %{with gcov}
+%undefine	with_apache1
+%undefine	with_apache2
+%undefine	with_cgi
+%undefine	with_litespeed
+%endif
 
 # mm is not thread safe
 %if %{with zts}
@@ -82,8 +91,10 @@
 %undefine	with_fpm
 %endif
 
+%if 0
 %if %{without apache1} && %{without apache2}
 ERROR: You need to select at least one Apache SAPI to build shared modules.
+%endif
 %endif
 
 # filter depends on pcre
@@ -167,6 +178,7 @@ Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
 Patch54:	mysqlnd-shared.patch
+Patch55:	bug-52078-fileinode.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -214,6 +226,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
+%{?with_snmp:%{?with_tests:mibs-net-snmp}}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
 BuildRequires:	pkgconfig
@@ -1814,6 +1827,7 @@ cp php.ini-production php.ini
 %patch52 -p1
 %patch53 -p1
 %patch54 -p1
+%patch55 -p1
 
 %if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
@@ -1830,6 +1844,7 @@ rm -f ext/recode/config9.m4
 rm -rf ext/sqlite3/libsqlite
 #rm -rf ext/bcmath/libbcmath
 #rm -rf ext/date/lib
+#rm -rf ext/fileinfo/libmagic
 #rm -rf ext/dba/libcdb
 #rm -rf ext/dba/libflatfile
 #rm -rf ext/dba/libinifile
@@ -1837,9 +1852,10 @@ rm -rf ext/sqlite3/libsqlite
 #rm -rf ext/mbstring/libmbfl
 #rm -rf ext/mbstring/oniguruma
 rm -rf ext/pcre/pcrelib
-rm -rf ext/pdo_sqlite/sqlite
+rm -rf ext/pdo_sqlite/libsqlite
 #rm -rf ext/soap/interop
 rm -r ext/xmlrpc/libxmlrpc
+#rm -rf ext/zip/lib
 
 cp -af Zend/LICENSE{,.Zend}
 install -p %{SOURCE13} dep-tests.sh
@@ -1888,7 +1904,10 @@ export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
 	-I%{_includedir}/xmlrpc-epi"
 
 sapis="
-cgi-fcgi cli
+cli
+%if %{with cgi}
+cgi-fcgi
+%endif
 %if %{with fpm}
 fpm
 %endif
@@ -2075,9 +2094,11 @@ sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
 %endif
 
 # CGI/FCGI
+%if %{with cgi}
 cp -af php_config.h.cgi-fcgi main/php_config.h
 %{__make} -f Makefile.cgi-fcgi
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
+%endif
 
 # PHP FPM
 %if %{with fpm}
@@ -2125,15 +2146,31 @@ if grep -v OK dep-tests.log; then
 	exit 1
 fi
 
+%if %{with gcov}
+# Use CLI SAPI
+cp -af php_config.h.cli main/php_config.h
+cp -af Makefile.cli Makefile
+%{__make} lcov
+# you really don't want to package result of gcov build
+exit 1
+%endif
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
 cp -af php_config.h.cli main/php_config.h
 cp -af Makefile.cli Makefile
+
+cat <<'EOF' > run-tests.sh
+#!/bin/sh
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
 unset TZ LANG LC_ALL || :
-%{__make} test RUN_TESTS_SETTINGS="-s test.log" PHP_TEST_SHARED_SYSTEM_EXTENSIONS=
-unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
+%{__make} test \
+	EXTENSION_DIR=. \
+	PHP_TEST_SHARED_SYSTEM_EXTENSIONS= \
+	RUN_TESTS_SETTINGS="-q $*"
+EOF
+chmod +x run-tests.sh
+./run-tests.sh -w failed.log -s test.log
 
 # collect failed tests into cleanup script used in prep.
 sed -ne '/FAILED TEST SUMMARY/,/^===/p' test.log | sed -e '1,/^---/d;/^===/,$d' > tests-failed.log
@@ -2179,8 +2216,11 @@ sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_c
 sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
 # install CGI/FCGI
+%if %{with cgi}
 libtool --silent --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
 ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+%endif
 
 # install FCGI PM
 %if %{with fpm}
@@ -2201,9 +2241,7 @@ ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
-install -d $RPM_BUILD_ROOT%{_sysconfdir}
 cp -a %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 cp -a %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
@@ -2587,12 +2625,14 @@ fi
 %attr(755,root,root) %{_sbindir}/php.litespeed
 %endif
 
+%if %{with cgi}
 %files cgi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cgi-fcgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
 %attr(755,root,root) %{_bindir}/php.cgi
 %attr(755,root,root) %{_bindir}/php.fcgi
+%endif
 
 %files cli
 %defattr(644,root,root,755)

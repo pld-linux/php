@@ -251,3 +251,25 @@ mv sapi/cli/tests/006.phpt{,.skip}
 mv sapi/cli/tests/016.phpt{,.skip}
 # Phar::buildFromIterator() RegexIterator(RecursiveIteratorIterator), SplFileInfo as current
 mv ext/phar/tests/phar_buildfromiterator10.phpt{,.skip}
+# output buffering - fatalism
+mv tests/output/ob_011.phpt{,.skip}
+# Inconsistencies when accessing protected members
+mv Zend/tests/access_modifiers_008.phpt{,.skip}
+# Inconsistencies when accessing protected members - 2
+mv Zend/tests/access_modifiers_009.phpt{,.skip}
+# Bug #48770 (call_user_func_array() fails to call parent from inheriting class)
+mv Zend/tests/bug48770.phpt{,.skip}
+# Bug #48770 (call_user_func_array() fails to call parent from inheriting class)
+mv Zend/tests/bug48770_2.phpt{,.skip}
+# Bug #48770 (call_user_func_array() fails to call parent from inheriting class)
+mv Zend/tests/bug48770_3.phpt{,.skip}
+# DBA with persistent connections
+mv ext/dba/tests/dba015.phpt{,.skip} (info: FLATFILE handler used)
+# DBA DB4 with persistent connections
+mv ext/dba/tests/dba_db4_018.phpt{,.skip} (info: DB4 handler used)
+# Bug #42718 (unsafe_raw filter not applied when configured as default filter)
+mv ext/filter/tests/bug42718.phpt{,.skip}
+# SimpleXML: array casting bug
+mv ext/simplexml/tests/034.phpt{,.skip}
+# Bug #39863 (file_exists() silently truncates after a null byte)
+mv ext/standard/tests/file/bug39863.phpt{,.skip}

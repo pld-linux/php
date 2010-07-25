@@ -225,7 +225,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
-%{?with_snmp:%{?with_tests:mibs-net-snmp}}
+%{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
 BuildRequires:	pkgconfig

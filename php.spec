@@ -59,7 +59,7 @@
 %bcond_without	apache2		# disable building Apache 2.x SAPI
 %bcond_without	zts		# disable Zend Thread Safety
 %bcond_without	cgi			# disable CGI/FCGI SAPI
-%bcond_without	fpm		# fpm patches from http://www.php-fpm.org/
+%bcond_without	fpm		# disable FPM
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
@@ -102,7 +102,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		5
+%define		rel		0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -110,13 +110,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.2
+Version:	5.3.3
 Release:	%{rel}%{?with_type_hints:th}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	46f500816125202c48a458d0133254a4
+# Source0-md5:	21ceeeb232813c10283a5ca1b4c87b48
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -164,7 +164,6 @@ Patch36:	%{name}-mysql-charsetphpini.patch
 Patch37:	%{name}-mysqli-charsetphpini.patch
 Patch38:	%{name}-pdo_mysql-charsetphpini.patch
 Patch39:	%{name}-use-prog_sendmail.patch
-Patch40:	%{name}-fpm.patch
 Patch41:	%{name}-fpm-config.patch
 Patch42:	%{name}-fpm-shared.patch
 Patch43:	%{name}-silent-session-cleanup.patch
@@ -1810,7 +1809,6 @@ cp php.ini-production php.ini
 %patch38 -p1
 %patch39 -p1
 %if %{with fpm}
-%patch40 -p1
 %patch41 -p1
 %patch42 -p1
 %endif

@@ -24,7 +24,7 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/php-fpm ]; then
 		msg_starting "PHP FastCGI Process Manager"
-		daemon --pidfile $pidfile /usr/bin/php.fpm --fpm --fpm-config /etc/php/fpm.conf
+		daemon --pidfile $pidfile /usr/sbin/php-fpm --fpm --fpm-config /etc/php/php-fpm.conf
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/php-fpm
 	else
@@ -91,7 +91,7 @@ case "$1" in
 	reload USR1 0
 	;;
   status)
-	status php-fpm php.fpm
+	status php-fpm
 	RETVAL=$?
 	;;
   *)

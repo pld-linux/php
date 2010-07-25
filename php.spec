@@ -102,7 +102,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		0.1
+%define		rel		0.2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2217,8 +2217,8 @@ cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 
 # install FCGI PM
 %if %{with fpm}
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/fpm.d
-libtool --silent --mode=install install sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_bindir}/php.fpm
+install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
+libtool --silent --mode=install install sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
 cp -a sapi/fpm/php-fpm.1 $RPM_BUILD_ROOT%{_mandir}/man1
 cp -a sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
@@ -2647,7 +2647,7 @@ fi
 %doc sapi/fpm/LICENSE
 %dir %{_sysconfdir}/fpm.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
-%attr(755,root,root) %{_bindir}/php.fpm
+%attr(755,root,root) %{_sbindir}/php-fpm
 %{_mandir}/man1/php-fpm.1*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/php-fpm
 %attr(754,root,root) /etc/rc.d/init.d/php-fpm

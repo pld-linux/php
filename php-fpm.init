@@ -6,8 +6,8 @@
 #
 # description:	PHP FastCGI Process Manager
 #
-# processname:	php.fpm
-# config:	/etc/php/fpm.conf
+# processname:	php-fpm
+# config:	/etc/php/php-fpm.conf
 # pidfile:	/var/run/php/fpm.pid
 #
 # $Id$
@@ -24,7 +24,7 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/php-fpm ]; then
 		msg_starting "PHP FastCGI Process Manager"
-		daemon --pidfile $pidfile /usr/sbin/php-fpm --fpm --fpm-config /etc/php/php-fpm.conf
+		daemon --pidfile $pidfile /usr/sbin/php-fpm --fpm-config /etc/php/php-fpm.conf
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/php-fpm
 	else

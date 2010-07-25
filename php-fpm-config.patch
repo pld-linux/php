@@ -1,5 +1,14 @@
---- php-5.3.3/sapi/fpm/php-fpm.conf.in~	2010-05-29 13:39:35.000000000 +0300
-+++ php-5.3.3/sapi/fpm/php-fpm.conf.in	2010-07-24 22:29:56.752470466 +0300
+--- php-5.3.3/sapi/fpm/php-fpm.conf.in	2010-07-24 22:29:56.752470466 +0300
++++ php-5.3.3/sapi/fpm/php-fpm.conf.in	2010-07-25 22:30:52.547803067 +0300
+@@ -84,7 +84,7 @@
+ ; must be separated by a comma. If this value is left blank, connections will be
+ ; accepted from any ip address.
+ ; Default Value: any
+-;listen.allowed_clients = 127.0.0.1
++listen.allowed_clients = 127.0.0.1
+ 
+ ; Set permissions for unix socket, if one is used. In Linux, read/write
+ ; permissions must be set in order to allow connections from a web server. Many
 @@ -245,7 +245,7 @@
  ; the current environment.
  ; Default Value: clean env

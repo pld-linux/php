@@ -1933,7 +1933,7 @@ for sapi in $sapis; do
 		sapi_args='--disable-cgi %{?with_gcov:--enable-gcov}'
 	;;
 	fpm)
-		sapi_args='--disable-cli --with-fpm'
+		sapi_args='--disable-cli --enable-fpm'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
@@ -1980,11 +1980,6 @@ for sapi in $sapis; do
 	--enable-hash=shared \
 	--enable-xmlwriter=shared \
 %if %{with fpm}
-	--with-libevent=shared \
-	--with-fpm-conf=%{_sysconfdir}/fpm.conf \
-	--with-fpm-log=/var/log/fpm.log \
-	--with-fpm-pid=/var/run/php/fpm.pid \
-	--with-fpm-port=9000 \
 	--with-fpm-user=http \
 	--with-fpm-group=http \
 %endif
@@ -2222,9 +2217,10 @@ cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 
 # install FCGI PM
 %if %{with fpm}
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/fpm.d
 libtool --silent --mode=install install sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_bindir}/php.fpm
-cp -a sapi/fpm/php-fpm.1 $RPM_BUILD_ROOT%{_mandir}/man1/php-fpm.1
-cp -a sapi/fpm/php_fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}/fpm.conf
+cp -a sapi/fpm/php-fpm.1 $RPM_BUILD_ROOT%{_mandir}/man1
+cp -a sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
@@ -2649,7 +2645,8 @@ fi
 %defattr(644,root,root,755)
 %doc %lang(ru) sapi/fpm/readme-ru.markdown
 %doc sapi/fpm/nginx-site-conf.sample
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fpm.conf
+%dir %{_sysconfdir}/fpm.d
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
 %attr(755,root,root) %{_bindir}/php.fpm
 %{_mandir}/man1/php-fpm.1*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/php-fpm

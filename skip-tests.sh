@@ -249,3 +249,5 @@ mv ext/xsl/tests/xsltprocessor_registerPHPFunctions-funcundef.phpt{,.skip}
 mv sapi/cli/tests/006.phpt{,.skip}
 # CLI -a and readline
 mv sapi/cli/tests/016.phpt{,.skip}
+# Phar::buildFromIterator() RegexIterator(RecursiveIteratorIterator), SplFileInfo as current
+mv ext/phar/tests/phar_buildfromiterator10.phpt{,.skip}

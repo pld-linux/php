@@ -264,9 +264,9 @@ mv Zend/tests/bug48770_2.phpt{,.skip}
 # Bug #48770 (call_user_func_array() fails to call parent from inheriting class)
 mv Zend/tests/bug48770_3.phpt{,.skip}
 # DBA with persistent connections
-mv ext/dba/tests/dba015.phpt{,.skip} (info: FLATFILE handler used)
+mv ext/dba/tests/dba015.phpt{,.skip}
 # DBA DB4 with persistent connections
-mv ext/dba/tests/dba_db4_018.phpt{,.skip} (info: DB4 handler used)
+mv ext/dba/tests/dba_db4_018.phpt{,.skip}
 # Bug #42718 (unsafe_raw filter not applied when configured as default filter)
 mv ext/filter/tests/bug42718.phpt{,.skip}
 # SimpleXML: array casting bug

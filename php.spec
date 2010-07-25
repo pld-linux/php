@@ -2643,8 +2643,8 @@ fi
 %if %{with fpm}
 %files fpm
 %defattr(644,root,root,755)
-%doc %lang(ru) sapi/fpm/readme-ru.markdown
-%doc sapi/fpm/nginx-site-conf.sample
+%doc sapi/fpm/CREDITS
+%doc sapi/fpm/LICENSE
 %dir %{_sysconfdir}/fpm.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
 %attr(755,root,root) %{_bindir}/php.fpm

@@ -273,3 +273,25 @@ mv ext/filter/tests/bug42718.phpt{,.skip}
 mv ext/simplexml/tests/034.phpt{,.skip}
 # Bug #39863 (file_exists() silently truncates after a null byte)
 mv ext/standard/tests/file/bug39863.phpt{,.skip}
+# DOMDocument::$validateOnParse - effectual determination (dom_document_validate_on_parse_read/dom_document_validate_on_parse_write)
+mv ext/dom/tests/DOMDocument_validate_on_parse_variation.phpt{,.skip}
+# Test fileinode() function: Basic functionality
+mv ext/standard/tests/file/fileinode_basic.phpt{,.skip}
+# Test fileinode() function: Variations
+mv ext/standard/tests/file/fileinode_variation.phpt{,.skip}
+# Test fileinode() function: usage variations - links
+mv ext/standard/tests/file/fileinode_variation1.phpt{,.skip}
+# various file stat func tests
+mv ext/standard/tests/file/filestat.phpt{,.skip}
+# Test lstat() and stat() functions: usage variations - dir/file name stored in object
+mv ext/standard/tests/file/lstat_stat_variation18.phpt{,.skip}
+# Test lstat() and stat() functions: usage variations - dir/file names in array
+mv ext/standard/tests/file/lstat_stat_variation19.phpt{,.skip}
+# Test lstat() and stat() functions: usage variations - link names stored in array/object
+mv ext/standard/tests/file/lstat_stat_variation20.phpt{,.skip}
+# getlastmod() and others
+mv ext/standard/tests/file/statpage.phpt{,.skip}
+# Test tempnam() function: usage variations - creating files
+mv ext/standard/tests/file/tempnam_variation1.phpt{,.skip}
+# Bug #40576 (double values are truncated to 6 decimal digits when encoding)
+mv ext/xmlrpc/tests/bug40576.phpt{,.skip}

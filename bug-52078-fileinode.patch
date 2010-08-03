@@ -372,3 +372,21 @@
 +File inode is => %i
  File created in => directory specified
  *** Done ***
+--- php-5.3.3/tests/security/open_basedir_fileinode.phpt~	2008-05-09 11:39:44.000000000 +0300
++++ php-5.3.3/tests/security/open_basedir_fileinode.phpt	2010-07-27 22:51:29.603089549 +0300
+@@ -46,10 +46,10 @@
+ 
+ Warning: fileinode(): open_basedir restriction in effect. File(./../.) is not within the allowed path(s): (.) in %s on line %d
+ bool(false)
+-int(%d)
+-int(%d)
+-int(%d)
+-int(%d)
+-int(%d)
++int(%i)
++int(%i)
++int(%i)
++int(%i)
++int(%i)
+ *** Finished testing open_basedir configuration [fileinode] ***
+ 

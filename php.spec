@@ -178,6 +178,8 @@ Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
 Patch54:	mysqlnd-shared.patch
 Patch55:	bug-52078-fileinode.patch
+Patch56:	bug-51901.patch
+Patch57:	bug-52448.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1826,6 +1828,8 @@ cp php.ini-production php.ini
 %patch53 -p1
 %patch54 -p1
 %patch55 -p1
+%patch56 -p0
+%patch57 -p1
 
 %if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
@@ -1864,6 +1868,14 @@ sed -i -e 's#-fvisibility=hidden##g' configure*
 # disable broken tests
 # says just "Terminated" twice and fails
 mv sapi/cli/tests/022.phpt{,.broken}
+
+# php-5.3.3/ext/standard/tests/file/statpage.phpt
+rm ext/standard/tests/file/statpage.phpt
+
+# idiotic test, it will fail if somebody else makes space on disk or if disk
+# space is not yet allocated (xfs). report upstream to advice bogus test is
+# probably pointless.
+rm ext/standard/tests/file/disk_free_space_basic.phpt
 
 sh -xe %{_sourcedir}/skip-tests.sh
 

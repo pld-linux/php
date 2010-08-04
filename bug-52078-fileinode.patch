@@ -390,3 +390,13 @@
 +int(%i)
  *** Finished testing open_basedir configuration [fileinode] ***
  
+--- php-5.3.3/ext/spl/tests/SplFileInfo_getInode_basic.phpt~	2010-08-04 16:25:21.000000000 +0300
++++ php-5.3.3/ext/spl/tests/SplFileInfo_getInode_basic.phpt	2010-08-04 16:28:32.722932851 +0300
+@@ -11,6 +11,7 @@
+ --SKIPIF--
+ <?php
+ if (substr(PHP_OS, 0, 3) == 'WIN') die("skip this test not for Windows platforms");
++if (PHP_INT_SIZE == 4) die("skip this test is for >32bit platform only (inodes overflow there)");
+ ?>
+ --FILE--
+ <?php

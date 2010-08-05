@@ -180,6 +180,7 @@ Patch54:	mysqlnd-shared.patch
 Patch55:	bug-52078-fileinode.patch
 Patch56:	bug-51901.patch
 Patch57:	bug-52448.patch
+Patch58:	bug-52533.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -195,6 +196,7 @@ BuildRequires:	elfutils-devel
 %{?with_fdf:BuildRequires:	fdftk-devel}
 #BuildRequires:	flex
 BuildRequires:	pkgconfig
+BuildRequires:	sed >= 4.0
 %if %{with mssql} || %{with sybase_ct}
 BuildRequires:	freetds-devel >= 0.82
 %endif
@@ -226,8 +228,8 @@ BuildRequires:	libxslt-devel >= 1.1.0
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
 %{?with_gcov:BuildRequires:	lcov}
-%{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
+%{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
 BuildRequires:	pkgconfig
@@ -237,7 +239,7 @@ BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
-BuildRequires:	rpmbuild(macros) >= 1.527
+BuildRequires:	rpmbuild(macros) >= 1.566
 %{?with_sqlite:BuildRequires:	sqlite-devel}
 %{?with_sqlite3:BuildRequires:	sqlite3-devel >= 3.3.9}
 BuildRequires:	t1lib-devel
@@ -1827,9 +1829,11 @@ cp php.ini-production php.ini
 %patch52 -p1
 %patch53 -p1
 %patch54 -p1
+%undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1
 %patch56 -p0
 %patch57 -p1
+%patch58 -p1
 
 %if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4

@@ -102,7 +102,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		4
+%define		rel		5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -447,6 +447,7 @@ Summary(pl.UTF-8):	Wspólne pliki dla modułu Apache'a i programu CGI
 Summary(ru.UTF-8):	Разделяемые библиотеки для PHP
 Summary(uk.UTF-8):	Бібліотеки спільного використання для PHP
 Group:		Libraries
+Requires(post):	sed >= 4.0
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
@@ -2308,6 +2309,16 @@ cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+%post common
+# PHP 5.3 requires timezone being setup, try setup it from tzdata
+if [ -f /etc/sysconfig/timezone ]; then
+	TIMEZONE=
+	. /etc/sysconfig/timezone
+	if [ "$TIMEZONE" ]; then
+		%{__sed} -i -e "s,^;date.timezone = .*,date.timezone = $TIMEZONE," /etc/php/php.ini
+	fi
+fi
 
 %post -n apache1-mod_php
 if [ "$1" = "1" ]; then

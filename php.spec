@@ -102,7 +102,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		7
+%define		rel		8
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2353,11 +2353,11 @@ fi
 
 %post common
 # PHP 5.3 requires timezone being setup, try setup it from tzdata
-if [ -f /etc/sysconfig/timezone ]; then
+if ! grep -q '^date.timezone[[:space:]]*=' %{_sysconfdir}/php.ini && [ -f /etc/sysconfig/timezone ]; then
 	TIMEZONE=
 	. /etc/sysconfig/timezone
 	if [ "$TIMEZONE" ]; then
-		%{__sed} -i -e "s,^;date.timezone\s*=.*,date.timezone = $TIMEZONE," /etc/php/php.ini
+		%{__sed} -i -e "s,^;date.timezone[[:space:]]*=.*,date.timezone = $TIMEZONE," %{_sysconfdir}/php.ini
 	fi
 fi
 

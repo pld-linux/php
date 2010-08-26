@@ -2094,6 +2094,8 @@ sapis=$(awk '/^PHP_SAPI = /{print $3}' Makefile.* | sort -u | xargs)
 sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
 
 # must make libphp_common first, so modules can link against it.
+cp -af php_config.h.cli main/php_config.h
+cp -af Makefile.cli Makefile
 %{__make} libphp_common.la
 %{__make} build-modules
 
@@ -2206,8 +2208,9 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
-# install the Apache modules' files
-%{__make} install-headers install-build install-modules install-programs \
+cp -af php_config.h.cli main/php_config.h
+cp -af Makefile.cli Makefile
+%{__make} install \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
 # install Apache1 DSO module
@@ -2295,10 +2298,6 @@ mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
 %endif
 ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
-# as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h
-# isn't installed by install-headers make target, we do it manually here.
-# this header file is required by e.g. filter PECL extension
-install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pcre.h
 # for php-pecl-mailparse
 install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
@@ -2972,6 +2971,8 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/phar.ini
 %attr(755,root,root) %{php_extensiondir}/phar.so
+%attr(755,root,root) %{_bindir}/phar
+%attr(755,root,root) %{_bindir}/phar.phar
 %endif
 
 %files posix

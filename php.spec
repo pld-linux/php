@@ -448,7 +448,6 @@ Summary(ru.UTF-8):	Разделяемые библиотеки для PHP
 Summary(uk.UTF-8):	Бібліотеки спільного використання для PHP
 Group:		Libraries
 Requires(post):	sed >= 4.0
-Requires(post):	/sbin/ldconfig
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
@@ -2349,17 +2348,14 @@ if [ "$1" = "0" ]; then
 fi
 
 %post common
-/sbin/ldconfig
 # PHP 5.3 requires timezone being setup, try setup it from tzdata
 if [ -f /etc/sysconfig/timezone ]; then
 	TIMEZONE=
 	. /etc/sysconfig/timezone
 	if [ "$TIMEZONE" ]; then
-		%{__sed} -i -e "s,^;date.timezone = .*,date.timezone = $TIMEZONE," /etc/php/php.ini
+		%{__sed} -i -e "s,^;date.timezone\s*=.*,date.timezone = $TIMEZONE," /etc/php/php.ini
 	fi
 fi
-
-%postun	common -p /sbin/ldconfig
 
 %posttrans common
 # minimizing apache restarts logics. we restart webserver:

@@ -102,7 +102,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		6
+%define		rel		7
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -181,6 +181,7 @@ Patch55:	bug-52078-fileinode.patch
 Patch56:	bug-51901.patch
 Patch57:	bug-52448.patch
 Patch58:	bug-52533.patch
+Patch59:	%{name}-systzdata.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -452,6 +453,7 @@ Requires(post):	sed >= 4.0
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Requires:	rpm-whiteout >= 1.28
+Requires:	tzdata
 Provides:	php(date)
 Provides:	php(ereg)
 Provides:	php(hash)
@@ -1840,6 +1842,7 @@ cp php.ini-production php.ini
 %patch56 -p0
 %patch57 -p1
 %patch58 -p1
+%patch59 -p1
 
 %if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
@@ -1979,6 +1982,7 @@ for sapi in $sapis; do
 	--with-config-file-path=%{_sysconfdir} \
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
+	--with-system-tzdata \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	--enable-inline-optimization \

@@ -2216,6 +2216,9 @@ cp -af Makefile.cli Makefile
 %{__make} install \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
+# make link relative
+ln -sfn phar.phar $RPM_BUILD_ROOT%{_bindir}/phar
+
 # install Apache1 DSO module
 %if %{with apache1}
 libtool --silent --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1

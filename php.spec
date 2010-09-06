@@ -112,7 +112,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.14
-Release:	2
+Release:	3
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -571,19 +571,22 @@ precision math functions support.
 Moduł PHP umożliwiający korzystanie z dokładnych funkcji
 matematycznych takich jak w programie bc.
 
-%package bzip2
+%package bz2
 Summary:	Bzip2 extension module for PHP
 Summary(pl.UTF-8):	Moduł bzip2 dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.bzip2.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(bz2)
 Provides:	php(bzip2)
+Provides:	php-bzip2 = %{epoch}:%{version}-%{release}
+Obsoletes:	php-bzip2
 
-%description bzip2
+%description bz2
 This is a dynamic shared object (DSO) for PHP that will add bzip2
 compression support to PHP.
 
-%description bzip2 -l pl.UTF-8
+%description bz2 -l pl.UTF-8
 Moduł PHP umożliwiający używanie kompresji bzip2.
 
 %package calendar
@@ -670,6 +673,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dom)
 # it has some compatibility functions
 Provides:	php(domxml)
+Provides:	php-domxml = %{epoch}:%{version}-%{release}
 Obsoletes:	php-domxml <= 3:4.3.8-1
 
 %description dom
@@ -2393,7 +2397,7 @@ fi
 
 # extension scripts defines
 %extension_scripts bcmath
-%extension_scripts bzip2
+%extension_scripts bz2
 %extension_scripts calendar
 %extension_scripts ctype
 %extension_scripts curl
@@ -2460,9 +2464,6 @@ fi
 
 %triggerun bcmath -- %{name}-bcmath < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bcmath\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun bzip2 -- %{name}-bzip2 < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bzip2\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun calendar -- %{name}-calendar < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*calendar\.so/d' %{_sysconfdir}/php.ini
@@ -2723,7 +2724,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/bcmath.ini
 %attr(755,root,root) %{php_extensiondir}/bcmath.so
 
-%files bzip2
+%files bz2
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/bz2.ini
 %attr(755,root,root) %{php_extensiondir}/bz2.so

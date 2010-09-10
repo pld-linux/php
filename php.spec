@@ -29,6 +29,7 @@
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
+%bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	litespeed	# build litespeed module
 %bcond_without	curl		# without CURL extension module
@@ -182,6 +183,7 @@ Patch56:	bug-51901.patch
 Patch57:	bug-52448.patch
 Patch58:	bug-52533.patch
 Patch59:	%{name}-systzdata.patch
+Patch60:	%{name}-oracle-instantclient.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -231,6 +233,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
+%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
 BuildRequires:	pkgconfig
@@ -1843,6 +1846,7 @@ cp php.ini-production php.ini
 %patch57 -p1
 %patch58 -p1
 %patch59 -p1
+%patch60 -p1
 
 %if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
@@ -2017,7 +2021,7 @@ for sapi in $sapis; do
 %endif
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	--with-pdo-mysql=shared%{?with_mysqlnd:,mysqlnd} \
-	%{?with_oci8:--with-pdo-oci=shared} \
+	%{?with_oci8:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
@@ -2060,7 +2064,7 @@ for sapi in $sapis; do
 	%{?with_mysqlnd:--with-mysqlnd=shared} \
 	--with-mysql=shared%{?with_mysqlnd:,mysqlnd} \
 	%{?with_mysqli:--with-mysqli=shared%{?with_mysqlnd:,mysqlnd}} \
-	%{?with_oci8:--with-oci8=shared} \
+	%{?with_oci8:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
 	%{__with_without pcre pcre-regex /usr} \

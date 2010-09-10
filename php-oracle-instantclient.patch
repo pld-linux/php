@@ -1,0 +1,63 @@
+--- php-5.3.3/ext/oci8/config.m4.orig	2010-06-25 23:18:09.000000000 +0200
++++ php-5.3.3/ext/oci8/config.m4	2010-09-10 19:37:23.484315002 +0200
+@@ -304,6 +304,9 @@
+ 
+     AC_MSG_CHECKING([Oracle Instant Client SDK header directory])
+ 
++    dnl Header directory for Instant Client SDK PLD RPM install
++    OCISDKPLDINC=$PHP_OCI8_INSTANT_CLIENT/../include/oracle/client
++
+     dnl Header directory for Instant Client SDK RPM install
+     OCISDKRPMINC=`echo "$PHP_OCI8_INSTANT_CLIENT" | $PHP_OCI8_SED -e 's!^/usr/lib/oracle/\(.*\)/client\('${PHP_OCI8_IC_LIBDIR_SUFFIX}'\)*/lib[/]*$!/usr/include/oracle/\1/client\2!'`
+ 
+@@ -313,7 +316,11 @@
+     dnl Header directory for manual installation
+     OCISDKMANINC=`echo "$PHP_OCI8_INSTANT_CLIENT" | $PHP_OCI8_SED -e 's!\(.*\)/lib[/]*$!\1/include!'`
+ 
+-    if test -f "$OCISDKRPMINC/oci.h"; then
++    if test -f "$OCISDKPLDINC/oci.h"; then
++      AC_MSG_RESULT($OCISDKPLDINC)
++      PHP_ADD_INCLUDE($OCISDKPLDINC)
++      OCI8INCDIR=$OCISDKPLDINC
++    elif test -f "$OCISDKRPMINC/oci.h"; then
+       AC_MSG_RESULT($OCISDKRPMINC)
+       PHP_ADD_INCLUDE($OCISDKRPMINC)
+       OCI8INCDIR=$OCISDKRPMINC
+--- php-5.3.3/ext/pdo_oci/config.m4~	2010-02-04 02:12:14.000000000 +0100
++++ php-5.3.3/ext/pdo_oci/config.m4	2010-09-10 19:58:31.206315023 +0200
+@@ -6,8 +6,10 @@
+ AC_DEFUN([AC_PDO_OCI_VERSION],[
+   AC_MSG_CHECKING([Oracle version])
+   for OCI_VER in $SUPPORTED_LIB_VERS; do
+-    if test -f $PDO_OCI_DIR/lib/libclntsh.$SHLIB_SUFFIX_NAME.$OCI_VER; then
++    if test -f $1/lib/libclntsh.$SHLIB_SUFFIX_NAME.$OCI_VER; then
+       PDO_OCI_VERSION="$OCI_VER"
++    elif test -f $1/libclntsh.$SHLIB_SUFFIX_NAME.$OCI_VER; then
++      PDO_OCI_VERSION="$OCI_VER"
+     fi
+   done
+   if test -z "$PDO_OCI_VERSION"; then
+@@ -86,6 +86,9 @@
+     elif test -f $PDO_OCI_IC_PREFIX/client/include/oci.h ; then
+       PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/client/include)
+       AC_MSG_RESULT($PDO_OCI_IC_PREFIX/client/include)
++    elif test -f $PDO_OCI_IC_PREFIX/../include/oracle/client/oci.h ; then
++      PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/../include/oracle/client)
++      AC_MSG_RESULT($PDO_OCI_IC_PREFIX/../include/oracle/client)
+     else
+       AC_MSG_ERROR([I'm too dumb to figure out where the include dir is in your Instant Client install])
+     fi
+@@ -103,7 +103,12 @@
+     else
+       AC_MSG_ERROR([I'm too dumb to figure out where the libraries are in your Instant Client install])
+     fi
+-    PDO_OCI_VERSION="`echo $PDO_OCI_IC_VERS | cut -d. -f1-2`"
++    __PDO_OCI_VERSION="`echo $PDO_OCI_IC_VERS | cut -d. -f1-2`"
++    if test -n "$__PDO_OCI_VERSION" ; then
++      PDO_OCI_VERSION=$__PDO_OCI_VERSION
++    else
++      AC_PDO_OCI_VERSION($PDO_OCI_IC_PREFIX)
++    fi
+   else
+     AC_PDO_OCI_CHECK_LIB_DIR($PDO_OCI_DIR)
+ 

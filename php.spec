@@ -68,6 +68,7 @@
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
+%define	litespeed_version	5.4
 
 # disable all sapis
 %if %{with gcov}
@@ -129,6 +130,8 @@ Source11:	%{name}-fpm.logrotate
 Source12:	%{name}-branch.sh
 Source13:	dep-tests.sh
 Source14:	skip-tests.sh
+Source15:	http://litespeedtech.com/packages/lsapi/%{name}-litespeed-%{litespeed_version}.tgz
+# Source15-md5:	8738d9e3a232c2a0518c514802c66d73
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch
@@ -2115,6 +2118,7 @@ cp -af Makefile.cli Makefile
 %endif
 
 %if %{with litespeed}
+gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %{__make} -f Makefile.litespeed
 %endif
 

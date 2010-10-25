@@ -214,7 +214,7 @@ BuildRequires:	gd-devel(imagerotate) = 5.2.0
 %endif
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
-%{?with_imap:BuildRequires:	imap-devel >= 1:2001-0.BETA.200107022325.2}
+%{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
 BuildRequires:	libicu-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
@@ -848,6 +848,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.imap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Requires:	imap-lib >= 1:2007e-2
 Provides:	php(imap)
 
 %description imap

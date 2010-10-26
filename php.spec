@@ -26,7 +26,6 @@
 # Reflection
 #
 # Conditional build:
-%bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
@@ -40,7 +39,7 @@
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 # don't turn it on by default; see TODO item for mysqlnd in this spec
-%bcond_with	mysqlnd		# without mysqlnd support in mysql related extensions
+%bcond_with	mysqlnd		# with mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
@@ -59,7 +58,7 @@
 %bcond_without	apache1		# disable building Apache 1.3.x SAPI
 %bcond_without	apache2		# disable building Apache 2.x SAPI
 %bcond_without	zts		# disable Zend Thread Safety
-%bcond_without	cgi			# disable CGI/FCGI SAPI
+%bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
@@ -200,7 +199,6 @@ BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 #BuildRequires:	fcgi-devel
-%{?with_fdf:BuildRequires:	fdftk-devel}
 #BuildRequires:	flex
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
@@ -678,22 +676,6 @@ support in image files.
 
 %description exif -l pl.UTF-8
 Moduł PHP dodający obsługę znaczników EXIF w plikach obrazków.
-
-%package fdf
-Summary:	FDF extension module for PHP
-Summary(pl.UTF-8):	Moduł FDF dla PHP
-Group:		Libraries
-URL:		http://www.php.net/manual/en/book.fdf.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(fdf)
-
-%description fdf
-This PHP module adds support for PDF Forms through Adobe FDFTK
-library.
-
-%description fdf -l pl.UTF-8
-Moduł PHP dodający obsługę formularzy PDF poprzez bibliotekę Adobe
-FDFTK.
 
 %package fileinfo
 Summary:	libmagic bindings
@@ -2053,7 +2035,6 @@ for sapi in $sapis; do
 	--with-bz2=shared \
 	%{__with_without curl curl shared} \
 	--with-db4 \
-	%{?with_fdf:--with-fdftk=shared} \
 	--with-iconv=shared \
 	--with-freetype-dir=shared \
 	--with-gettext=shared \
@@ -2429,7 +2410,6 @@ fi
 %extension_scripts dba
 %extension_scripts dom
 %extension_scripts exif
-%extension_scripts fdf
 %extension_scripts fileinfo
 %extension_scripts filter
 %extension_scripts ftp
@@ -2507,9 +2487,6 @@ fi
 
 %triggerun exif -- %{name}-exif < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*exif\.so/d' %{_sysconfdir}/php.ini
-
-%triggerun fdf -- %{name}-fdf < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*fdf\.so/d' %{_sysconfdir}/php.ini
 
 %triggerun ftp -- %{name}-ftp < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ftp\.so/d' %{_sysconfdir}/php.ini
@@ -2764,13 +2741,6 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
-
-%if %{with fdf}
-%files fdf
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/fdf.ini
-%attr(755,root,root) %{php_extensiondir}/fdf.so
-%endif
 
 %files fileinfo
 %defattr(644,root,root,755)

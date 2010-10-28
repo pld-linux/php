@@ -432,6 +432,7 @@ Pakiet dostarczający dowiązanie symboliczne /usr/bin/php do PHP CLI.
 
 %package fpm
 Summary:	PHP FastCGI Process Manager
+Summary(pl.UTF-8):	PHP FastCGI Process Manager - zarządca procesów FastCGI
 Group:		Development/Languages/PHP
 URL:		http://www.php-fpm.org/
 Requires(post,preun):	/sbin/chkconfig
@@ -447,8 +448,11 @@ Provides:	webserver(php) = %{version}
 %description fpm
 PHP FastCGI Process Manager.
 
+%description fpm -l pl.UTF-8
+PHP FastCGI Process Manager - zarządca procesów FastCGI.
+
 %package common
-Summary:	Common files needed by both Apache modules and CGI/CLI SAPI-s
+Summary:	Common files needed by both Apache modules and CGI/CLI SAPIs
 Summary(pl.UTF-8):	Wspólne pliki dla modułu Apache'a i programu CGI
 Summary(ru.UTF-8):	Разделяемые библиотеки для PHP
 Summary(uk.UTF-8):	Бібліотеки спільного використання для PHP
@@ -482,7 +486,7 @@ Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2
 
 %description common
-Common files needed by both Apache modules and CGI/CLI SAPI-s.
+Common files needed by both Apache modules and CGI/CLI SAPIs.
 
 %description common -l pl.UTF-8
 Wspólne pliki dla modułu Apache'a i programu CGI.
@@ -679,6 +683,7 @@ Moduł PHP dodający obsługę znaczników EXIF w plikach obrazków.
 
 %package fileinfo
 Summary:	libmagic bindings
+Summary(pl.UTF-8):	Wiązania do libmagic
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.fileinfo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -693,6 +698,13 @@ etc...
 
 Additionally it can also be used to retrieve the MIME type for a
 particular file and for text files proper language encoding.
+
+%description fileinfo -l pl.UTF-8
+To rozszerzenie pozwala na uzyskanie informacji dotyczących większości
+plików. Informacje mogą zawierać wymiary, jakość, długość itp.
+
+Ponadto rozszerzenie można wykorzystać do odczytania typu MIME danego
+pliku oraz kodowania plików tekstowych.
 
 %package filter
 Summary:	Extension for safely dealing with input parameters
@@ -861,7 +873,7 @@ Moduł PHP umożliwiający dostęp do baz danych InterBase i Firebird.
 
 %package intl
 Summary:	Internationalization extension (ICU wrapper)
-Summary(pl.UTF-8):	Rozszerzenie do internacjonalizacji (wrapper ICU)
+Summary(pl.UTF-8):	Rozszerzenie do internacjonalizacji (interfejs do ICU)
 Group:		Libraries
 URL:		http://www.php.net/intl
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -875,8 +887,9 @@ their scripts.
 
 %description intl -l pl.UTF-8
 Rozszerzenie do internacjonalizacji (dalej nazywane Intl) jest
-wrapperem biblioteki ICU, pozwalającym programistom PHP na wykonywanie
-w skryptach porównań zdgodnych z UCA oraz formatowań daty/czasu/walut.
+interfejsem do biblioteki ICU, pozwalającym programistom PHP na
+wykonywanie w skryptach porównań zgodnych z UCA oraz formatowania
+daty/czasu/walut.
 
 %package json
 Summary:	PHP C extension for JSON serialization
@@ -962,6 +975,7 @@ FreeTDS.
 
 %package mysqlnd
 Summary:	MySQL Native Client Driver for PHP
+Summary(pl.UTF-8):	Sterownik natywnego klienta MySQL dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.mysqlnd.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -981,6 +995,20 @@ most efficient use of memory. One example of the memory efficiency is
 the fact that when using the MySQL Client Library, each row is stored
 in memory twice, whereas with the MySQL Native Driver each row is only
 stored once in memory.
+
+%description mysqlnd -l pl.UTF-8
+MySQL Native Driver (natywny sterownik MySQL) to zamiennik biblioteki
+klienckiej MySQL (libmysql).
+
+Ponieważ sterownik natywny jest napisany jako rozszerzenie PHP, jest
+ściśle powiązany z pracą PHP. Daje to większą wydajność, zwłaszcza
+jeśli chodzi o wykorzystanie pamięci, jako że sterownik wykorzystuje
+system zarządzania pamięcią PHP; obsługuje także ograniczenie pamięci
+z PHP. Niniejszy sterownik ma wydajność porównywalną lub lepszą niż
+biblioteka kliencka MySQL, a pamięć zawsze wykorzystuje efektywniej.
+Przykładem tego może być fakt, że w przypadku biblioteki klienckiej
+każdy wiersz jest przechowywany w pamięci dwukrotnie, natomiast przy
+tym sterowniku - tylko raz.
 
 %package mysql
 Summary:	MySQL database module for PHP

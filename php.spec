@@ -7,7 +7,7 @@
 #   - removed from php 5.1:
 #   cpdf, fam, oracle
 #   - removed from php 5.2:
-#   filepro, hw
+#   filepro, hwapi
 #   - removed from php 5.3:
 #   dbase, mime_magic, ming, ncurses, sybase
 # - make additional headers and checking added by mail patch configurable
@@ -973,43 +973,6 @@ databases support through FreeTDS library.
 Moduł PHP dodający obsługę baz danych MS SQL poprzez bibliotekę
 FreeTDS.
 
-%package mysqlnd
-Summary:	MySQL Native Client Driver for PHP
-Summary(pl.UTF-8):	Sterownik natywnego klienta MySQL dla PHP
-Group:		Libraries
-URL:		http://www.php.net/manual/en/book.mysqlnd.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(mysqlnd)
-
-%description mysqlnd
-MySQL Native Driver is a replacement for the MySQL Client Library
-(libmysql).
-
-Because MySQL Native Driver is written as a PHP extension, it is
-tightly coupled to the workings of PHP. This leads to gains in
-efficiency, especially when it comes to memory usage, as the driver
-uses the PHP memory management system. It also supports the PHP memory
-limit. Using MySQL Native Driver leads to comparable or better
-performance than using MySQL Client Library, it always ensures the
-most efficient use of memory. One example of the memory efficiency is
-the fact that when using the MySQL Client Library, each row is stored
-in memory twice, whereas with the MySQL Native Driver each row is only
-stored once in memory.
-
-%description mysqlnd -l pl.UTF-8
-MySQL Native Driver (natywny sterownik MySQL) to zamiennik biblioteki
-klienckiej MySQL (libmysql).
-
-Ponieważ sterownik natywny jest napisany jako rozszerzenie PHP, jest
-ściśle powiązany z pracą PHP. Daje to większą wydajność, zwłaszcza
-jeśli chodzi o wykorzystanie pamięci, jako że sterownik wykorzystuje
-system zarządzania pamięcią PHP; obsługuje także ograniczenie pamięci
-z PHP. Niniejszy sterownik ma wydajność porównywalną lub lepszą niż
-biblioteka kliencka MySQL, a pamięć zawsze wykorzystuje efektywniej.
-Przykładem tego może być fakt, że w przypadku biblioteki klienckiej
-każdy wiersz jest przechowywany w pamięci dwukrotnie, natomiast przy
-tym sterowniku - tylko raz.
-
 %package mysql
 Summary:	MySQL database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych MySQL dla PHP
@@ -1049,6 +1012,43 @@ is that it provides access to functionality of MySQL 4.1 and above.
 Moduł PHP umożliwiający udoskonalony dostęp do bazy danych MySQL.
 Różnicą między nim a modułem mysql jest dostęp do funkcjonalności
 MySQL w wersji 4.1 i nowszych.
+
+%package mysqlnd
+Summary:	MySQL Native Client Driver for PHP
+Summary(pl.UTF-8):	Sterownik natywnego klienta MySQL dla PHP
+Group:		Libraries
+URL:		http://www.php.net/manual/en/book.mysqlnd.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(mysqlnd)
+
+%description mysqlnd
+MySQL Native Driver is a replacement for the MySQL Client Library
+(libmysql).
+
+Because MySQL Native Driver is written as a PHP extension, it is
+tightly coupled to the workings of PHP. This leads to gains in
+efficiency, especially when it comes to memory usage, as the driver
+uses the PHP memory management system. It also supports the PHP memory
+limit. Using MySQL Native Driver leads to comparable or better
+performance than using MySQL Client Library, it always ensures the
+most efficient use of memory. One example of the memory efficiency is
+the fact that when using the MySQL Client Library, each row is stored
+in memory twice, whereas with the MySQL Native Driver each row is only
+stored once in memory.
+
+%description mysqlnd -l pl.UTF-8
+MySQL Native Driver (natywny sterownik MySQL) to zamiennik biblioteki
+klienckiej MySQL (libmysql).
+
+Ponieważ sterownik natywny jest napisany jako rozszerzenie PHP, jest
+ściśle powiązany z pracą PHP. Daje to większą wydajność, zwłaszcza
+jeśli chodzi o wykorzystanie pamięci, jako że sterownik wykorzystuje
+system zarządzania pamięcią PHP; obsługuje także ograniczenie pamięci
+z PHP. Niniejszy sterownik ma wydajność porównywalną lub lepszą niż
+biblioteka kliencka MySQL, a pamięć zawsze wykorzystuje efektywniej.
+Przykładem tego może być fakt, że w przypadku biblioteki klienckiej
+każdy wiersz jest przechowywany w pamięci dwukrotnie, natomiast przy
+tym sterowniku - tylko raz.
 
 %package oci8
 Summary:	Oracle 8+ database module for PHP
@@ -2454,9 +2454,9 @@ fi
 %extension_scripts mbstring
 %extension_scripts mcrypt
 %extension_scripts mssql
-%extension_scripts mysqlnd
 %extension_scripts mysql
 %extension_scripts mysqli
+%extension_scripts mysqlnd
 %extension_scripts oci8
 %extension_scripts odbc
 %extension_scripts openssl
@@ -2770,6 +2770,11 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
 
+%files exif
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
+%attr(755,root,root) %{php_extensiondir}/exif.so
+
 %files fileinfo
 %defattr(644,root,root,755)
 %doc README.input_filter
@@ -2783,11 +2788,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
 %attr(755,root,root) %{php_extensiondir}/filter.so
 %endif
-
-%files exif
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
-%attr(755,root,root) %{php_extensiondir}/exif.so
 
 %files ftp
 %defattr(644,root,root,755)
@@ -2867,13 +2867,6 @@ fi
 %attr(755,root,root) %{php_extensiondir}/mssql.so
 %endif
 
-%if %{with mysqlnd}
-%files mysqlnd
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/MySQLND.ini
-%attr(755,root,root) %{php_extensiondir}/mysqlnd.so
-%endif
-
 %files mysql
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysql.ini
@@ -2884,6 +2877,13 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysqli.ini
 %attr(755,root,root) %{php_extensiondir}/mysqli.so
+%endif
+
+%if %{with mysqlnd}
+%files mysqlnd
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/MySQLND.ini
+%attr(755,root,root) %{php_extensiondir}/mysqlnd.so
 %endif
 
 %if %{with oci8}
@@ -3011,11 +3011,6 @@ fi
 %attr(755,root,root) %{php_extensiondir}/recode.so
 %endif
 
-%files simplexml
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
-%attr(755,root,root) %{php_extensiondir}/simplexml.so
-
 %files session
 %defattr(644,root,root,755)
 %doc ext/session/mod_files.sh
@@ -3026,6 +3021,11 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/shmop.ini
 %attr(755,root,root) %{php_extensiondir}/shmop.so
+
+%files simplexml
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
+%attr(755,root,root) %{php_extensiondir}/simplexml.so
 
 %if %{with snmp}
 %files snmp

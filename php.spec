@@ -1,15 +1,15 @@
-# TODO
-# - NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
+# NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
+# TODO:
 # - wddx: restore session support (not compiled in due DL extension check)
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
-#   db, hyperwave, java, mcal, overload, qtdom
+#   db [pecl-svn], hyperwave [pecl-svn], java [pecl-svn], mcal [pecl-svn], overload [???], qtdom [pecl-svn]
 #   - removed from php 5.1:
-#   cpdf, fam, oracle
+#   oracle [pecl-svn]
 #   - removed from php 5.2:
-#   filepro, hwapi
+#   filepro [pecl-svn], hwapi [pecl-svn]
 #   - removed from php 5.3:
-#   dbase, mime_magic, ming, ncurses, sybase
+#   ming [pecl-svn or ming.spec?]
 # - make additional headers and checking added by mail patch configurable
 # - modularize standard (output from pure php -m)?
 # - lib64 patch obsolete by $PHP_LIBDIR ?
@@ -689,6 +689,7 @@ URL:		http://www.php.net/manual/en/book.fileinfo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(fileinfo)
+Obsoletes:	php-mime_magic
 Obsoletes:	php-pecl-fileinfo
 
 %description fileinfo
@@ -1551,7 +1552,6 @@ URL:		http://www.php.net/manual/en/book.sybase.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sybase-ct)
 Obsoletes:	php-sybase
-Conflicts:	php-sybase
 
 %description sybase-ct
 This is a dynamic shared object (DSO) for PHP that will add Sybase and

@@ -1471,7 +1471,7 @@ Moduł PHP dodający obsługę gniazdek.
 
 %package spl
 Summary:	Standard PHP Library module for PHP
-Summary(pl.UTF-8):	Moduł SPL dla PHP
+Summary(pl.UTF-8):	Moduł biblioteki standardowej (Standard PHP Library) dla PHP
 Group:		Libraries
 URL:		http://php.net/manual/en/book.spl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1484,7 +1484,7 @@ This is a dynamic shared object (DSO) for PHP that will add Standard
 PHP Library support.
 
 %description spl -l pl.UTF-8
-Moduł PHP dodający obsługę gniazdek.
+Moduł PHP z biblioteką standardową PHP (SPL - Standard PHP Library).
 
 %package sqlite
 Summary:	SQLite extension module for PHP
@@ -1872,25 +1872,24 @@ sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 
 # conflict seems to be resolved by recode patches
-rm -f ext/recode/config9.m4
+%{__rm} ext/recode/config9.m4
 
 # remove all bundled libraries not to link with them accidentally
-#rm -rf ext/sqlite/libsqlite
-rm -rf ext/sqlite3/libsqlite
-#rm -rf ext/bcmath/libbcmath
-#rm -rf ext/date/lib
-#rm -rf ext/fileinfo/libmagic
-#rm -rf ext/dba/libcdb
-#rm -rf ext/dba/libflatfile
-#rm -rf ext/dba/libinifile
-#rm -rf ext/gd/libgd
-#rm -rf ext/mbstring/libmbfl
-#rm -rf ext/mbstring/oniguruma
-rm -rf ext/pcre/pcrelib
-rm -rf ext/pdo_sqlite/libsqlite
-#rm -rf ext/soap/interop
-rm -r ext/xmlrpc/libxmlrpc
-#rm -rf ext/zip/lib
+#%{__rm} -r ext/sqlite/libsqlite
+%{__rm} -r ext/sqlite3/libsqlite
+#%{__rm} -r ext/bcmath/libbcmath
+#%{__rm} -r ext/date/lib
+#%{__rm} -r ext/fileinfo/libmagic
+#%{__rm} -r ext/dba/libcdb
+#%{__rm} -r ext/dba/libflatfile
+#%{__rm} -r ext/dba/libinifile
+#%{__rm} -r ext/gd/libgd
+#%{__rm} -r ext/mbstring/libmbfl
+#%{__rm} -r ext/mbstring/oniguruma
+%{__rm} -r ext/pcre/pcrelib
+#%{__rm} -r ext/soap/interop
+%{__rm} -r ext/xmlrpc/libxmlrpc
+#%{__rm} -r ext/zip/lib
 
 cp -af Zend/LICENSE{,.Zend}
 install -p %{SOURCE13} dep-tests.sh
@@ -1903,12 +1902,12 @@ sed -i -e 's#-fvisibility=hidden##g' configure*
 mv sapi/cli/tests/022.phpt{,.broken}
 
 # php-5.3.3/ext/standard/tests/file/statpage.phpt
-rm ext/standard/tests/file/statpage.phpt
+%{__rm} ext/standard/tests/file/statpage.phpt
 
 # idiotic test, it will fail if somebody else makes space on disk or if disk
 # space is not yet allocated (xfs). report upstream to advice bogus test is
 # probably pointless.
-rm ext/standard/tests/file/disk_free_space_basic.phpt
+%{__rm} ext/standard/tests/file/disk_free_space_basic.phpt
 
 sh -xe %{_sourcedir}/skip-tests.sh
 

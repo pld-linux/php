@@ -8,8 +8,6 @@
 #   oracle [pecl-svn]
 #   - removed from php 5.2:
 #   filepro [pecl-svn], hwapi [pecl-svn]
-#   - removed from php 5.3:
-#   ming [pecl-svn or ming.spec?]
 # - make additional headers and checking added by mail patch configurable
 # - modularize standard (output from pure php -m)?
 # - lib64 patch obsolete by $PHP_LIBDIR ?

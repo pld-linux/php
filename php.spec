@@ -101,7 +101,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		9
+%define		rel		10
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2166,6 +2166,8 @@ generate_inifiles() {
 		[ "$mod" = "pcre" ] && conf="PCRE.ini"
 		# spl needs to be loaded before mysqli
 		[ "$mod" = "spl" ] && conf="SPL.ini"
+		# session needs to be loaded before php-pecl-http, php-pecl-memcache, php-pecl-session_mysql
+		[ "$mod" = "session" ] && conf="Session.ini"
 		# mysqlnd needs to be loaded before mysql,mysqli,pdo_mysqli
 		[ "$mod" = "mysqlnd" ] && conf="MySQLND.ini"
 		echo "+ $conf"

@@ -3013,7 +3013,7 @@ fi
 %files session
 %defattr(644,root,root,755)
 %doc ext/session/mod_files.sh
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/session.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/Session.ini
 %attr(755,root,root) %{php_extensiondir}/session.so
 
 %files shmop

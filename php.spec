@@ -112,7 +112,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.14
-Release:	6
+Release:	7
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -3024,7 +3024,7 @@ fi
 %files session
 %defattr(644,root,root,755)
 %doc ext/session/mod_files.sh
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/session.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/Session.ini
 %attr(755,root,root) %{php_extensiondir}/session.so
 
 %files shmop

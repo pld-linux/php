@@ -112,7 +112,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.14
-Release:	5
+Release:	6
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -2156,6 +2156,8 @@ generate_inifiles() {
 		[ "$mod" = "pcre" ] && conf="PCRE.ini"
 		# spl needs to be loaded before mysqli
 		[ "$mod" = "spl" ] && conf="SPL.ini"
+		# session needs to be loaded before php-pecl-http, php-pecl-memcache, php-pecl-session_mysql
+		[ "$mod" = "session" ] && conf="Session.ini"
 		echo "+ $conf"
 		cat > conf.d/$conf <<-EOF
 			; Enable $mod extension module

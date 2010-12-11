@@ -55,7 +55,7 @@
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	apache1		# disable building Apache 1.3.x SAPI
 %bcond_without	apache2		# disable building Apache 2.x SAPI
-%bcond_without	zts		# disable Zend Thread Safety
+%bcond_with	zts		# Zend Thread Safety
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_without	suhosin		# with suhosin patch
@@ -101,7 +101,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		10
+%define		rel		11
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP

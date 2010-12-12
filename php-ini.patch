@@ -1,5 +1,5 @@
---- php-5.3.1/php.ini	2010-02-20 16:23:03.343575520 +0200
-+++ php-5.3.1/php.ini	2010-02-20 16:19:19.737335390 +0200
+--- php-5.3.4/php.ini~	2010-12-12 23:03:42.000000000 +0200
++++ php-5.3.4/php.ini	2010-12-12 23:05:56.583592856 +0200
 @@ -223,7 +223,7 @@
  ; Development Value: Off
  ; Production Value: Off
@@ -92,7 +92,20 @@
  
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
-@@ -938,54 +891,6 @@
+@@ -876,11 +876,7 @@
+ ;
+ ;   extension=modulename.extension
+ ;
+-; For example, on Windows:
+-;
+-;   extension=msql.dll
+-;
+-; ... or under UNIX:
++; For example under UNIX:
+ ;
+ ;   extension=msql.so
+ ;
+@@ -891,49 +887,8 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.
  ;
@@ -104,8 +117,6 @@
 -;
 -;extension=php_bz2.dll
 -;extension=php_curl.dll
--;extension=php_dba.dll
--;extension=php_exif.dll
 -;extension=php_fileinfo.dll
 -;extension=php_gd2.dll
 -;extension=php_gettext.dll
@@ -115,8 +126,7 @@
 -;extension=php_interbase.dll
 -;extension=php_ldap.dll
 -;extension=php_mbstring.dll
--;extension=php_ming.dll
--;extension=php_mssql.dll
+-;extension=php_exif.dll      ; Must be after mbstring as it depends on it
 -;extension=php_mysql.dll
 -;extension=php_mysqli.dll
 -;extension=php_oci8.dll      ; Use with Oracle 10gR2 Instant Client
@@ -130,7 +140,6 @@
 -;extension=php_pdo_pgsql.dll
 -;extension=php_pdo_sqlite.dll
 -;extension=php_pgsql.dll
--;extension=php_phar.dll
 -;extension=php_pspell.dll
 -;extension=php_shmop.dll
 -;extension=php_snmp.dll
@@ -143,10 +152,11 @@
 -;extension=php_xmlrpc.dll
 -;extension=php_xsl.dll
 -;extension=php_zip.dll
--
++; Ideally in PLD Linux you should install appropriate php-<extension> or
++; php-pecl-<extension> package.
+ 
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;
- ;;;;;;;;;;;;;;;;;;;
 @@ -1235,6 +1140,9 @@
  ; http://php.net/mysql.connect-timeout
  mysql.connect_timeout = 60

@@ -16,15 +16,15 @@
  	mysqli_globals->reconnect = 0;
  	mysqli_globals->report_mode = 0;
  	mysqli_globals->report_ht = 0;
---- php-5.3.1/ext/mysqli/mysqli_nonapi.c~	2009-11-12 19:48:36.000000000 +0200
-+++ php-5.3.1/ext/mysqli/mysqli_nonapi.c	2010-02-20 01:02:24.838907461 +0200
-@@ -60,7 +60,7 @@
+--- php-5.3.4/ext/mysqli/mysqli_nonapi.c~	2010-12-12 23:07:03.000000000 +0200
++++ php-5.3.4/ext/mysqli/mysqli_nonapi.c	2010-12-12 23:07:36.497424912 +0200
+@@ -61,7 +61,7 @@
  	MY_MYSQL			*mysql = NULL;
  	MYSQLI_RESOURCE		*mysqli_resource = NULL;
  	zval				*object = getThis();
 -	char				*hostname = NULL, *username=NULL, *passwd=NULL, *dbname=NULL, *socket=NULL;
 +	char				*hostname = NULL, *username=NULL, *passwd=NULL, *dbname=NULL, *socket=NULL, *connect_charset=NULL;
- 	unsigned int		hostname_len = 0, username_len = 0, passwd_len = 0, dbname_len = 0, socket_len = 0;
+ 	int					hostname_len = 0, username_len = 0, passwd_len = 0, dbname_len = 0, socket_len = 0;
  	zend_bool			persistent = FALSE;
  	long				port = 0, flags = 0;
 @@ -241,6 +241,12 @@

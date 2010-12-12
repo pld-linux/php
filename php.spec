@@ -101,7 +101,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		11
+%define		rel		0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -109,13 +109,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.3
+Version:	5.3.4
 Release:	%{rel}%{?with_type_hints:th}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	21ceeeb232813c10283a5ca1b4c87b48
+# Source0-md5:	2c069d8f690933e3bf6a8741ed818150
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -179,9 +179,7 @@ Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
 Patch54:	mysqlnd-shared.patch
 Patch55:	bug-52078-fileinode.patch
-Patch56:	bug-51901.patch
 Patch57:	bug-52448.patch
-Patch58:	bug-52533.patch
 Patch59:	%{name}-systzdata.patch
 Patch60:	%{name}-oracle-instantclient.patch
 Patch61:	%{name}-krb5-ac.patch
@@ -1802,7 +1800,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%patch8 -p1
+#%patch8 -p1
 %patch7 -p1
 %patch9 -p1
 cp php.ini-production php.ini
@@ -1855,9 +1853,7 @@ cp php.ini-production php.ini
 %patch54 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1
-%patch56 -p0
 %patch57 -p1
-%patch58 -p1
 %patch59 -p1
 %patch60 -p1
 %patch61 -p1
@@ -2228,7 +2224,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi}} \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
-	$RPM_BUILD_ROOT%{_mandir}/man1 \
+	$RPM_BUILD_ROOT%{_mandir}/man{1,8} \
 
 cp -af php_config.h.cli main/php_config.h
 cp -af Makefile.cli Makefile
@@ -2270,7 +2266,7 @@ cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %if %{with fpm}
 install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
 libtool --silent --mode=install install sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
-cp -a sapi/fpm/php-fpm.1 $RPM_BUILD_ROOT%{_mandir}/man1
+cp -a sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8
 cp -a sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
@@ -2695,7 +2691,7 @@ fi
 %dir %{_sysconfdir}/fpm.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
 %attr(755,root,root) %{_sbindir}/php-fpm
-%{_mandir}/man1/php-fpm.1*
+%{_mandir}/man8/php-fpm.8*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/php-fpm
 %attr(754,root,root) /etc/rc.d/init.d/php-fpm
 %endif

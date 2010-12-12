@@ -257,7 +257,7 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -600,59 +627,6 @@
+@@ -630,59 +630,6 @@
  ; needs to go here.  Specify the location of the extension with the
  ; extension_dir directive above.
  
@@ -272,7 +272,6 @@
 -;extension=php_curl.dll
 -;extension=php_dba.dll
 -;extension=php_dbase.dll
--;extension=php_exif.dll
 -;extension=php_fdf.dll
 -;extension=php_gd2.dll
 -;extension=php_gettext.dll
@@ -282,6 +281,7 @@
 -;extension=php_interbase.dll
 -;extension=php_ldap.dll
 -;extension=php_mbstring.dll
+-;extension=php_exif.dll
 -;extension=php_mcrypt.dll
 -;extension=php_mhash.dll
 -;extension=php_mime_magic.dll

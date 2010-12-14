@@ -65,7 +65,7 @@
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
-%define	litespeed_version	5.4
+%define	litespeed_version	5.5
 
 # disable all sapis
 %if %{with gcov}
@@ -101,7 +101,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel		1
+%define		rel		2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -128,7 +128,7 @@ Source12:	%{name}-branch.sh
 Source13:	dep-tests.sh
 Source14:	skip-tests.sh
 Source15:	http://litespeedtech.com/packages/lsapi/%{name}-litespeed-%{litespeed_version}.tgz
-# Source15-md5:	8738d9e3a232c2a0518c514802c66d73
+# Source15-md5:	9d58485d5fd6b5f5fefcec41b9ce283e
 Patch0:		%{name}-shared.patch
 Patch1:		%{name}-pldlogo.patch
 Patch2:		%{name}-mail.patch

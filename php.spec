@@ -59,7 +59,7 @@
 %bcond_without	apache1		# disable building Apache 1.3.x module
 %bcond_without	apache2		# disable building Apache 2.x module
 %bcond_without	fcgi		# disable building FCGI SAPI
-%bcond_with	zts		# disable Zend Thread Safety
+%bcond_without	zts		# disable Zend Thread Safety
 %bcond_without	fpm		# fpm patches from http://www.php-fpm.org/
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	system_xmlrpc_epi	# use system xmlrpc-epi library (broken on 64bit arches, see http://bugs.php.net/41611)
@@ -112,7 +112,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.16
-Release:	1
+Release:	2
 Epoch:		4
 License:	PHP
 Group:		Libraries

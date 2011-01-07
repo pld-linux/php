@@ -1,5 +1,14 @@
 --- php-5.3.3/sapi/fpm/php-fpm.conf.in	2010-07-24 22:29:56.752470466 +0300
 +++ php-5.3.3/sapi/fpm/php-fpm.conf.in	2010-07-25 22:30:52.547803067 +0300
+@@ -22,7 +22,7 @@
+ ; Pid file
+ ; Note: the default prefix is @EXPANDED_LOCALSTATEDIR@
+ ; Default Value: none
+-;pid = run/php-fpm.pid
++pid = /var/run/php/fpm.pid
+ 
+ ; Error log file
+ ; Note: the default prefix is @EXPANDED_LOCALSTATEDIR@
 @@ -84,7 +84,7 @@
  ; must be separated by a comma. If this value is left blank, connections will be
  ; accepted from any ip address.
@@ -9,6 +18,21 @@
  
  ; Set permissions for unix socket, if one is used. In Linux, read/write
  ; permissions must be set in order to allow connections from a web server. Many
+@@ -159,12 +159,12 @@
+ ; The desired minimum number of idle server processes.
+ ; Note: Used only when pm is set to 'dynamic'
+ ; Note: Mandatory when pm is set to 'dynamic'
+-;pm.min_spare_servers = 5
++pm.min_spare_servers = 5
+ 
+ ; The desired maximum number of idle server processes.
+ ; Note: Used only when pm is set to 'dynamic'
+ ; Note: Mandatory when pm is set to 'dynamic'
+-;pm.max_spare_servers = 35
++pm.max_spare_servers = 35
+  
+ ; The number of requests each child process should execute before respawning.
+ ; This can be useful to work around memory leaks in 3rd party libraries. For
 @@ -245,7 +245,7 @@
  ; the current environment.
  ; Default Value: clean env

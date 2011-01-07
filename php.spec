@@ -111,13 +111,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.2.16
-Release:	3
+Version:	5.2.17
+Release:	1
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	3b0bd012bd53bac9a5fefca61eccd5c6
+# Source0-md5:	b27947f3045220faf16e4d9158cbfe13
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-cgi.ini
@@ -189,7 +189,6 @@ Patch53:	%{name}-gmp.patch
 Patch54:	fix-test-run.patch
 Patch55:	%{name}-krb5.patch
 Patch56:	php-php_dl.patch
-Patch57:	%{name}-bug-float.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1865,7 +1864,6 @@ done
 %patch54 -p1
 %patch55 -p1
 %patch56 -p1
-%patch57 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

@@ -101,7 +101,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	2
+%define		rel	3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -233,7 +233,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 %{?with_instantclient:BuildRequires:	oracle-instantclient-devel}
 BuildRequires:	pam-devel
-%{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
+%{?with_pcre:BuildRequires:	pcre-devel >= 8.10}
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
@@ -510,7 +510,7 @@ Requires:	libtool >= 2:2.2
 %else
 Requires:	libtool
 %endif
-%{?with_pcre:Requires:	pcre-devel >= 6.6}
+%{?with_pcre:Requires:	pcre-devel >= 8.10}
 Requires:	shtool
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel

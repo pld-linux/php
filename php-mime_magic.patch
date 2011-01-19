@@ -9,3 +9,17 @@
      fi
    else
      MAGIC_MIME_LOCATIONS="/usr/local/apache/conf/magic /usr/local/etc/apache/conf/magic /etc/apache/magic /etc/httpd/conf/magic /usr/share/magic.mime /usr/share/misc/magic.mime /etc/magic.mime"
+--- php-5.2.17/ext/mime_magic/mime_magic.c~	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/ext/mime_magic/mime_magic.c	2011-01-19 16:58:40.032694842 +0100
+@@ -441,8 +441,9 @@
+ 			continue;
+ 
+ 		/* parse it */
+-		if (parse(line + ws_offset, lineno) != 0)
+-			++errs;
++		if (parse(line + ws_offset, lineno) != 0) {
++			//++errs;
++		}
+     }
+ 
+     (void) fclose(f);

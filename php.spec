@@ -101,7 +101,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	3
+%define		rel	4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -1378,6 +1378,7 @@ Summary:	session extension module for PHP
 Summary(pl.UTF-8):	Moduł session dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Suggests:	%{name}-hash = %{epoch}:%{version}-%{release}
 Provides:	php(session)
 

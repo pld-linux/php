@@ -1860,6 +1860,9 @@ cp php.ini-production php.ini
 %patch60 -p1
 %patch61 -p1
 
+%{__rm} -r sapi/litespeed
+gzip -dc %{SOURCE15} | tar xf - -C sapi/
+
 %if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 %endif
@@ -1946,6 +1949,9 @@ cli
 %if %{with cgi}
 cgi-fcgi
 %endif
+%if %{with litespeed}
+litespeed
+%endif
 %if %{with fpm}
 fpm
 %endif
@@ -1954,9 +1960,6 @@ apxs1
 %endif
 %if %{with apache2}
 apxs2
-%endif
-%if %{with litespeed}
-litespeed
 %endif
 "
 for sapi in $sapis; do
@@ -2125,7 +2128,6 @@ cp -af Makefile.cli Makefile
 %endif
 
 %if %{with litespeed}
-gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %{__make} -f Makefile.litespeed
 %endif
 
@@ -2238,20 +2240,20 @@ ln -sfn phar.phar $RPM_BUILD_ROOT%{_bindir}/phar
 
 # install Apache1 DSO module
 %if %{with apache1}
-libtool --silent --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
+libtool --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
 %endif
 
 # install Apache2 DSO module
 %if %{with apache2}
-libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
+libtool --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
 %endif
 
 # install litespeed sapi
 %if %{with litespeed}
-libtool --silent --mode=install install sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/php.litespeed
+libtool --mode=install install sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/php.litespeed
 %endif
 
-libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+libtool --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
 # fix install paths, avoid evil rpaths
 sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
 # better solution?
@@ -2259,7 +2261,7 @@ sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_lib
 
 # install CGI/FCGI
 %if %{with cgi}
-libtool --silent --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
+libtool --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
 ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
 cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
@@ -2267,7 +2269,7 @@ cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 # install FCGI PM
 %if %{with fpm}
 install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
-libtool --silent --mode=install install sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
+libtool --mode=install install sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
 cp -a sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8
 cp -a sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
@@ -2277,7 +2279,7 @@ cp -a %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
 %endif
 
 # install CLI
-libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
+libtool --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
 install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php

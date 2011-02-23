@@ -196,6 +196,7 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 #BuildRequires:	fcgi-devel
 #BuildRequires:	flex
+BuildRequires:	mysql-devel
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
 %if %{with mssql} || %{with sybase_ct}

@@ -28,11 +28,11 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
-%bcond_with	litespeed	# build litespeed module
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
+%bcond_without	litespeed	# build litespeed module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
@@ -101,7 +101,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	4
+%define		rel	5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP

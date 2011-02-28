@@ -1,5 +1,6 @@
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # TODO:
+# - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):

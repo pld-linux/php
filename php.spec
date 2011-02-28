@@ -102,7 +102,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	6
+%define		rel	7
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -575,7 +575,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(bz2)
 Provides:	php(bzip2)
 Provides:	php-bzip2 = %{epoch}:%{version}-%{release}
-Obsoletes:	php-bzip2
+Obsoletes:	php-bzip2 < 4:5.2.14-3
 
 %description bz2
 This is a dynamic shared object (DSO) for PHP that will add bzip2
@@ -805,7 +805,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(hash)
 Provides:	php(mhash)
 Provides:	php-mhash = %{epoch}:%{version}-%{release}
-Obsoletes:	php-mhash
+Obsoletes:	php-mhash < 4:5.3.0
 Obsoletes:	php-pecl-hash
 
 %description hash
@@ -1249,7 +1249,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-pgsql)
 Provides:	php-pecl-PDO_PGSQL
-Obsoletes:	php-pecl-PDO_PGSQL
+Obsoletes:	php-pecl-PDO_PGSQL < 4:5.2.1-2
 
 %description pdo-pgsql
 This is a dynamic shared object (DSO) for PHP that will add PDO

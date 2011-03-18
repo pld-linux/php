@@ -74,6 +74,6 @@
  
 -			if ((ndir = php_scandir(ini_path, &namelist, 0, php_alphasort)) > 0) {
 +			if ((ndir = php_scandir(ini_path, &namelist, 0, php_csort)) > 0) {
- 				memset(&fh, 0, sizeof(fh));
+ 				memset(&fh2, 0, sizeof(fh2));
  
  				for (i = 0; i < ndir; i++) {

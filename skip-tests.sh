@@ -3,8 +3,6 @@
 mv ext/calendar/tests/easter_date.phpt{,.skip}
 # unixtojd()
 mv ext/calendar/tests/unixtojd.phpt{,.skip}
-# curl_error() function - basic test for curl_error using a fake url
-mv ext/curl/tests/curl_error_basic.phpt{,.skip}
 # curl_setopt() basic parameter test
 mv ext/curl/tests/curl_setopt_error.phpt{,.skip}
 # timezone_abbreviations_list() tests

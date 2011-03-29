@@ -479,7 +479,7 @@ Provides:	php-standard
 Provides:	php5(debug) = %{php_debug}
 Provides:	php5(thread-safety) = %{zend_zts}
 %{!?with_mysqlnd:Obsoletes:	php-mysqlnd}
-%{?with_pcre:%requires_eq	pcre}
+%{?with_pcre:%requires_ge	pcre}
 Obsoletes:	php-pecl-domxml
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	rpm < 4.4.2-0.2

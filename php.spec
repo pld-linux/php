@@ -33,6 +33,7 @@
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
+%bcond_without	kerberos5	# without Kerberos5 support
 %bcond_without	litespeed	# build litespeed module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mm		# without mm support for session storage
@@ -197,6 +198,7 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 #BuildRequires:	fcgi-devel
 #BuildRequires:	flex
+%{?with_kerberos5:BuildRequires:	heimdal-devel}
 BuildRequires:	mysql-devel
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
@@ -2081,7 +2083,7 @@ for sapi in $sapis; do
 	%{?with_mysqli:--with-mysqli=shared%{?with_mysqlnd:,mysqlnd}} \
 	%{?with_oci8:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_openssl:--with-openssl=shared} \
-	--with-kerberos \
+	%{?with_kerberos5:--with-kerberos} \
 	%{__with_without pcre pcre-regex /usr} \
 	%{__enable_disable filter filter shared} \
 	--with-pear=%{php_pear_dir} \

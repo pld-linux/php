@@ -1,0 +1,22 @@
+--- php-5.3.6/ext/mysql/php_mysql.c~	2011-04-13 20:47:29.263652096 +0200
++++ php-5.3.6/ext/mysql/php_mysql.c	2011-04-13 20:48:30.206453191 +0200
+@@ -706,7 +706,7 @@
+ 
+ #if !defined(MYSQL_USE_MYSQLND)
+ 	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
+-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
++		php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+ 						"Headers and client library minor version mismatch. Headers:%d Library:%ld",
+ 						MYSQL_VERSION_ID, mysql_get_client_version());
+ 	}
+--- php-5.3.6/ext/mysqli/mysqli_nonapi.c~	2011-04-13 20:47:29.273652556 +0200
++++ php-5.3.6/ext/mysqli/mysqli_nonapi.c	2011-04-13 20:48:41.070285840 +0200
+@@ -75,7 +75,7 @@
+ 
+ #if !defined(MYSQL_USE_MYSQLND)
+ 	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
+-		php_error_docref(NULL TSRMLS_CC, E_WARNING,
++		php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+ 						"Headers and client library minor version mismatch. Headers:%d Library:%ld",
+ 						MYSQL_VERSION_ID, mysql_get_client_version());
+ 	}

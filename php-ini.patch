@@ -18,15 +18,6 @@
  
  ;;;;;;;;;;;;;;;;;;;
  ; Resource Limits ;
-@@ -583,7 +583,7 @@
- ; Development Value: On
- ; Production Value: Off
- ; http://php.net/track-errors
--track_errors = Off
-+track_errors = On
- 
- ; Turn off normal error reporting and emit XML-RPC error XML
- ; http://php.net/xmlrpc-errors
 @@ -804,7 +804,7 @@
  
  ; Directory in which the loadable extensions (modules) reside.

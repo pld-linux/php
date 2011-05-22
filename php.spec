@@ -253,7 +253,7 @@ BuildRequires:	rpmbuild(macros) >= 1.566
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
-%{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel}
+%{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel >= 0.54.1}
 BuildRequires:	zlib-devel >= 1.0.9
 %if %{with apache1}
 BuildRequires:	apache1-devel

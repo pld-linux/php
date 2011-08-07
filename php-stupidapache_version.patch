@@ -1,14 +1,17 @@
---- php-5.3.1/acinclude.m4~	2009-11-26 00:49:53.000000000 +0200
-+++ php-5.3.1/acinclude.m4	2009-11-26 00:51:11.466867803 +0200
-@@ -2582,7 +2582,11 @@
+--- php-5.4.0alpha2/acinclude.m4	2011-08-07 21:13:21.581133944 +0300
++++ php-5.4.0alpha2/acinclude.m4	2011-08-07 21:10:21.766717150 +0300
+@@ -2607,7 +2609,14 @@
  dnl version for apache1/2.
  dnl
  AC_DEFUN([PHP_AP_EXTRACT_VERSION],[
--  ac_output=`$1 -v 2>&1 | grep version`
+-  ac_output=`$1 -v 2>&1 | grep version | $SED -e 's/Oracle-HTTP-//'`
++  PHP_ARG_WITH(apache-version, Set Apache version,
++  [  --with-apache-version=VERSION      Set Apache version instead of detecting from httpd binary])
++
 +  if test "$with_apache_version" != "no"; then
 +    ac_output="foo bar baz $with_apache_version"
 +  else
-+    ac_output=`$1 -v 2>&1 | grep version`
++    ac_output=`$1 -v 2>&1 | grep version | $SED -e 's/Oracle-HTTP-//'`
 +  fi
    ac_IFS=$IFS
  IFS="- /.

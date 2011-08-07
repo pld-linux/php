@@ -23,8 +23,8 @@
        AC_MSG_RESULT($OCISDKRPMINC)
        PHP_ADD_INCLUDE($OCISDKRPMINC)
        OCI8INCDIR=$OCISDKRPMINC
---- php-5.3.3/ext/pdo_oci/config.m4~	2010-02-04 02:12:14.000000000 +0100
-+++ php-5.3.3/ext/pdo_oci/config.m4	2010-09-10 19:58:31.206315023 +0200
+--- php-5.4.0alpha2/ext/pdo_oci/config.m4~	2011-08-07 12:46:31.000000000 +0300
++++ php-5.4.0alpha2/ext/pdo_oci/config.m4	2011-08-07 12:48:24.712839499 +0300
 @@ -6,8 +6,10 @@
  AC_DEFUN([AC_PDO_OCI_VERSION],[
    AC_MSG_CHECKING([Oracle version])
@@ -37,10 +37,10 @@
      fi
    done
    if test -z "$PDO_OCI_VERSION"; then
-@@ -86,6 +86,9 @@
-     elif test -f $PDO_OCI_IC_PREFIX/client/include/oci.h ; then
-       PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/client/include)
-       AC_MSG_RESULT($PDO_OCI_IC_PREFIX/client/include)
+@@ -103,6 +103,9 @@
+     elif test -f $PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include/oci.h ; then
+       PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include)
+       AC_MSG_RESULT($PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include)
 +    elif test -f $PDO_OCI_IC_PREFIX/../include/oracle/client/oci.h ; then
 +      PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/../include/oracle/client)
 +      AC_MSG_RESULT($PDO_OCI_IC_PREFIX/../include/oracle/client)

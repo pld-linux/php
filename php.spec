@@ -1,4 +1,15 @@
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
+# TODO 5.4:
+# - do not remove PatchX: definitions until merged to HEAD, needed for tracking their state
+# - check php-sapi-ini-file.patch for safe mode removal
+# - enable suhoshin patch (needs api porting)
+# - enable litespeed (needs api porting)
+# - update imap annotations patch (needs api porting)
+# - update imap myrights patch (needs api porting)
+# - dba: enable: --with-tcadb=DIR        DBA: Tokyo Cabinet abstract DB support
+# - --with-vpx-dir=DIR     GD: Set the path to libvpx install prefix
+# --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
+# --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.  
 # TODO:
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
@@ -34,7 +45,7 @@
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	kerberos5	# without Kerberos5 support
-%bcond_without	litespeed	# build litespeed module
+%bcond_with	litespeed	# build litespeed module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mm		# without mm support for session storage
@@ -62,7 +73,7 @@
 %bcond_with	zts		# Zend Thread Safety
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
-%bcond_without	suhosin		# with suhosin patch
+%bcond_with	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_with	type_hints	# experimental support for strict typing/casting
@@ -105,7 +116,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	11
+%define		rel	0.2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -113,13 +124,14 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.6
+Version:	5.4.0
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	2286f5a82a6e8397955a0025c1c2ad98
+#Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+Source0:	http://downloads.php.net/stas/%{name}-%{version}alpha2.tar.bz2
+# Source0-md5:	6af29928f5962a855b7763ff81388201
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -131,6 +143,7 @@ Source11:	%{name}-fpm.logrotate
 Source12:	%{name}-branch.sh
 Source13:	dep-tests.sh
 Source14:	skip-tests.sh
+# Source15Download: http://litespeedtech.com/lsapi-downloads.html
 Source15:	http://litespeedtech.com/packages/lsapi/%{name}-litespeed-%{litespeed_version}.tgz
 # Source15-md5:	9d58485d5fd6b5f5fefcec41b9ce283e
 Patch0:		%{name}-shared.patch
@@ -148,7 +161,7 @@ Patch10:	%{name}-ini.patch
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
 Patch14:	%{name}-no_pear_install.patch
-Patch15:	%{name}-zlib.patch
+#Patch15:	%{name}-zlib.patch # no longer needed?
 Patch17:	%{name}-readline.patch
 Patch18:	%{name}-nohttpd.patch
 Patch19:	%{name}-gd_imagerotate_enable.patch
@@ -162,7 +175,7 @@ Patch26:	%{name}-pear.patch
 Patch27:	%{name}-config-dir.patch
 Patch29:	%{name}-fcgi-graceful.patch
 Patch31:	%{name}-fcgi-error_log-no-newlines.patch
-Patch32:	%{name}-curl-limit-speed.patch
+#Patch32:	%{name}-curl-limit-speed.patch # applied upstream
 Patch34:	%{name}-libtool.patch
 Patch35:	%{name}-tds.patch
 Patch36:	%{name}-mysql-charsetphpini.patch
@@ -176,7 +189,7 @@ Patch44:	%{name}-include_path.patch
 Patch45:	%{name}-imap-annotations.patch
 Patch46:	%{name}-imap-myrights.patch
 Patch47:	suhosin.patch
-Patch49:	%{name}-m4-divert.patch
+#Patch49:	%{name}-m4-divert.patch # no longer needed, upstream supports new ac
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
@@ -189,7 +202,7 @@ Patch60:	%{name}-oracle-instantclient.patch
 Patch61:	%{name}-krb5-ac.patch
 Patch62:	mcrypt-libs.patch
 Patch63:	%{name}-mysql-nowarning.patch
-Patch64:	%{name}-buff_ovf.patch
+#Patch64:	%{name}-buff_ovf.patch # upstream has fix for this
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -251,7 +264,6 @@ BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.566
-%{?with_sqlite2:BuildRequires:	sqlite-devel}
 %if %{with sqlite3} || %{with pdo_sqlite}
 BuildRequires:	sqlite3-devel >= 3.3.9
 %endif
@@ -279,9 +291,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20090626
-%define		zend_module_api		20090626
-%define		zend_extension_api	220090626
+%define		php_api_version		20100412
+%define		zend_module_api		20100525
+%define		zend_extension_api	220100525
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -1495,36 +1507,6 @@ PHP Library support.
 %description spl -l pl.UTF-8
 Moduł PHP z biblioteką standardową PHP (SPL - Standard PHP Library).
 
-%package sqlite
-Summary:	SQLite extension module for PHP
-Summary(pl.UTF-8):	Moduł SQLite dla PHP
-Group:		Libraries
-URL:		http://www.php.net/manual/en/book.sqlite.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
-Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
-Provides:	php(sqlite)
-
-%description sqlite
-SQLite is a C library that implements an embeddable SQL database
-engine. Programs that link with the SQLite library can have SQL
-database access without running a separate RDBMS process.
-
-SQLite is not a client library used to connect to a big database
-server. SQLite is the server. The SQLite library reads and writes
-directly to and from the database files on disk.
-
-%description sqlite -l pl.UTF-8
-SQLite jest napisaną w C biblioteką implementującą osadzalny silnik
-bazodanowy SQL. Program linkujący się z biblioteką SQLite może mieć
-dostęp do bazy SQL bez potrzeby uruchamiania dodatkowego procesu
-RDBMS.
-
-SQLite to nie klient baz danych - biblioteka nie łączy się z serwerami
-baz danych. SQLite sam jest serwerem. Biblioteka SQLite czyta i
-zapisuje dane bezpośrednio z/do plików baz danych znajdujących się na
-dysku.
-
 %package sqlite3
 Summary:	SQLite3 extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite3 dla PHP
@@ -1803,7 +1785,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}alpha2
 # prep for suhosin patch
 %{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1
@@ -1822,7 +1804,6 @@ cp php.ini-production php.ini
 %patch12 -p0
 %endif
 %patch14 -p1
-%patch15 -p1
 %patch17 -p1
 %patch18 -p1
 %if %{with system_gd}
@@ -1838,7 +1819,6 @@ cp php.ini-production php.ini
 %patch27 -p1
 %patch29 -p1
 %patch31 -p1
-%patch32 -p1
 %if "%{pld_release}" != "ac"
 %patch34 -p1
 %endif
@@ -1853,12 +1833,11 @@ cp php.ini-production php.ini
 %endif
 %patch43 -p1
 %patch44 -p1
-%patch45 -p1
-%patch46 -p1
+#%patch45 -p1 # imap annotations. fixme
+#%patch46 -p1 # imap myrights. fixme
 %if %{with suhosin}
 %patch47 -p1
 %endif
-%patch49 -p1
 %patch50 -p1
 %patch51 -p1
 %patch52 -p1
@@ -1872,7 +1851,6 @@ cp php.ini-production php.ini
 %patch61 -p1
 %patch62 -p1
 %patch63 -p1
-%patch64 -p1
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 
@@ -1887,7 +1865,6 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 %{__rm} ext/recode/config9.m4
 
 # remove all bundled libraries not to link with them accidentally
-#%{__rm} -r ext/sqlite/libsqlite
 %{__rm} -r ext/sqlite3/libsqlite
 #%{__rm} -r ext/bcmath/libbcmath
 #%{__rm} -r ext/date/lib
@@ -2012,7 +1989,6 @@ for sapi in $sapis; do
 	--with-libdir=%{_lib} \
 	--with-config-file-path=%{_sysconfdir} \
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
-	--with-exec-dir=%{_bindir} \
 	--with-system-tzdata \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
@@ -2062,11 +2038,9 @@ for sapi in $sapis; do
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \
-	--enable-safe-mode \
 	--enable-soap=shared \
 	--enable-sockets=shared \
 	--enable-tokenizer=shared \
-	--enable-ucd-snmp-hack \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
 	--enable-xmlreader=shared \
@@ -2104,7 +2078,6 @@ for sapi in $sapis; do
 	--with-regex=system \
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
-	%{!?with_sqlite2:--without-sqlite}%{?with_sqlite2:--with-sqlite=shared,/usr --enable-sqlite-utf8} \
 	%{!?with_pdo_sqlite:--without-pdo-sqlite} \
 	%{__with_without sqlite3 sqlite3 shared,/usr} \
 	--with-t1lib=shared \
@@ -2490,7 +2463,6 @@ fi
 %extension_scripts soap
 %extension_scripts sockets
 %extension_scripts spl
-%extension_scripts sqlite
 %extension_scripts sqlite3
 %extension_scripts sybase-ct
 %extension_scripts sysvmsg
@@ -2622,9 +2594,6 @@ fi
 %triggerun sockets -- %{name}-sockets < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sockets\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun sqlite -- %{name}-sqlite < 4:5.0.4-9.1
-%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sqlite\.so/d' %{_sysconfdir}/php.ini
-
 %triggerun sybase-ct -- %{name}-sybase-ct < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase-ct\.so/d' %{_sysconfdir}/php.ini
 
@@ -2717,7 +2686,7 @@ fi
 %defattr(644,root,root,755)
 %doc php.ini-*
 %doc CREDITS Zend/ZEND_CHANGES
-%doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
+%doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS
 %doc README.PHP4-TO-PHP5-THIN-CHANGES
 %doc README.namespaces
 
@@ -3062,14 +3031,6 @@ fi
 %doc ext/spl/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
 %attr(755,root,root) %{php_extensiondir}/spl.so
-
-%if %{with sqlite2}
-%files sqlite
-%defattr(644,root,root,755)
-%doc ext/sqlite/{README,TODO,CREDITS}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sqlite.ini
-%attr(755,root,root) %{php_extensiondir}/sqlite.so
-%endif
 
 %if %{with sqlite3}
 %files sqlite3

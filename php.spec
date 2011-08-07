@@ -4,7 +4,7 @@
 # - wddx: restore session support (not compiled in due DL extension check)
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
 #   - removed from php 5.0 (currently in php4):
-#   db [pecl-svn], hyperwave [pecl-svn], java [pecl-svn], mcal [pecl-svn], overload [???], qtdom [pecl-svn]
+#   db [pecl-svn], hyperwave [pecl-svn], java [pecl-svn], mcal [pecl-svn], qtdom [pecl-svn]
 #   - removed from php 5.1:
 #   oracle [pecl-svn]
 #   - removed from php 5.2:
@@ -475,14 +475,12 @@ Provides:	php(ereg)
 Provides:	php(hash)
 Provides:	php(libxml)
 Provides:	php(modules_api) = %{php_api_version}
-Provides:	php(overload)
 Provides:	php(reflection)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
 Provides:	php-date
 Provides:	php-ereg
-Provides:	php-overload
 Provides:	php-reflection
 Provides:	php-standard
 Provides:	php5(debug) = %{php_debug}
@@ -2056,7 +2054,6 @@ for sapi in $sapis; do
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--without-libexpat-dir \
-	--enable-overload=shared \
 	--enable-posix=shared \
 	--enable-shared \
 	--enable-session=shared \

@@ -44,12 +44,13 @@
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
+%bcond_without	pdo_sqlite	# without PDO SQLite extension module
 %bcond_without	pgsql		# without PostgreSQL extension module
 %bcond_without	phar		# without phar extension module
 %bcond_without	pspell		# without pspell extension module
 %bcond_without	recode		# without recode extension module
 %bcond_without	snmp		# without SNMP extension module
-%bcond_without	sqlite		# without SQLite extension module
+%bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
@@ -249,8 +250,10 @@ BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.566
-%{?with_sqlite:BuildRequires:	sqlite-devel}
-%{?with_sqlite3:BuildRequires:	sqlite3-devel >= 3.3.9}
+%{?with_sqlite2:BuildRequires:	sqlite-devel}
+%if %{with sqlite3} || %{with pdo_sqlite}
+BuildRequires:	sqlite3-devel >= 3.3.9
+%endif
 BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
@@ -2047,7 +2050,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
-	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
+	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
 	--without-libexpat-dir \
 	--enable-overload=shared \
 	--enable-posix=shared \
@@ -2101,7 +2104,8 @@ for sapi in $sapis; do
 	--with-regex=system \
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
-	%{!?with_sqlite:--without-sqlite --without-pdo-sqlite}%{?with_sqlite:--with-sqlite=shared,/usr --enable-sqlite-utf8} \
+	%{!?with_sqlite2:--without-sqlite}%{?with_sqlite2:--with-sqlite=shared,/usr --enable-sqlite-utf8} \
+	%{!?with_pdo_sqlite:--without-pdo-sqlite} \
 	%{__with_without sqlite3 sqlite3 shared,/usr} \
 	--with-t1lib=shared \
 	%{?with_tidy:--with-tidy=shared} \
@@ -2972,7 +2976,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pdo_pgsql.so
 %endif
 
-%if %{with sqlite}
+%if %{with pdo_sqlite}
 %files pdo-sqlite
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_sqlite.ini
@@ -3059,7 +3063,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
 %attr(755,root,root) %{php_extensiondir}/spl.so
 
-%if %{with sqlite}
+%if %{with sqlite2}
 %files sqlite
 %defattr(644,root,root,755)
 %doc ext/sqlite/{README,TODO,CREDITS}

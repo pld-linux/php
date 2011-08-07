@@ -36,6 +36,7 @@
 %bcond_without	kerberos5	# without Kerberos5 support
 %bcond_without	litespeed	# build litespeed module
 %bcond_without	ldap		# without LDAP extension module
+%bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 # don't turn it on by default; see TODO item for mysqlnd in this spec
@@ -812,9 +813,11 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.gmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(hash)
+%if %{with mhash}
 Provides:	php(mhash)
 Provides:	php-mhash = %{epoch}:%{version}-%{release}
 Obsoletes:	php-mhash < 4:5.3.0
+%endif
 Obsoletes:	php-pecl-hash
 
 %description hash
@@ -2045,6 +2048,7 @@ for sapi in $sapis; do
 %if %{with interbase} && %{without interbase_inst}
 	--with-pdo-firebird=shared,/usr \
 %endif
+	%{?with_mhash:--with-mhash=yes} \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	--with-pdo-mysql=shared%{?with_mysqlnd:,mysqlnd} \
 	%{?with_oci8:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \

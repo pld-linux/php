@@ -1,0 +1,23 @@
+--- php-5.3.2/ext/mysqlnd/config9.m4~	2009-12-22 21:30:09.000000000 +0200
++++ php-5.3.2/ext/mysqlnd/config9.m4	2010-04-14 01:33:20.435275382 +0300
+@@ -20,7 +20,7 @@
+ 				   mysqlnd_result.c mysqlnd_result_meta.c mysqlnd_debug.c\
+ 				   mysqlnd_block_alloc.c php_mysqlnd.c"
+ 
+-  PHP_NEW_EXTENSION(mysqlnd, $mysqlnd_sources, no)
++  PHP_NEW_EXTENSION(mysqlnd, $mysqlnd_sources, yes)
+   PHP_ADD_BUILD_DIR([ext/mysqlnd], 1)
+   PHP_INSTALL_HEADERS([ext/mysqlnd/])
+ 
+--- php-5.3.2/ext/mysqlnd/php_mysqlnd.c~	2010-01-20 19:09:28.000000000 +0200
++++ php-5.3.2/ext/mysqlnd/php_mysqlnd.c	2010-04-14 09:18:30.725599897 +0300
+@@ -273,6 +273,9 @@
+ };
+ /* }}} */
+ 
++#ifdef COMPILE_DL_MYSQLND
++ZEND_GET_MODULE(mysqlnd)
++#endif
+ 
+ /*
+  * Local variables:

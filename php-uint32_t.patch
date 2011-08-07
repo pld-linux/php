@@ -1,0 +1,11 @@
+diff -ur php5.3-200903291030/Zend/zend_strtod.c mod/Zend/zend_strtod.c
+--- php5.3-200903291030/Zend/zend_strtod.c	2009-03-18 12:36:20.000000000 +0100
++++ mod/Zend/zend_strtod.c	2009-03-29 18:34:10.000000000 +0200
+@@ -93,6 +93,7 @@
+ 
+ #include <zend_operators.h>
+ #include <zend_strtod.h>
++#include <stdint.h>
+ 
+ #ifdef ZTS
+ #include <TSRM.h>

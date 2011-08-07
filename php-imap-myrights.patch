@@ -1,0 +1,92 @@
+diff -r 5daa8cce8706 ext/imap/php_imap.c
+--- a/ext/imap/php_imap.c	Wed Dec 23 22:46:34 2009 +0100
++++ b/ext/imap/php_imap.c	Wed Dec 23 22:49:02 2009 +0100
+@@ -157,6 +157,11 @@
+ ZEND_END_ARG_INFO()
+ 
+ ZEND_BEGIN_ARG_INFO_EX(arginfo_imap_getacl, 0, 0, 2)
++	ZEND_ARG_INFO(0, stream_id)
++	ZEND_ARG_INFO(0, mailbox)
++ZEND_END_ARG_INFO()
++
++ZEND_BEGIN_ARG_INFO_EX(arginfo_imap_myrights, 0, 0, 2)
+ 	ZEND_ARG_INFO(0, stream_id)
+ 	ZEND_ARG_INFO(0, mailbox)
+ ZEND_END_ARG_INFO()
+@@ -555,6 +560,7 @@
+ 	PHP_FE(imap_set_quota,							arginfo_imap_set_quota)
+ 	PHP_FE(imap_setacl,								arginfo_imap_setacl)
+ 	PHP_FE(imap_getacl,								arginfo_imap_getacl)
++	PHP_FE(imap_myrights,							arginfo_imap_myrights)
+ #endif
+ #if defined(HAVE_IMAP2005)
+  	PHP_FE(imap_setannotation,						arginfo_imap_setannotation)
+@@ -817,6 +823,20 @@
+ 	for(; alist; alist = alist->next) {
+ 		add_assoc_stringl(IMAPG(imap_acl_list), alist->identifier, alist->rights, strlen(alist->rights), 1);
+ 	}
++}
++/* }}} */
++
++/* {{{ mail_myrights
++ *
++ * Mail MYRIGHTS callback
++ * Called via the mail_parameter function in c-client:src/c-client/mail.c
++ */
++void mail_myrights(MAILSTREAM *stream, char *mailbox, char *rights)
++{
++	TSRMLS_FETCH();
++
++	ZVAL_STRING(IMAPG(imap_acl_list), rights, 1)
++
+ }
+ /* }}} */
+ #endif
+@@ -1525,6 +1545,36 @@
+ 	IMAPG(imap_acl_list) = NIL;
+ }
+ /* }}} */
++
++/* {{{ proto string imap_myrights(resource stream_id, string mailbox)
++	Gets my rights (ACL) for a given mailbox */
++PHP_FUNCTION(imap_myrights)
++{
++	zval **streamind, **mailbox;
++	pils *imap_le_struct;
++
++	if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_ex(2, &streamind, &mailbox) == FAILURE) {
++		ZEND_WRONG_PARAM_COUNT();
++	}
++
++	ZEND_FETCH_RESOURCE(imap_le_struct, pils *, streamind, -1, "imap", le_imap);
++
++	convert_to_string_ex(mailbox);
++
++	IMAPG(imap_acl_list) = return_value;
++
++	/* set the callback for the GET_ACL function */
++	mail_parameters(NIL, SET_MYRIGHTS, (void *) mail_myrights);
++	if(!imap_myrights(imap_le_struct->imap_stream, Z_STRVAL_PP(mailbox))) {
++		php_error(E_WARNING, "c-client imap_myrights failed");
++		zval_dtor(return_value);
++		RETURN_FALSE;
++	}
++
++	IMAPG(imap_acl_list) = NIL;
++}
++/* }}} */
++
+ #endif /* HAVE_IMAP2000 || HAVE_IMAP2001 */
+  
+ #if defined(HAVE_IMAP2005)
+diff -r 5daa8cce8706 ext/imap/php_imap.h
+--- a/ext/imap/php_imap.h	Wed Dec 23 22:46:34 2009 +0100
++++ b/ext/imap/php_imap.h	Wed Dec 23 22:49:02 2009 +0100
+@@ -183,6 +183,7 @@
+ PHP_FUNCTION(imap_set_quota);
+ PHP_FUNCTION(imap_setacl);
+ PHP_FUNCTION(imap_getacl);
++PHP_FUNCTION(imap_myrights);
+ #endif
+ #if defined(HAVE_IMAP2005)
+ PHP_FUNCTION(imap_setannotation);

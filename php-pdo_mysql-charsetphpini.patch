@@ -1,0 +1,76 @@
+This is damn ugly patch if you need to update it, see PHP_5_2 branch version to
+understand what this patch is supposed to do as in 5.3 the ini section is
+enabled only if mysqlnd driver is enabled which makes the contexts really
+small.
+
+--- php-5.3.1/ext/pdo_mysql/mysql_driver.c~	2010-02-20 01:08:04.000000000 +0200
++++ php-5.3.1/ext/pdo_mysql/mysql_driver.c	2010-02-20 01:08:52.982186037 +0200
+@@ -436,6 +436,7 @@
+ 	pdo_mysql_db_handle *H;
+ 	int i, ret = 0;
+ 	char *host = NULL, *unix_socket = NULL;
++	char *connect_charset = NULL;
+ 	unsigned int port = 3306;
+ 	char *dbname;
+ 	struct pdo_data_src_parser vars[] = {
+@@ -731,6 +731,12 @@
+ 		password_len = strlen(dbh->password);
+ 	}
+ 
++	connect_charset = PDO_MYSQL_G(connect_charset);
++
++	if (connect_charset != NULL) {
++		mysql_options(H->server, MYSQL_SET_CHARSET_NAME, connect_charset);
++	}
++
+ 	if (mysqlnd_connect(H->server, host, dbh->username, dbh->password, password_len, dbname, dbname_len,
+ 						port, unix_socket, connect_opts, PDO_MYSQL_G(mysqlnd_thd_zval_cache) TSRMLS_CC) == NULL) {
+ #else
+--- php-5.3.3/ext/pdo_mysql/pdo_mysql.c~	2010-07-24 19:23:14.000000000 +0300
++++ php-5.3.3/ext/pdo_mysql/pdo_mysql.c	2010-07-24 19:24:48.363581841 +0300
+@@ -56,6 +56,7 @@
+ #if PDO_DBG_ENABLED
+ 	STD_PHP_INI_ENTRY("pdo_mysql.debug",	NULL, PHP_INI_SYSTEM, OnUpdateString, debug, zend_pdo_mysql_globals, pdo_mysql_globals)
+ #endif
++	STD_PHP_INI_ENTRY("pdo_mysql.connect_charset",	NULL,	PHP_INI_ALL,	OnUpdateString,	connect_charset,	zend_pdo_mysql_globals,	pdo_mysql_globals)
+ PHP_INI_END()
+ /* }}} */
+ 
+@@ -89,9 +90,7 @@
+ static PHP_MSHUTDOWN_FUNCTION(pdo_mysql)
+ {
+ 	php_pdo_unregister_driver(&pdo_mysql_driver);
+-#if PDO_USE_MYSQLND
+ 	UNREGISTER_INI_ENTRIES();
+-#endif
+ 
+ 	return SUCCESS;
+ }
+@@ -108,9 +107,7 @@
+ 
+ 	php_info_print_table_end();
+ 
+-#ifdef PDO_USE_MYSQLND
+ 	DISPLAY_INI_ENTRIES();
+-#endif
+ }
+ /* }}} */
+ 
+@@ -161,6 +161,7 @@
+ 	pdo_mysql_globals->debug = NULL;	/* The actual string */
+ 	pdo_mysql_globals->dbg = NULL;	/* The DBG object*/
+ #endif
++	pdo_mysql_globals->connect_charset = NULL;
+ }
+ /* }}} */
+ 
+--- php-5.3.2RC3/ext/pdo_mysql/php_pdo_mysql_int.h~	2010-02-04 11:37:38.000000000 +0200
++++ php-5.3.2RC3/ext/pdo_mysql/php_pdo_mysql_int.h	2010-02-26 19:11:47.484055898 +0200
+@@ -69,6 +69,7 @@
+ 	char          *debug; /* The actual string */
+ 	MYSQLND_DEBUG *dbg;	/* The DBG object */
+ #endif
++	char          *connect_charset;
+ #if defined(PHP_WIN32) && !PDO_DBG_ENABLED
+ 	/* dummy member so we get at least one member in the struct
+ 	 * and avoids build errors.

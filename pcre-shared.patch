@@ -1,0 +1,118 @@
+--- php-5.3.1/ext/pcre/config0.m4	2009-11-27 08:19:08.836025192 +0000
++++ php-5.3.1/ext/pcre/config0.m4	2009-11-30 22:09:24.385647500 +0000
+@@ -11,7 +11,7 @@
+ 
+   if test "$PHP_PCRE_REGEX" != "yes" && test "$PHP_PCRE_REGEX" != "no"; then
+     AC_MSG_CHECKING([for PCRE headers location])
+-    for i in $PHP_PCRE_REGEX $PHP_PCRE_REGEX/include $PHP_PCRE_REGEX/include/pcre $PHP_PCRE_REGEX/local/include; do
++    for i in $PHP_PCRE_REGEX $PHP_PCRE_REGEX/include $PHP_PCRE_REGEX/include/pcre $PHP_PCRE_REGEX/local/include /usr/include; do
+       test -f $i/pcre.h && PCRE_INCDIR=$i
+     done
+ 
+@@ -21,7 +21,7 @@
+     AC_MSG_RESULT([$PCRE_INCDIR])
+ 
+     AC_MSG_CHECKING([for PCRE library location])
+-    for j in $PHP_PCRE_REGEX $PHP_PCRE_REGEX/$PHP_LIBDIR; do
++    for j in $PHP_PCRE_REGEX $PHP_PCRE_REGEX/$PHP_LIBDIR /usr/$PHP_LIBDIR; do
+       test -f $j/libpcre.a || test -f $j/libpcre.$SHLIB_SUFFIX_NAME && PCRE_LIBDIR=$j
+     done
+     
+@@ -43,12 +43,13 @@
+       AC_MSG_ERROR([The PCRE extension requires PCRE library version >= 6.6])
+     fi
+ 
+-    PHP_ADD_LIBRARY_WITH_PATH(pcre, $PCRE_LIBDIR)
++    PHP_ADD_LIBRARY_WITH_PATH(pcre, $PCRE_LIBDIR, PCRE_SHARED_LIBADD)
+     
+     AC_DEFINE(HAVE_PCRE, 1, [ ])
+     PHP_ADD_INCLUDE($PCRE_INCDIR)
+-    PHP_NEW_EXTENSION(pcre, php_pcre.c, no)
++    PHP_NEW_EXTENSION(pcre, php_pcre.c, $ext_shared)
+     PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h])
++    EXTRA_LIBS="$EXTRA_LIBS -lpcre"
+   else
+     AC_MSG_CHECKING([for PCRE library to use])
+     AC_MSG_RESULT([bundled])
+@@ -59,7 +60,7 @@
+     				 pcrelib/pcre_ord2utf8.c pcrelib/pcre_refcount.c pcrelib/pcre_study.c \
+     				 pcrelib/pcre_tables.c pcrelib/pcre_try_flipped.c pcrelib/pcre_valid_utf8.c \
+     				 pcrelib/pcre_version.c pcrelib/pcre_xclass.c"
+-    PHP_NEW_EXTENSION(pcre, $pcrelib_sources php_pcre.c, no,,-I@ext_srcdir@/pcrelib)
++    PHP_NEW_EXTENSION(pcre, $pcrelib_sources php_pcre.c, $ext_shared,,-I@ext_srcdir@/pcrelib)
+     PHP_ADD_BUILD_DIR($ext_builddir/pcrelib)
+     PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h pcrelib/])
+     AC_DEFINE(HAVE_BUNDLED_PCRE, 1, [ ])
+--- php-5.3.1/ext/pcre/php_pcre.h	2009-11-30 20:59:04.046581246 +0200
++++ php-5.3.1.pcre/ext/pcre/php_pcre.h	2009-11-30 21:38:06.435493243 +0000
+@@ -34,7 +34,12 @@
+ #endif
+ 
+ PHPAPI char *php_pcre_replace(char *regex, int regex_len, char *subject, int subject_len, zval *replace_val, int is_callable_replace, int *result_len, int limit, int *replace_count TSRMLS_DC);
++#if COMPILE_DL_PCRE
++#define pcre_get_compiled_regex pcre_get_compiled_regex_p
++extern PHPAPI pcre* (*pcre_get_compiled_regex)(char *regex, pcre_extra **extra, int *options TSRMLS_DC);
++#else
+ PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *options TSRMLS_DC);
++#endif
+ PHPAPI pcre* pcre_get_compiled_regex_ex(char *regex, pcre_extra **extra, int *preg_options, int *coptions TSRMLS_DC);
+ 
+ extern zend_module_entry pcre_module_entry;
+--- php-5.3.1/ext/pcre/php_pcre.c	2009-11-30 21:10:01.370473754 +0200
++++ php-5.3.1.pcre/ext/pcre/php_pcre.c	2009-11-30 21:38:01.759684456 +0000
+@@ -27,6 +27,11 @@
+ 
+ #if HAVE_PCRE || HAVE_BUNDLED_PCRE
+ 
++#if COMPILE_DL_PCRE
++#undef pcre_get_compiled_regex
++PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *preg_options TSRMLS_DC);
++#endif
++
+ #include "ext/standard/php_string.h"
+ 
+ #define PREG_PATTERN_ORDER			1
+@@ -153,6 +158,10 @@
+ 	REGISTER_LONG_CONSTANT("PREG_BAD_UTF8_OFFSET_ERROR", PHP_PCRE_BAD_UTF8_OFFSET_ERROR, CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_STRING_CONSTANT("PCRE_VERSION", (char *)pcre_version(), CONST_CS | CONST_PERSISTENT);
+ 
++#if COMPILE_DL_PCRE
++	pcre_get_compiled_regex_p = pcre_get_compiled_regex;
++#endif
++
+ 	return SUCCESS;
+ }
+ /* }}} */
+@@ -429,6 +438,7 @@
+ }
+ /* }}} */
+ 
++
+ /* {{{ pcre_get_compiled_regex
+  */
+ PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *preg_options TSRMLS_DC)
+--- php-5.3.1/ext/standard/browscap.c	2009-06-06 02:40:49.000000000 +0000
++++ php-5.3.1.pcre/ext/standard/browscap.c	2009-11-30 21:33:00.775241138 +0000
+@@ -31,6 +31,11 @@
+ static zval *current_section;
+ static char *current_section_name;
+ 
++#if COMPILE_DL_PCRE
++// will be visible in here
++PHPAPI pcre* (*pcre_get_compiled_regex_p)(char *regex, pcre_extra **extra, int *options TSRMLS_DC);
++#endif
++
+ #define DEFAULT_SECTION_NAME "Default Browser Capability Settings"
+ 
+ /* OBJECTS_FIXME: This whole extension needs going through. The use of objects looks pretty broken here */
+--- php-5.3.2/sapi/cli/tests/018.phpt~	2008-03-17 16:05:39.000000000 +0200
++++ php-5.3.2/sapi/cli/tests/018.phpt	2010-03-16 20:41:11.341251246 +0200
+@@ -20,8 +20,6 @@
+ --EXPECTF--     
+ [PHP Modules]
+ %a
+-pcre
+-%a
+ 
+ [Zend Modules]
+ %aDone

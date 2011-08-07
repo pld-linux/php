@@ -2059,7 +2059,6 @@ for sapi in $sapis; do
 	--enable-session=shared \
 	--enable-shmop=shared \
 	--enable-simplexml=shared \
-	--enable-spl=shared \
 	--enable-sysvmsg=shared \
 	--enable-sysvsem=shared \
 	--enable-sysvshm=shared \

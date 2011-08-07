@@ -1,0 +1,6 @@
+- up to 5.4.0alpha2
+  - sqlite ext moved to pecl (php-pecl-SQLite)
+  - --enable-ucd-snmp-hack removed (snmp ext got rewrite)
+  - safe mode removed (--with-exec-dir option removed)
+  - updated patches, builds
+  - tests fail on carme due net-snmp 5.7 problems: http://pastebin.com/BCQMdQUQ

@@ -35,8 +35,8 @@
  	REGISTER_SPL_SUB_CLASS_EX(RecursiveTreeIterator, RecursiveIteratorIterator, spl_RecursiveTreeIterator_new, spl_funcs_RecursiveTreeIterator);
  	REGISTER_SPL_CLASS_CONST_LONG(RecursiveTreeIterator, "BYPASS_CURRENT",      RTIT_BYPASS_CURRENT);
  	REGISTER_SPL_CLASS_CONST_LONG(RecursiveTreeIterator, "BYPASS_KEY",          RTIT_BYPASS_KEY);
---- php-5.3.1/ext/spl/spl_iterators.h~	2008-12-31 11:15:49.000000000 +0000
-+++ php-5.3.1/ext/spl/spl_iterators.h	2009-11-27 16:36:35.215748808 +0000
+--- php-5.4.0alpha3/ext/spl/spl_iterators.h~	2011-07-27 11:48:08.000000000 +0300
++++ php-5.4.0alpha3/ext/spl/spl_iterators.h	2011-08-08 00:12:10.892993117 +0300
 @@ -51,7 +51,12 @@
  extern PHPAPI zend_class_entry *spl_ce_AppendIterator;
  extern PHPAPI zend_class_entry *spl_ce_RegexIterator;
@@ -47,8 +47,8 @@
 +#else
  extern PHPAPI zend_class_entry *spl_ce_Countable;
 +#endif
- 
- PHP_MINIT_FUNCTION(spl_iterators);
+ extern PHPAPI zend_class_entry *spl_ce_CallbackFilterIterator;
+ extern PHPAPI zend_class_entry *spl_ce_RecursiveCallbackFilterIterator;
  
 --- php-5.3.1/ext/standard/array.c~	2009-08-14 06:20:21.000000000 +0000
 +++ php-5.3.1/ext/standard/array.c	2009-11-27 16:37:15.029078323 +0000

@@ -1,3 +1,4 @@
+# TODO
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # TODO 5.4:
 # - do not remove PatchX: definitions until merged to HEAD, needed for tracking their state
@@ -130,8 +131,8 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://downloads.php.net/stas/%{name}-%{version}alpha2.tar.bz2
-# Source0-md5:	6af29928f5962a855b7763ff81388201
+Source0:	http://downloads.php.net/stas/%{name}-%{version}alpha3.tar.bz2
+# Source0-md5:	68f277b9be92e51931ab1d705e7c6bde
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -206,7 +207,7 @@ Patch63:	%{name}-mysql-nowarning.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
-BuildRequires:	autoconf >= 2.53
+BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison
 BuildRequires:	bzip2-devel
@@ -1785,7 +1786,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{version}alpha2
+%setup -q -n %{name}-%{version}alpha3
 # prep for suhosin patch
 %{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1
@@ -2004,7 +2005,6 @@ for sapi in $sapis; do
 	--enable-gd-native-ttf \
 	--enable-intl=shared \
 	--enable-libxml \
-	--enable-magic-quotes \
 	--enable-mbstring=shared,all \
 	--enable-mbregex \
 	--enable-pcntl=shared \
@@ -2686,9 +2686,9 @@ fi
 %defattr(644,root,root,755)
 %doc php.ini-*
 %doc CREDITS Zend/ZEND_CHANGES
-%doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS
+%doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS UPGRADING
 %doc README.PHP4-TO-PHP5-THIN-CHANGES
-%doc README.namespaces
+%doc README.namespaces README.Zeus README.MAILINGLIST_RULES
 
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
@@ -2697,14 +2697,14 @@ fi
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
 
-%doc ext/session/mod_files.sh
-
 %files devel
 %defattr(644,root,root,755)
 %doc README.UNIX-BUILD-SYSTEM
 %doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
 %doc CODING_STANDARDS README.EXTENSIONS README.PARAMETER_PARSING_API README.STREAMS
 %doc README.SUBMITTING_PATCH README.TESTING README.TESTING2
+%doc README.NEW-OUTPUT-API UPGRADING.INTERNALS
+%doc README.REDIST.BINS README.RELEASE_PROCESS README.SVN-RULES README.UNIX-BUILD-SYSTEM
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
@@ -2758,7 +2758,6 @@ fi
 
 %files fileinfo
 %defattr(644,root,root,755)
-%doc README.input_filter
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/fileinfo.ini
 %attr(755,root,root) %{php_extensiondir}/fileinfo.so
 

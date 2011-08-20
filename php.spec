@@ -105,7 +105,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	11
+%define		rel	1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -113,13 +113,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.6
+Version:	5.3.7
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	2286f5a82a6e8397955a0025c1c2ad98
+# Source0-md5:	2d47d003c96de4e88863ff38da61af33
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -162,7 +162,6 @@ Patch26:	%{name}-pear.patch
 Patch27:	%{name}-config-dir.patch
 Patch29:	%{name}-fcgi-graceful.patch
 Patch31:	%{name}-fcgi-error_log-no-newlines.patch
-Patch32:	%{name}-curl-limit-speed.patch
 Patch34:	%{name}-libtool.patch
 Patch35:	%{name}-tds.patch
 Patch36:	%{name}-mysql-charsetphpini.patch
@@ -189,7 +188,7 @@ Patch60:	%{name}-oracle-instantclient.patch
 Patch61:	%{name}-krb5-ac.patch
 Patch62:	mcrypt-libs.patch
 Patch63:	%{name}-mysql-nowarning.patch
-Patch64:	%{name}-buff_ovf.patch
+Patch64:	%{name}-m4.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1838,7 +1837,6 @@ cp php.ini-production php.ini
 %patch27 -p1
 %patch29 -p1
 %patch31 -p1
-%patch32 -p1
 %if "%{pld_release}" != "ac"
 %patch34 -p1
 %endif

@@ -5317,11 +5317,13 @@ diff -Naurp php-5.3.6RC1/Zend/zend_hash.c php-5.3.6RC1.oden/Zend/zend_hash.c
  	while (p != NULL) {
  		q = p;
  		p = p->pListNext;
-@@ -610,6 +811,7 @@ static Bucket *zend_hash_apply_deleter(H
+--- x/Zend/zend_hash.c~	2011-08-20 18:08:23.000000000 +0200
++++ x/Zend/zend_hash.c	2011-08-20 18:09:01.292927307 +0200
+@@ -808,6 +808,7 @@
  	ht->nNumOfElements--;
  	HANDLE_UNBLOCK_INTERRUPTIONS();
  
-+        zend_hash_check_destructor(ht->pDestructor);
++	zend_hash_check_destructor(ht->pDestructor);
  	if (ht->pDestructor) {
  		ht->pDestructor(p->pData);
  	}

@@ -37,10 +37,10 @@
      fi
    done
    if test -z "$PDO_OCI_VERSION"; then
-@@ -86,6 +86,9 @@
-     elif test -f $PDO_OCI_IC_PREFIX/client/include/oci.h ; then
-       PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/client/include)
-       AC_MSG_RESULT($PDO_OCI_IC_PREFIX/client/include)
+@@ -103,6 +103,9 @@
+     elif test -f $PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include/oci.h ; then
+       PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include)
+       AC_MSG_RESULT($PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include)
 +    elif test -f $PDO_OCI_IC_PREFIX/../include/oracle/client/oci.h ; then
 +      PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/../include/oracle/client)
 +      AC_MSG_RESULT($PDO_OCI_IC_PREFIX/../include/oracle/client)

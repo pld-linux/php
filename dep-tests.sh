@@ -4,6 +4,7 @@
 with_mysqlnd=mysqlnd
 
 dep_spl="pcre simplexml"
+dep_session="spl $dep_spl"
 dep_filter='pcre'
 dep_eaccelerator='session'
 dep_mysql="$with_mysqlnd"
@@ -32,7 +33,7 @@ conf_dir=${CONFIG_DIR:-$(php-config --sysconfdir)/conf.d $(php-config --sysconfd
 tmpini=$(mktemp)
 
 # poldek --sn ac-ready -u php-*
-for ext in $ext_dir/spl.so; do
+for ext in $ext_dir/*.so; do
 	[ -f $ext ] || continue
 	ext=${ext##*/}; ext=${ext%.so}
 

@@ -105,7 +105,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	1
+%define		rel	2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -189,6 +189,7 @@ Patch61:	%{name}-krb5-ac.patch
 Patch62:	mcrypt-libs.patch
 Patch63:	%{name}-mysql-nowarning.patch
 Patch64:	%{name}-m4.patch
+Patch65:	%{name}-crypt-bugfix-55439.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1871,6 +1872,7 @@ cp php.ini-production php.ini
 %patch62 -p1
 %patch63 -p1
 %patch64 -p1
+%patch65 -p1
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 

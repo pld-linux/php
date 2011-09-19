@@ -1,4 +1,7 @@
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
+# UNPACKAGED EXTENSION NOTES:
+# - com_dotnet is Win32-only
+# - enchant is packaged separately (php-pecl-enchant)
 # TODO:
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
@@ -512,7 +515,7 @@ Summary(ru.UTF-8):	Пакет разработки для построения �
 Summary(uk.UTF-8):	Пакет розробки для побудови розширень PHP
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	autoconf
+Requires:	autoconf >= 2.13
 Requires:	automake
 %if "%{pld_release}" != "ac"
 Requires:	libtool >= 2:2.2
@@ -1622,10 +1625,10 @@ URL:		http://qa.php.net/
 Requires:	%{name}-cli
 
 %description tests
-This package contains unit tests for PHP and it's extensions.
+This package contains unit tests for PHP and its extensions.
 
 %description tests -l pl.UTF-8
-Ten pakiet zawiera pliki testów jednostkowych dla PHP i rozszerzeń
+Ten pakiet zawiera pliki testów jednostkowych dla PHP i rozszerzeń.
 
 %package tidy
 Summary:	Tidy extension module for PHP
@@ -2701,8 +2704,7 @@ fi
 %if %{with fpm}
 %files fpm
 %defattr(644,root,root,755)
-%doc sapi/fpm/CREDITS
-%doc sapi/fpm/LICENSE
+%doc sapi/fpm/{CREDITS,LICENSE}
 %dir %{_sysconfdir}/fpm.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
 %attr(755,root,root) %{_sbindir}/php-fpm
@@ -2713,12 +2715,7 @@ fi
 
 %files common
 %defattr(644,root,root,755)
-%doc php.ini-*
-%doc CREDITS Zend/ZEND_CHANGES
-%doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS TODO*
-%doc README.PHP4-TO-PHP5-THIN-CHANGES
-%doc README.namespaces
-
+%doc CREDITS EXTENSIONS LICENSE NEWS README.{PHP4-TO-PHP5-THIN-CHANGES,namespaces} TODO* UPGRADING* Zend/{LICENSE.Zend,ZEND_CHANGES} php.ini-*
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
@@ -2730,10 +2727,7 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%doc README.UNIX-BUILD-SYSTEM
-%doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
-%doc CODING_STANDARDS README.EXTENSIONS README.PARAMETER_PARSING_API README.STREAMS
-%doc README.SUBMITTING_PATCH README.TESTING README.TESTING2
+%doc CODING_STANDARDS README.{EXTENSIONS,EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
@@ -2787,14 +2781,12 @@ fi
 
 %files fileinfo
 %defattr(644,root,root,755)
-%doc README.input_filter
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/fileinfo.ini
 %attr(755,root,root) %{php_extensiondir}/fileinfo.so
 
 %if %{with filter}
 %files filter
 %defattr(644,root,root,755)
-%doc README.input_filter
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
 %attr(755,root,root) %{php_extensiondir}/filter.so
 %endif
@@ -3056,8 +3048,7 @@ fi
 
 %files spl
 %defattr(644,root,root,755)
-%doc ext/spl/{CREDITS,README,TODO}
-%doc ext/spl/examples
+%doc ext/spl/{CREDITS,README,TODO,examples}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
 %attr(755,root,root) %{php_extensiondir}/spl.so
 

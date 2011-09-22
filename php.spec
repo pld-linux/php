@@ -2776,8 +2776,6 @@ fi
 # embedded
 %{_libdir}/libphp5.so
 %{_libdir}/libphp5.la
-%dir %{_includedir}/php/sapi/embed
-%{_includedir}/php/sapi/embed/php_embed.h
 %endif
 
 %files bcmath

@@ -65,6 +65,7 @@
 %bcond_with	zts		# Zend Thread Safety
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
+%bcond_without	embed		# disable Embedded API
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
@@ -108,7 +109,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	2
+%define		rel	3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -147,6 +148,7 @@ Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-config-file-scan-dir.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
+Patch11:	embed.patch
 %if %{with type_hints}
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
@@ -425,6 +427,15 @@ PHP as CLI interpreter.
 
 %description cli -l pl.UTF-8
 PHP jako interpreter działający z linii poleceń.
+
+%package embedded
+Summary:	PHP library for embedding in applications
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description embedded
+The php-embedded package contains a library which can be embedded into
+applications to provide PHP scripting language support.
 
 %package program
 Summary:	/usr/bin/php symlink
@@ -1818,8 +1829,9 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch8 -p1
 %patch7 -p1
 %patch9 -p1
-cp php.ini-production php.ini
+cp -p php.ini-production php.ini
 %patch10 -p1
+%patch11 -p1
 %if %{with type_hints}
 %patch12 -p0
 %endif
@@ -1904,7 +1916,7 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 %{__rm} -r ext/xmlrpc/libxmlrpc
 #%{__rm} -r ext/zip/lib
 
-cp -af Zend/LICENSE{,.Zend}
+cp -pf Zend/LICENSE{,.Zend}
 install -p %{SOURCE13} dep-tests.sh
 
 # breaks build
@@ -1969,6 +1981,9 @@ litespeed
 %if %{with fpm}
 fpm
 %endif
+%if %{with embed}
+embed
+%endif
 %if %{with apache1}
 apxs1
 %endif
@@ -1991,6 +2006,9 @@ for sapi in $sapis; do
 	;;
 	fpm)
 		sapi_args='--disable-cli --enable-fpm'
+		;;
+	embed)
+		sapi_args='--disable-cli --enable-embed'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
@@ -2147,20 +2165,20 @@ cp -af Makefile.cli Makefile
 
 # CGI/FCGI
 %if %{with cgi}
-cp -af php_config.h.cgi-fcgi main/php_config.h
+cp -pf php_config.h.cgi-fcgi main/php_config.h
 %{__make} -f Makefile.cgi-fcgi
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
 
 # PHP FPM
 %if %{with fpm}
-cp -af php_config.h.fpm main/php_config.h
+cp -pf php_config.h.fpm main/php_config.h
 %{__make} -f Makefile.fpm
  ./sapi/fpm/php-fpm -qn -m > /dev/null
 %endif
 
 # CLI
-cp -af php_config.h.cli main/php_config.h
+cp -pf php_config.h.cli main/php_config.h
 %{__make} -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
 
@@ -2202,8 +2220,8 @@ fi
 
 %if %{with gcov}
 # Use CLI SAPI
-cp -af php_config.h.cli main/php_config.h
-cp -af Makefile.cli Makefile
+cp -pf php_config.h.cli main/php_config.h
+cp -pf Makefile.cli Makefile
 %{__make} lcov
 # you really don't want to package result of gcov build
 exit 1
@@ -2211,8 +2229,8 @@ exit 1
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
-cp -af php_config.h.cli main/php_config.h
-cp -af Makefile.cli Makefile
+cp -pf php_config.h.cli main/php_config.h
+cp -pf Makefile.cli Makefile
 
 cat <<'EOF' > run-tests.sh
 #!/bin/sh
@@ -2244,8 +2262,8 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man{1,8} \
 
-cp -af php_config.h.cli main/php_config.h
-cp -af Makefile.cli Makefile
+cp -pf php_config.h.cli main/php_config.h
+cp -pf Makefile.cli Makefile
 %{__make} install \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
@@ -2254,20 +2272,20 @@ ln -sfn phar.phar $RPM_BUILD_ROOT%{_bindir}/phar
 
 # install Apache1 DSO module
 %if %{with apache1}
-libtool --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
+libtool --mode=install install -p sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
 %endif
 
 # install Apache2 DSO module
 %if %{with apache2}
-libtool --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
+libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
 %endif
 
 # install litespeed sapi
 %if %{with litespeed}
-libtool --mode=install install sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/php.litespeed
+libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/php.litespeed
 %endif
 
-libtool --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
 # fix install paths, avoid evil rpaths
 sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
 # better solution?
@@ -2275,48 +2293,57 @@ sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_lib
 
 # install CGI/FCGI
 %if %{with cgi}
-libtool --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
+# install-cgi
+libtool --mode=install install -p sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
 ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
-cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
 
 # install FCGI PM
 %if %{with fpm}
 install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
-libtool --mode=install install sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
-cp -a sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8
-cp -a sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
+libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
+cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8
+cp -p sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
-cp -a %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
+cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
+%endif
+
+# install Embedded API
+%if %{with embed}
+%{__make} -f Makefile.embed install-sapi INSTALL_ROOT=$RPM_BUILD_ROOT
+# we could use install-headers from Makefile.embed, but that would reinstall all headers
+install -d $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
+cp -p sapi/embed/php_embed.h $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
 %endif
 
 # install CLI
-libtool --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
-install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
+libtool --mode=install install -p sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
+cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
-cp -a %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-cp -a %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
+cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+cp -p %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
-cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
-rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
+cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
-cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
-cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
-rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
+cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
-cp -a conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
+cp -p conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 
 # per SAPI ini directories
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
@@ -2339,7 +2366,7 @@ ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
 # for php-pecl-mailparse
 install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
-cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
+cp -p ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 
 # tests
 install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
@@ -2386,6 +2413,9 @@ fi
 if [ "$1" = "0" ]; then
 	%userremove http
 fi
+
+%post	embedded -p /sbin/ldconfig
+%postun	embedded -p /sbin/ldconfig
 
 %post common
 # PHP 5.3 requires timezone being setup, try setup it from tzdata
@@ -2689,6 +2719,12 @@ fi
 %attr(755,root,root) %{_bindir}/php.fcgi
 %endif
 
+%if %{with embed}
+%files embedded
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libphp5-%{version}.so
+%endif
+
 %files cli
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cli.d
@@ -2736,6 +2772,13 @@ fi
 %{_libdir}/php/build
 %{_mandir}/man1/php-config.1*
 %{_mandir}/man1/phpize.1*
+%if %{with embed}
+# embedded
+%{_libdir}/libphp5.so
+%{_libdir}/libphp5.la
+%dir %{_includedir}/php/sapi/embed
+%{_includedir}/php/sapi/embed/php_embed.h
+%endif
 
 %files bcmath
 %defattr(644,root,root,755)

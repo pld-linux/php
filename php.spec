@@ -109,7 +109,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	3
+%define		rel	4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2286,10 +2286,6 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
-# fix install paths, avoid evil rpaths
-sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
-# better solution?
-sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
 # install CGI/FCGI
 %if %{with cgi}
@@ -2372,6 +2368,13 @@ cp -p ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstri
 install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 install -p run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
 cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
+
+# fix install paths, avoid evil rpaths
+sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
+# libphp5.la contains our buildroot in dependency_libs
+sed -i -e "/dependency_libs/ s,/[^ ]*/libs/libphp_common.la,%{_libdir}/libphp_common.la," $RPM_BUILD_ROOT%{_libdir}/libphp5.la
+# better solution?
+sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
 %clean
 rm -rf $RPM_BUILD_ROOT

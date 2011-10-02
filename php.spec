@@ -1328,6 +1328,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Suggests:	php-program
 Provides:	php(phar)
 
 %description phar

@@ -1934,7 +1934,7 @@ done
 %patch55 -p1
 %patch56 -p1
 %patch57 -p1
-%patch58 -p1
+%patch58 -p4
 %patch65 -p1
 
 %patch201 -p1 -b .CVE-2011-2202

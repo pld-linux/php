@@ -191,6 +191,7 @@ Patch55:	bug-52078-fileinode.patch
 Patch56:	%{name}-krb5.patch
 Patch57:	php-php_dl.patch
 Patch58:	php-svn-281516.patch
+Patch59:	%{name}-systzdata.patch
 # http://spot.fedorapeople.org/php-5.3.6-libzip.patch
 Patch65:	system-libzip.patch
 # CENTALT patches
@@ -523,6 +524,7 @@ Group:		Libraries
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Requires:	rpm-whiteout >= 1.28
+Requires:	tzdata
 Provides:	php(date)
 Provides:	php(ereg)
 Provides:	php(libxml)
@@ -1935,6 +1937,7 @@ done
 %patch56 -p1
 %patch57 -p1
 %patch58 -p4
+%patch59 -p1
 %patch65 -p1
 
 %patch201 -p1 -b .CVE-2011-2202
@@ -2118,6 +2121,7 @@ for sapi in $sapis; do
 	--with-config-file-path=%{_sysconfdir} \
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
+	--with-system-tzdata \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	%{?with_suhosin:--enable-suhosin} \

@@ -190,6 +190,7 @@ Patch54:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
 Patch56:	%{name}-krb5.patch
 Patch57:	php-php_dl.patch
+Patch58:	php-svn-281516.patch
 # http://spot.fedorapeople.org/php-5.3.6-libzip.patch
 Patch65:	system-libzip.patch
 # CENTALT patches
@@ -1933,6 +1934,7 @@ done
 %patch55 -p1
 %patch56 -p1
 %patch57 -p1
+%patch58 -p1
 %patch65 -p1
 
 %patch201 -p1 -b .CVE-2011-2202

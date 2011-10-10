@@ -112,7 +112,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.17
-Release:	6
+Release:	7
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -192,6 +192,69 @@ Patch56:	%{name}-krb5.patch
 Patch57:	php-php_dl.patch
 # http://spot.fedorapeople.org/php-5.3.6-libzip.patch
 Patch65:	system-libzip.patch
+# CENTALT patches
+# CVE
+Patch201: php-5.2.17-CVE-2011-2202.patch
+Patch202: php-5.2.17-CVE-2011-1938.patch
+Patch203: php-5.2.17-CVE-2011-1148.patch
+Patch204: php-5.2.17-CVE-2011-0708.patch
+Patch205: php-5.2.17-CVE-2011-1092.patch
+# Backport from 5.3.6
+Patch301: php-5.3.6-bug-54055.patch
+Patch302: php-5.3.6-bug-53577.patch
+Patch303: php-5.2.17-bug-48484.patch
+Patch304: php-5.3.6-bug-48607.patch
+Patch305: php-5.3.6-bug-53574.patch
+Patch306: php-5.3.6-bug-52290.patch
+Patch307: php-5.2.17-bug-52063.patch
+Patch308: php-5.3.6-bug-53924.patch
+Patch309: php-5.3.6-bug-53150.patch
+Patch310: php-5.3.6-bug-52209.patch
+Patch311: php-5.3.6-bug-47435.patch
+Patch312: php-5.3.6-bug-53377.patch
+Patch313: php-5.2.17-bug-39847.patch
+Patch314: php-5.3.6-39199.patch
+Patch315: php-5.3.6-bug-53630.patch
+Patch316: php-5.3.6-bug-51336.patch
+Patch317: php-5.3.6-bug-53515.patch
+Patch318: php-5.3.6-bug-54092.patch
+Patch319: php-5.3.6-bug-53903.patch
+Patch320: php-5.3.6-bug-54089.patch
+Patch321: php-5.3.6-bug-53603.patch
+Patch322: php-5.3.6-bug-53854.patch
+Patch323: php-5.3.6-bug-53579.patch
+Patch324: php-5.3.6-bug-53568.patch
+Patch325: php-5.2.17-bug-49072.patch
+# 5.3.7
+Patch330: php-5.3.7-bug-55399.patch
+Patch331: php-5.2.17-bug-55082.patch
+Patch332: php-5.3.7-bug-55014.patch
+#Patch333: php-5.3.7-bug-54924.patch
+Patch334: php-5.3.7-bug-54180.patch
+Patch335: php-5.3.7-bug-54137.patch
+Patch336: php-5.3.7-bug-53848.patch
+Patch337: php-5.3.7-bug-52935.patch
+Patch338: php-5.3.7-bug-51997.patch
+Patch339: php-5.3.7-bug-50363.patch
+Patch340: php-5.3.7-bug-48465.patch
+Patch341: php-5.3.7-bug-54529.patch
+Patch342: php-5.3.7-bug-52496.patch
+Patch343: php-5.3.7-bug-54242.patch
+Patch344: php-5.3.7-bug-54121.patch
+Patch345: php-5.3.7-bug-53037.patch
+Patch346: php-5.3.7-bug-54269.patch
+Patch347: php-5.3.7-bug-54601.patch
+Patch348: php-5.3.7-bug-54440.patch
+Patch349: php-5.3.7-bug-54494.patch
+Patch350: php-5.3.7-bug-54221.patch
+Patch351: php-5.3.7-bug-52104.patch
+Patch352: php-5.3.7-bug-54329.patch
+Patch353: php-5.3.7-bug-53782.patch
+Patch354: php-5.3.7-bug-54318.patch
+Patch355: php-5.3.7-bug-55323.patch
+Patch356: php-5.3.7-bug-54312.patch
+Patch357: php-5.3.7-bug-51958.patch
+Patch358: php-5.3.7-bug-54946.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1871,6 +1934,69 @@ done
 %patch56 -p1
 %patch57 -p1
 %patch65 -p1
+
+%patch201 -p1 -b .CVE-2011-2202
+%patch202 -p1 -b .CVE-2011-1938
+%patch203 -p1 -b .CVE-2011-1148
+%patch204 -p1 -b .CVE-2011-0708
+%patch205 -p1 -b .CVE-2011-1092
+
+# Bugfix backport from 5.3.6
+%patch301 -p1 -b .bug-54055
+%patch302 -p1 -b .bug-53577
+%patch303 -p1 -b .bug-48484
+%patch304 -p1 -b .bug-48607
+%patch305 -p1 -b .bug-53574
+%patch306 -p1 -b .bug-52290
+%patch307 -p1 -b .bug-52063
+%patch308 -p1 -b .bug-53924
+%patch309 -p1 -b .bug-53150
+%patch310 -p1 -b .bug-52209
+%patch311 -p1 -b .bug-47435
+%patch312 -p1 -b .bug-53377
+%patch313 -p1 -b .bug-39847
+%patch314 -p1 -b .bug-39199
+%patch315 -p1 -b .bug-53630
+%patch316 -p1 -b .bug-51336
+%patch317 -p1 -b .bug-53515
+%patch318 -p1 -b .bug-54092
+%patch319 -p1 -b .bug-53903
+%patch320 -p1 -b .bug-54089
+%patch321 -p1 -b .bug-53603
+%patch322 -p1 -b .bug-53854
+%patch323 -p1 -b .bug-53579
+%patch324 -p1 -b .bug-53568
+%patch325 -p1 -b .bug-49072
+# Bugfix backport from 5.3.7
+%patch330 -p1 -b .bug-55399
+%patch331 -p1 -b .bug-55082
+%patch332 -p1 -b .bug-55014
+#accert %patch333 -p1 -b .bug-54924
+%patch334 -p1 -b .bug-54180
+%patch335 -p1 -b .bug-54137
+%patch336 -p1 -b .bug-53848
+%patch337 -p1 -b .bug-52935
+%patch338 -p1 -b .bug-51997
+%patch339 -p1 -b .bug-50363
+%patch340 -p1 -b .bug-48465
+%patch341 -p1 -b .bug-54529
+%patch342 -p1 -b .bug-52496
+%patch343 -p1 -b .bug-54242
+%patch344 -p1 -b .bug-54121
+%patch345 -p1 -b .bug-53037
+%patch346 -p1 -b .bug-54269
+%patch347 -p1 -b .bug-54601
+%patch348 -p1 -b .bug-54440
+%patch349 -p1 -b .bug-54494
+%patch350 -p1 -b .bug-54221
+%patch351 -p1 -b .bug-52104
+%patch352 -p1 -b .bug-54329
+%patch353 -p1 -b .bug-53782
+%patch354 -p1 -b .bug-54318
+#soap %patch355 -p1 -b .bug-55323
+%patch356 -p1 -b .bug-54312
+%patch357 -p1 -b .bug-51958
+%patch358 -p1 -b .bug-54946
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

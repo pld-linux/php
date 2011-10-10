@@ -1,0 +1,13 @@
+--- PHP_5_3/ext/standard/url.c	2011/08/11 12:34:51	314782
++++ PHP_5_3/ext/standard/url.c	2011/08/11 13:01:52	314783
+@@ -197,6 +197,10 @@
+ 				efree(ret);
+ 				return NULL;
+ 			}
++		} else if (p == pp && *pp == '\0') {
++			STR_FREE(ret->scheme);
++			efree(ret);
++			return NULL;
+ 		} else {
+ 			goto just_path;
+ 		}

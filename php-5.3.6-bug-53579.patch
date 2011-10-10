@@ -1,0 +1,10 @@
+--- PHP_5_3/ext/zip/zip_stream.c	2010/12/20 10:50:59	306492
++++ PHP_5_3/ext/zip/zip_stream.c	2010/12/20 11:00:27	306493
+@@ -216,6 +216,7 @@
+ 			self->stream = NULL;
+ 			self->cursor = 0;
+ 			stream = php_stream_alloc(&php_stream_zipio_ops, self, NULL, mode);
++			stream->orig_path = estrdup(path);
+ 		} else {
+ 			zip_close(stream_za);
+ 		}

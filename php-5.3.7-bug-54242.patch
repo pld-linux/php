@@ -1,0 +1,11 @@
+--- PHP_5_3/ext/dba/dba_flatfile.c	2011/03/13 14:19:31	309171
++++ PHP_5_3/ext/dba/dba_flatfile.c	2011/03/13 14:21:58	309172
+@@ -96,7 +96,7 @@
+ 		return SUCCESS;
+ 	case 1:
+ 		php_error_docref1(NULL TSRMLS_CC, key, E_WARNING, "Key already exists");
+-		return SUCCESS;
++		return FAILURE;
+ 	}
+ }
+ 

@@ -1,0 +1,13 @@
+--- PHP_5_3/ext/standard/url.c	2011/03/17 16:20:19	309351
++++ PHP_5_3/ext/standard/url.c	2011/03/17 18:02:58	309352
+@@ -316,6 +316,10 @@
+ 		pp = strchr(s, '#');
+ 
+ 		if (pp && pp < p) {
++			if (pp - s) {
++				ret->path = estrndup(s, (pp-s));
++				php_replace_controlchars_ex(ret->path, (pp - s));
++			}
+ 			p = pp;
+ 			goto label_parse;
+ 		}

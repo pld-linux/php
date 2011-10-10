@@ -1,0 +1,15 @@
+--- PHP_5_3/ext/mbstring/libmbfl/mbfl/mbfilter.c	2011/04/09 16:02:40	310107
++++ PHP_5_3/ext/mbstring/libmbfl/mbfl/mbfilter.c	2011/04/09 16:59:36	310108
+@@ -1202,10 +1202,10 @@
+ 		len = string->len;
+ 		start = from;
+ 		end = from + length;
+-		if (encoding->flag & (MBFL_ENCTYPE_WCS2BE | MBFL_ENCTYPE_MWC2LE)) {
++		if (encoding->flag & (MBFL_ENCTYPE_WCS2BE | MBFL_ENCTYPE_WCS2LE)) {
+ 			start *= 2;
+ 			end = start + length*2;
+-		} else if (encoding->flag & (MBFL_ENCTYPE_WCS4BE | MBFL_ENCTYPE_MWC4LE)) {
++		} else if (encoding->flag & (MBFL_ENCTYPE_WCS4BE | MBFL_ENCTYPE_WCS4LE)) {
+ 			start *= 4;
+ 			end = start + length*4;
+ 		} else if (encoding->mblen_table != NULL) {

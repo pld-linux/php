@@ -1,0 +1,13 @@
+--- PHP_5_3/ext/tokenizer/tokenizer.c	2011/02/28 14:16:00	308760
++++ PHP_5_3/ext/tokenizer/tokenizer.c	2011/02/28 15:18:27	308761
+@@ -151,6 +151,10 @@
+ 		ZVAL_NULL(&token);
+ 
+ 		token_line = CG(zend_lineno);
++
++		if (token_type == T_HALT_COMPILER) {
++			break;
++		}
+ 	}
+ }
+ 

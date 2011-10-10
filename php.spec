@@ -190,6 +190,8 @@ Patch54:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
 Patch56:	%{name}-krb5.patch
 Patch57:	php-php_dl.patch
+# http://spot.fedorapeople.org/php-5.3.6-libzip.patch
+Patch65:	system-libzip.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -209,6 +211,7 @@ BuildRequires:	elfutils-devel
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 BuildRequires:	freetds-devel
+BuildRequires:	libzip-devel >= 0.10-3
 %endif
 BuildRequires:	freetype-devel >= 2.0
 %if %{with system_gd}
@@ -1753,6 +1756,7 @@ URL:		http://www.php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zip)
 Obsoletes:	php-pecl-zip
+Requires:	libzip >= 0.10-3
 
 %description zip
 Zip is an extension to create, modify and read zip files.
@@ -1866,6 +1870,7 @@ done
 %patch55 -p1
 %patch56 -p1
 %patch57 -p1
+%patch65 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -2091,6 +2096,7 @@ for sapi in $sapis; do
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
+	--with-libzip \
 	--enable-zip=shared,/usr \
 
 	cp -f Makefile Makefile.$sapi

@@ -187,8 +187,9 @@ Patch51:	spl-shared.patch
 Patch52:	%{name}-libpng.patch
 Patch53:	%{name}-gmp.patch
 Patch54:	fix-test-run.patch
-Patch55:	%{name}-krb5.patch
-Patch56:	php-php_dl.patch
+Patch55:	bug-52078-fileinode.patch
+Patch56:	%{name}-krb5.patch
+Patch57:	php-php_dl.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1864,6 +1865,7 @@ done
 %patch54 -p1
 %patch55 -p1
 %patch56 -p1
+%patch57 -p1
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

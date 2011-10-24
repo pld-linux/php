@@ -109,7 +109,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	8
+%define		rel	9
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -194,8 +194,6 @@ Patch61:	%{name}-krb5-ac.patch
 Patch62:	mcrypt-libs.patch
 Patch63:	%{name}-mysql-nowarning.patch
 Patch64:	%{name}-m4.patch
-# http://spot.fedorapeople.org/php-5.3.6-libzip.patch
-Patch65:	system-libzip.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -210,7 +208,6 @@ BuildRequires:	elfutils-devel
 #BuildRequires:	fcgi-devel
 #BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
-BuildRequires:	libzip-devel >= 0.10-3
 BuildRequires:	mysql-devel
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
@@ -1796,7 +1793,6 @@ Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	libzip >= 0.10-3
 Provides:	php(zip)
 Obsoletes:	php-pecl-zip
 
@@ -1893,7 +1889,6 @@ cp -p php.ini-production php.ini
 %patch62 -p1
 %patch63 -p1
 %patch64 -p1
-%patch65 -p1
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 
@@ -2139,7 +2134,6 @@ for sapi in $sapis; do
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
-	--with-libzip \
 	--enable-zip=shared,/usr \
 
 	# save for debug

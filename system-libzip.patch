@@ -1,0 +1,130 @@
+
+https://bugzilla.redhat.com/show_bug.cgi?id=551513
+https://bugs.php.net/bug.php?id=39388
+http://spot.fedorapeople.org/php-5.3.6-libzip.patch
+pld fixes: link with -lzip when using system lib, -lz otherwise
+
+--- php-5.3.8/ext/zip/config.m4~	2008-08-08 12:47:15.000000000 +0300
++++ php-5.3.8/ext/zip/config.m4	2011-09-27 01:18:53.258197363 +0300
+@@ -13,8 +13,72 @@
+ PHP_ARG_WITH(pcre-dir, pcre install prefix,
+ [  --with-pcre-dir           ZIP: pcre install prefix], no, no)
+ 
++PHP_ARG_WITH(libzip, libzip,
++[  --with-libzip[=DIR]       ZIP: use libzip], no, no)
++
+ if test "$PHP_ZIP" != "no"; then
++  dnl This is PECL build, check if bundled PCRE library is used
++  old_CPPFLAGS=$CPPFLAGS
++  CPPFLAGS=$INCLUDES
++  AC_EGREP_CPP(yes,[
++#include <main/php_config.h>
++#if defined(HAVE_BUNDLED_PCRE) && !defined(COMPILE_DL_PCRE)
++yes
++#endif
++  ],[
++    PHP_PCRE_REGEX=yes
++  ],[
++    AC_EGREP_CPP(yes,[
++#include <main/php_config.h>
++#if defined(HAVE_PCRE) && !defined(COMPILE_DL_PCRE)
++yes
++#endif
++    ],[
++      PHP_PCRE_REGEX=pecl
++    ],[
++      PHP_PCRE_REGEX=no
++    ])
++  ])
++  CPPFLAGS=$old_CPPFLAGS
++
++  if test "$PHP_LIBZIP" != "no"; then
++    dnl system libzip, depends on libzip
++    if test -r $PHP_LIBZIP/include/zip.h; then
++      LIBZIP_DIR=$PHP_LIBZIP
++    else
++      AC_MSG_CHECKING(for libzip in default path)
++      for i in /usr/local /usr; do
++        if test -r $i/include/zip.h; then
++          LIBZIP_DIR=$i
++          AC_MSG_RESULT(found in $i)
++          break
++        fi
++      done
++    fi
++
++    if test -z "$LIBZIP_DIR"; then
++      AC_MSG_RESULT(not found)
++      AC_MSG_ERROR(Please reinstall the libzip distribution)
++    fi
+ 
++    dnl Could not think of a simple way to check libzip for overwrite support
++    PHP_CHECK_LIBRARY(zip, zip_open,
++    [
++      PHP_ADD_INCLUDE($LIBZIP_DIR/include)
++      PHP_ADD_LIBRARY_WITH_PATH(zip, $LIBZIP_DIR/$PHP_LIBDIR, ZIP_SHARED_LIBADD)
++      AC_DEFINE(HAVE_LIBZIP,1,[ ])
++    ], [
++      AC_MSG_ERROR(could not find usable libzip)
++    ], [
++      -L$LIBZIP_DIR/$PHP_LIBDIR
++    ])
++
++    AC_DEFINE(HAVE_ZIP,1,[ ])
++    PHP_NEW_EXTENSION(zip, php_zip.c zip_stream.c, $ext_shared)
++    PHP_SUBST(ZIP_SHARED_LIBADD)
++  else
++
++  dnl bundled libzip, depends on zlib
+   if test "$PHP_ZLIB_DIR" != "no" && test "$PHP_ZLIB_DIR" != "yes"; then
+     if test -f "$PHP_ZLIB_DIR/include/zlib/zlib.h"; then
+       PHP_ZLIB_DIR="$PHP_ZLIB_DIR"
+@@ -47,31 +111,7 @@
+     PHP_ADD_INCLUDE($PHP_ZLIB_INCDIR)
+   fi
+ 
+-  dnl This is PECL build, check if bundled PCRE library is used
+-  old_CPPFLAGS=$CPPFLAGS
+-  CPPFLAGS=$INCLUDES
+-  AC_EGREP_CPP(yes,[
+-#include <main/php_config.h>
+-#if defined(HAVE_BUNDLED_PCRE) && !defined(COMPILE_DL_PCRE)
+-yes
+-#endif
+-  ],[
+-    PHP_PCRE_REGEX=yes
+-  ],[
+-    AC_EGREP_CPP(yes,[
+-#include <main/php_config.h>
+-#if defined(HAVE_PCRE) && !defined(COMPILE_DL_PCRE)
+-yes
+-#endif
+-    ],[
+-      PHP_PCRE_REGEX=pecl
+-    ],[
+-      PHP_PCRE_REGEX=no
+-    ])
+-  ])
+-  CPPFLAGS=$old_CPPFLAGS
+-
+-  PHP_ZIP_SOURCES="$PHP_ZIP_SOURCES lib/zip_add.c lib/zip_error.c lib/zip_fclose.c \
++    PHP_ZIP_SOURCES="$PHP_ZIP_SOURCES lib/zip_add.c lib/zip_error.c lib/zip_fclose.c \
+                          lib/zip_fread.c lib/zip_open.c lib/zip_source_filep.c  \
+                          lib/zip_strerror.c lib/zip_close.c lib/zip_error_get.c \
+                          lib/zip_file_error_get.c lib/zip_free.c lib/zip_rename.c \
+@@ -91,10 +131,11 @@
+                          lib/zip_unchange_archive.c lib/zip_memdup.c lib/zip_stat_init.c lib/zip_add_dir.c \
+                          lib/zip_error_clear.c lib/zip_file_error_clear.c"
+ 
+-  AC_DEFINE(HAVE_ZIP,1,[ ])
+-  PHP_NEW_EXTENSION(zip, php_zip.c zip_stream.c $PHP_ZIP_SOURCES, $ext_shared)
+-  PHP_ADD_BUILD_DIR($ext_builddir/lib, 1)
+-  PHP_SUBST(ZIP_SHARED_LIBADD)
++    AC_DEFINE(HAVE_ZIP,1,[ ])
++    PHP_NEW_EXTENSION(zip, php_zip.c zip_stream.c $PHP_ZIP_SOURCES, $ext_shared)
++    PHP_ADD_BUILD_DIR($ext_builddir/lib, 1)
++    PHP_SUBST(ZIP_SHARED_LIBADD)
++  fi
+ 
+   dnl so we always include the known-good working hack.
+   PHP_ADD_MAKEFILE_FRAGMENT

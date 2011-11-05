@@ -1,7 +1,7 @@
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
-# - enchant is packaged separately (php-pecl-enchant)
+# - enchant is packaged separately (php-pecl-enchant). why it's not packaged here?
 # TODO:
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
@@ -292,10 +292,15 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		zend_extension_api	220090626
 
 # Extension versions
-%define		fileinfover 1.0.5-dev
-%define		pharver     2.0.1
-%define		zipver      1.9.1
-%define		jsonver     1.2.1
+%define		bz2ver		1.0
+%define		enchantver	1.1.0
+%define		fileinfover	1.0.5-dev
+%define		hashver		1.0
+%define		intlver		1.1.0
+%define		jsonver		1.2.1
+%define		pharver		2.0.1
+%define		sqlitever	2.0-dev
+%define		zipver		1.9.1
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -603,10 +608,11 @@ Summary(pl.UTF-8):	Moduł bzip2 dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.bzip2.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(bz2)
+Provides:	php(bz2) = %{bz2ver}
 Provides:	php(bzip2)
 Provides:	php-bzip2 = %{epoch}:%{version}-%{release}
 Obsoletes:	php-bzip2 < 4:5.2.14-3
+Obsoletes:	php-pecl-bz2 < %{bz2ver}
 
 %description bz2
 This is a dynamic shared object (DSO) for PHP that will add bzip2
@@ -833,13 +839,13 @@ Summary(pl.UTF-8):	Szkielet do obliczania skrótów wiadomości
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.gmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(hash)
+Provides:	php(hash) = %{hashver}
 %if %{with mhash}
 Provides:	php(mhash)
 Provides:	php-mhash = %{epoch}:%{version}-%{release}
 Obsoletes:	php-mhash < 4:5.3.0
 %endif
-Obsoletes:	php-pecl-hash
+Obsoletes:	php-pecl-hash < %{hashver}
 
 %description hash
 Native implementations of common message digest algorithms using a
@@ -909,7 +915,8 @@ Summary(pl.UTF-8):	Rozszerzenie do internacjonalizacji (interfejs do ICU)
 Group:		Libraries
 URL:		http://www.php.net/intl
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(intl)
+Provides:	php(intl) = %{intlver}
+Obsoletes:	php-pecl-intl < %{intlver}
 
 %description intl
 Internationalization extension (further is referred as Intl) is a
@@ -1530,7 +1537,8 @@ URL:		http://www.php.net/manual/en/book.sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
-Provides:	php(sqlite)
+Provides:	php(sqlite) = %{sqlitever}
+Obsoletes:	php-pecl-SQLite < %{sqlitever}
 
 %description sqlite
 SQLite is a C library that implements an embeddable SQL database
@@ -1992,6 +2000,36 @@ ver=$(sed -n '/#define PHP_JSON_VERSION /{s/.* "//;s/".*$//;p}' ext/json/php_jso
 if test "$ver" != "%{jsonver}"; then
 	: Error: Upstream JSON version is now ${ver}, expecting %{jsonver}.
 	: Update the jsonver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -rne 's,.*<version>(.+)</version>,\1,p' ext/bz2/package.xml)
+if test "$ver" != "%{bz2ver}"; then
+	: Error: Upstream BZIP2 version is now ${ver}, expecting %{bz2ver}.
+	: Update the bz2ver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_ENCHANT_VERSION /{s/.* "//;s/".*$//;p}' ext/enchant/php_enchant.h)
+if test "$ver" != "%{enchantver}"; then
+	: Error: Upstream Enchant version is now ${ver}, expecting %{enchantver}.
+	: Update the enchantver macro and rebuild.
+	exit 1
+fi
+ver=$(awk '/#define PHP_HASH_EXTVER/ {print $3}' ext/hash/php_hash.h | xargs)
+if test "$ver" != "%{hashver}"; then
+	: Error: Upstream HASH version is now ${ver}, expecting %{hashver}.
+	: Update the hashver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_INTL_VERSION /{s/.* "//;s/".*$//;p}' ext/intl/php_intl.h)
+if test "$ver" != "%{intlver}"; then
+	: Error: Upstream Intl version is now ${ver}, expecting %{intlver}.
+	: Update the intlver macro and rebuild.
+	exit 1
+fi
+ver=$(awk '/#define PHP_SQLITE_MODULE_VERSION/ {print $3}' ext/sqlite/sqlite.c | xargs)
+if test "$ver" != "%{sqlitever}"; then
+	: Error: Upstream Sqlite version is now ${ver}, expecting %{sqlitever}.
+	: Update the sqlitever macro and rebuild.
 	exit 1
 fi
 

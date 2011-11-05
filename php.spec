@@ -110,7 +110,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	9
+%define		rel	10
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -290,6 +290,12 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		php_api_version		20090626
 %define		zend_module_api		20090626
 %define		zend_extension_api	220090626
+
+# Extension versions
+%define		fileinfover 1.0.5-dev
+%define		pharver     2.0.1
+%define		zipver      1.9.1
+%define		jsonver     1.2.1
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -711,9 +717,9 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.fileinfo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Provides:	php(fileinfo)
+Provides:	php(fileinfo) = %{fileinfover}
 Obsoletes:	php-mime_magic
-Obsoletes:	php-pecl-fileinfo
+Obsoletes:	php-pecl-fileinfo < %{fileinfover}
 
 %description fileinfo
 This extension allows retrieval of information regarding vast majority
@@ -923,8 +929,8 @@ Summary(pl.UTF-8):	Rozszerzenie C PHP dla serializacji JSON
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.json.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(json)
-Obsoletes:	php-pecl-json
+Provides:	php(json) = %{jsonver}
+Obsoletes:	php-pecl-json < %{jsonver}
 
 %description json
 php-json is an extremely fast PHP C extension for JSON (JavaScript
@@ -1332,7 +1338,8 @@ Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 # zlib is required by phar program, but as phar cli is optional should the dep be too
 Suggests:	%{name}-zlib
 Suggests:	php-program
-Provides:	php(phar)
+Provides:	php(phar) = %{pharver}
+Obsoletes:	php-pecl-phar < %{pharver}
 
 %description phar
 This is a dynamic shared object (DSO) for PHP that will add phar
@@ -1798,8 +1805,8 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %{?with_system_libzip:Requires:	libzip >= 0.10-3}
-Provides:	php(zip)
-Obsoletes:	php-pecl-zip
+Provides:	php(zip) = %{zipver}
+Obsoletes:	php-pecl-zip < %{zipver}
 
 %description zip
 Zip is an extension to create, modify and read zip files.
@@ -1959,6 +1966,32 @@ fi
 API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h)
 if [ $API != %{zend_extension_api} ]; then
 	echo "Set %%define zend_extension_api to $API and re-run."
+	exit 1
+fi
+
+# Check for some extension version
+ver=$(sed -n '/#define PHP_FILEINFO_VERSION /{s/.* "//;s/".*$//;p}' ext/fileinfo/php_fileinfo.h)
+if test "$ver" != "%{fileinfover}"; then
+	: Error: Upstream FILEINFO version is now ${ver}, expecting %{fileinfover}.
+	: Update the fileinfover macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_PHAR_VERSION /{s/.* "//;s/".*$//;p}' ext/phar/php_phar.h)
+if test "$ver" != "%{pharver}"; then
+	: Error: Upstream PHAR version is now ${ver}, expecting %{pharver}.
+	: Update the pharver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_ZIP_VERSION_STRING /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
+if test "$ver" != "%{zipver}"; then
+	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.
+	: Update the zipver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_JSON_VERSION /{s/.* "//;s/".*$//;p}' ext/json/php_json.h)
+if test "$ver" != "%{jsonver}"; then
+	: Error: Upstream JSON version is now ${ver}, expecting %{jsonver}.
+	: Update the jsonver macro and rebuild.
 	exit 1
 fi
 

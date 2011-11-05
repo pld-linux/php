@@ -1,7 +1,6 @@
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
-# - enchant is packaged separately (php-pecl-enchant). why it's not packaged here?
 # TODO:
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
@@ -35,6 +34,7 @@
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
+%bcond_without	enchant		# without Enchant extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	kerberos5	# without Kerberos5 support
@@ -208,6 +208,7 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
+%{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 #BuildRequires:	fcgi-devel
 #BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
@@ -700,6 +701,35 @@ support.
 
 %description dom -l pl.UTF-8
 Moduł PHP dodający nową obsługę DOM.
+
+%package enchant
+Summary:	libenchant binder
+Summary(pl.UTF-8):	dowiązania biblioteki libenchant
+Group:		Libraries
+URL:		http://www.php.net/manual/en/book.exif.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(enchant) = %{enchantver}
+Obsoletes:	php-pecl-enchant < %{enchantver}
+
+%description enchant
+Enchant is a binder for libenchant. Libenchant provides a common API
+for many spell libraries:
+- aspell/pspell (intended to replace ispell)
+- hspell (hebrew)
+- ispell
+- myspell (OpenOffice.org project, mozilla)
+- uspell (primarily Yiddish, Hebrew, and Eastern European languages) A
+  plugin system allows to add custom spell support.
+
+%description enchant -l pl.UTF-8
+Enchant jest dowiązaniem do biblioteki libenchant, która udostępnia
+ujednolicone API dla wielu narzędzi sprawdzających pisownię:
+- aspell/pspell (w zamierzeniu ma zastąpić ispell)
+- hspell (hebrajski)
+- ispell
+- myspell (projekt OpenOffice.org, mozilla)
+- uspell (głównie Jidysz, Hebrajski oraz języki wschodnioeuropejskie)
+  System wtyczek pozwala na dodanie wsparcia dla kolejnych narzędzi.
 
 %package exif
 Summary:	exif extension module for PHP
@@ -2171,6 +2201,7 @@ for sapi in $sapis; do
 	%{__with_without curl curl shared} \
 	--with-db4 \
 	--with-iconv=shared \
+	%{?with_enchant:--with-enchant=shared,/usr} \
 	--with-freetype-dir=shared \
 	--with-gettext=shared \
 	--with-gd=shared%{?with_system_gd:,/usr} \
@@ -2562,6 +2593,7 @@ fi
 %extension_scripts curl
 %extension_scripts dba
 %extension_scripts dom
+%extension_scripts enchant
 %extension_scripts exif
 %extension_scripts fileinfo
 %extension_scripts filter
@@ -2896,6 +2928,12 @@ fi
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
+
+%files enchant
+%defattr(644,root,root,755)
+%doc ext/enchant/{CREDITS,docs/examples}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/enchant.ini
+%attr(755,root,root) %{php_extensiondir}/enchant.so
 
 %files exif
 %defattr(644,root,root,755)

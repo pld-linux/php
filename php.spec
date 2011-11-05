@@ -2481,8 +2481,10 @@ cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
 # fix install paths, avoid evil rpaths
 sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
+%if %{with embed}
 # libphp5.la contains our buildroot in dependency_libs
 sed -i -e "/dependency_libs/ s,/[^ ]*/libs/libphp_common.la,%{_libdir}/libphp_common.la," $RPM_BUILD_ROOT%{_libdir}/libphp5.la
+%endif
 # better solution?
 sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 

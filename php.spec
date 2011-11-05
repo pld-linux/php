@@ -1,5 +1,3 @@
-# TODO
-# NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # TODO 5.4:
 # - do not remove PatchX: definitions until merged to HEAD, needed for tracking their state
 # - check php-sapi-ini-file.patch for safe mode removal
@@ -11,6 +9,9 @@
 # - --with-vpx-dir=DIR     GD: Set the path to libvpx install prefix
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.  
+# NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
+# UNPACKAGED EXTENSION NOTES:
+# - com_dotnet is Win32-only
 # TODO:
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
@@ -41,8 +42,10 @@
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
+%bcond_with	system_libzip	# with system libzip (reported broken currently)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
+%bcond_without	enchant		# without Enchant extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	kerberos5	# without Kerberos5 support
@@ -74,6 +77,7 @@
 %bcond_with	zts		# Zend Thread Safety
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
+%bcond_without	embed		# disable Embedded API
 %bcond_with	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
@@ -117,7 +121,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.2
+%define		rel	0.3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -158,6 +162,7 @@ Patch7:		%{name}-sapi-ini-file.patch
 Patch8:		%{name}-config-file-scan-dir.patch
 Patch9:		%{name}-sh.patch
 Patch10:	%{name}-ini.patch
+Patch11:	embed.patch
 %if %{with type_hints}
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
@@ -203,7 +208,9 @@ Patch60:	%{name}-oracle-instantclient.patch
 Patch61:	%{name}-krb5-ac.patch
 Patch62:	mcrypt-libs.patch
 Patch63:	%{name}-mysql-nowarning.patch
-#Patch64:	%{name}-buff_ovf.patch # upstream has fix for this
+#Patch64:	%{name}-m4.patch # not needed on 5.4 branch
+# http://spot.fedorapeople.org/php-5.3.6-libzip.patch
+Patch65:	system-libzip.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -215,9 +222,11 @@ BuildRequires:	bzip2-devel
 BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
+%{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 #BuildRequires:	fcgi-devel
 #BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
+%{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10-3}
 BuildRequires:	mysql-devel
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
@@ -295,6 +304,16 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		php_api_version		20100412
 %define		zend_module_api		20100525
 %define		zend_extension_api	220100525
+
+# Extension versions
+%define		bz2ver		1.0
+%define		enchantver	1.1.0
+%define		fileinfover	1.0.5-dev
+%define		hashver		1.0
+%define		intlver		1.1.0
+%define		jsonver		1.2.1
+%define		pharver		2.0.1
+%define		zipver		1.9.1
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -437,6 +456,15 @@ PHP as CLI interpreter.
 %description cli -l pl.UTF-8
 PHP jako interpreter działający z linii poleceń.
 
+%package embedded
+Summary:	PHP library for embedding in applications
+Group:		Libraries
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+
+%description embedded
+The php-embedded package contains a library which can be embedded into
+applications to provide PHP scripting language support.
+
 %package program
 Summary:	/usr/bin/php symlink
 Summary(pl.UTF-8):	Dowiązanie symboliczne /usr/bin/php
@@ -526,7 +554,7 @@ Summary(ru.UTF-8):	Пакет разработки для построения �
 Summary(uk.UTF-8):	Пакет розробки для побудови розширень PHP
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	autoconf
+Requires:	autoconf >= 2.13
 Requires:	automake
 %if "%{pld_release}" != "ac"
 Requires:	libtool >= 2:2.2
@@ -593,10 +621,11 @@ Summary(pl.UTF-8):	Moduł bzip2 dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.bzip2.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(bz2)
+Provides:	php(bz2) = %{bz2ver}
 Provides:	php(bzip2)
 Provides:	php-bzip2 = %{epoch}:%{version}-%{release}
 Obsoletes:	php-bzip2 < 4:5.2.14-3
+Obsoletes:	php-pecl-bz2 < %{bz2ver}
 
 %description bz2
 This is a dynamic shared object (DSO) for PHP that will add bzip2
@@ -685,6 +714,35 @@ support.
 %description dom -l pl.UTF-8
 Moduł PHP dodający nową obsługę DOM.
 
+%package enchant
+Summary:	libenchant binder
+Summary(pl.UTF-8):	dowiązania biblioteki libenchant
+Group:		Libraries
+URL:		http://www.php.net/manual/en/book.exif.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(enchant) = %{enchantver}
+Obsoletes:	php-pecl-enchant < %{enchantver}
+
+%description enchant
+Enchant is a binder for libenchant. Libenchant provides a common API
+for many spell libraries:
+- aspell/pspell (intended to replace ispell)
+- hspell (hebrew)
+- ispell
+- myspell (OpenOffice.org project, mozilla)
+- uspell (primarily Yiddish, Hebrew, and Eastern European languages) A
+  plugin system allows to add custom spell support.
+
+%description enchant -l pl.UTF-8
+Enchant jest dowiązaniem do biblioteki libenchant, która udostępnia
+ujednolicone API dla wielu narzędzi sprawdzających pisownię:
+- aspell/pspell (w zamierzeniu ma zastąpić ispell)
+- hspell (hebrajski)
+- ispell
+- myspell (projekt OpenOffice.org, mozilla)
+- uspell (głównie Jidysz, Hebrajski oraz języki wschodnioeuropejskie)
+  System wtyczek pozwala na dodanie wsparcia dla kolejnych narzędzi.
+
 %package exif
 Summary:	exif extension module for PHP
 Summary(pl.UTF-8):	Moduł exif dla PHP
@@ -707,9 +765,9 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.fileinfo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Provides:	php(fileinfo)
+Provides:	php(fileinfo) = %{fileinfover}
 Obsoletes:	php-mime_magic
-Obsoletes:	php-pecl-fileinfo
+Obsoletes:	php-pecl-fileinfo < %{fileinfover}
 
 %description fileinfo
 This extension allows retrieval of information regarding vast majority
@@ -823,13 +881,13 @@ Summary(pl.UTF-8):	Szkielet do obliczania skrótów wiadomości
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.gmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(hash)
+Provides:	php(hash) = %{hashver}
 %if %{with mhash}
 Provides:	php(mhash)
 Provides:	php-mhash = %{epoch}:%{version}-%{release}
 Obsoletes:	php-mhash < 4:5.3.0
 %endif
-Obsoletes:	php-pecl-hash
+Obsoletes:	php-pecl-hash < %{hashver}
 
 %description hash
 Native implementations of common message digest algorithms using a
@@ -899,7 +957,8 @@ Summary(pl.UTF-8):	Rozszerzenie do internacjonalizacji (interfejs do ICU)
 Group:		Libraries
 URL:		http://www.php.net/intl
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(intl)
+Provides:	php(intl) = %{intlver}
+Obsoletes:	php-pecl-intl < %{intlver}
 
 %description intl
 Internationalization extension (further is referred as Intl) is a
@@ -919,8 +978,8 @@ Summary(pl.UTF-8):	Rozszerzenie C PHP dla serializacji JSON
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.json.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(json)
-Obsoletes:	php-pecl-json
+Provides:	php(json) = %{jsonver}
+Obsoletes:	php-pecl-json < %{jsonver}
 
 %description json
 php-json is an extremely fast PHP C extension for JSON (JavaScript
@@ -1325,7 +1384,11 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
-Provides:	php(phar)
+# zlib is required by phar program, but as phar cli is optional should the dep be too
+Suggests:	%{name}-zlib
+Suggests:	php-program
+Provides:	php(phar) = %{pharver}
+Obsoletes:	php-pecl-phar < %{pharver}
 
 %description phar
 This is a dynamic shared object (DSO) for PHP that will add phar
@@ -1606,10 +1669,10 @@ URL:		http://qa.php.net/
 Requires:	%{name}-cli
 
 %description tests
-This package contains unit tests for PHP and it's extensions.
+This package contains unit tests for PHP and its extensions.
 
 %description tests -l pl.UTF-8
-Ten pakiet zawiera pliki testów jednostkowych dla PHP i rozszerzeń
+Ten pakiet zawiera pliki testów jednostkowych dla PHP i rozszerzeń.
 
 %package tidy
 Summary:	Tidy extension module for PHP
@@ -1760,8 +1823,9 @@ Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(zip)
-Obsoletes:	php-pecl-zip
+%{?with_system_libzip:Requires:	libzip >= 0.10-3}
+Provides:	php(zip) = %{zipver}
+Obsoletes:	php-pecl-zip < %{zipver}
 
 %description zip
 Zip is an extension to create, modify and read zip files.
@@ -1799,7 +1863,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch8 -p1
 %patch7 -p1
 %patch9 -p1
-cp php.ini-production php.ini
+cp -p php.ini-production php.ini
 %patch10 -p1
 %if %{with type_hints}
 %patch12 -p0
@@ -1852,12 +1916,11 @@ cp php.ini-production php.ini
 %patch61 -p1
 %patch62 -p1
 %patch63 -p1
+%{?with_system_libzip:%patch65 -p1}
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 
-%if "%{pld_release}" != "ac"
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
-%endif
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
@@ -1881,7 +1944,7 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 %{__rm} -r ext/xmlrpc/libxmlrpc
 #%{__rm} -r ext/zip/lib
 
-cp -af Zend/LICENSE{,.Zend}
+cp -pf Zend/LICENSE{,.Zend}
 install -p %{SOURCE13} dep-tests.sh
 
 # breaks build
@@ -1920,6 +1983,56 @@ if [ $API != %{zend_extension_api} ]; then
 	exit 1
 fi
 
+# Check for some extension version
+ver=$(sed -n '/#define PHP_FILEINFO_VERSION /{s/.* "//;s/".*$//;p}' ext/fileinfo/php_fileinfo.h)
+if test "$ver" != "%{fileinfover}"; then
+	: Error: Upstream FILEINFO version is now ${ver}, expecting %{fileinfover}.
+	: Update the fileinfover macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_PHAR_VERSION /{s/.* "//;s/".*$//;p}' ext/phar/php_phar.h)
+if test "$ver" != "%{pharver}"; then
+	: Error: Upstream PHAR version is now ${ver}, expecting %{pharver}.
+	: Update the pharver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_ZIP_VERSION_STRING /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
+if test "$ver" != "%{zipver}"; then
+	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.
+	: Update the zipver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_JSON_VERSION /{s/.* "//;s/".*$//;p}' ext/json/php_json.h)
+if test "$ver" != "%{jsonver}"; then
+	: Error: Upstream JSON version is now ${ver}, expecting %{jsonver}.
+	: Update the jsonver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -rne 's,.*<version>(.+)</version>,\1,p' ext/bz2/package.xml)
+if test "$ver" != "%{bz2ver}"; then
+	: Error: Upstream BZIP2 version is now ${ver}, expecting %{bz2ver}.
+	: Update the bz2ver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_ENCHANT_VERSION /{s/.* "//;s/".*$//;p}' ext/enchant/php_enchant.h)
+if test "$ver" != "%{enchantver}"; then
+	: Error: Upstream Enchant version is now ${ver}, expecting %{enchantver}.
+	: Update the enchantver macro and rebuild.
+	exit 1
+fi
+ver=$(awk '/#define PHP_HASH_EXTVER/ {print $3}' ext/hash/php_hash.h | xargs)
+if test "$ver" != "%{hashver}"; then
+	: Error: Upstream HASH version is now ${ver}, expecting %{hashver}.
+	: Update the hashver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_INTL_VERSION /{s/.* "//;s/".*$//;p}' ext/intl/php_intl.h)
+if test "$ver" != "%{intlver}"; then
+	: Error: Upstream Intl version is now ${ver}, expecting %{intlver}.
+	: Update the intlver macro and rebuild.
+	exit 1
+fi
+
 export EXTENSION_DIR="%{php_extensiondir}"
 # configure once (for faster debugging purposes)
 if [ ! -f _built-conf ]; then
@@ -1946,6 +2059,9 @@ litespeed
 %if %{with fpm}
 fpm
 %endif
+%if %{with embed}
+embed
+%endif
 %if %{with apache1}
 apxs1
 %endif
@@ -1968,6 +2084,9 @@ for sapi in $sapis; do
 	;;
 	fpm)
 		sapi_args='--disable-cli --enable-fpm'
+		;;
+	embed)
+		sapi_args='--disable-cli --enable-embed'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
@@ -2048,6 +2167,7 @@ for sapi in $sapis; do
 	%{__with_without curl curl shared} \
 	--with-db4 \
 	--with-iconv=shared \
+	%{?with_enchant:--with-enchant=shared,/usr} \
 	--with-freetype-dir=shared \
 	--with-gettext=shared \
 	--with-gd=shared%{?with_system_gd:,/usr} \
@@ -2087,6 +2207,7 @@ for sapi in $sapis; do
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
+	%{?with_system_libzip:--with-libzip} \
 	--enable-zip=shared,/usr \
 
 	# save for debug
@@ -2119,20 +2240,20 @@ cp -af Makefile.cli Makefile
 
 # CGI/FCGI
 %if %{with cgi}
-cp -af php_config.h.cgi-fcgi main/php_config.h
+cp -pf php_config.h.cgi-fcgi main/php_config.h
 %{__make} -f Makefile.cgi-fcgi
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
 %endif
 
 # PHP FPM
 %if %{with fpm}
-cp -af php_config.h.fpm main/php_config.h
+cp -pf php_config.h.fpm main/php_config.h
 %{__make} -f Makefile.fpm
  ./sapi/fpm/php-fpm -qn -m > /dev/null
 %endif
 
 # CLI
-cp -af php_config.h.cli main/php_config.h
+cp -pf php_config.h.cli main/php_config.h
 %{__make} -f Makefile.cli
 [ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
 
@@ -2174,8 +2295,8 @@ fi
 
 %if %{with gcov}
 # Use CLI SAPI
-cp -af php_config.h.cli main/php_config.h
-cp -af Makefile.cli Makefile
+cp -pf php_config.h.cli main/php_config.h
+cp -pf Makefile.cli Makefile
 %{__make} lcov
 # you really don't want to package result of gcov build
 exit 1
@@ -2183,8 +2304,8 @@ exit 1
 
 %if %{with tests}
 # Run tests, using the CLI SAPI
-cp -af php_config.h.cli main/php_config.h
-cp -af Makefile.cli Makefile
+cp -pf php_config.h.cli main/php_config.h
+cp -pf Makefile.cli Makefile
 
 cat <<'EOF' > run-tests.sh
 #!/bin/sh
@@ -2216,8 +2337,8 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
 	$RPM_BUILD_ROOT%{_mandir}/man{1,8} \
 
-cp -af php_config.h.cli main/php_config.h
-cp -af Makefile.cli Makefile
+cp -pf php_config.h.cli main/php_config.h
+cp -pf Makefile.cli Makefile
 %{__make} install \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
@@ -2226,69 +2347,74 @@ ln -sfn phar.phar $RPM_BUILD_ROOT%{_bindir}/phar
 
 # install Apache1 DSO module
 %if %{with apache1}
-libtool --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
+libtool --mode=install install -p sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
 %endif
 
 # install Apache2 DSO module
 %if %{with apache2}
-libtool --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
+libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
 %endif
 
 # install litespeed sapi
 %if %{with litespeed}
-libtool --mode=install install sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/php.litespeed
+libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/php.litespeed
 %endif
 
-libtool --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
-# fix install paths, avoid evil rpaths
-sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
-# better solution?
-sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
+libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
 
 # install CGI/FCGI
 %if %{with cgi}
-libtool --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
+# install-cgi
+libtool --mode=install install -p sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
 ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
-cp -a %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
 
 # install FCGI PM
 %if %{with fpm}
 install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
-libtool --mode=install install sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
-cp -a sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8
-cp -a sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
+libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
+cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8
+cp -p sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
-cp -a %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
+cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
+%endif
+
+# install Embedded API
+%if %{with embed}
+%{__make} -f Makefile.embed install-sapi INSTALL_ROOT=$RPM_BUILD_ROOT
+# we could use install-headers from Makefile.embed, but that would reinstall all headers
+install -d $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
+cp -p sapi/embed/php_embed.h $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
 %endif
 
 # install CLI
-libtool --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
-install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
+libtool --mode=install install -p sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
+cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
-cp -a %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-cp -a %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
+cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+cp -p %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
-cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
-rm -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
+cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
+%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
 %endif
 
 %if %{with apache2}
-cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
-cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
-rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
+cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
-cp -a conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
+cp -p conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 
 # per SAPI ini directories
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
@@ -2311,12 +2437,21 @@ ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
 
 # for php-pecl-mailparse
 install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
-cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
+cp -p ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
 
 # tests
 install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 install -p run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
 cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
+
+# fix install paths, avoid evil rpaths
+sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
+%if %{with embed}
+# libphp5.la contains our buildroot in dependency_libs
+sed -i -e "/dependency_libs/ s,/[^ ]*/libs/libphp_common.la,%{_libdir}/libphp_common.la," $RPM_BUILD_ROOT%{_libdir}/libphp5.la
+%endif
+# better solution?
+sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -2358,6 +2493,9 @@ fi
 if [ "$1" = "0" ]; then
 	%userremove http
 fi
+
+%post	embedded -p /sbin/ldconfig
+%postun	embedded -p /sbin/ldconfig
 
 %post common
 # PHP 5.3 requires timezone being setup, try setup it from tzdata
@@ -2422,6 +2560,7 @@ fi
 %extension_scripts curl
 %extension_scripts dba
 %extension_scripts dom
+%extension_scripts enchant
 %extension_scripts exif
 %extension_scripts fileinfo
 %extension_scripts filter
@@ -2657,6 +2796,12 @@ fi
 %attr(755,root,root) %{_bindir}/php.fcgi
 %endif
 
+%if %{with embed}
+%files embedded
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libphp5-%{version}.so
+%endif
+
 %files cli
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cli.d
@@ -2672,8 +2817,7 @@ fi
 %if %{with fpm}
 %files fpm
 %defattr(644,root,root,755)
-%doc sapi/fpm/CREDITS
-%doc sapi/fpm/LICENSE
+%doc sapi/fpm/{CREDITS,LICENSE}
 %dir %{_sysconfdir}/fpm.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
 %attr(755,root,root) %{_sbindir}/php-fpm
@@ -2684,12 +2828,7 @@ fi
 
 %files common
 %defattr(644,root,root,755)
-%doc php.ini-*
-%doc CREDITS Zend/ZEND_CHANGES
-%doc LICENSE Zend/LICENSE.Zend EXTENSIONS NEWS UPGRADING
-%doc README.PHP4-TO-PHP5-THIN-CHANGES
-%doc README.namespaces README.Zeus README.MAILINGLIST_RULES
-
+%doc CREDITS EXTENSIONS LICENSE NEWS README.{PHP4-TO-PHP5-THIN-CHANGES,namespaces} UPGRADING* Zend/{LICENSE.Zend,ZEND_CHANGES} php.ini-*
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
@@ -2697,14 +2836,11 @@ fi
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
 
+%doc ext/session/mod_files.sh
+
 %files devel
 %defattr(644,root,root,755)
-%doc README.UNIX-BUILD-SYSTEM
-%doc README.EXT_SKEL README.SELF-CONTAINED-EXTENSIONS
-%doc CODING_STANDARDS README.EXTENSIONS README.PARAMETER_PARSING_API README.STREAMS
-%doc README.SUBMITTING_PATCH README.TESTING README.TESTING2
-%doc README.NEW-OUTPUT-API UPGRADING.INTERNALS
-%doc README.REDIST.BINS README.RELEASE_PROCESS README.SVN-RULES README.UNIX-BUILD-SYSTEM
+%doc CODING_STANDARDS README.{EXTENSIONS,EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
@@ -2713,6 +2849,11 @@ fi
 %{_libdir}/php/build
 %{_mandir}/man1/php-config.1*
 %{_mandir}/man1/phpize.1*
+%if %{with embed}
+# embedded
+%{_libdir}/libphp5.so
+%{_libdir}/libphp5.la
+%endif
 
 %files bcmath
 %defattr(644,root,root,755)
@@ -2751,6 +2892,12 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
 
+%files enchant
+%defattr(644,root,root,755)
+%doc ext/enchant/{CREDITS,docs/examples}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/enchant.ini
+%attr(755,root,root) %{php_extensiondir}/enchant.so
+
 %files exif
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
@@ -2764,7 +2911,6 @@ fi
 %if %{with filter}
 %files filter
 %defattr(644,root,root,755)
-%doc README.input_filter
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
 %attr(755,root,root) %{php_extensiondir}/filter.so
 %endif
@@ -3026,8 +3172,7 @@ fi
 
 %files spl
 %defattr(644,root,root,755)
-%doc ext/spl/{CREDITS,README,TODO}
-%doc ext/spl/examples
+%doc ext/spl/{CREDITS,README,TODO,examples}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
 %attr(755,root,root) %{php_extensiondir}/spl.so
 

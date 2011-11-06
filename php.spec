@@ -77,7 +77,7 @@
 %bcond_with	zts		# Zend Thread Safety
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
-%bcond_without	embed		# disable Embedded API
+%bcond_with	embed		# disable Embedded API
 %bcond_with	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
@@ -135,8 +135,8 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://downloads.php.net/stas/%{name}-%{version}alpha3.tar.bz2
-# Source0-md5:	68f277b9be92e51931ab1d705e7c6bde
+Source0:	http://downloads.php.net/stas/%{name}-%{version}beta2.tar.bz2
+# Source0-md5:	51c6e9f1d83f94a323db4c4d5e65e421
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -200,12 +200,12 @@ Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
-Patch54:	mysqlnd-shared.patch
+#Patch54:	mysqlnd-shared.patch # shared build supported upstream
 Patch55:	bug-52078-fileinode.patch
-Patch57:	bug-52448.patch
+#Patch57:	bug-52448.patch # outdated
 Patch59:	%{name}-systzdata.patch
 Patch60:	%{name}-oracle-instantclient.patch
-Patch61:	%{name}-krb5-ac.patch
+#Patch61:	%{name}-krb5-ac.patch # not needed on 5.4 anymore
 Patch62:	mcrypt-libs.patch
 Patch63:	%{name}-mysql-nowarning.patch
 #Patch64:	%{name}-m4.patch # not needed on 5.4 branch
@@ -1515,6 +1515,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.snmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-sockets = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(snmp)
 
 %description snmp
@@ -1850,9 +1851,9 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{version}alpha3
+%setup -q -n %{name}-%{version}beta2
 # prep for suhosin patch
-%{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
+%undos Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1907,13 +1908,10 @@ cp -p php.ini-production php.ini
 %patch51 -p1
 %patch52 -p1
 %patch53 -p1
-%patch54 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1
-%patch57 -p1
 %patch59 -p1
 %patch60 -p1
-%patch61 -p1
 %patch62 -p1
 %patch63 -p1
 %{?with_system_libzip:%patch65 -p1}

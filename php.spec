@@ -30,6 +30,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
+%bcond_with	system_libzip	# with system libzip (reported broken: https://bugs.php.net/bug.php?id=60100)
 %bcond_with	gd_jis_conv	# causes imagettfbbox(): any2eucjp(): invalid code in input string when internal gd used
 %bcond_with	zend_multibyte		# enable zend multibyte, mbstring can't be shared then anymore
 %bcond_without	curl		# without CURL extension module
@@ -112,7 +113,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.17
-Release:	8
+Release:	9
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -276,7 +277,7 @@ BuildRequires:	elfutils-devel
 BuildRequires:	flex
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 BuildRequires:	freetds-devel
-BuildRequires:	libzip-devel >= 0.10-3
+%{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10-3}
 %endif
 BuildRequires:	freetype-devel >= 2.0
 %if %{with system_gd}
@@ -1822,7 +1823,7 @@ URL:		http://www.php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zip)
 Obsoletes:	php-pecl-zip
-Requires:	libzip >= 0.10-3
+%{?with_system_libzip:Requires:	libzip >= 0.10-3}
 
 %description zip
 Zip is an extension to create, modify and read zip files.
@@ -1938,7 +1939,7 @@ done
 %patch57 -p1
 %patch58 -p4
 %patch59 -p1
-%patch65 -p1
+%{?with_system_libzip:%patch65 -p1}
 
 %patch201 -p1 -b .CVE-2011-2202
 %patch202 -p1 -b .CVE-2011-1938
@@ -2228,7 +2229,7 @@ for sapi in $sapis; do
 	--with-xsl=shared \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
-	--with-libzip \
+	%{?with_system_libzip:--with-libzip} \
 	--enable-zip=shared,/usr \
 
 	cp -f Makefile Makefile.$sapi

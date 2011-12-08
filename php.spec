@@ -6,10 +6,10 @@
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
 # - dba: enable: --with-tcadb=DIR        DBA: Tokyo Cabinet abstract DB support
-# - --with-vpx-dir=DIR     GD: Set the path to libvpx install prefix
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
 # - recheck: define PDO_MYSQL_UNIX_ADDR (ensure if's correct with mysql-libs and mysqlng)
+# - uses libvpx for webp support, should use libwebp-devel instead?
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
@@ -122,7 +122,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.4
+%define		rel	0.5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -248,6 +248,7 @@ BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 #BuildRequires:	libtiff-devel
+BuildRequires:	libvpx-devel
 %if "%{pld_release}" != "ac"
 BuildRequires:	libtool >= 2:2.2
 %else
@@ -2147,6 +2148,7 @@ for sapi in $sapis; do
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
+	--with-vpx-dir=/usr \
 	--without-libexpat-dir \
 	--enable-posix=shared \
 	--enable-shared \

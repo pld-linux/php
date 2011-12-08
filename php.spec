@@ -249,6 +249,7 @@ BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 #BuildRequires:	libtiff-devel
 BuildRequires:	libvpx-devel
+BuildRequires:	tokyocabinet-devel
 %if "%{pld_release}" != "ac"
 BuildRequires:	libtool >= 2:2.2
 %else
@@ -2187,6 +2188,7 @@ for sapi in $sapis; do
 	%{?with_oci8:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \
+	--with-tcadb=/usr \
 	%{__with_without pcre pcre-regex /usr} \
 	%{__enable_disable filter filter shared} \
 	--with-pear=%{php_pear_dir} \

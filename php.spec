@@ -8,7 +8,8 @@
 # - dba: enable: --with-tcadb=DIR        DBA: Tokyo Cabinet abstract DB support
 # - --with-vpx-dir=DIR     GD: Set the path to libvpx install prefix
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
-# --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.  
+# --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
+# - recheck: define PDO_MYSQL_UNIX_ADDR (ensure if's correct with mysql-libs and mysqlng)
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
@@ -121,7 +122,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.3
+%define		rel	0.4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -135,8 +136,8 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://downloads.php.net/stas/%{name}-%{version}beta2.tar.bz2
-# Source0-md5:	51c6e9f1d83f94a323db4c4d5e65e421
+Source0:	http://downloads.php.net/stas/%{name}-%{version}RC2.tar.bz2
+# Source0-md5:	7e5ad382db17a81f0cd3c092399cb4af
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -1851,7 +1852,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{version}beta2
+%setup -q -n %{name}-%{version}RC2
 # prep for suhosin patch
 %undos Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1

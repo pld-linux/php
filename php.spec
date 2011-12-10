@@ -122,7 +122,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.5
+%define		rel	0.6
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -136,8 +136,8 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://downloads.php.net/stas/%{name}-%{version}RC2.tar.bz2
-# Source0-md5:	7e5ad382db17a81f0cd3c092399cb4af
+Source0:	http://downloads.php.net/stas/%{name}-%{version}RC3.tar.bz2
+# Source0-md5:	798e06ac342b0b44580324071fd2bd4c
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -1854,7 +1854,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{version}RC2
+%setup -q -n %{name}-%{version}RC3
 # prep for suhosin patch
 %undos Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1
@@ -1963,7 +1963,7 @@ mv sapi/cli/tests/022.phpt{,.broken}
 # probably pointless.
 %{__rm} ext/standard/tests/file/disk_free_space_basic.phpt
 
-sh -xe %{_sourcedir}/skip-tests.sh
+#sh -xe %{_sourcedir}/skip-tests.sh
 
 %build
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)

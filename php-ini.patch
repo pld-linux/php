@@ -1,5 +1,5 @@
---- php-5.4.0alpha3/php.ini~	2011-08-08 00:06:52.000000000 +0300
-+++ php-5.4.0alpha3/php.ini	2011-08-08 00:09:15.835275555 +0300
+--- php-5.4.0RC3/php.ini~	2011-12-10 03:28:54.000000000 +0200
++++ php-5.4.0RC3/php.ini	2011-12-10 03:29:47.322573066 +0200
 @@ -223,7 +223,7 @@
  ; Development Value: Off
  ; Production Value: Off
@@ -83,7 +83,7 @@
  
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
-@@ -795,52 +795,8 @@
+@@ -805,52 +805,8 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.
  ;
@@ -108,7 +108,7 @@
 -;extension=php_mysql.dll
 -;extension=php_mysqli.dll
 -;extension=php_oci8.dll      ; Use with Oracle 10gR2 Instant Client
--;extension=php_oci8_11g.dll  ; Use with Oracle 11g Instant Client
+-;extension=php_oci8_11g.dll  ; Use with Oracle 11gR2 Instant Client
 -;extension=php_openssl.dll
 -;extension=php_pdo_firebird.dll
 -;extension=php_pdo_mysql.dll

@@ -1,19 +1,17 @@
---- php-src/main/php_ini.c	2009/05/18 21:28:42	1.173
-+++ php-src/main/php_ini.c	2009/06/27 15:22:06	1.174
-@@ -349,7 +349,8 @@
+--- php-5.4.0RC3/main/php_ini.c~	2011-12-10 03:26:15.000000000 +0200
++++ php-5.4.0RC3/main/php_ini.c	2011-12-10 03:26:54.901295707 +0200
+@@ -376,6 +376,7 @@
  	char *open_basedir;
  	int free_ini_search_path = 0;
  	zend_file_handle fh;
--
 +	static const char paths_separator[] = { ZEND_PATHS_SEPARATOR, 0 };
-+	
+ 
  	if (zend_hash_init(&configuration_hash, 0, NULL, (dtor_func_t) config_zval_dtor, 1) == FAILURE) {
  		return FAILURE;
- 	}
-@@ -372,7 +373,6 @@
+@@ -398,7 +399,6 @@
+ 		int search_path_size;
  		char *default_location;
  		char *env_location;
- 		char *binary_location;
 -		static const char paths_separator[] = { ZEND_PATHS_SEPARATOR, 0 };
  #ifdef PHP_WIN32
  		char *reg_location;
@@ -66,7 +64,7 @@
 -								zend_llist_add_element(&scanned_ini_list, &p);
 +		/* List of found ini files */
 +		zend_llist_init(&scanned_ini_list, sizeof(char *), (llist_dtor_func_t) free_estring, 1);
-+		
++
 +		/* Split by paths_separator and load ini-files from all paths */
 +		path_copy = estrdup(php_ini_scanned_path);
 +		ini_path  = php_strtok_r(path_copy, paths_separator, &last);
@@ -91,13 +89,13 @@
 +						snprintf(ini_file, MAXPATHLEN, "%s%s", ini_path, namelist[i]->d_name);
 +					} else {
 +						snprintf(ini_file, MAXPATHLEN, "%s%c%s", ini_path, DEFAULT_SLASH, namelist[i]->d_name);
-+					}			
++					}
 +					if (VCWD_STAT(ini_file, &sb) == 0) {
 +						if (S_ISREG(sb.st_mode)) {
 +							if ((fh2.handle.fp = VCWD_FOPEN(ini_file, "r"))) {
 +								fh2.filename = ini_file;
 +								fh2.type = ZEND_HANDLE_FP;
-+								
++
 +								/* Reset active ini section */
 +								RESET_ACTIVE_INI_HASH();
 +
@@ -133,7 +131,7 @@
 -					strlcat(php_ini_scanned_files, element->next ? ",\n" : "\n", total_l);
 +			ini_path = php_strtok_r(NULL, paths_separator, &last);
 +		}
-+			
++
 +		if (total_l) {
 +			int php_ini_scanned_files_len = (php_ini_scanned_files) ? strlen(php_ini_scanned_files) + 1 : 0;
 +			php_ini_scanned_files = (char *) realloc(php_ini_scanned_files, php_ini_scanned_files_len + total_l + 1);

@@ -110,7 +110,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	10
+%define		rel	11
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -550,6 +550,7 @@ Requires:	libtool >= 2:2.2
 Requires:	libtool
 %endif
 %{?with_pcre:Requires:	pcre-devel >= 8.10}
+%{?with_embed:Requires:	%{name}-embed = %{epoch}:%{version}-%{release}}
 Requires:	shtool
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel

@@ -1,5 +1,5 @@
---- php-5.3.6/sapi/fpm/php-fpm.conf.in	2011-04-22 15:16:07.304822817 +0300
-+++ php-5.3.6/sapi/fpm/php-fpm.conf.in	2011-04-22 15:19:46.991588712 +0300
+--- php-5.3.6/sapi/fpm/php-fpm.conf.in	2011-04-22 15:19:46.991588712 +0300
++++ php-5.3.8/sapi/fpm/php-fpm.conf.in	2011-12-21 19:07:47.320624976 +0200
 @@ -22,7 +22,7 @@
  ; Pid file
  ; Note: the default prefix is @EXPANDED_LOCALSTATEDIR@
@@ -42,6 +42,15 @@
   
  ; The number of requests each child process should execute before respawning.
  ; This can be useful to work around memory leaks in 3rd party libraries. For
+@@ -214,7 +214,7 @@
+ ;       anything, but it may not be a good idea to use the .php extension or it
+ ;       may conflict with a real PHP file.
+ ; Default Value: not set 
+-;pm.status_path = /status
++;pm.status_path = /fpm-status
+  
+ ; The ping URI to call the monitoring page of FPM. If this value is not set, no
+ ; URI will be recognized as a ping page. This could be used to test from outside
 @@ -277,7 +277,7 @@
  ; the current environment.
  ; Default Value: clean env

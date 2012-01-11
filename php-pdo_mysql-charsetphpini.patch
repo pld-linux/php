@@ -46,16 +46,6 @@ small.
  
  	return SUCCESS;
  }
-@@ -108,9 +107,7 @@
- 
- 	php_info_print_table_end();
- 
--#ifdef PDO_USE_MYSQLND
- 	DISPLAY_INI_ENTRIES();
--#endif
- }
- /* }}} */
- 
 @@ -161,6 +161,7 @@
  	pdo_mysql_globals->debug = NULL;	/* The actual string */
  	pdo_mysql_globals->dbg = NULL;	/* The DBG object*/

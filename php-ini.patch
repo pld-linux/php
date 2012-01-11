@@ -1,5 +1,5 @@
---- php-5.3.4/php.ini~	2010-12-12 23:03:42.000000000 +0200
-+++ php-5.3.4/php.ini	2010-12-12 23:05:56.583592856 +0200
+--- php-5.3.9/php.ini~	2012-01-11 21:35:14.000000000 +0200
++++ php-5.3.9/php.ini	2012-01-11 21:35:49.227068991 +0200
 @@ -223,7 +223,7 @@
  ; Development Value: Off
  ; Production Value: Off
@@ -96,7 +96,7 @@
  ;
  ;   extension=msql.so
  ;
-@@ -887,39 +887,8 @@
+@@ -899,53 +899,8 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.
  ;
@@ -121,7 +121,7 @@
 -;extension=php_mysql.dll
 -;extension=php_mysqli.dll
 -;extension=php_oci8.dll      ; Use with Oracle 10gR2 Instant Client
--;extension=php_oci8_11g.dll  ; Use with Oracle 11g Instant Client
+-;extension=php_oci8_11g.dll  ; Use with Oracle 11gR2 Instant Client
 -;extension=php_openssl.dll
 -;extension=php_pdo_firebird.dll
 -;extension=php_pdo_mssql.dll
@@ -133,11 +133,25 @@
 -;extension=php_pgsql.dll
 -;extension=php_pspell.dll
 -;extension=php_shmop.dll
+-
+-; The MIBS data available in the PHP distribution must be installed. 
+-; See http://www.php.net/manual/en/snmp.installation.php 
+-;extension=php_snmp.dll
+-
+-;extension=php_soap.dll
+-;extension=php_sockets.dll
+-;extension=php_sqlite.dll
+-;extension=php_sqlite3.dll
+-;extension=php_sybase_ct.dll
+-;extension=php_tidy.dll
+-;extension=php_xmlrpc.dll
+-;extension=php_xsl.dll
+-;extension=php_zip.dll
 +; Ideally in PLD Linux you should install appropriate php-<extension> or
 +; php-pecl-<extension> package.
  
- ; The MIBS data available in the PHP distribution must be installed. 
- ; See http://www.php.net/manual/en/snmp.installation.php 
+ ;;;;;;;;;;;;;;;;;;;
+ ; Module Settings ;
 @@ -1235,6 +1140,9 @@
  ; http://php.net/mysql.connect-timeout
  mysql.connect_timeout = 60

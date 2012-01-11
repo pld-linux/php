@@ -110,7 +110,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	13
+%define		rel	0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -118,13 +118,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.8
+Version:	5.3.9
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	704cd414a0565d905e1074ffdc1fadfb
+# Source0-md5:	dd3288ed5c08cd61ac5bf619cb357521
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -186,12 +186,9 @@ Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
-Patch54:	mysqlnd-shared.patch
 Patch55:	bug-52078-fileinode.patch
-Patch57:	bug-52448.patch
 Patch59:	%{name}-systzdata.patch
 Patch60:	%{name}-oracle-instantclient.patch
-Patch61:	%{name}-krb5-ac.patch
 Patch62:	mcrypt-libs.patch
 Patch63:	%{name}-mysql-nowarning.patch
 Patch64:	%{name}-m4.patch
@@ -1930,13 +1927,10 @@ cp -p php.ini-production php.ini
 %patch51 -p1
 %patch52 -p1
 %patch53 -p1
-%patch54 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1
-%patch57 -p1
 %patch59 -p1
 %patch60 -p1
-%patch61 -p1
 %patch62 -p1
 %patch63 -p1
 %patch64 -p1

@@ -1,0 +1,2 @@
+- up to 5.3.7 (curl limit looks merged; buff_ovf also)
+  [CVE-2011-2483, CVE-2011-2202, CVE-2011-1148, CVE-2011-1938]

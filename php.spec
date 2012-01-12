@@ -2402,11 +2402,10 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 
 # install FCGI PM
 %if %{with fpm}
-install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
-libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
-cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8
-cp -p sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
-install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+%{__make} -f Makefile.fpm install-fpm \
+	INSTALL_ROOT=$RPM_BUILD_ROOT
+
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/fpm.d}
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
 cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
@@ -2858,6 +2857,8 @@ fi
 %{_mandir}/man8/php-fpm.8*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/php-fpm
 %attr(754,root,root) /etc/rc.d/init.d/php-fpm
+%dir %{_datadir}/fpm
+%{_datadir}/fpm/status.html
 %endif
 
 %files common

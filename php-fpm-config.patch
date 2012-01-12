@@ -60,3 +60,25 @@
  ;env[TMP] = /tmp
  ;env[TMPDIR] = /tmp
  ;env[TEMP] = /tmp
+--- php-5.3.9/sapi/fpm/status.html.in~	2011-10-08 23:43:12.000000000 +0300
++++ php-5.3.9/sapi/fpm/status.html.in	2012-01-12 02:19:09.573191879 +0200
+@@ -96,7 +96,7 @@
+ 			var sort_index;
+ 			var sort_order;
+ 
+-			doc_url.value = location.protocol + '//' + location.host + "/status?json&full";
++			doc_url.value = location.protocol + '//' + location.host + "/fpm-status?json&full";
+ 
+ 			ths = document.getElementsByTagName("th");
+ 			for (var i=0; i<ths.length; i++) {
+--- php-5.3.9/sapi/fpm/Makefile.frag~	2012-01-11 21:49:42.000000000 +0200
++++ php-5.3.9/sapi/fpm/Makefile.frag	2012-01-12 02:20:25.553355153 +0200
+@@ -21,7 +21,7 @@
+ 	@echo "Installing PHP FPM config:        $(INSTALL_ROOT)$(sysconfdir)/" && \
+ 	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir) || :
+ 
+-	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf.default || :
++	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf || :
+ 
+ 	@echo "Installing PHP FPM man page:      $(INSTALL_ROOT)$(mandir)/man8/"
+ 	@$(mkinstalldirs) $(INSTALL_ROOT)$(mandir)/man8

@@ -136,8 +136,8 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://downloads.php.net/stas/%{name}-%{version}RC4.tar.bz2
-# Source0-md5:	76b3e3277874769ad3fd4bf710e416ea
+Source0:	http://downloads.php.net/stas/%{name}-%{version}RC6.tar.bz2
+# Source0-md5:	57ebb13b37bdce10ce2e2a2327873555
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -1854,7 +1854,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{version}RC4
+%setup -q -n %{name}-%{version}RC6
 # prep for suhosin patch
 %undos Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1

@@ -1,0 +1,12 @@
+diff -up php-5.2.17/ext/standard/file.c.bug-55674 php-5.2.17/ext/standard/file.c
+--- php-5.2.17/ext/standard/file.c.bug-55674	2012-01-12 09:39:13.000000000 +0700
++++ php-5.2.17/ext/standard/file.c	2012-01-12 09:39:28.000000000 +0700
+@@ -2156,7 +2156,7 @@ PHPAPI void php_fgetcsv(php_stream *stre
+ 		inc_len = (bptr < limit ? (*bptr == '\0' ? 1: php_mblen(bptr, limit - bptr)): 0);
+ 		if (inc_len == 1) {
+ 			char *tmp = bptr;
+-			while (isspace((int)*(unsigned char *)tmp)) {
++			while ((*tmp != delimiter) && isspace((int)*(unsigned char *)tmp)) {
+ 				tmp++;
+ 			}
+ 			if (*tmp == enclosure) {

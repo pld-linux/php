@@ -113,7 +113,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.17
-Release:	9
+Release:	10
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -202,6 +202,8 @@ Patch202: php-5.2.17-CVE-2011-1938.patch
 Patch203: php-5.2.17-CVE-2011-1148.patch
 Patch204: php-5.2.17-CVE-2011-0708.patch
 Patch205: php-5.2.17-CVE-2011-1092.patch
+Patch206: php-5.2.17-CVE-2011-0421.patch
+
 # Backport from 5.3.6
 Patch301: php-5.3.6-bug-54055.patch
 Patch302: php-5.3.6-bug-53577.patch
@@ -258,6 +260,27 @@ Patch355: php-5.3.7-bug-55323.patch
 Patch356: php-5.3.7-bug-54312.patch
 Patch357: php-5.3.7-bug-51958.patch
 Patch358: php-5.3.7-bug-54946.patch
+# 5.3.9 backport
+Patch359: php-5.2.17-CVE-2011-4566.patch
+Patch360: php-5.2.17-bug-60206.patch
+Patch361: php-5.2.17-bug-60138.patch
+Patch362: php-5.2.17-bug-60120.patch
+Patch363: php-5.2.17-bug-55674.patch
+Patch364: php-5.2.17-bug-55509.patch
+Patch365: php-5.2.17-bug-55504.patch
+Patch366: php-5.2.17-bug-52461.patch
+Patch367: php-5.2.17-bug-55366.patch
+Patch368: php-5.2.17-bug-55273.patch
+Patch369: php-5.2.17-bug-52624.patch
+Patch370: php-5.2.17-bug-43200.patch
+Patch371: php-5.2.17-bug-54682.patch
+Patch372: php-5.2.17-bug-60455.patch
+Patch373: php-5.2.17-bug-60183.patch
+Patch374: php-5.2.17-bug-55478.patch
+
+#php-5.2-max-input-vars patch
+Patch400: php-5.2.17-max-input-vars.patch
+Patch401: php-5.2.17-bug-323007-2.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1946,6 +1969,7 @@ done
 %patch203 -p1 -b .CVE-2011-1148
 %patch204 -p1 -b .CVE-2011-0708
 %patch205 -p1 -b .CVE-2011-1092
+%patch206 -p1 -b .CVE-2011-0421
 
 # Bugfix backport from 5.3.6
 %patch301 -p1 -b .bug-54055
@@ -2003,6 +2027,25 @@ done
 %patch356 -p1 -b .bug-54312
 %patch357 -p1 -b .bug-51958
 %patch358 -p1 -b .bug-54946
+%patch359 -p1 -b .CVE-2011-4566
+%patch360 -p1 -b .bug-60206
+%patch361 -p1 -b .bug-60138
+%patch362 -p1 -b .bug-60120
+%patch363 -p1 -b .bug-55674
+%patch364 -p1 -b .bug-55509
+%patch365 -p1 -b .bug-55504
+%patch366 -p1 -b .bug-52461
+%patch367 -p1 -b .bug-55366
+%patch368 -p1 -b .bug-55273
+%patch369 -p1 -b .bug-52624
+%patch370 -p1 -b .bug-43200
+%patch371 -p1 -b .bug-54682
+%patch372 -p1 -b .bug-60455
+%patch373 -p1 -b .bug-60183
+%patch374 -p1 -b .bug-55478
+
+%patch400 -p1 -b .php-5.2-max-input-vars
+%patch401 -p1 -b .bug-323007
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
@@ -3250,6 +3293,15 @@ fi
 %{php_data_dir}/tests/php/strings
 %{php_data_dir}/tests/php/quicktester.inc
 %attr(755,root,root) %{php_data_dir}/tests/php/run-tests.php
+
+# random junk, didn't check, maybe can be just removed
+%{php_data_dir}/tests/php/bin-info.inc
+%{php_data_dir}/tests/php/foo*
+%{php_data_dir}/tests/php/odbc*.php
+%{php_data_dir}/tests/php/recurse
+%{php_data_dir}/tests/php/run.*
+%{php_data_dir}/tests/php/scan_cases
+%{php_data_dir}/tests/php/test*
 
 %if %{with tidy}
 %files tidy

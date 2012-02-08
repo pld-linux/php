@@ -6,7 +6,7 @@ diff -up php-5.2.17/ext/standard/info.c.bug-52461 php-5.2.17/ext/standard/info.c
  
  	PUTS("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">\n");
 -	PUTS("<html>");
-+	PUTS("<html xmlns=\"http://www.w3.org/1999/xhtml\">>");
++	PUTS("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
  	PUTS("<head>\n");
  	php_info_print_style(TSRMLS_C);
  	PUTS("<title>phpinfo()</title>");

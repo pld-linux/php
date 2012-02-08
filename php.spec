@@ -122,7 +122,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.7
+%define		rel	0.8
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -136,8 +136,8 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-Source0:	http://downloads.php.net/stas/%{name}-%{version}RC6.tar.bz2
-# Source0-md5:	57ebb13b37bdce10ce2e2a2327873555
+Source0:	http://downloads.php.net/stas/%{name}-%{version}RC7.tar.bz2
+# Source0-md5:	83e759b0eb87ebdf0124d64361daaf54
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -1854,7 +1854,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{name}-%{version}RC6
+%setup -q -n %{name}-%{version}RC7
 # prep for suhosin patch
 %undos Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1

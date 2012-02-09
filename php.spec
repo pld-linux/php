@@ -110,7 +110,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	4
+%define		rel	5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2404,6 +2404,8 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %if %{with fpm}
 %{__make} -f Makefile.fpm install-fpm \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
+# Makefile.fpm incorrectly installs libtool script instead of final binary so overwrite
+libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
 
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/fpm.d}
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm

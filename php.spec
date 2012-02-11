@@ -2499,6 +2499,9 @@ install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 install -p run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
 cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
+# /var/run/php is in php-dirs, here conflicts with __spec_install_post_check_tmpfiles macro
+rmdir $RPM_BUILD_ROOT/var/run/php
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 

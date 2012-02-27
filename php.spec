@@ -277,10 +277,16 @@ Patch371: php-5.2.17-bug-54682.patch
 Patch372: php-5.2.17-bug-60455.patch
 Patch373: php-5.2.17-bug-60183.patch
 Patch374: php-5.2.17-bug-55478.patch
+# Bug-319457 CVE-2011-4153
+Patch375: php-5.2.17-bug-319457.patch
+# Bug-55776 CVE-2012-0788
+Patch376: php-5.2.17-bug-55776.patch
 
 #php-5.2-max-input-vars patch
 Patch400: php-5.2.17-max-input-vars.patch
 Patch401: php-5.2.17-bug-323007-2.patch
+# Bug-323016 CVE-2012-0831
+Patch402: php-5.2.17-bug-323016.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2043,9 +2049,12 @@ done
 %patch372 -p1 -b .bug-60455
 %patch373 -p1 -b .bug-60183
 %patch374 -p1 -b .bug-55478
+%patch375 -p1 -b .bug-319457
+%patch376 -p1 -b .bug-55776
 
 %patch400 -p1 -b .php-5.2-max-input-vars
 %patch401 -p1 -b .bug-323007
+%patch402 -p1 -b .bug-323016
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

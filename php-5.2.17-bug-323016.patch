@@ -1,0 +1,48 @@
+diff -up php-5.2.17/main/php_variables.c.bug-323016 php-5.2.17/main/php_variables.c
+--- php-5.2.17/main/php_variables.c.bug-323016	2012-02-16 09:26:09.000000000 +0700
++++ php-5.2.17/main/php_variables.c	2012-02-16 09:29:47.000000000 +0700
+@@ -29,6 +29,7 @@
+ #include "SAPI.h"
+ #include "php_logos.h"
+ #include "zend_globals.h"
++#include "php_ini.h"
+ 
+ /* for systems that need to override reading of environment variables */
+ void _php_import_environment_variables(zval *array_ptr TSRMLS_DC);
+@@ -438,7 +439,10 @@ void _php_import_environment_variables(z
+ 
+ 	/* turn off magic_quotes while importing environment variables */
+ 	int magic_quotes_gpc = PG(magic_quotes_gpc);
+-	PG(magic_quotes_gpc) = 0;
++
++	if (PG(magic_quotes_gpc)) {
++		zend_alter_ini_entry_ex("magic_quotes_gpc", sizeof("magic_quotes_gpc"), "0", 1, ZEND_INI_SYSTEM, ZEND_INI_STAGE_ACTIVATE, 1);
++	}
+ 
+ 	for (env = environ; env != NULL && *env != NULL; env++) {
+ 		p = strchr(*env, '=');
+@@ -581,7 +585,9 @@ static inline void php_register_server_v
+ 		zval_ptr_dtor(&PG(http_globals)[TRACK_VARS_SERVER]);
+ 	}
+ 	PG(http_globals)[TRACK_VARS_SERVER] = array_ptr;
+-	PG(magic_quotes_gpc) = 0;
++	if (PG(magic_quotes_gpc)) {
++		zend_alter_ini_entry_ex("magic_quotes_gpc", sizeof("magic_quotes_gpc"), "0", 1, ZEND_INI_SYSTEM, ZEND_INI_STAGE_ACTIVATE, 1);
++	}
+ 
+ 	/* Server variables */
+ 	if (sapi_module.register_server_variables) {
+diff -up php-5.2.17/sapi/cgi/cgi_main.c.bug-323016 php-5.2.17/sapi/cgi/cgi_main.c
+--- php-5.2.17/sapi/cgi/cgi_main.c.bug-323016	2010-01-03 15:23:27.000000000 +0600
++++ php-5.2.17/sapi/cgi/cgi_main.c	2012-02-16 09:26:09.000000000 +0700
+@@ -609,7 +609,9 @@ void cgi_php_import_environment_variable
+ 		int filter_arg = (array_ptr == PG(http_globals)[TRACK_VARS_ENV])?PARSE_ENV:PARSE_SERVER;
+ 
+ 		/* turn off magic_quotes while importing environment variables */
+-		PG(magic_quotes_gpc) = 0;
++		if (PG(magic_quotes_gpc)) {
++			zend_alter_ini_entry_ex("magic_quotes_gpc", sizeof("magic_quotes_gpc"), "0", 1, ZEND_INI_SYSTEM, ZEND_INI_STAGE_ACTIVATE, 1);
++		}
+ 		for (zend_hash_internal_pointer_reset_ex(&request->env, &pos);
+ 		     zend_hash_get_current_key_ex(&request->env, &var, &var_len, &idx, 0, &pos) == HASH_KEY_IS_STRING &&
+ 		     zend_hash_get_current_data_ex(&request->env, (void **) &val, &pos) == SUCCESS;

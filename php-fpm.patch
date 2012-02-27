@@ -167,7 +167,6 @@ diff --git a/libevent/strlcpy.c b/libevent/strlcpy.c
 new file mode 100644
 index 0000000..a1a413d
 diff --git a/main/php_config.h.in b/main/php_config.h.in
-index 6df7d68..f155934 100644
 --- a/main/php_config.h.in
 +++ b/main/php_config.h.in
 @@ -170,6 +170,9 @@
@@ -218,16 +217,13 @@ index 6df7d68..f155934 100644
  /* Define if system uses EBCDIC */
  #undef CHARSET_EBCDIC
  
-diff --git a/sapi/cgi/Makefile.frag b/sapi/cgi/Makefile.frag
-index 57a3b29..6fa6c9f 100644
---- a/sapi/cgi/Makefile.frag
-+++ b/sapi/cgi/Makefile.frag
+--- php-5.2.17/sapi/cgi/Makefile.frag~	2012-02-27 14:44:23.000000000 +0200
++++ php-5.2.17/sapi/cgi/Makefile.frag	2012-02-27 14:46:13.037731342 +0200
 @@ -1,2 +1,2 @@
--$(SAPI_CGI_PATH): $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS)
-+$(SAPI_CGI_PATH): $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)
+-$(SAPI_CGI_PATH): libphp_common.la $(PHP_SAPI_OBJS)
++$(SAPI_CGI_PATH): libphp_common.la $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)
  	$(BUILD_CGI)
 diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
-index a4a19c2..2c19083 100644
 --- a/sapi/cgi/cgi_main.c
 +++ b/sapi/cgi/cgi_main.c
 @@ -55,6 +55,9 @@
@@ -548,10 +544,8 @@ index a4a19c2..2c19083 100644
  #endif
  
  		if (cgi_sapi_module.php_ini_path_override) {
-diff --git a/sapi/cgi/config9.m4 b/sapi/cgi/config9.m4
-index 4ff90fd..fdf409b 100644
---- a/sapi/cgi/config9.m4
-+++ b/sapi/cgi/config9.m4
+--- php-5.2.17/sapi/cgi/config9.m4~	2012-02-27 14:44:23.000000000 +0200
++++ php-5.2.17/sapi/cgi/config9.m4	2012-02-27 14:48:07.279580606 +0200
 @@ -22,6 +22,10 @@ PHP_ARG_ENABLE(path-info-check,,
  [  --disable-path-info-check CGI: If this is disabled, paths such as
                              /info.php/test?a=b will fail to work], yes, no)
@@ -584,7 +578,7 @@ index 4ff90fd..fdf409b 100644
      dnl --enable-force-cgi-redirect
      AC_MSG_CHECKING(whether to force Apache CGI redirect)
      if test "$PHP_FORCE_CGI_REDIRECT" = "yes"; then
-@@ -93,10 +111,10 @@ if test "$PHP_SAPI" = "default"; then
+@@ -111,10 +111,10 @@
          BUILD_CGI="echo '\#! .' > php.sym && echo >>php.sym && nm -BCpg \`echo \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) | sed 's/\([A-Za-z0-9_]*\)\.lo/\1.o/g'\` | \$(AWK) '{ if (((\$\$2 == \"T\") || (\$\$2 == \"D\") || (\$\$2 == \"B\")) && (substr(\$\$3,1,1) != \".\")) { print \$\$3 } }' | sort -u >> php.sym && \$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) -Wl,-brtl -Wl,-bE:php.sym \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
          ;;
        *darwin*)
@@ -592,13 +586,12 @@ index 4ff90fd..fdf409b 100644
 +        BUILD_CGI="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_SAPI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(SAPI_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
        ;;
        *)
--        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
-+        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(SAPI_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
+-        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
++        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(SAPI_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
        ;;
      esac
  
 diff --git a/sapi/cgi/fastcgi.c b/sapi/cgi/fastcgi.c
-index 68b7e21..bcc0e7e 100644
 --- a/sapi/cgi/fastcgi.c
 +++ b/sapi/cgi/fastcgi.c
 @@ -27,6 +27,11 @@
@@ -774,7 +767,6 @@ index 68b7e21..bcc0e7e 100644
  					struct pollfd fds;
  					int ret;
 diff --git a/sapi/cgi/fastcgi.h b/sapi/cgi/fastcgi.h
-index c095c49..a3b3832 100644
 --- a/sapi/cgi/fastcgi.h
 +++ b/sapi/cgi/fastcgi.h
 @@ -114,6 +114,9 @@ typedef struct _fcgi_request {
@@ -798,7 +790,6 @@ index c095c49..a3b3832 100644
  #endif
 diff --git a/sapi/cgi/fpm/Makefile.frag b/sapi/cgi/fpm/Makefile.frag
 new file mode 100644
-index 0000000..15e6637
 --- /dev/null
 +++ b/sapi/cgi/fpm/Makefile.frag
 @@ -0,0 +1,21 @@
@@ -825,7 +816,6 @@ index 0000000..15e6637
 +
 diff --git a/sapi/cgi/fpm/acinclude.m4 b/sapi/cgi/fpm/acinclude.m4
 new file mode 100644
-index 0000000..e4d1f3e
 --- /dev/null
 +++ b/sapi/cgi/fpm/acinclude.m4
 @@ -0,0 +1,377 @@
@@ -1208,7 +1198,6 @@ index 0000000..e4d1f3e
 +])
 diff --git a/sapi/cgi/fpm/conf/php-fpm.conf.in b/sapi/cgi/fpm/conf/php-fpm.conf.in
 new file mode 100644
-index 0000000..a54b0c2
 --- /dev/null
 +++ b/sapi/cgi/fpm/conf/php-fpm.conf.in
 @@ -0,0 +1,156 @@
@@ -1370,10 +1359,9 @@ index 0000000..a54b0c2
 +</configuration>
 diff --git a/sapi/cgi/fpm/config.m4 b/sapi/cgi/fpm/config.m4
 new file mode 100644
-index 0000000..65ea5e2
 --- /dev/null
 +++ b/sapi/cgi/fpm/config.m4
-@@ -0,0 +1,141 @@
+@@ -0,0 +1,117 @@
 +
 +FPM_VERSION="0.5.14"
 +
@@ -1414,8 +1402,8 @@ index 0000000..65ea5e2
 +AC_FPM_TRACE
 +dnl AC_FPM_JUDY
 +
-+LIBEVENT_CFLAGS="-I$abs_srcdir/libevent"
-+LIBEVENT_LIBS="$abs_builddir/libevent/libevent.a"
++LIBEVENT_CFLAGS=""
++LIBEVENT_LIBS="-levent"
 +
 +SAPI_EXTRA_DEPS="$LIBEVENT_LIBS"
 +
@@ -1443,30 +1431,6 @@ index 0000000..65ea5e2
 +PHP_ADD_BUILD_DIR(sapi/cgi/fpm)
 +
 +install_fpm="install-fpm"
-+
-+PHP_CONFIGURE_PART(Configuring libevent)
-+
-+test -d "$abs_builddir/libevent" || mkdir -p $abs_builddir/libevent
-+
-+dnl this is a bad hack
-+
-+chmod +x "$abs_srcdir/libevent/configure" \
-+		"$abs_srcdir/libevent/depcomp" \
-+		"$abs_srcdir/libevent/install-sh" \
-+		"$abs_srcdir/libevent/missing"
-+
-+libevent_configure="cd $abs_builddir/libevent ; CFLAGS=\"$CFLAGS $GCC_CFLAGS\" $abs_srcdir/libevent/configure --disable-shared"
-+
-+(eval $libevent_configure)
-+
-+if test ! -f "$abs_builddir/libevent/Makefile" ; then
-+	echo "Failed to configure libevent" >&2
-+	exit 1
-+fi
-+
-+dnl another hack for stealing libevent dependant library list
-+
-+LIBEVENT_LIBS="$LIBEVENT_LIBS `echo "@LIBS@" | $abs_builddir/libevent/config.status --file=-:-`"
 +
 +SAPI_EXTRA_LIBS="$LIBEVENT_LIBS $LIBXML_LIBS $JUDY_LIBS"
 +
@@ -1607,7 +1571,6 @@ index 0000000..9db2c9b
 +
 diff --git a/sapi/cgi/fpm/fpm.h b/sapi/cgi/fpm/fpm.h
 new file mode 100644
-index 0000000..eebd2dc
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm.h
 @@ -0,0 +1,30 @@
@@ -1643,7 +1606,6 @@ index 0000000..eebd2dc
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_arrays.h b/sapi/cgi/fpm/fpm_arrays.h
 new file mode 100644
-index 0000000..fee6661
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_arrays.h
 @@ -0,0 +1,110 @@
@@ -1759,7 +1721,6 @@ index 0000000..fee6661
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_atomic.h b/sapi/cgi/fpm/fpm_atomic.h
 new file mode 100644
-index 0000000..3334ae0
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_atomic.h
 @@ -0,0 +1,85 @@
@@ -1850,7 +1811,6 @@ index 0000000..3334ae0
 +
 diff --git a/sapi/cgi/fpm/fpm_autoconf.h.in b/sapi/cgi/fpm/fpm_autoconf.h.in
 new file mode 100644
-index 0000000..d00c165
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_autoconf.h.in
 @@ -0,0 +1,9 @@
@@ -1865,7 +1825,6 @@ index 0000000..d00c165
 +
 diff --git a/sapi/cgi/fpm/fpm_children.c b/sapi/cgi/fpm/fpm_children.c
 new file mode 100644
-index 0000000..f586405
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_children.c
 @@ -0,0 +1,385 @@
@@ -2256,7 +2215,6 @@ index 0000000..f586405
 +
 diff --git a/sapi/cgi/fpm/fpm_children.h b/sapi/cgi/fpm/fpm_children.h
 new file mode 100644
-index 0000000..c85adf9
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_children.h
 @@ -0,0 +1,33 @@
@@ -2295,7 +2253,6 @@ index 0000000..c85adf9
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_cleanup.c b/sapi/cgi/fpm/fpm_cleanup.c
 new file mode 100644
-index 0000000..b4ef7bb
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_cleanup.c
 @@ -0,0 +1,51 @@
@@ -2352,7 +2309,6 @@ index 0000000..b4ef7bb
 +
 diff --git a/sapi/cgi/fpm/fpm_cleanup.h b/sapi/cgi/fpm/fpm_cleanup.h
 new file mode 100644
-index 0000000..4d7cf39
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_cleanup.h
 @@ -0,0 +1,21 @@
@@ -2379,7 +2335,6 @@ index 0000000..4d7cf39
 +
 diff --git a/sapi/cgi/fpm/fpm_clock.c b/sapi/cgi/fpm/fpm_clock.c
 new file mode 100644
-index 0000000..2abbce8
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_clock.c
 @@ -0,0 +1,115 @@
@@ -2500,7 +2455,6 @@ index 0000000..2abbce8
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_clock.h b/sapi/cgi/fpm/fpm_clock.h
 new file mode 100644
-index 0000000..6aab959
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_clock.h
 @@ -0,0 +1,13 @@
@@ -2519,7 +2473,6 @@ index 0000000..6aab959
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_conf.c b/sapi/cgi/fpm/fpm_conf.c
 new file mode 100644
-index 0000000..adf4f1a
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_conf.c
 @@ -0,0 +1,532 @@
@@ -3057,7 +3010,6 @@ index 0000000..adf4f1a
 +}
 diff --git a/sapi/cgi/fpm/fpm_conf.h b/sapi/cgi/fpm/fpm_conf.h
 new file mode 100644
-index 0000000..4dd011e
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_conf.h
 @@ -0,0 +1,73 @@
@@ -3136,7 +3088,6 @@ index 0000000..4dd011e
 +
 diff --git a/sapi/cgi/fpm/fpm_config.h b/sapi/cgi/fpm/fpm_config.h
 new file mode 100644
-index 0000000..319b200
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_config.h
 @@ -0,0 +1,39 @@
@@ -3181,7 +3132,6 @@ index 0000000..319b200
 +
 diff --git a/sapi/cgi/fpm/fpm_env.c b/sapi/cgi/fpm/fpm_env.c
 new file mode 100644
-index 0000000..624a9fe
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_env.c
 @@ -0,0 +1,125 @@
@@ -3312,7 +3262,6 @@ index 0000000..624a9fe
 +}
 diff --git a/sapi/cgi/fpm/fpm_env.h b/sapi/cgi/fpm/fpm_env.h
 new file mode 100644
-index 0000000..0f79ed7
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_env.h
 @@ -0,0 +1,24 @@
@@ -3342,7 +3291,6 @@ index 0000000..0f79ed7
 +
 diff --git a/sapi/cgi/fpm/fpm_events.c b/sapi/cgi/fpm/fpm_events.c
 new file mode 100644
-index 0000000..654e9c8
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_events.c
 @@ -0,0 +1,135 @@
@@ -3483,7 +3431,6 @@ index 0000000..654e9c8
 +
 diff --git a/sapi/cgi/fpm/fpm_events.h b/sapi/cgi/fpm/fpm_events.h
 new file mode 100644
-index 0000000..d5a45ce
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_events.h
 @@ -0,0 +1,16 @@
@@ -3505,7 +3452,6 @@ index 0000000..d5a45ce
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_php.c b/sapi/cgi/fpm/fpm_php.c
 new file mode 100644
-index 0000000..fb46b9b
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_php.c
 @@ -0,0 +1,190 @@
@@ -3701,7 +3647,6 @@ index 0000000..fb46b9b
 +}
 diff --git a/sapi/cgi/fpm/fpm_php.h b/sapi/cgi/fpm/fpm_php.h
 new file mode 100644
-index 0000000..a05464f
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_php.h
 @@ -0,0 +1,22 @@
@@ -3729,7 +3674,6 @@ index 0000000..a05464f
 +
 diff --git a/sapi/cgi/fpm/fpm_php_trace.c b/sapi/cgi/fpm/fpm_php_trace.c
 new file mode 100644
-index 0000000..25a0d71
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_php_trace.c
 @@ -0,0 +1,171 @@
@@ -3906,7 +3850,6 @@ index 0000000..25a0d71
 +
 diff --git a/sapi/cgi/fpm/fpm_php_trace.h b/sapi/cgi/fpm/fpm_php_trace.h
 new file mode 100644
-index 0000000..af5e456
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_php_trace.h
 @@ -0,0 +1,13 @@
@@ -3925,7 +3868,6 @@ index 0000000..af5e456
 +
 diff --git a/sapi/cgi/fpm/fpm_process_ctl.c b/sapi/cgi/fpm/fpm_process_ctl.c
 new file mode 100644
-index 0000000..c9b69eb
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_process_ctl.c
 @@ -0,0 +1,354 @@
@@ -4285,7 +4227,6 @@ index 0000000..c9b69eb
 +
 diff --git a/sapi/cgi/fpm/fpm_process_ctl.h b/sapi/cgi/fpm/fpm_process_ctl.h
 new file mode 100644
-index 0000000..8424f10
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_process_ctl.h
 @@ -0,0 +1,39 @@
@@ -4330,7 +4271,6 @@ index 0000000..8424f10
 +
 diff --git a/sapi/cgi/fpm/fpm_request.c b/sapi/cgi/fpm/fpm_request.c
 new file mode 100644
-index 0000000..3faf77d
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_request.c
 @@ -0,0 +1,164 @@
@@ -4500,7 +4440,6 @@ index 0000000..3faf77d
 +
 diff --git a/sapi/cgi/fpm/fpm_request.h b/sapi/cgi/fpm/fpm_request.h
 new file mode 100644
-index 0000000..d768db6
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_request.h
 @@ -0,0 +1,27 @@
@@ -4533,7 +4472,6 @@ index 0000000..d768db6
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_shm.c b/sapi/cgi/fpm/fpm_shm.c
 new file mode 100644
-index 0000000..21c3d75
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_shm.c
 @@ -0,0 +1,100 @@
@@ -4639,7 +4577,6 @@ index 0000000..21c3d75
 +
 diff --git a/sapi/cgi/fpm/fpm_shm.h b/sapi/cgi/fpm/fpm_shm.h
 new file mode 100644
-index 0000000..f3f0be0
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_shm.h
 @@ -0,0 +1,22 @@
@@ -4667,7 +4604,6 @@ index 0000000..f3f0be0
 +
 diff --git a/sapi/cgi/fpm/fpm_shm_slots.c b/sapi/cgi/fpm/fpm_shm_slots.c
 new file mode 100644
-index 0000000..efa3707
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_shm_slots.c
 @@ -0,0 +1,127 @@
@@ -4800,7 +4736,6 @@ index 0000000..efa3707
 +
 diff --git a/sapi/cgi/fpm/fpm_shm_slots.h b/sapi/cgi/fpm/fpm_shm_slots.h
 new file mode 100644
-index 0000000..4596c6f
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_shm_slots.h
 @@ -0,0 +1,43 @@
@@ -4849,7 +4784,6 @@ index 0000000..4596c6f
 +
 diff --git a/sapi/cgi/fpm/fpm_signals.c b/sapi/cgi/fpm/fpm_signals.c
 new file mode 100644
-index 0000000..2cf878d
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_signals.c
 @@ -0,0 +1,252 @@
@@ -5107,7 +5041,6 @@ index 0000000..2cf878d
 +}
 diff --git a/sapi/cgi/fpm/fpm_signals.h b/sapi/cgi/fpm/fpm_signals.h
 new file mode 100644
-index 0000000..eb80fae
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_signals.h
 @@ -0,0 +1,16 @@
@@ -5129,7 +5062,6 @@ index 0000000..eb80fae
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_sockets.c b/sapi/cgi/fpm/fpm_sockets.c
 new file mode 100644
-index 0000000..5acb559
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_sockets.c
 @@ -0,0 +1,427 @@
@@ -5562,7 +5494,6 @@ index 0000000..5acb559
 +}
 diff --git a/sapi/cgi/fpm/fpm_sockets.h b/sapi/cgi/fpm/fpm_sockets.h
 new file mode 100644
-index 0000000..d5433e3
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_sockets.h
 @@ -0,0 +1,37 @@
@@ -5605,7 +5536,6 @@ index 0000000..d5433e3
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_stdio.c b/sapi/cgi/fpm/fpm_stdio.c
 new file mode 100644
-index 0000000..a6818d7
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_stdio.c
 @@ -0,0 +1,286 @@
@@ -5897,7 +5827,6 @@ index 0000000..a6818d7
 +}
 diff --git a/sapi/cgi/fpm/fpm_stdio.h b/sapi/cgi/fpm/fpm_stdio.h
 new file mode 100644
-index 0000000..d3d61e4
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_stdio.h
 @@ -0,0 +1,20 @@
@@ -5923,7 +5852,6 @@ index 0000000..d3d61e4
 +
 diff --git a/sapi/cgi/fpm/fpm_str.h b/sapi/cgi/fpm/fpm_str.h
 new file mode 100644
-index 0000000..19e2055
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_str.h
 @@ -0,0 +1,49 @@
@@ -5978,7 +5906,6 @@ index 0000000..19e2055
 +#endif
 diff --git a/sapi/cgi/fpm/fpm_trace.c b/sapi/cgi/fpm/fpm_trace.c
 new file mode 100644
-index 0000000..7996355
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_trace.c
 @@ -0,0 +1,46 @@
@@ -6030,7 +5957,6 @@ index 0000000..7996355
 +
 diff --git a/sapi/cgi/fpm/fpm_trace.h b/sapi/cgi/fpm/fpm_trace.h
 new file mode 100644
-index 0000000..b421172
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_trace.h
 @@ -0,0 +1,17 @@
@@ -6053,7 +5979,6 @@ index 0000000..b421172
 +
 diff --git a/sapi/cgi/fpm/fpm_trace_mach.c b/sapi/cgi/fpm/fpm_trace_mach.c
 new file mode 100644
-index 0000000..11cb9cf
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_trace_mach.c
 @@ -0,0 +1,102 @@
@@ -6161,7 +6086,6 @@ index 0000000..11cb9cf
 +
 diff --git a/sapi/cgi/fpm/fpm_trace_pread.c b/sapi/cgi/fpm/fpm_trace_pread.c
 new file mode 100644
-index 0000000..f41bb91
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_trace_pread.c
 @@ -0,0 +1,67 @@
@@ -6234,7 +6158,6 @@ index 0000000..f41bb91
 +
 diff --git a/sapi/cgi/fpm/fpm_trace_ptrace.c b/sapi/cgi/fpm/fpm_trace_ptrace.c
 new file mode 100644
-index 0000000..11e2081
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_trace_ptrace.c
 @@ -0,0 +1,85 @@
@@ -6325,7 +6248,6 @@ index 0000000..11e2081
 +
 diff --git a/sapi/cgi/fpm/fpm_unix.c b/sapi/cgi/fpm/fpm_unix.c
 new file mode 100644
-index 0000000..4d5eecc
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_unix.c
 @@ -0,0 +1,289 @@
@@ -6620,7 +6542,6 @@ index 0000000..4d5eecc
 +}
 diff --git a/sapi/cgi/fpm/fpm_unix.h b/sapi/cgi/fpm/fpm_unix.h
 new file mode 100644
-index 0000000..3451db1
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_unix.h
 @@ -0,0 +1,17 @@
@@ -6643,7 +6564,6 @@ index 0000000..3451db1
 +
 diff --git a/sapi/cgi/fpm/fpm_worker_pool.c b/sapi/cgi/fpm/fpm_worker_pool.c
 new file mode 100644
-index 0000000..49dd5a8
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_worker_pool.c
 @@ -0,0 +1,69 @@
@@ -6718,7 +6638,6 @@ index 0000000..49dd5a8
 +}
 diff --git a/sapi/cgi/fpm/fpm_worker_pool.h b/sapi/cgi/fpm/fpm_worker_pool.h
 new file mode 100644
-index 0000000..cc0dbbd
 --- /dev/null
 +++ b/sapi/cgi/fpm/fpm_worker_pool.h
 @@ -0,0 +1,46 @@
@@ -6770,7 +6689,6 @@ index 0000000..cc0dbbd
 +
 diff --git a/sapi/cgi/fpm/init.d/php-fpm.in b/sapi/cgi/fpm/init.d/php-fpm.in
 new file mode 100644
-index 0000000..0befa52
 --- /dev/null
 +++ b/sapi/cgi/fpm/init.d/php-fpm.in
 @@ -0,0 +1,139 @@
@@ -6915,7 +6833,6 @@ index 0000000..0befa52
 +esac
 diff --git a/sapi/cgi/fpm/xml_config.c b/sapi/cgi/fpm/xml_config.c
 new file mode 100644
-index 0000000..10eb77e
 --- /dev/null
 +++ b/sapi/cgi/fpm/xml_config.c
 @@ -0,0 +1,278 @@
@@ -7199,7 +7116,6 @@ index 0000000..10eb77e
 +
 diff --git a/sapi/cgi/fpm/xml_config.h b/sapi/cgi/fpm/xml_config.h
 new file mode 100644
-index 0000000..b6169cd
 --- /dev/null
 +++ b/sapi/cgi/fpm/xml_config.h
 @@ -0,0 +1,43 @@
@@ -7248,7 +7164,6 @@ index 0000000..b6169cd
 +#endif
 diff --git a/sapi/cgi/fpm/zlog.c b/sapi/cgi/fpm/zlog.c
 new file mode 100644
-index 0000000..2fb6c45
 --- /dev/null
 +++ b/sapi/cgi/fpm/zlog.c
 @@ -0,0 +1,113 @@
@@ -7367,7 +7282,6 @@ index 0000000..2fb6c45
 +}
 diff --git a/sapi/cgi/fpm/zlog.h b/sapi/cgi/fpm/zlog.h
 new file mode 100644
-index 0000000..b5ac3d9
 --- /dev/null
 +++ b/sapi/cgi/fpm/zlog.h
 @@ -0,0 +1,34 @@

@@ -1,0 +1,170 @@
+PHP 5.2.x Remote Code Execution Vulnerability
+
+http://securityvulns.ru/docs27701.html
+http://www.securityfocus.com/archive/1/521695
+http://www.securityfocus.com/bid/52065
+http://xforce.iss.net/xforce/xfdb/73286
+
+Description:
+
+If PHP bails out in startup stage before setting PG(modules_activated)
+to 1, the filter_globals struct is not cleaned up on shutdown stage.
+The subsequence request will use uncleaned value in filter_globals
+struct. With special crafted request, this problem can lead to
+information disclosure and remote code execution.
+
+Only apache modules SAPI are found to vulnerable to this problem.
+While other SAPIs are safe because a PHP process exits when PHP bails
+out before setting PG(modules_activated) to 1.
+
+This bug was fixed before releasing 5.3.0.
+http://svn.php.net/viewvc?view=revision&revision=279522. But the patch
+is not backported to 5.2 version as described in
+https://bugs.php.net/bug.php?id=47930
+
+This patch backports it.
+Index: branches/PHP_5_3/ext/filter/filter.c
+===================================================================
+--- branches/PHP_5_3/ext/filter/filter.c	(revision 279521)
++++ branches/PHP_5_3/ext/filter/filter.c	(revision 279522)
+@@ -76,6 +76,7 @@
+ #endif
+ 
+ static unsigned int php_sapi_filter(int arg, char *var, char **val, unsigned int val_len, unsigned int *new_val_len TSRMLS_DC);
++static unsigned int php_sapi_filter_init(TSRMLS_D);
+ 
+ /* {{{ arginfo */
+ ZEND_BEGIN_ARG_INFO_EX(arginfo_filter_input, 0, 0, 2)
+@@ -270,7 +271,7 @@
+ 	REGISTER_LONG_CONSTANT("FILTER_FLAG_NO_RES_RANGE", FILTER_FLAG_NO_RES_RANGE, CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_LONG_CONSTANT("FILTER_FLAG_NO_PRIV_RANGE", FILTER_FLAG_NO_PRIV_RANGE, CONST_CS | CONST_PERSISTENT);
+ 
+-	sapi_register_input_filter(php_sapi_filter);
++	sapi_register_input_filter(php_sapi_filter, php_sapi_filter_init);
+ 
+ 	return SUCCESS;
+ }
+@@ -339,6 +340,17 @@
+ }
+ /* }}} */
+ 
++static unsigned int php_sapi_filter_init(TSRMLS_D)
++{
++	IF_G(get_array) = NULL;
++	IF_G(post_array) = NULL;
++	IF_G(cookie_array) = NULL;
++	IF_G(server_array) = NULL;
++	IF_G(env_array) = NULL;
++	IF_G(session_array) = NULL;
++	return SUCCESS;
++}
++
+ static void php_zval_filter(zval **value, long filter, long flags, zval *options, char* charset, zend_bool copy TSRMLS_DC) /* {{{ */
+ {
+ 	filter_list_entry  filter_func;
+
+Property changes on: branches/PHP_5_3/ext/filter/filter.c
+___________________________________________________________________
+Modified: cvs2svn:cvs-rev
+## -1 +1 ##
+-1.52.2.39.2.15
++1.52.2.39.2.16
+\ No newline at end of property
+Index: branches/PHP_5_3/main/SAPI.c
+===================================================================
+--- branches/PHP_5_3/main/SAPI.c	(revision 279521)
++++ branches/PHP_5_3/main/SAPI.c	(revision 279522)
+@@ -326,6 +326,9 @@
+ 			sapi_module.activate(TSRMLS_C);
+ 		}
+ 	}
++	if (sapi_module.input_filter_init ) {
++		sapi_module.input_filter_init(TSRMLS_C);
++	}
+ }
+ 
+ /*
+@@ -392,6 +395,9 @@
+ 			sapi_module.activate(TSRMLS_C);
+ 		}
+ 	}
++	if (sapi_module.input_filter_init ) {
++		sapi_module.input_filter_init(TSRMLS_C);
++	}
+ }
+ 
+ 
+@@ -925,13 +931,14 @@
+ 	return SUCCESS;
+ }
+ 
+-SAPI_API int sapi_register_input_filter(unsigned int (*input_filter)(int arg, char *var, char **val, unsigned int val_len, unsigned int *new_val_len TSRMLS_DC))
++SAPI_API int sapi_register_input_filter(unsigned int (*input_filter)(int arg, char *var, char **val, unsigned int val_len, unsigned int *new_val_len TSRMLS_DC), unsigned int (*input_filter_init)(TSRMLS_D))
+ {
+ 	TSRMLS_FETCH();
+ 	if (SG(sapi_started) && EG(in_execution)) {
+ 		return FAILURE;
+ 	}
+ 	sapi_module.input_filter = input_filter;
++	sapi_module.input_filter_init = input_filter_init;
+ 	return SUCCESS;
+ }
+ 
+
+Property changes on: branches/PHP_5_3/main/SAPI.c
+___________________________________________________________________
+Modified: cvs2svn:cvs-rev
+## -1 +1 ##
+-1.202.2.7.2.15.2.6
++1.202.2.7.2.15.2.7
+\ No newline at end of property
+Index: branches/PHP_5_3/main/SAPI.h
+===================================================================
+--- branches/PHP_5_3/main/SAPI.h	(revision 279521)
++++ branches/PHP_5_3/main/SAPI.h	(revision 279522)
+@@ -192,7 +192,7 @@
+ SAPI_API void sapi_unregister_post_entry(sapi_post_entry *post_entry TSRMLS_DC);
+ SAPI_API int sapi_register_default_post_reader(void (*default_post_reader)(TSRMLS_D));
+ SAPI_API int sapi_register_treat_data(void (*treat_data)(int arg, char *str, zval *destArray TSRMLS_DC));
+-SAPI_API int sapi_register_input_filter(unsigned int (*input_filter)(int arg, char *var, char **val, unsigned int val_len, unsigned int *new_val_len TSRMLS_DC));
++SAPI_API int sapi_register_input_filter(unsigned int (*input_filter)(int arg, char *var, char **val, unsigned int val_len, unsigned int *new_val_len TSRMLS_DC), unsigned int (*input_filter_init)(TSRMLS_D));
+ 
+ SAPI_API int sapi_flush(TSRMLS_D);
+ SAPI_API struct stat *sapi_get_stat(TSRMLS_D);
+@@ -259,6 +259,7 @@
+ 	int phpinfo_as_text;
+ 
+ 	char *ini_entries;
++	unsigned int (*input_filter_init)(TSRMLS_D);
+ };
+ 
+ 
+
+Property changes on: branches/PHP_5_3/main/SAPI.h
+___________________________________________________________________
+Modified: cvs2svn:cvs-rev
+## -1 +1 ##
+-1.114.2.1.2.3.2.7
++1.114.2.1.2.3.2.8
+\ No newline at end of property
+Index: branches/PHP_5_3/main/php_content_types.c
+===================================================================
+--- branches/PHP_5_3/main/php_content_types.c	(revision 279521)
++++ branches/PHP_5_3/main/php_content_types.c	(revision 279522)
+@@ -75,7 +75,7 @@
+ {
+ 	sapi_register_default_post_reader(php_default_post_reader);
+ 	sapi_register_treat_data(php_default_treat_data);
+-	sapi_register_input_filter(php_default_input_filter);
++	sapi_register_input_filter(php_default_input_filter, NULL);
+ 	return SUCCESS;
+ }
+ /* }}} */
+
+Property changes on: branches/PHP_5_3/main/php_content_types.c
+___________________________________________________________________
+Modified: cvs2svn:cvs-rev
+## -1 +1 ##
+-1.32.2.1.2.4.2.2
++1.32.2.1.2.4.2.3
+\ No newline at end of property

@@ -1,0 +1,53 @@
+--- php-src/ext/tidy/php_tidy.h	2006/01/01 12:50:16	1.26.2.1
++++ php-src/ext/tidy/php_tidy.h	2006/05/24 21:22:13	1.26.2.1.2.1
+@@ -40,6 +40,7 @@
+ #define TIDY_ATTR_ME(name, param) TIDY_METHOD_MAP(name, tam_ ##name, param)
+ 
+ PHP_MINIT_FUNCTION(tidy);
++PHP_MSHUTDOWN_FUNCTION(tidy);
+ PHP_RINIT_FUNCTION(tidy);
+ PHP_MINFO_FUNCTION(tidy);
+ 
+--- php-src/ext/tidy/tidy.c	2006/05/09 23:58:46	1.66.2.8.2.1
++++ php-src/ext/tidy/tidy.c	2006/05/24 21:22:13	1.66.2.8.2.2
+@@ -326,7 +326,7 @@
+ 	"tidy",
+ 	tidy_functions,
+ 	PHP_MINIT(tidy),
+-	NULL,
++	PHP_MSHUTDOWN(tidy),
+ 	PHP_RINIT(tidy),
+ 	NULL,
+ 	PHP_MINFO(tidy),
+@@ -1000,6 +1000,17 @@
+ 	return SUCCESS;
+ }
+ 
++PHP_MSHUTDOWN_FUNCTION(tidy)
++{
++#ifdef ZTS
++	ts_free_id(tidy_globals_id);
++#else
++	tidy_globals_dtor(&tidy_globals TSRMLS_CC);
++#endif
++	UNREGISTER_INI_ENTRIES();
++	return SUCCESS;
++}
++
+ PHP_MINFO_FUNCTION(tidy)
+ {
+ 	php_info_print_table_start();
+--- php-src/ext/sybase_ct/php_sybase_ct.c	2006/01/01 12:50:16	1.103.2.5
++++ php-src/ext/sybase_ct/php_sybase_ct.c	2006/05/24 20:21:02	1.103.2.5.2.1
+@@ -442,6 +442,11 @@
+ PHP_MSHUTDOWN_FUNCTION(sybase)
+ {
+ 	UNREGISTER_INI_ENTRIES();
++#ifdef ZTS
++	ts_free_id(sybase_globals_id);
++#else
++	php_sybase_destroy_globals(&sybase_globals TSRMLS_CC);
++#endif
+ #if 0
+ 	ct_exit(context, CS_UNUSED);
+ 	cs_ctx_drop(context);

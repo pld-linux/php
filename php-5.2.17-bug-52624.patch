@@ -1,0 +1,12 @@
+diff -up php-5.2.17/ext/standard/file.c.bug-52624 php-5.2.17/ext/standard/file.c
+--- php-5.2.17/ext/standard/file.c.bug-52624	2012-01-12 11:20:05.000000000 +0700
++++ php-5.2.17/ext/standard/file.c	2012-01-12 11:21:32.000000000 +0700
+@@ -842,7 +842,7 @@ PHP_FUNCTION(tempnam)
+ 		p[63] = '\0';
+ 	}
+ 
+-	if ((fd = php_open_temporary_fd(d, p, &opened_path TSRMLS_CC)) >= 0) {
++	if ((fd = php_open_temporary_fd_ex(d, p, &opened_path,1 TSRMLS_CC)) >= 0) {
+ 		close(fd);
+ 		RETVAL_STRING(opened_path, 0);
+ 	} else {

@@ -1,0 +1,10 @@
+--- PHP_5_3/ext/standard/http_fopen_wrapper.c	2011/05/29 07:35:10	311541
++++ PHP_5_3/ext/standard/http_fopen_wrapper.c	2011/05/29 09:23:08	311542
+@@ -631,7 +631,6 @@
+ 		}
+ 		php_stream_write(stream, "\r\n", sizeof("\r\n")-1);
+ 		php_stream_write(stream, Z_STRVAL_PP(tmpzval), Z_STRLEN_PP(tmpzval));
+-		php_stream_write(stream, "\r\n\r\n", sizeof("\r\n\r\n")-1);
+ 	} else {
+ 		php_stream_write(stream, "\r\n", sizeof("\r\n")-1);
+ 	}

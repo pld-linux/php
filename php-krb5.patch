@@ -1,0 +1,12 @@
+--- php-5.2.14/acinclude.m4~	2010-10-22 21:16:27.173736151 +0200
++++ php-5.2.14/acinclude.m4	2010-10-22 21:24:22.776982966 +0200
+@@ -2276,9 +2276,7 @@
+     if test "$PHP_KERBEROS_DIR"; then
+       found_kerberos=yes
+       PHP_ADD_LIBPATH($PHP_KERBEROS_DIR/$PHP_LIBDIR, $1)
+-      PHP_ADD_LIBRARY(gssapi_krb5, 1, $1)
+       PHP_ADD_LIBRARY(krb5, 1, $1)
+-      PHP_ADD_LIBRARY(k5crypto, 1, $1)
+       PHP_ADD_LIBRARY(com_err,  1, $1)
+       PHP_ADD_INCLUDE($PHP_KERBEROS_DIR/include)
+     fi

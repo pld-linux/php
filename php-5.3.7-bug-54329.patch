@@ -1,0 +1,11 @@
+--- PHP_5_3/ext/pdo_dblib/dblib_stmt.c	2011/07/03 18:01:36	312859
++++ PHP_5_3/ext/pdo_dblib/dblib_stmt.c	2011/07/03 19:01:42	312860
+@@ -39,7 +39,7 @@
+ 	
+ 	for (i = 0; i < S->nrows; i++) {
+ 		for (j = 0; j < S->ncols; j++) {
+-			pdo_dblib_colval *val = &S->rows[i] + j;
++			pdo_dblib_colval *val = &S->rows[i*S->ncols] + j;
+ 			if (val->data) {
+ 				efree(val->data);
+ 				val->data = NULL;

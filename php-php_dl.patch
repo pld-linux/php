@@ -1,0 +1,49 @@
+backport extension loading from 5.3
+
+this allows to load permanent modules with full path (eases make test code)
+
+--- php-5.2.14/ext/standard/dl.c~	2010-10-31 17:07:21.000000000 +0200
++++ php-5.2.14/ext/standard/dl.c	2010-10-31 17:27:21.409467169 +0200
+@@ -114,6 +114,7 @@
+ 	zend_module_entry *(*get_module)(void);
+ 	int error_type;
+ 	char *extension_dir;
++	char *filename = Z_STRVAL_P(file);
+ 
+ 	if (type == MODULE_PERSISTENT) {
+ 		extension_dir = INI_STR("extension_dir");
+@@ -127,23 +128,24 @@
+ 		error_type = E_CORE_WARNING;
+ 	}
+ 
+-	if (extension_dir && extension_dir[0]){
+-		int extension_dir_len = strlen(extension_dir);
+-
++	/* Check if passed filename contains directory separators */
++	if (strchr(filename, '/') != NULL || strchr(filename, DEFAULT_SLASH) != NULL) {
++		/* Passing modules with full path is not supported for dynamically loaded extensions */
+ 		if (type == MODULE_TEMPORARY) {
+-			if (strchr(Z_STRVAL_P(file), '/') != NULL || strchr(Z_STRVAL_P(file), DEFAULT_SLASH) != NULL) {
+-				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Temporary module name should contain only filename");
+-				RETURN_FALSE;
+-			}
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Temporary module name should contain only filename");
++			return FAILURE;
+ 		}
++		libpath = estrdup(filename);
++	} else if (extension_dir && extension_dir[0]) {
++		int extension_dir_len = strlen(extension_dir);
+ 
+ 		if (IS_SLASH(extension_dir[extension_dir_len-1])) {
+-			spprintf(&libpath, 0, "%s%s", extension_dir, Z_STRVAL_P(file));
++			spprintf(&libpath, 0, "%s%s", extension_dir, filename); /* SAFE */
+ 		} else {
+-			spprintf(&libpath, 0, "%s%c%s", extension_dir, DEFAULT_SLASH, Z_STRVAL_P(file));
++			spprintf(&libpath, 0, "%s%c%s", extension_dir, DEFAULT_SLASH, filename); /* SAFE */
+ 		}
+ 	} else {
+-		libpath = estrndup(Z_STRVAL_P(file), Z_STRLEN_P(file));
++		return FAILURE; /* Not full path given or extension_dir is not set */
+ 	}
+ 
+ 	/* load dynamic symbol */

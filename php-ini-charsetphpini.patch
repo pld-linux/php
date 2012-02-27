@@ -1,0 +1,33 @@
+--- php-5.2.4/php.ini~	2008-09-23 14:06:04.000000000 +0300
++++ php-5.2.4/php.ini	2008-10-08 01:34:12.575347747 +0300
+@@ -749,6 +749,9 @@
+ ; Maximum time (in seconds) for connect timeout. -1 means no limit
+ mysql.connect_timeout = 60
+ 
++; The name of the character set to use as the default character set.
++;mysql.connect_charset=utf8
++
+ ; Trace mode. When trace_mode is active (=On), warnings for table/index scans and
+ ; SQL-Errors will be displayed.
+ mysql.trace_mode = Off
+@@ -768,6 +771,9 @@
+ ; MySQL defaults.
+ mysqli.default_socket =
+ 
++; The name of the character set to use as the default character set.
++;mysqli.connect_charset=utf8
++
+ ; Default host for mysql_connect() (doesn't apply in safe mode).
+ mysqli.default_host =
+ 
+@@ -784,6 +790,10 @@
+ ; Allow or prevent reconnect
+ mysqli.reconnect = Off
+ 
++[pdo_mysql]
++; The name of the character set to use as the default character set.
++;pdo_mysql.connect_charset=utf8
++
+ [mSQL]
+ ; Allow or prevent persistent links.
+ msql.allow_persistent = On

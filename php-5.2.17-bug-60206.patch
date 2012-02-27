@@ -1,0 +1,48 @@
+diff -up php-5.2.17/sapi/apache2filter/sapi_apache2.c.bug-60206 php-5.2.17/sapi/apache2filter/sapi_apache2.c
+--- php-5.2.17/sapi/apache2filter/sapi_apache2.c.bug-60206	2012-01-12 09:06:47.000000000 +0700
++++ php-5.2.17/sapi/apache2filter/sapi_apache2.c	2012-01-12 09:06:59.000000000 +0700
+@@ -404,7 +404,7 @@ static void php_apache_request_ctor(ap_f
+ 	efree(content_type);
+ 
+ 	content_length = (char *) apr_table_get(f->r->headers_in, "Content-Length");
+-	SG(request_info).content_length = (content_length ? atoi(content_length) : 0);
++	SG(request_info).content_length = (content_length ? atol(content_length) : 0);
+ 	
+ 	apr_table_unset(f->r->headers_out, "Content-Length");
+ 	apr_table_unset(f->r->headers_out, "Last-Modified");
+diff -up php-5.2.17/sapi/apache2handler/sapi_apache2.c.bug-60206 php-5.2.17/sapi/apache2handler/sapi_apache2.c
+--- php-5.2.17/sapi/apache2handler/sapi_apache2.c.bug-60206	2012-01-12 09:07:37.000000000 +0700
++++ php-5.2.17/sapi/apache2handler/sapi_apache2.c	2012-01-12 09:07:46.000000000 +0700
+@@ -454,7 +454,7 @@ static int php_apache_request_ctor(reque
+ 	r->no_local_copy = 1;
+ 
+ 	content_length = (char *) apr_table_get(r->headers_in, "Content-Length");
+-	SG(request_info).content_length = (content_length ? atoi(content_length) : 0);
++	SG(request_info).content_length = (content_length ? atol(content_length) : 0);
+ 
+ 	apr_table_unset(r->headers_out, "Content-Length");
+ 	apr_table_unset(r->headers_out, "Last-Modified");
+diff -up php-5.2.17/sapi/apache_hooks/mod_php5.c.bug-60206 php-5.2.17/sapi/apache_hooks/mod_php5.c
+--- php-5.2.17/sapi/apache_hooks/mod_php5.c.bug-60206	2012-01-12 09:08:19.000000000 +0700
++++ php-5.2.17/sapi/apache_hooks/mod_php5.c	2012-01-12 09:08:26.000000000 +0700
+@@ -571,7 +571,7 @@ static void init_request_info(TSRMLS_D)
+ 	SG(request_info).request_method = (char *)r->method;
+ 	SG(request_info).proto_num = r->proto_num;
+ 	SG(request_info).content_type = (char *) table_get(r->subprocess_env, "CONTENT_TYPE");
+-	SG(request_info).content_length = (content_length ? atoi(content_length) : 0);
++	SG(request_info).content_length = (content_length ? atol(content_length) : 0);
+ 	SG(sapi_headers).http_response_code = r->status;
+ 
+ 	if (r->headers_in) {
+diff -up php-5.2.17/sapi/apache/mod_php5.c.bug-60206 php-5.2.17/sapi/apache/mod_php5.c
+--- php-5.2.17/sapi/apache/mod_php5.c.bug-60206	2012-01-12 09:05:59.000000000 +0700
++++ php-5.2.17/sapi/apache/mod_php5.c	2012-01-12 09:06:19.000000000 +0700
+@@ -513,7 +513,7 @@ static void init_request_info(TSRMLS_D)
+ 	SG(request_info).request_uri = r->uri;
+ 	SG(request_info).request_method = (char *)r->method;
+ 	SG(request_info).content_type = (char *) table_get(r->subprocess_env, "CONTENT_TYPE");
+-	SG(request_info).content_length = (content_length ? atoi(content_length) : 0);
++	SG(request_info).content_length = (content_length ? atol(content_length) : 0);
+ 	SG(sapi_headers).http_response_code = r->status;
+ 	SG(request_info).proto_num = r->proto_num;
+ 

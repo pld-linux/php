@@ -1,0 +1,12 @@
+diff -up php-5.2.17/main/rfc1867.c.bug-55504 php-5.2.17/main/rfc1867.c
+--- php-5.2.17/main/rfc1867.c.bug-55504	2012-01-12 10:13:38.000000000 +0700
++++ php-5.2.17/main/rfc1867.c	2012-01-12 10:14:14.000000000 +0700
+@@ -817,7 +817,7 @@ SAPI_API SAPI_POST_HANDLER_FUNC(rfc1867_
+ 		}
+ 	} else {
+ 		/* search for the end of the boundary */
+-		boundary_end = strchr(boundary, ',');
++		boundary_end = strpbrk(boundary, ",;");
+ 	}
+ 	if (boundary_end) {
+ 		boundary_end[0] = '\0';

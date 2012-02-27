@@ -1,0 +1,71 @@
+--- /repository/php-src/ext/mbstring/mb_gpc.c	2008/12/31 11:17:39	1.17.2.2.2.5
++++ /repository/php-src/ext/mbstring/mb_gpc.c	2009/03/15 20:44:17	1.17.2.2.2.6
+@@ -58,6 +58,11 @@
+ 	int free_buffer=0;
+ 	enum mbfl_no_encoding detected;
+ 	php_mb_encoding_handler_info_t info;
++
++	{
++		char *value = zend_ini_string("mbstring.internal_encoding", sizeof("mbstring.internal_encoding"), 0);
++		_php_mb_ini_mbstring_internal_encoding_set(value, value ? strlen(value): 0 TSRMLS_CC);
++	}
+ 
+ 	if (!MBSTRG(encoding_translation)) {
+ 		php_default_treat_data(arg, str, destArray TSRMLS_CC);
+--- /repository/php-src/ext/mbstring/mbstring.c	2009/02/15 07:11:23	1.224.2.22.2.46
++++ /repository/php-src/ext/mbstring/mbstring.c	2009/03/15 20:44:17	1.224.2.22.2.47
+@@ -656,7 +656,7 @@
+ /* }}} */
+ 
+ /* {{{ static _php_mb_ini_mbstring_internal_encoding_set */
+-static int _php_mb_ini_mbstring_internal_encoding_set(const char *new_value, uint new_value_length TSRMLS_DC)
++int _php_mb_ini_mbstring_internal_encoding_set(const char *new_value, uint new_value_length TSRMLS_DC)
+ {
+ 	enum mbfl_no_encoding no_encoding;
+ 	const char *enc_name = NULL;
+@@ -826,7 +826,6 @@
+ 	if (MBSTRG(encoding_translation)) {
+ 		sapi_unregister_post_entry(php_post_entries TSRMLS_CC);
+ 		sapi_register_post_entries(mbstr_post_entries TSRMLS_CC);
+-		sapi_register_treat_data(mbstr_treat_data);
+ 	} else {
+ 		sapi_unregister_post_entry(mbstr_post_entries TSRMLS_CC);
+ 		sapi_register_post_entries(php_post_entries TSRMLS_CC);
+@@ -927,9 +926,12 @@
+ 
+ 	REGISTER_INI_ENTRIES();
+ 
++	/* This is a global handler. Should not be set in a per-request handler. */
++	sapi_register_treat_data(mbstr_treat_data);
++
++	/* Post handlers are stored in the thread-local context. */
+ 	if (MBSTRG(encoding_translation)) {
+ 		sapi_register_post_entries(mbstr_post_entries TSRMLS_CC);
+-		sapi_register_treat_data(mbstr_treat_data);
+ 	}
+ 
+ 	REGISTER_LONG_CONSTANT("MB_OVERLOAD_MAIL", MB_OVERLOAD_MAIL, CONST_CS | CONST_PERSISTENT);
+@@ -967,11 +969,6 @@
+ 	enum mbfl_no_encoding *list=NULL, *entry;
+ 	zend_function *func, *orig;
+ 	const struct mb_overload_def *p;
+-
+-	{
+-		char *value = zend_ini_string("mbstring.internal_encoding", sizeof("mbstring.internal_encoding"), 0);
+-		_php_mb_ini_mbstring_internal_encoding_set(value, value ? strlen(value): 0 TSRMLS_CC);
+-	}
+ 
+ 	MBSTRG(current_internal_encoding) = MBSTRG(internal_encoding);
+ 	MBSTRG(current_http_output_encoding) = MBSTRG(http_output_encoding);
+--- /repository/php-src/ext/mbstring/mbstring.h	2008/12/31 11:17:39	1.66.2.4.2.9
++++ /repository/php-src/ext/mbstring/mbstring.h	2009/03/15 20:44:17	1.66.2.4.2.10
+@@ -158,6 +158,9 @@
+ MBSTRING_API int php_mb_gpc_encoding_detector(char **arg_string, int *arg_length, int num, char *arg_list TSRMLS_DC);
+ 
+ MBSTRING_API int php_mb_stripos(int mode, char *old_haystack, int old_haystack_len, char *old_needle, int old_needle_len, long offset, char *from_encoding TSRMLS_DC);
++
++/* internal use only */
++int _php_mb_ini_mbstring_internal_encoding_set(const char *new_value, uint new_value_length TSRMLS_DC);
+ 
+ ZEND_BEGIN_MODULE_GLOBALS(mbstring)
+ 	enum mbfl_no_language language;

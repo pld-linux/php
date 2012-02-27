@@ -1,0 +1,32 @@
+fix "invalid operands to binary -" error caused by missing stpcpy prototype:
+
+php-5.2.17/Zend/zend_language_parser.c:2581: error: invalid operands to binary -
+php-5.2.17/Zend/zend_language_parser.c: In function `yysyntax_error':
+php-5.2.17/Zend/zend_language_parser.c:2640: warning: assignment makes pointer from integer without a cast
+php-5.2.17/Zend/zend_language_parser.c:2656: warning: assignment makes pointer from integer without a cast
+make: *** [Zend/zend_language_parser.lo] Error 1
+
+http://llvm.org/bugs/show_bug.cgi?id=3443
+http://news.php.net/php.zend-engine.cvs/7639
+http://svn.php.net/viewvc?view=revision&revision=281516
+
+--- php/php-src/branches/PHP_5_3/Zend/zend.h	2009/06/01 17:35:12	281515
++++ php/php-src/branches/PHP_5_3/Zend/zend.h	2009/06/01 17:51:53	281516
+@@ -34,8 +34,6 @@
+ #define END_EXTERN_C()
+ #endif
+ 
+-#include <stdio.h>
+-
+ /*
+  * general definitions
+  */
+@@ -66,6 +64,8 @@
+ #endif
+ 
+ /* all HAVE_XXX test have to be after the include of zend_config above */
++
++#include <stdio.h>
+ 
+ #ifdef HAVE_UNIX_H
+ # include <unix.h>

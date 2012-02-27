@@ -1,0 +1,13 @@
+diff -up php-5.2.17/ext/ftp/ftp.c.bug-60183 php-5.2.17/ext/ftp/ftp.c
+--- php-5.2.17/ext/ftp/ftp.c.bug-60183	2012-01-12 12:04:18.000000000 +0700
++++ php-5.2.17/ext/ftp/ftp.c	2012-01-12 12:04:40.000000000 +0700
+@@ -1122,6 +1122,9 @@ ftp_putcmd(ftpbuf_t *ftp, const char *cm
+ 
+ 	data = ftp->outbuf;
+ 
++	/* Clear the extra-lines buffer */
++	ftp->extra = NULL;
++
+ 	if (my_send(ftp, ftp->fd, data, size) != size) {
+ 		return 0;
+ 	}

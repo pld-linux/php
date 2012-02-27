@@ -1,0 +1,11 @@
+--- PHP_5_2/ext/snmp/snmp.c	2011/01/31 11:17:22	307875
++++ PHP_5_2/ext/snmp/snmp.c	2011/01/31 11:34:12	307876
+@@ -502,7 +502,7 @@
+ 					}
+ 				}	
+ 			} else {
+-				if (st != SNMP_CMD_WALK || response->errstat != SNMP_ERR_NOSUCHNAME) {
++				if ((st != SNMP_CMD_WALK && st != SNMP_CMD_REALWALK) || response->errstat != SNMP_ERR_NOSUCHNAME) {
+ 					php_error_docref(NULL TSRMLS_CC, E_WARNING, "Error in packet: %s", snmp_errstring(response->errstat));
+ 					if (response->errstat == SNMP_ERR_NOSUCHNAME) {
+ 						for (count=1, vars = response->variables; vars && count != response->errindex;

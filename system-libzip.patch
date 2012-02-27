@@ -1,0 +1,63 @@
+
+https://bugzilla.redhat.com/show_bug.cgi?id=551513
+https://bugs.php.net/bug.php?id=39388
+http://spot.fedorapeople.org/php-5.3.6-libzip.patch
+pld fixes: link with -lzip when using system lib, -lz otherwise
+
+--- php-5.2.17/ext/zip/config.m4	2011-10-10 21:33:09.589608203 +0300
++++ php-5.3.8/ext/zip/config.m4	2011-09-27 01:24:57.614837494 +0300
+@@ -10,8 +10,48 @@
+ [  --with-zlib-dir[=DIR]     ZIP: Set the path to libz install prefix], no, no)
+ fi
+ 
++PHP_ARG_WITH(libzip, libzip,
++[  --with-libzip[=DIR]       ZIP: use libzip], no, no)
++
+ if test "$PHP_ZIP" != "no"; then
++  if test "$PHP_LIBZIP" != "no"; then
++    dnl system libzip, depends on libzip
++    if test -r $PHP_LIBZIP/include/zip.h; then
++      LIBZIP_DIR=$PHP_LIBZIP
++    else
++      AC_MSG_CHECKING(for libzip in default path)
++      for i in /usr/local /usr; do
++        if test -r $i/include/zip.h; then
++          LIBZIP_DIR=$i
++          AC_MSG_RESULT(found in $i)
++          break
++        fi
++      done
++    fi
+ 
++    if test -z "$LIBZIP_DIR"; then
++      AC_MSG_RESULT(not found)
++      AC_MSG_ERROR(Please reinstall the libzip distribution)
++    fi
++
++    dnl Could not think of a simple way to check libzip for overwrite support
++    PHP_CHECK_LIBRARY(zip, zip_open,
++    [
++      PHP_ADD_INCLUDE($LIBZIP_DIR/include)
++      PHP_ADD_LIBRARY_WITH_PATH(zip, $LIBZIP_DIR/$PHP_LIBDIR, ZIP_SHARED_LIBADD)
++      AC_DEFINE(HAVE_LIBZIP,1,[ ])
++    ], [
++      AC_MSG_ERROR(could not find usable libzip)
++    ], [
++      -L$LIBZIP_DIR/$PHP_LIBDIR
++    ])
++
++    AC_DEFINE(HAVE_ZIP,1,[ ])
++    PHP_NEW_EXTENSION(zip, php_zip.c zip_stream.c, $ext_shared)
++    PHP_SUBST(ZIP_SHARED_LIBADD)
++  else
++
++  dnl bundled libzip, depends on zlib
+ 	if test "$PHP_ZLIB_DIR" != "no" && test "$PHP_ZLIB_DIR" != "yes"; then
+ 		if test -f "$PHP_ZLIB_DIR/include/zlib/zlib.h"; then
+ 			PHP_ZLIB_DIR="$PHP_ZLIB_DIR"
+@@ -68,4 +108,5 @@
+ 	PHP_NEW_EXTENSION(zip, php_zip.c zip_stream.c $PHP_ZIP_SOURCES, $ext_shared)
+ 	PHP_ADD_BUILD_DIR($ext_builddir/lib, 1)
+ 	PHP_SUBST(ZIP_SHARED_LIBADD)
++  fi
+ 	

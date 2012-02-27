@@ -1,0 +1,11 @@
+--- php-5.2.11/acinclude.m4~	2009-09-21 22:31:13.000000000 +0300
++++ php-5.2.11/acinclude.m4	2009-09-21 22:32:11.001106977 +0300
+@@ -1019,7 +1019,7 @@
+   is_it_shared=$[PHP_]translit($2,a-z_-,A-Z__)[_SHARED]
+   is_it_enabled=$[PHP_]translit($2,a-z_-,A-Z__)
+   if test "$am_i_shared" = "no" && test "$is_it_shared" = "yes" ; then
+-    AC_MSG_ERROR([
++    AC_MSG_WARN([
+ You've configured extension $1 to build statically, but it
+ depends on extension $2, which you've configured to build shared.
+ You either need to build $1 shared or build $2 statically for the

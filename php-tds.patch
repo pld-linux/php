@@ -1,0 +1,11 @@
+--- php-5.2.14/ext/sybase_ct/config.m4.orig	2010-07-07 12:16:48.000000000 +0200
++++ php-5.2.14/ext/sybase_ct/config.m4	2010-07-23 17:03:25.014237104 +0200
+@@ -31,7 +31,7 @@
+   fi
+   
+   PHP_ADD_LIBPATH($SYBASE_CT_LIBDIR, SYBASE_CT_SHARED_LIBADD)
+-  if test -f $SYBASE_CT_INCDIR/tds.h || test -f $SYBASE_CT_INCDIR/tds_sysdep_public.h; then
++  if test -f $SYBASE_CT_INCDIR/sybdb.h; then
+     PHP_ADD_LIBRARY(ct,, SYBASE_CT_SHARED_LIBADD)
+     SYBASE_CT_LIBS="-L$SYBASE_CT_LIBDIR -lct"
+   elif test -f $SYBASE_CT_INCDIR/libsybct64; then

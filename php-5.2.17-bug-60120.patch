@@ -1,0 +1,12 @@
+diff -up php-5.2.17/ext/standard/proc_open.c.bug-60120 php-5.2.17/ext/standard/proc_open.c
+--- php-5.2.17/ext/standard/proc_open.c.bug-60120	2012-01-12 09:22:27.000000000 +0700
++++ php-5.2.17/ext/standard/proc_open.c	2012-01-12 09:22:47.000000000 +0700
+@@ -453,7 +453,7 @@ PHP_FUNCTION(proc_get_status)
+ 
+ /* {{{ handy definitions for portability/readability */
+ #ifdef PHP_WIN32
+-# define pipe(pair)		(CreatePipe(&pair[0], &pair[1], &security, 2048L) ? 0 : -1)
++# define pipe(pair)		(CreatePipe(&pair[0], &pair[1], &security, 0) ? 0 : -1)
+ 
+ # define COMSPEC_NT	"cmd.exe"
+ # define COMSPEC_9X	"command.com"

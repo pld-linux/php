@@ -113,7 +113,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
 Version:	5.2.17
-Release:	12
+Release:	13
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -2510,8 +2510,10 @@ install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 install -p run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
 cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
+%if %{with fpm}
 # /var/run/php is in php-dirs, here conflicts with __spec_install_post_check_tmpfiles macro
 rmdir $RPM_BUILD_ROOT/var/run/php
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT

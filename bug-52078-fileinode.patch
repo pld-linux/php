@@ -1,24 +1,3 @@
---- php-5.2.13/ext/standard/tests/file/fileinode_variation3.phpt~	2008-11-25 13:33:41.000000000 +0200
-+++ php-5.2.13/ext/standard/tests/file/fileinode_variation3.phpt	2010-06-14 00:23:51.340272864 +0300
-@@ -57,15 +57,15 @@
- --EXPECTF--
- *** Testing fileinode() with different notations of file names ***
- - Iteration 1 -
--int(%d)
-+int(%i)
- - Iteration 2 -
- 
- Warning: fileinode(): stat failed for %s//fileinode_variation3/fileinode_variation3.tmp/ in %s on line %d
- bool(false)
- - Iteration 3 -
--int(%d)
-+int(%i)
- - Iteration 4 -
--int(%d)
-+int(%i)
- - Iteration 5 -
- 
- Warning: fileinode(): stat failed for %s//fileinode_variation3/*.tmp in %s on line %d
 --- php-5.3.3/ext/standard/tests/file/fileinode_basic.phpt~	2007-11-05 19:43:21.000000000 +0200
 +++ php-5.3.3/ext/standard/tests/file/fileinode_basic.phpt	2010-07-26 19:31:43.613553760 +0300
 @@ -28,9 +28,9 @@

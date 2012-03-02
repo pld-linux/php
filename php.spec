@@ -315,6 +315,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		intlver		1.1.0
 %define		jsonver		1.2.1
 %define		pharver		2.0.1
+%define		sqlite3ver	0.7
 %define		zipver		1.9.1
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
@@ -1580,7 +1581,7 @@ Summary(pl.UTF-8):	Moduł SQLite3 dla PHP
 Group:		Libraries
 URL:		http://php.net/manual/en/book.sqlite3.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(sqlite3)
+Provides:	php(sqlite3) = %{sqlite3ver}
 
 %description sqlite3
 SQLite is a C library that implements an embeddable SQL database
@@ -1996,6 +1997,12 @@ if test "$ver" != "%{pharver}"; then
 	: Update the pharver macro and rebuild.
 	exit 1
 fi
+ver=$(sed -n '/#define PHP_SQLITE3_VERSION/{s/.* "//;s/".*$//;p}' ext/sqlite3/php_sqlite3.h)
+if test "$ver" != "%{sqlite3ver}"; then
+	: Error: Upstream Sqlite3 version is now ${ver}, expecting %{sqlite3ver}.
+	: Update the sqlite3ver macro and rebuild.
+	exit 1
+fi
 ver=$(sed -n '/#define PHP_ZIP_VERSION_STRING /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
 if test "$ver" != "%{zipver}"; then
 	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.
@@ -2032,6 +2039,8 @@ if test "$ver" != "%{intlver}"; then
 	: Update the intlver macro and rebuild.
 	exit 1
 fi
+.
+
 
 export EXTENSION_DIR="%{php_extensiondir}"
 # configure once (for faster debugging purposes)

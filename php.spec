@@ -2039,8 +2039,6 @@ if test "$ver" != "%{intlver}"; then
 	: Update the intlver macro and rebuild.
 	exit 1
 fi
-.
-
 
 export EXTENSION_DIR="%{php_extensiondir}"
 # configure once (for faster debugging purposes)

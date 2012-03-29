@@ -1935,7 +1935,7 @@ cp -p php.ini-production php.ini
 %patch62 -p1
 %patch63 -p1
 %patch64 -p1
-%patch66 -p1
+%patch66 -p4
 %{?with_system_libzip:%patch65 -p1}
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/

@@ -1,0 +1,79 @@
+diff -r 591dd6329e97 ext/imap/php_imap.c
+--- a/ext/imap/php_imap.c	Mon Dec 22 06:35:22 2008 +0100
++++ b/ext/imap/php_imap.c	Mon Dec 22 06:35:27 2008 +0100
+@@ -157,6 +157,7 @@
+ 	PHP_FE(imap_set_quota,							NULL)
+ 	PHP_FE(imap_setacl,								NULL)
+ 	PHP_FE(imap_getacl,								NULL)
++	PHP_FE(imap_myrights,							NULL)
+ #endif
+ #if defined(HAVE_IMAP2005)
+  	PHP_FE(imap_setannotation,							NULL)
+@@ -417,6 +418,20 @@
+ 	for(; alist; alist = alist->next) {
+ 		add_assoc_stringl(IMAPG(imap_acl_list), alist->identifier, alist->rights, strlen(alist->rights), 1);
+ 	}
++}
++/* }}} */
++
++/* {{{ mail_myrights
++ *
++ * Mail MYRIGHTS callback
++ * Called via the mail_parameter function in c-client:src/c-client/mail.c
++ */
++void mail_myrights(MAILSTREAM *stream, char *mailbox, char *rights)
++{
++	TSRMLS_FETCH();
++
++	ZVAL_STRING(IMAPG(imap_acl_list), rights, 1)
++
+ }
+ /* }}} */
+ 
+@@ -1130,6 +1145,35 @@
+ }
+ /* }}} */
+ 
++/* {{{ proto string imap_myrights(resource stream_id, string mailbox)
++	Gets my rights (ACL) for a given mailbox */
++PHP_FUNCTION(imap_myrights)
++{
++	zval **streamind, **mailbox;
++	pils *imap_le_struct;
++
++	if(ZEND_NUM_ARGS() != 2 || zend_get_parameters_ex(2, &streamind, &mailbox) == FAILURE) {
++		ZEND_WRONG_PARAM_COUNT();
++	}
++
++	ZEND_FETCH_RESOURCE(imap_le_struct, pils *, streamind, -1, "imap", le_imap);
++
++	convert_to_string_ex(mailbox);
++
++	IMAPG(imap_acl_list) = return_value;
++
++	/* set the callback for the GET_ACL function */
++	mail_parameters(NIL, SET_MYRIGHTS, (void *) mail_myrights);
++	if(!imap_myrights(imap_le_struct->imap_stream, Z_STRVAL_PP(mailbox))) {
++		php_error(E_WARNING, "c-client imap_myrights failed");
++		zval_dtor(return_value);
++		RETURN_FALSE;
++	}
++
++	IMAPG(imap_acl_list) = NIL;
++}
++/* }}} */
++
+ #endif /* HAVE_IMAP2000 || HAVE_IMAP2001 */
+ 
+ #if defined(HAVE_IMAP2005)
+diff -r 591dd6329e97 ext/imap/php_imap.h
+--- a/ext/imap/php_imap.h	Mon Dec 22 06:35:22 2008 +0100
++++ b/ext/imap/php_imap.h	Mon Dec 22 06:35:27 2008 +0100
+@@ -178,6 +178,7 @@
+ PHP_FUNCTION(imap_set_quota);
+ PHP_FUNCTION(imap_setacl);
+ PHP_FUNCTION(imap_getacl);
++PHP_FUNCTION(imap_myrights);
+ #endif
+ #if defined(HAVE_IMAP2005)
+ PHP_FUNCTION(imap_setannotation);

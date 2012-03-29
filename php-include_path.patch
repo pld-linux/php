@@ -1,0 +1,11 @@
+--- php-5.2.8/configure.in~	2008-12-16 22:27:12.000000000 +0200
++++ php-5.2.8/configure.in	2008-12-17 16:13:05.619902948 +0200
+@@ -1136,7 +1136,7 @@
+ EXPANDED_DATADIR=$datadir
+ EXPANDED_PHP_CONFIG_FILE_PATH=`eval echo "$PHP_CONFIG_FILE_PATH"`
+ EXPANDED_PHP_CONFIG_FILE_SCAN_DIR=`eval echo "$PHP_CONFIG_FILE_SCAN_DIR"`
+-INCLUDE_PATH=.:$EXPANDED_PEAR_INSTALLDIR
++INCLUDE_PATH=.:$EXPANDED_PEAR_INSTALLDIR:/usr/share/php
+ 
+ exec_prefix=$old_exec_prefix
+ libdir=$old_libdir

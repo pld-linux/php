@@ -105,94 +105,102 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
+%define		orgname	php
+%if "%{pld_release}" == "th"
+%define		php_suffix 52
+%else
+%define		php_suffix %{nil}
+%endif
+
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
 Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
-Name:		php
+Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
 Release:	13
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
 # Source0-md5:	b27947f3045220faf16e4d9158cbfe13
-Source2:	%{name}-mod_%{name}.conf
-Source3:	%{name}-cgi-fcgi.ini
-Source4:	%{name}-cgi.ini
-Source5:	%{name}-apache.ini
-Source6:	%{name}-cli.ini
+Source2:	%{orgname}-mod_%{orgname}.conf
+Source3:	%{orgname}-cgi-fcgi.ini
+Source4:	%{orgname}-cgi.ini
+Source5:	%{orgname}-apache.ini
+Source6:	%{orgname}-cli.ini
 # Taken from: http://browsers.garykeith.com/downloads.asp
-Source8:	%{name}_browscap.ini
+Source8:	%{orgname}_browscap.ini
 # lynx -dump ftp://distfiles.gentoo.org/pub/gentoo/distfiles/|grep -o ftp://.*php-patchset.*tar.bz2
-#Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{name}-patchset-%{version}-r1.tar.bz2
+#Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{orgname}-patchset-%{version}-r1.tar.bz2
 ## Source9-md5:	d67f23f5e69664e06fce89b064d5bbab
-Source10:	%{name}-fpm.init
-Source11:	%{name}-fpm.logrotate
-Source12:	%{name}-branch.sh
+Source10:	%{orgname}-fpm.init
+Source11:	%{orgname}-fpm.logrotate
+Source12:	%{orgname}-branch.sh
 Source13:	dep-tests.sh
 Source14:	skip-tests.sh
-Patch0:		%{name}-shared.patch
-Patch1:		%{name}-pldlogo.patch
-Patch2:		%{name}-mail.patch
-Patch3:		%{name}-link-libs.patch
-Patch4:		%{name}-libpq_fs_h_path.patch
-Patch5:		%{name}-filter-shared.patch
-Patch6:		%{name}-build_modules.patch
-Patch7:		%{name}-sapi-ini-file.patch
-Patch8:		%{name}-no-metaccld.patch
-Patch9:		%{name}-sh.patch
-Patch10:	%{name}-ini.patch
-Patch11:	%{name}-acam.patch
-Patch12:	%{name}-threads-acfix.patch
-Patch13:	%{name}-tsrmlsfetchgcc2.patch
-Patch14:	%{name}-no_pear_install.patch
-Patch15:	%{name}-zlib.patch
-Patch16:	%{name}-sybase-fix.patch
-Patch17:	%{name}-readline.patch
-Patch18:	%{name}-nohttpd.patch
-Patch19:	%{name}-gd_imagerotate_enable.patch
-Patch20:	%{name}-uint32_t.patch
-Patch21:	%{name}-dba-link.patch
-Patch22:	%{name}-both-apxs.patch
-Patch23:	%{name}-builddir.patch
-Patch24:	%{name}-zlib-for-getimagesize.patch
-Patch25:	%{name}-versioning.patch
-Patch26:	%{name}-pear.patch
-Patch27:	%{name}-config-dir.patch
-Patch28:	%{name}-bug-42952.patch
-Patch29:	%{name}-fcgi-graceful.patch
-Patch30:	%{name}-apr-apu.patch
-Patch31:	%{name}-fcgi-error_log-no-newlines.patch
-Patch32:	%{name}-curl-limit-speed.patch
-Patch33:	%{name}-mime_magic.patch
-Patch34:	%{name}-libtool.patch
-Patch35:	%{name}-tds.patch
-Patch36:	%{name}-mysql-charsetphpini.patch
-Patch37:	%{name}-mysqli-charsetphpini.patch
-Patch38:	%{name}-pdo_mysql-charsetphpini.patch
-Patch39:	%{name}-use-prog_sendmail.patch
-Patch40:	%{name}-fpm.patch
-Patch41:	%{name}-fpm-config.patch
-Patch42:	%{name}-fpm-initdir.patch
-Patch43:	%{name}-silent-session-cleanup.patch
-Patch44:	%{name}-include_path.patch
-Patch45:	%{name}-imap-annotations.patch
-Patch46:	%{name}-imap-myrights.patch
+Patch0:		%{orgname}-shared.patch
+Patch1:		%{orgname}-pldlogo.patch
+Patch2:		%{orgname}-mail.patch
+Patch3:		%{orgname}-link-libs.patch
+Patch4:		%{orgname}-libpq_fs_h_path.patch
+Patch5:		%{orgname}-filter-shared.patch
+Patch6:		%{orgname}-build_modules.patch
+Patch7:		%{orgname}-sapi-ini-file.patch
+Patch8:		%{orgname}-no-metaccld.patch
+Patch9:		%{orgname}-sh.patch
+Patch10:	%{orgname}-ini.patch
+Patch11:	%{orgname}-acam.patch
+Patch12:	%{orgname}-threads-acfix.patch
+Patch13:	%{orgname}-tsrmlsfetchgcc2.patch
+Patch14:	%{orgname}-no_pear_install.patch
+Patch15:	%{orgname}-zlib.patch
+Patch16:	%{orgname}-sybase-fix.patch
+Patch17:	%{orgname}-readline.patch
+Patch18:	%{orgname}-nohttpd.patch
+Patch19:	%{orgname}-gd_imagerotate_enable.patch
+Patch20:	%{orgname}-uint32_t.patch
+Patch21:	%{orgname}-dba-link.patch
+Patch22:	%{orgname}-both-apxs.patch
+Patch23:	%{orgname}-builddir.patch
+Patch24:	%{orgname}-zlib-for-getimagesize.patch
+Patch25:	%{orgname}-versioning.patch
+Patch26:	%{orgname}-pear.patch
+Patch27:	%{orgname}-config-dir.patch
+Patch28:	%{orgname}-bug-42952.patch
+Patch29:	%{orgname}-fcgi-graceful.patch
+Patch30:	%{orgname}-apr-apu.patch
+Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
+Patch32:	%{orgname}-curl-limit-speed.patch
+Patch33:	%{orgname}-mime_magic.patch
+Patch34:	%{orgname}-libtool.patch
+Patch35:	%{orgname}-tds.patch
+Patch36:	%{orgname}-mysql-charsetphpini.patch
+Patch37:	%{orgname}-mysqli-charsetphpini.patch
+Patch38:	%{orgname}-pdo_mysql-charsetphpini.patch
+Patch39:	%{orgname}-use-prog_sendmail.patch
+Patch40:	%{orgname}-fpm.patch
+Patch41:	%{orgname}-fpm-config.patch
+Patch42:	%{orgname}-fpm-initdir.patch
+Patch43:	%{orgname}-silent-session-cleanup.patch
+Patch44:	%{orgname}-include_path.patch
+Patch45:	%{orgname}-imap-annotations.patch
+Patch46:	%{orgname}-imap-myrights.patch
 Patch47:	suhosin.patch
-Patch49:	%{name}-m4-divert.patch
+Patch49:	%{orgname}-m4-divert.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
-Patch52:	%{name}-libpng.patch
-Patch53:	%{name}-gmp.patch
+Patch52:	%{orgname}-libpng.patch
+Patch53:	%{orgname}-gmp.patch
 Patch54:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
-Patch56:	%{name}-krb5.patch
+Patch56:	%{orgname}-krb5.patch
 Patch57:	php-php_dl.patch
 Patch58:	php-svn-281516.patch
-Patch59:	%{name}-systzdata.patch
+Patch59:	%{orgname}-systzdata.patch
+Patch60:	bug-60986.patch
 # http://spot.fedorapeople.org/php-5.3.6-libzip.patch
 Patch65:	system-libzip.patch
 Patch66:	bug-47930.patch
@@ -441,7 +449,7 @@ PHP - це мова написання скриптів, що вбудовуют
 роботи з базами даних є доволі простим. Найбільш популярне
 використання PHP - заміна для CGI скриптів.
 
-%package -n apache1-mod_php
+%package -n apache1-mod_php%{php_suffix}
 Summary:	PHP DSO module for Apache 1.3.x
 Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 1.3.x
 Group:		Development/Languages/PHP
@@ -453,13 +461,13 @@ Provides:	webserver(php) = %{version}
 Obsoletes:	apache-mod_php < 1:4.1.1
 Obsoletes:	phpfi
 
-%description -n apache1-mod_php
+%description -n apache1-mod_php%{php_suffix}
 PHP as DSO module for Apache 1.3.x.
 
-%description -n apache1-mod_php -l pl.UTF-8
+%description -n apache1-mod_php%{php_suffix} -l pl.UTF-8
 PHP jako moduł DSO (Dynamic Shared Object) dla Apache 1.3.x.
 
-%package -n apache-mod_php
+%package -n apache-mod_php%{php_suffix}
 Summary:	PHP DSO module for Apache 2.x
 Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 2.x
 Group:		Development/Languages/PHP
@@ -469,10 +477,10 @@ Requires:	apache-mod_mime
 Provides:	webserver(php) = %{version}
 Obsoletes:	phpfi
 
-%description -n apache-mod_php
+%description -n apache-mod_php%{php_suffix}
 PHP as DSO module for Apache 2.x.
 
-%description -n apache-mod_php -l pl.UTF-8
+%description -n apache-mod_php%{php_suffix} -l pl.UTF-8
 PHP jako moduł DSO (Dynamic Shared Object) dla Apache 2.x.
 
 %package fcgi
@@ -623,7 +631,10 @@ Requires:	libtool
 %{?with_pcre:Requires:	pcre-devel >= 6.6}
 Requires:	shtool
 Obsoletes:	php-pear-devel
+Obsoletes:	php-devel
 Obsoletes:	php4-devel
+Obsoletes:	php53-devel
+Obsoletes:	php54-devel
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.
@@ -1878,7 +1889,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q -n %{orgname}-%{version}
 # for suhosin patch
 %{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
 
@@ -1969,6 +1980,7 @@ done
 %patch57 -p1
 %patch58 -p4
 %patch59 -p1
+%patch60 -p4
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p2
 
@@ -2518,22 +2530,22 @@ rmdir $RPM_BUILD_ROOT/var/run/php
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -n apache1-mod_php
+%post -n apache1-mod_php%{php_suffix}
 if [ "$1" = "1" ]; then
 	%service -q apache restart
 fi
 
-%postun -n apache1-mod_php
+%postun -n apache1-mod_php%{php_suffix}
 if [ "$1" = "0" ]; then
 	%service -q apache restart
 fi
 
-%post -n apache-mod_php
+%post -n apache-mod_php%{php_suffix}
 if [ "$1" = "1" ]; then
 	%service -q httpd restart
 fi
 
-%postun -n apache-mod_php
+%postun -n apache-mod_php%{php_suffix}
 if [ "$1" = "0" ]; then
 	%service -q httpd restart
 fi
@@ -2574,7 +2586,7 @@ fi
 [ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
 
 %if %{with apache1}
-%triggerpostun -n apache1-mod_php -- php < 4:5.0.4-9.11
+%triggerpostun -n apache1-mod_php%{php_suffix} -- php < 4:5.0.4-9.11
 sed -i -e '
 	/^AddType application\/x-httpd-php \.php/s,^,#,
 	/^\(Add\|Load\)Module.*php5\.\(so\|c\)/d
@@ -2583,7 +2595,7 @@ sed -i -e '
 %endif
 
 %if %{with apache2}
-%triggerpostun -n apache-mod_php -- php < 4:5.0.4-7.1, php < 4:5.0.4-7.1
+%triggerpostun -n apache-mod_php%{php_suffix} -- php < 4:5.0.4-7.1
 # for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
 if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
 	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
@@ -2671,79 +2683,79 @@ fi
 %extension_scripts zip
 %extension_scripts zlib
 
-%triggerun bcmath -- %{name}-bcmath < 4:5.0.4-9.1
+%triggerun bcmath -- %{orgname}-bcmath < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*bcmath\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun calendar -- %{name}-calendar < 4:5.0.4-9.1
+%triggerun calendar -- %{orgname}-calendar < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*calendar\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun ctype -- %{name}-ctype < 4:5.0.4-9.1
+%triggerun ctype -- %{orgname}-ctype < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ctype\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun curl -- %{name}-curl < 4:5.0.4-9.1
+%triggerun curl -- %{orgname}-curl < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*curl\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun dba -- %{name}-dba < 4:5.0.4-9.1
+%triggerun dba -- %{orgname}-dba < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dba\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun dbase -- %{name}-dbase < 4:5.0.4-9.1
+%triggerun dbase -- %{orgname}-dbase < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dbase\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun dom -- %{name}-dom < 4:5.0.4-9.1
+%triggerun dom -- %{orgname}-dom < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*dom\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun exif -- %{name}-exif < 4:5.0.4-9.1
+%triggerun exif -- %{orgname}-exif < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*exif\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun fdf -- %{name}-fdf < 4:5.0.4-9.1
+%triggerun fdf -- %{orgname}-fdf < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*fdf\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun ftp -- %{name}-ftp < 4:5.0.4-9.1
+%triggerun ftp -- %{orgname}-ftp < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ftp\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun gd -- %{name}-gd < 4:5.0.4-9.1
+%triggerun gd -- %{orgname}-gd < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gd\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun gettext -- %{name}-gettext < 4:5.0.4-9.1
+%triggerun gettext -- %{orgname}-gettext < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gettext\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun gmp -- %{name}-gmp < 4:5.0.4-9.1
+%triggerun gmp -- %{orgname}-gmp < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*gmp\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun iconv -- %{name}-iconv < 4:5.0.4-9.1
+%triggerun iconv -- %{orgname}-iconv < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*iconv\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun imap -- %{name}-imap < 4:5.0.4-9.1
+%triggerun imap -- %{orgname}-imap < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*imap\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun interbase -- %{name}-interbase < 4:5.0.4-9.1
+%triggerun interbase -- %{orgname}-interbase < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*interbase\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun ldap -- %{name}-ldap < 4:5.0.4-9.1
+%triggerun ldap -- %{orgname}-ldap < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ldap\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun mbstring -- %{name}-mbstring < 4:5.0.4-9.1
+%triggerun mbstring -- %{orgname}-mbstring < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mbstring\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun mcrypt -- %{name}-mcrypt < 4:5.0.4-9.1
+%triggerun mcrypt -- %{orgname}-mcrypt < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mcrypt\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun mhash -- %{name}-mhash < 4:5.0.4-9.1
+%triggerun mhash -- %{orgname}-mhash < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mhash\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun mime_magic -- %{name}-mime_magic < 4:5.0.4-9.1
+%triggerun mime_magic -- %{orgname}-mime_magic < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mime_magic\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun ming -- %{name}-ming < 4:5.0.4-9.1
+%triggerun ming -- %{orgname}-ming < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ming\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun mssql -- %{name}-mssql < 4:5.0.4-9.1
+%triggerun mssql -- %{orgname}-mssql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mssql\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun mysql -- %{name}-mysql < 4:5.0.4-9.1
+%triggerun mysql -- %{orgname}-mysql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysql\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun ncurses -- %{name}-ncurses < 4:5.1.2-9.5
+%triggerun ncurses -- %{orgname}-ncurses < 4:5.1.2-9.5
 if [ -f %{_sysconfdir}/php-cgi.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cgi.ini
 fi
@@ -2751,19 +2763,19 @@ if [ -f %{_sysconfdir}/php-cli.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*ncurses\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
-%triggerun mysqli -- %{name}-mysqli < 4:5.0.4-9.1
+%triggerun mysqli -- %{orgname}-mysqli < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*mysqli\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun oci8 -- %{name}-oci8 < 4:5.0.4-9.1
+%triggerun oci8 -- %{orgname}-oci8 < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*oci8\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun odbc -- %{name}-odbc < 4:5.0.4-9.1
+%triggerun odbc -- %{orgname}-odbc < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*odbc\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun openssl -- %{name}-openssl < 4:5.0.4-9.1
+%triggerun openssl -- %{orgname}-openssl < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*openssl\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun pcntl -- %{name}-pcntl < 4:5.1.2-9.5
+%triggerun pcntl -- %{orgname}-pcntl < 4:5.1.2-9.5
 if [ -f %{_sysconfdir}/php-cgi.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cgi.ini
 fi
@@ -2771,19 +2783,19 @@ if [ -f %{_sysconfdir}/php-cli.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcntl\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
-%triggerun pcre -- %{name}-pcre < 4:5.0.4-9.1
+%triggerun pcre -- %{orgname}-pcre < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pcre\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun pgsql -- %{name}-pgsql < 4:5.0.4-9.1
+%triggerun pgsql -- %{orgname}-pgsql < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pgsql\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun posix -- %{name}-posix < 4:5.0.4-9.1
+%triggerun posix -- %{orgname}-posix < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*posix\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun pspell -- %{name}-pspell < 4:5.0.4-9.1
+%triggerun pspell -- %{orgname}-pspell < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*pspell\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun readline -- %{name}-readline < 4:5.1.2-9.5
+%triggerun readline -- %{orgname}-readline < 4:5.1.2-9.5
 if [ -f %{_sysconfdir}/php-cgi.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{_sysconfdir}/php-cgi.ini
 fi
@@ -2791,62 +2803,62 @@ if [ -f %{_sysconfdir}/php-cli.ini ]; then
 	%{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*readline\.so/d' %{_sysconfdir}/php-cli.ini
 fi
 
-%triggerun recode -- %{name}-recode < 4:5.0.4-9.1
+%triggerun recode -- %{orgname}-recode < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*recode\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun session -- %{name}-session < 4:5.0.4-9.1
+%triggerun session -- %{orgname}-session < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*session\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun shmop -- %{name}-shmop < 4:5.0.4-9.1
+%triggerun shmop -- %{orgname}-shmop < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*shmop\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun snmp -- %{name}-snmp < 4:5.0.4-9.1
+%triggerun snmp -- %{orgname}-snmp < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*snmp\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun soap -- %{name}-soap < 4:5.0.4-9.1
+%triggerun soap -- %{orgname}-soap < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*soap\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun sockets -- %{name}-sockets < 4:5.0.4-9.1
+%triggerun sockets -- %{orgname}-sockets < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sockets\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun sqlite -- %{name}-sqlite < 4:5.0.4-9.1
+%triggerun sqlite -- %{orgname}-sqlite < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sqlite\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun sybase -- %{name}-sybase < 4:5.0.4-9.1
+%triggerun sybase -- %{orgname}-sybase < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun sybase-ct -- %{name}-sybase-ct < 4:5.0.4-9.1
+%triggerun sybase-ct -- %{orgname}-sybase-ct < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sybase-ct\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun sysvmsg -- %{name}-sysvmsg < 4:5.0.4-9.1
+%triggerun sysvmsg -- %{orgname}-sysvmsg < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvmsg\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun sysvsem -- %{name}-sysvsem < 4:5.0.4-9.1
+%triggerun sysvsem -- %{orgname}-sysvsem < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvsem\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun sysvshm -- %{name}-sysvshm < 4:5.0.4-9.1
+%triggerun sysvshm -- %{orgname}-sysvshm < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*sysvshm\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun tidy -- %{name}-tidy < 4:5.0.4-9.1
+%triggerun tidy -- %{orgname}-tidy < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*tidy\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun wddx -- %{name}-wddx < 4:5.0.4-9.1
+%triggerun wddx -- %{orgname}-wddx < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*wddx\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun xml -- %{name}-xml < 4:5.0.4-9.1
+%triggerun xml -- %{orgname}-xml < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xml\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun xmlrpc -- %{name}-xmlrpc < 4:5.0.4-9.1
+%triggerun xmlrpc -- %{orgname}-xmlrpc < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xmlrpc\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun xsl -- %{name}-xsl < 4:5.0.4-9.1
+%triggerun xsl -- %{orgname}-xsl < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*xsl\.so/d' %{_sysconfdir}/php.ini
 
-%triggerun zlib -- %{name}-zlib < 4:5.0.4-9.1
+%triggerun zlib -- %{orgname}-zlib < 4:5.0.4-9.1
 %{__sed} -i -e '/^extension[[:space:]]*=[[:space:]]*zlib\.so/d' %{_sysconfdir}/php.ini
 
 %if %{with apache1}
-%files -n apache1-mod_php
+%files -n apache1-mod_php%{php_suffix}
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache.d
@@ -2855,7 +2867,7 @@ fi
 %endif
 
 %if %{with apache2}
-%files -n apache-mod_php
+%files -n apache-mod_php%{php_suffix}
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache2handler.d

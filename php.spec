@@ -110,7 +110,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	7
+%define		rel	1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -118,13 +118,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.10
+Version:	5.3.11
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	816259e5ca7d0a7e943e56a3bb32b17f
+# Source0-md5:	94709f6e7c920cbe26e19fa991d9975d
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -186,7 +186,6 @@ Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
-Patch55:	bug-52078-fileinode.patch
 Patch59:	%{name}-systzdata.patch
 Patch60:	%{name}-oracle-instantclient.patch
 Patch62:	mcrypt-libs.patch
@@ -194,7 +193,6 @@ Patch63:	%{name}-mysql-nowarning.patch
 Patch64:	%{name}-m4.patch
 # http://spot.fedorapeople.org/php-5.3.6-libzip.patch
 Patch65:	system-libzip.patch
-Patch66:	bug-60986.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1929,13 +1927,11 @@ cp -p php.ini-production php.ini
 %patch52 -p1
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
-%patch55 -p1
 %patch59 -p1
 %patch60 -p1
 %patch62 -p1
 %patch63 -p1
 %patch64 -p1
-%patch66 -p4
 %{?with_system_libzip:%patch65 -p1}
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/

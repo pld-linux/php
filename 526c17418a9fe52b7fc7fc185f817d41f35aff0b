@@ -1,0 +1,1 @@
+- up to 5.3.12; fixes cgi security bug (CVE-2012-1823)

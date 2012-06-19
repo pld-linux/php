@@ -118,13 +118,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.13
+Version:	5.3.14
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	370be99c5cdc2e756c82c44d774933c8
+# Source0-md5:	7caac4f71e2f21426c11ac153e538392
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini

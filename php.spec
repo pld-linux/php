@@ -2614,6 +2614,7 @@ fi
 %extension_scripts odbc
 %extension_scripts openssl
 %extension_scripts pcre
+%extension_scripts pdo
 %extension_scripts pdo-dblib
 %extension_scripts pdo-firebird
 %extension_scripts pdo-mysql
@@ -2622,11 +2623,13 @@ fi
 %extension_scripts pdo-sqlite
 %extension_scripts pgsql
 %extension_scripts phar
+%extension_scripts pcntl
 %extension_scripts posix
 %extension_scripts pspell
 %extension_scripts recode
 %extension_scripts session
 %extension_scripts shmop
+%extension_scripts simplexml
 %extension_scripts snmp
 %extension_scripts soap
 %extension_scripts sockets

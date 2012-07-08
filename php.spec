@@ -442,12 +442,17 @@ PHP jako interpreter działający z linii poleceń.
 
 %package embedded
 Summary:	PHP library for embedding in applications
+Summary(pl.UTF-8):	Biblioteka PHP do osadzania w aplikacjach
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 
 %description embedded
 The php-embedded package contains a library which can be embedded into
 applications to provide PHP scripting language support.
+
+%description embedded -l pl.UTF-8
+Ten pakiet zawiera  bibliotekę, którą można osadzać w aplikacjach w
+celu obsługi PHP jako języka skryptowego.
 
 %package program
 Summary:	/usr/bin/php symlink

@@ -2605,6 +2605,7 @@ fi
 %extension_scripts pdo
 %extension_scripts pdo-dblib
 %extension_scripts pdo-firebird
+%extension_scripts pdo-oci
 %extension_scripts pdo-mysql
 %extension_scripts pdo-odbc
 %extension_scripts pdo-pgsql

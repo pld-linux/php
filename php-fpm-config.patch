@@ -51,6 +51,15 @@
   
  ; The ping URI to call the monitoring page of FPM. If this value is not set, no
  ; URI will be recognized as a ping page. This could be used to test from outside
+@@ -449,7 +449,7 @@
+ ; Note: on highloaded environement, this can cause some delay in the page
+ ; process time (several ms).
+ ; Default Value: no
+-;catch_workers_output = yes
++catch_workers_output = yes
+ 
+ ; Limits the extensions of the main script FPM will allow to parse. This can
+ ; prevent configuration mistakes on the web server side. You should only limit
 @@ -463,7 +463,7 @@
  ; the current environment.
  ; Default Value: clean env

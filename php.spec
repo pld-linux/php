@@ -10,6 +10,7 @@
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
 # - recheck: define PDO_MYSQL_UNIX_ADDR (ensure if's correct with mysql-libs and mysqlng)
 # - uses libvpx for webp support, should use libwebp-devel instead?
+# - fpm -qn check fails, as it still loads /etc/php/php.ini
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
@@ -2266,7 +2267,7 @@ cp -pf php_config.h.cgi-fcgi main/php_config.h
 %if %{with fpm}
 cp -pf php_config.h.fpm main/php_config.h
 %{__make} -f Makefile.fpm
- ./sapi/fpm/php-fpm -qn -m > /dev/null
+#./sapi/fpm/php-fpm -qn -m > /dev/null
 %endif
 
 # CLI

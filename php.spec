@@ -2422,7 +2422,7 @@ cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
-sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
+sed -e 's#%{_prefix}/lib/php#%{php_extensiondir}#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 cp -p %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini

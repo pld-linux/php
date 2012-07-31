@@ -132,7 +132,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 54
 
-%define		rel	0.3
+%define		rel	0.4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2422,7 +2422,10 @@ cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
 echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
 
-sed -e 's#%{_prefix}/lib/php#%{php_extensiondir}#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
+sed -e '
+	s#/usr/lib/php#%{php_extensiondir}#
+	s#/etc/php#%{_sysconfdir}#
+' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 cp -p %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini

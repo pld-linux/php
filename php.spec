@@ -2269,20 +2269,22 @@ cp -af Makefile.cli Makefile
 %if %{with cgi}
 cp -pf php_config.h.cgi-fcgi main/php_config.h
 %{__make} -f Makefile.cgi-fcgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = "cgi-fcgi" ]
 %endif
 
 # PHP FPM
 %if %{with fpm}
 cp -pf php_config.h.fpm main/php_config.h
 %{__make} -f Makefile.fpm
-#./sapi/fpm/php-fpm -qn -m > /dev/null
+./sapi/fpm/php-fpm -n -m
+[ $(./sapi/fpm/php-fpm -n -m | grep cgi-fcgi) = "cgi-fcgi" ]
+
 %endif
 
 # CLI
 cp -pf php_config.h.cli main/php_config.h
 %{__make} -f Makefile.cli
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = "cli" ]
 
 # check for stupid xml parse breakage where &lt; and &gt; just get lost in parse result
 ./sapi/cli/php -n -dextension_dir=modules -dextension=xml.so -r '$p = xml_parser_create(); xml_parse_into_struct($p, "<x>&lt;</x>", $vals, $index); exit((int )empty($vals[0]["value"]));'

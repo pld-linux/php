@@ -18,6 +18,7 @@
 #        file /usr/bin/php.cli from install of php54-cli-5.4.5-0.2.i686 conflicts with file from package php-cli-5.3.14-1.i686
 #        file /usr/share/man/man1/php.1.gz from install of php54-cli-5.4.5-0.2.i686 conflicts with file from package php-cli-5.3.14-1.i686
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
+# - mysqlnd seems to be default on (and statically linked!)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
 # TODO:
@@ -132,7 +133,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 54
 
-%define		rel	0.5
+%define		rel	0.6
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2440,10 +2441,11 @@ cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 %endif
 
 # ensure that paths are correct for current php version and arch
+grep -El '/etc/php/|/usr/lib/php/' %{_sysconfdir}/*.ini | xargs -r \
 %{__sed} -i -e '
 	s#/usr/lib/php#%{php_extensiondir}#
 	s#/etc/php#%{_sysconfdir}#
-' $RPM_BUILD_ROOT%{_sysconfdir}/*.ini
+'
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 cp -p conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d

@@ -17,7 +17,6 @@
 #        file /usr/share/man/man8/php-fpm.8.gz from install of php54-fpm-5.4.5-0.2.i686 conflicts with file from package php-fpm-5.3.14-1.i686
 #        file /usr/bin/php.cli from install of php54-cli-5.4.5-0.2.i686 conflicts with file from package php-cli-5.3.14-1.i686
 #        file /usr/share/man/man1/php.1.gz from install of php54-cli-5.4.5-0.2.i686 conflicts with file from package php-cli-5.3.14-1.i686
-#        file /usr/bin/php.cgi from install of php54-cgi-5.4.5-0.2.i686 conflicts with file from package php-cgi-5.3.14-1.i686
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
@@ -133,7 +132,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 54
 
-%define		rel	0.2
+%define		rel	0.3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2392,8 +2391,8 @@ libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
 # install CGI/FCGI
 %if %{with cgi}
 # install-cgi
-libtool --mode=install install -p sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
-ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+libtool --mode=install install -p sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/%{name}.cgi
+ln -sf %{name}.cgi $RPM_BUILD_ROOT%{_bindir}/%{name}.fcgi
 cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
 
@@ -2678,8 +2677,8 @@ fi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cgi-fcgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
-%attr(755,root,root) %{_bindir}/php.cgi
-%attr(755,root,root) %{_bindir}/php.fcgi
+%attr(755,root,root) %{_bindir}/%{name}.cgi
+%attr(755,root,root) %{_bindir}/%{name}.fcgi
 %endif
 
 %if %{with embed}

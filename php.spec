@@ -394,7 +394,7 @@ PHP - це мова написання скриптів, що вбудовуют
 роботи з базами даних є доволі простим. Найбільш популярне
 використання PHP - заміна для CGI скриптів.
 
-%package -n apache1-mod_php%{php_suffix}
+%package -n apache1-mod_%{name}
 Summary:	PHP DSO module for Apache 1.3.x
 Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 1.3.x
 Group:		Development/Languages/PHP
@@ -406,13 +406,13 @@ Provides:	webserver(php) = %{version}
 Obsoletes:	apache-mod_php < 1:4.1.1
 Obsoletes:	phpfi
 
-%description -n apache1-mod_php%{php_suffix}
+%description -n apache1-mod_%{name}
 PHP as DSO module for Apache 1.3.x.
 
-%description -n apache1-mod_php%{php_suffix} -l pl.UTF-8
+%description -n apache1-mod_%{name} -l pl.UTF-8
 PHP jako moduł DSO (Dynamic Shared Object) dla Apache 1.3.x.
 
-%package -n apache-mod_php%{php_suffix}
+%package -n apache-mod_%{name}
 Summary:	PHP DSO module for Apache 2.x
 Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 2.x
 Group:		Development/Languages/PHP
@@ -422,10 +422,10 @@ Requires:	apache-mod_mime
 Provides:	webserver(php) = %{version}
 Obsoletes:	phpfi
 
-%description -n apache-mod_php%{php_suffix}
+%description -n apache-mod_%{name}
 PHP as DSO module for Apache 2.x.
 
-%description -n apache-mod_php%{php_suffix} -l pl.UTF-8
+%description -n apache-mod_%{name} -l pl.UTF-8
 PHP jako moduł DSO (Dynamic Shared Object) dla Apache 2.x.
 
 %package litespeed
@@ -2492,22 +2492,22 @@ sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_lib
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -n apache1-mod_php%{php_suffix}
+%post -n apache1-mod_%{name}
 if [ "$1" = "1" ]; then
 	%service -q apache restart
 fi
 
-%postun -n apache1-mod_php%{php_suffix}
+%postun -n apache1-mod_%{name}
 if [ "$1" = "0" ]; then
 	%service -q apache restart
 fi
 
-%post -n apache-mod_php%{php_suffix}
+%post -n apache-mod_%{name}
 if [ "$1" = "1" ]; then
 	%service -q httpd restart
 fi
 
-%postun -n apache-mod_php%{php_suffix}
+%postun -n apache-mod_%{name}
 if [ "$1" = "0" ]; then
 	%service -q httpd restart
 fi
@@ -2641,7 +2641,7 @@ fi
 %extension_scripts zlib
 
 %if %{with apache1}
-%files -n apache1-mod_php%{php_suffix}
+%files -n apache1-mod_%{name}
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache.d
@@ -2650,7 +2650,7 @@ fi
 %endif
 
 %if %{with apache2}
-%files -n apache-mod_php%{php_suffix}
+%files -n apache-mod_%{name}
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache2handler.d
@@ -2661,7 +2661,7 @@ fi
 %if %{with litespeed}
 %files litespeed
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_sbindir}/php.litespeed
+%attr(755,root,root) %{_sbindir}/%{name}.litespeed
 %endif
 
 %if %{with cgi}

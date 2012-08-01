@@ -2684,12 +2684,12 @@ fi
 %dir %{_sysconfdir}/cli.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
 %attr(755,root,root) %{_bindir}/php.cli
-%{_mandir}/man1/php.1*
 %{_mandir}/man1/php.cli.1*
 
 %files program
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/php
+%{_mandir}/man1/php.1*
 
 %if %{with fpm}
 %files fpm

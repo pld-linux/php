@@ -2244,7 +2244,7 @@ for sapi in $sapis; do
 done
 
 # as we build each SAPI in own make, adjust php-config.in forehead
-sapis=$(awk '/^PHP_SAPI = /{print $3}' Makefile.* | sort -u | xargs)
+sapis=$(awk '/^PHP_SAPI = /{print $3}' Makefile.* | sort -u | grep -v none | xargs)
 sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
 
 # must make libphp_common first, so modules can link against it.

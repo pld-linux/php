@@ -8,7 +8,6 @@
 # - dba: enable: --with-tcadb=DIR        DBA: Tokyo Cabinet abstract DB support
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
-# - recheck: define PDO_MYSQL_UNIX_ADDR (ensure if's correct with mysql-libs and mysqlng)
 # - uses libvpx for webp support, should use libwebp-devel instead?
 # - fpm -qn check fails, as it still loads /etc/php/php.ini
 # - co-install with php 5.3:
@@ -2278,7 +2277,6 @@ cp -pf php_config.h.fpm main/php_config.h
 %{__make} -f Makefile.fpm
 ./sapi/fpm/php-fpm -n -m
 [ $(./sapi/fpm/php-fpm -n -m | grep cgi-fcgi) = "cgi-fcgi" ]
-
 %endif
 
 # CLI

@@ -1,14 +1,14 @@
 #!/bin/sh
 #
-# php-fpm	PHP FastCGI Process Manager
+# @processname@	PHP FastCGI Process Manager
 #
 # chkconfig:	345 80 30
 #
 # description:	PHP FastCGI Process Manager
 #
-# processname:	php-fpm
+# processname:	@processname@
 # config:	/etc/php/fpm.conf
-# pidfile:	/var/run/php/fpm.pid
+# pidfile:	/var/run/php/@processname@.pid
 #
 
 # Source function library
@@ -17,31 +17,31 @@
 # Get network config
 . /etc/sysconfig/network
 
-pidfile=/var/run/php/php-fpm.pid
-lockfile=/var/lock/subsys/php-fpm
+pidfile=/var/run/php/@processname@.pid
+lockfile=/var/lock/subsys/@processname@
 
 start() {
 	# Check if the service is already running?
 	if [ -f $lockfile ]; then
-		msg_already_running "PHP FastCGI Process Manager"
+		msg_already_running "PHP FastCGI Process Manager (@processname@)"
 		return
 	fi
 
-	msg_starting "PHP FastCGI Process Manager"
-	daemon --pidfile $pidfile /usr/sbin/php-fpm --fpm-config /etc/php/php-fpm.conf
+	msg_starting "PHP FastCGI Process Manager (@processname@)"
+	daemon --pidfile $pidfile /usr/sbin/@processname@ --fpm-config /etc/php/php-fpm.conf
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch $lockfile
 }
 
 stop() {
 	if [ ! -f $lockfile ]; then
-		msg_not_running "PHP FastCGI Process Manager"
+		msg_not_running "PHP FastCGI Process Manager (@processname@)"
 		return
 	fi
 
 	# Stop daemons.
-	msg_stopping "PHP FastCGI Process Manager"
-	# always gracefully shut down php-fpm
+	msg_stopping "PHP FastCGI Process Manager (@processname@)"
+	# always gracefully shut down @processname@
 	/sbin/start-stop-daemon -q --stop -s QUIT --retry QUIT/600/TERM/10 --pidfile $pidfile
 	[ "$?" -eq 0 ] && ok || fail
 	rm -f $lockfile
@@ -51,19 +51,19 @@ reload() {
 	local sig=${1:-HUP}
 	local retnr=${2:-7}
 	if [ ! -f $lockfile ]; then
-		msg_not_running "PHP FastCGI Process Manager"
+		msg_not_running "PHP FastCGI Process Manager (@processname@)"
 		RETVAL=$retnr
 		return
 	fi
 
-	msg_reloading "PHP FastCGI Process Manager"
-	killproc --pidfile $pidfile php-fpm -$sig
+	msg_reloading "PHP FastCGI Process Manager (@processname@)"
+	killproc --pidfile $pidfile @processname@ -$sig
 	RETVAL=$?
 }
 
 condrestart() {
 	if [ ! -f $lockfile ]; then
-		msg_not_running "PHP FastCGI Process Manager"
+		msg_not_running "PHP FastCGI Process Manager (@processname@)"
 		RETVAL=$1
 		return
 	fi
@@ -95,7 +95,7 @@ case "$1" in
 	reload USR1 0
 	;;
   status)
-	status php-fpm
+	status @processname@
 	RETVAL=$?
 	;;
   *)

@@ -2420,10 +2420,10 @@ cp -p sapi/embed/php_embed.h $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
 %endif
 
 # install CLI
-libtool --mode=install install -p sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
-cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
-echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
-ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
+libtool --mode=install install -p sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/%{name}
+cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{name}.1
+echo ".so %{name}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
+ln -sf %{name} $RPM_BUILD_ROOT%{_bindir}/php
 
 cp -p php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
@@ -2683,8 +2683,8 @@ fi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cli.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
-%attr(755,root,root) %{_bindir}/php.cli
-%{_mandir}/man1/php.cli.1*
+%attr(755,root,root) %{_bindir}/%{name}
+%{_mandir}/man1/%{name}.1*
 
 %files program
 %defattr(644,root,root,755)

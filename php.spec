@@ -2452,7 +2452,7 @@ libtool --silent --mode=install install sapi/fcgi/php-cgi $RPM_BUILD_ROOT%{_bind
 
 # install FCGI PM
 %if %{with fpm}
-libtool --silent --mode=install install sapi/fpm/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.fpm
+libtool --silent --mode=install install sapi/fpm/php-cgi $RPM_BUILD_ROOT%{_sbindir}/php.fpm
 %{__make} install-fpm -f Makefile.fpm \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 install %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
@@ -2736,7 +2736,7 @@ fi
 %files fpm
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fpm.conf
-%attr(755,root,root) %{_bindir}/php.fpm
+%attr(755,root,root) %{_sbindir}/php-fpm
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/php-fpm
 %attr(754,root,root) /etc/rc.d/init.d/php-fpm
 %endif

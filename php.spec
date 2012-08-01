@@ -2560,13 +2560,13 @@ fi
 %useradd -u 51 -r -s /bin/false -c "HTTP User" -g http http
 
 %post fpm
-/sbin/chkconfig --add php-fpm
-%service php-fpm restart
+/sbin/chkconfig --add %{name}-fpm
+%service %{name}-fpm restart
 
 %preun fpm
 if [ "$1" = 0 ]; then
-	%service php-fpm stop
-	/sbin/chkconfig --del php-fpm
+	%service %{name}-fpm stop
+	/sbin/chkconfig --del %{name}-fpm
 fi
 
 %postun fpm

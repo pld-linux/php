@@ -2591,24 +2591,6 @@ fi
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
 [ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
 
-%if %{with apache1}
-%triggerpostun -n apache1-mod_php%{php_suffix} -- php < 4:5.0.4-9.11
-sed -i -e '
-	/^AddType application\/x-httpd-php \.php/s,^,#,
-	/^\(Add\|Load\)Module.*php5\.\(so\|c\)/d
-' /etc/apache/apache.conf
-%service -q apache restart
-%endif
-
-%if %{with apache2}
-%triggerpostun -n apache-mod_php%{php_suffix} -- php < 4:5.0.4-7.1
-# for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
-if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
-	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
-	mv -f %{_sysconfdir}/php-apache.ini.rpmsave %{_sysconfdir}/php-apache2handler.ini
-fi
-%endif
-
 # common macros called at extension post/postun scriptlet
 %define	extension_scripts() \
 %post %1 \

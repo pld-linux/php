@@ -2386,7 +2386,7 @@ libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT
 
 # install litespeed sapi
 %if %{with litespeed}
-libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/php.litespeed
+libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/%{name}.litespeed
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
@@ -2402,13 +2402,18 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 # install FCGI PM
 %if %{with fpm}
 install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
-libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
-cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8
+libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}/%{name}-fpm
+cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8/%{name}-fpm.8
 cp -p sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
-install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
+install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm
+%{__sed} -i -e '
+	s#/usr/lib/php#%{php_extensiondir}#
+	s#/etc/php#%{_sysconfdir}#
+	s#@processname@#%{name}-fpm#g
+' $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.conf
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
-cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
+cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 %endif
 
 # install Embedded API
@@ -2697,10 +2702,10 @@ fi
 %doc sapi/fpm/{CREDITS,LICENSE}
 %dir %{_sysconfdir}/fpm.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
-%attr(755,root,root) %{_sbindir}/php-fpm
-%{_mandir}/man8/php-fpm.8*
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/php-fpm
-%attr(754,root,root) /etc/rc.d/init.d/php-fpm
+%attr(755,root,root) %{_sbindir}/%{name}-fpm
+%{_mandir}/man8/%{name}-fpm.8*
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/%{name}-fpm
+%attr(754,root,root) /etc/rc.d/init.d/%{name}-fpm
 %endif
 
 %files common

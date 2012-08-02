@@ -5,7 +5,6 @@
 # - enable litespeed (needs api porting)
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
-# - dba: enable: --with-tcadb=DIR        DBA: Tokyo Cabinet abstract DB support
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
 # - uses libvpx for webp support, should use libwebp-devel instead?

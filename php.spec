@@ -2763,6 +2763,7 @@ fi
 
 %files dba
 %defattr(644,root,root,755)
+%doc ext/dba/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dba.ini
 %attr(755,root,root) %{php_extensiondir}/dba.so
 

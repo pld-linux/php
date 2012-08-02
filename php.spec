@@ -17,7 +17,6 @@
 #        file /usr/bin/php.cli from install of php54-cli-5.4.5-0.2.i686 conflicts with file from package php-cli-5.3.14-1.i686
 #        file /usr/share/man/man1/php.1.gz from install of php54-cli-5.4.5-0.2.i686 conflicts with file from package php-cli-5.3.14-1.i686
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
-# - mysqlnd seems to be default on (and statically linked!)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
 # TODO:
@@ -132,7 +131,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 54
 
-%define		rel	0.6
+%define		rel	0.14
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -237,7 +236,7 @@ BuildRequires:	elfutils-devel
 #BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10-3}
-BuildRequires:	mysql-devel
+%{!?with_mysqlnd:BuildRequires:	mysql-devel}
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
 %if %{with mssql} || %{with sybase_ct}
@@ -2167,7 +2166,7 @@ for sapi in $sapis; do
 %endif
 	%{?with_mhash:--with-mhash=yes} \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
-	--with-pdo-mysql=shared%{?with_mysqlnd:,mysqlnd} \
+	--with-pdo-mysql=shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd} \
 	%{?with_oci8:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
@@ -2205,9 +2204,9 @@ for sapi in $sapis; do
 	--with-mcrypt=shared \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
-	%{?with_mysqlnd:--with-mysqlnd=shared} \
-	--with-mysql=shared%{?with_mysqlnd:,mysqlnd} \
-	%{?with_mysqli:--with-mysqli=shared%{?with_mysqlnd:,mysqlnd}} \
+	%{?with_mysqlnd:--enable-mysqlnd=shared} \
+	--with-mysql=shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd} \
+	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_oci8:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \

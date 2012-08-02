@@ -120,7 +120,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	33
+Release:	34
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -495,6 +495,18 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs >= 1.4
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
+Provides:	%{name}(debug) = %{php_debug}
+Provides:	%{name}(modules_api) = %{php_api_version}
+Provides:	%{name}(thread-safety) = %{zend_zts}
+Provides:	%{name}(zend_extension_api) = %{zend_extension_api}
+Provides:	%{name}(zend_module_api) = %{zend_module_api}
+Provides:	%{name}-core
+Provides:	%{name}-date
+Provides:	%{name}-ereg
+%{?with_zend_multibyte:Provides:	%{name}-mbstring = %{epoch}:%{version}-%{release}}
+Provides:	%{name}-overload
+Provides:	%{name}-reflection
+Provides:	%{name}-standard
 Provides:	php(core) = %{version}
 Provides:	php(date)
 Provides:	php(ereg)
@@ -504,17 +516,6 @@ Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(overload)
 Provides:	php(reflection)
 Provides:	php(standard)
-Provides:	php(zend_extension_api) = %{zend_extension_api}
-Provides:	php(zend_module_api) = %{zend_module_api}
-Provides:	php-core
-Provides:	php-date
-Provides:	php-ereg
-%{?with_zend_multibyte:Provides:	php-mbstring = %{epoch}:%{version}-%{release}}
-Provides:	php-overload
-Provides:	php-reflection
-Provides:	php-standard
-Provides:	php5(debug) = %{php_debug}
-Provides:	php5(thread-safety) = %{zend_zts}
 # ensure backward compatibility for Titanium
 # to be dropped in future but ask Titanium RM before doing so
 %if "%{pld_release}" == "ti"
@@ -527,6 +528,8 @@ Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 %endif
+%{!?with_mysqlnd:Obsoletes:	php-mysqlnd}
+%{?with_pcre:%requires_ge_to	pcre pcre-devel}
 Obsoletes:	php-pecl-domxml
 Conflicts:	php-pecl-memcache < 3.0.4-2
 Conflicts:	php4-common < 3:4.4.4-8
@@ -624,9 +627,9 @@ Summary(pl.UTF-8):	Moduł bzip2 dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.bzip2.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	%{name}-bzip2 = %{epoch}:%{version}-%{release}
 Provides:	php(bz2)
 Provides:	php(bzip2)
-Provides:	php-bzip2 = %{epoch}:%{version}-%{release}
 Obsoletes:	php-bzip2
 
 %description bz2
@@ -719,8 +722,8 @@ URL:		http://www.php.net/manual/en/book.dom.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dom)
 # it has some compatibility functions
+Provides:	%{name}-domxml = %{epoch}:%{version}-%{release}
 Provides:	php(domxml)
-Provides:	php-domxml = %{epoch}:%{version}-%{release}
 Obsoletes:	php-domxml <= 3:4.3.8-1
 
 %description dom
@@ -1795,9 +1798,9 @@ Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+%{?with_system_libzip:Requires:	libzip >= 0.10-3}
 Provides:	php(zip)
 Obsoletes:	php-pecl-zip
-%{?with_system_libzip:Requires:	libzip >= 0.10-3}
 
 %description zip
 Zip is an extension to create, modify and read zip files.

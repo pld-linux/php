@@ -1,5 +1,5 @@
---- php-5.3.9/php.ini~	2012-01-11 21:35:14.000000000 +0200
-+++ php-5.3.9/php.ini	2012-01-11 21:35:49.227068991 +0200
+--- php-5.3.15/php.ini~	2012-08-02 03:24:53.000000000 +0300
++++ php-5.3.15/php.ini	2012-08-02 03:31:32.384194939 +0300
 @@ -223,7 +223,7 @@
  ; Development Value: Off
  ; Production Value: Off
@@ -27,12 +27,10 @@
  ; On windows:
  ; extension_dir = "ext"
  
-@@ -812,54 +812,7 @@
- ; properly in multithreaded servers, such as IIS or Zeus, and is automatically
- ; disabled on them.
+@@ -826,53 +826,6 @@
  ; http://php.net/enable-dl
--enable_dl = Off
--
+ enable_dl = Off
+ 
 -; cgi.force_redirect is necessary to provide security running PHP as a CGI under
 -; most web servers.  Left undefined, PHP turns this on by default.  You can
 -; turn it off here AT YOUR OWN RISK
@@ -49,7 +47,7 @@
 -; will look for to know it is OK to continue execution.  Setting this variable MAY
 -; cause security issues, KNOW WHAT YOU ARE DOING FIRST.
 -; http://php.net/cgi.redirect-status-env
--;cgi.redirect_status_env = ;
+-;cgi.redirect_status_env =
 -
 -; cgi.fix_pathinfo provides *real* PATH_INFO/PATH_TRANSLATED support for CGI.  PHP's
 -; previous behaviour was to set PATH_TRANSLATED to SCRIPT_FILENAME, and to not grok
@@ -66,7 +64,7 @@
 -; does not currently support this feature (03/17/2002)
 -; Set to 1 if running under IIS.  Default is zero.
 -; http://php.net/fastcgi.impersonate
--;fastcgi.impersonate = 1;
+-;fastcgi.impersonate = 1
 -
 -; Disable logging through FastCGI connection. PHP's default behavior is to enable
 -; this feature.
@@ -79,10 +77,10 @@
 -; Default is zero.
 -; http://php.net/cgi.rfc2616-headers
 -;cgi.rfc2616_headers = 0
-+enable_dl = Off
- 
+-
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
+ ;;;;;;;;;;;;;;;;
 @@ -876,11 +876,7 @@
  ;
  ;   extension=modulename.extension

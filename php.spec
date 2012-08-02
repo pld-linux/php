@@ -110,7 +110,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	2
+%define		rel	1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -118,13 +118,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		php
-Version:	5.3.14
+Version:	5.3.15
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
-# Source0-md5:	7caac4f71e2f21426c11ac153e538392
+# Source0-md5:	5cfcfd0fa4c4da7576f397073e7993cc
 Source2:	%{name}-mod_%{name}.conf
 Source3:	%{name}-cgi-fcgi.ini
 Source4:	%{name}-apache.ini
@@ -297,7 +297,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		1.2.1
 %define		pharver		2.0.1
 %define		sqlitever	2.0-dev
-%define		zipver		1.9.1
+%define		zipver		1.11.0
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -2282,7 +2282,7 @@ cp -pf php_config.h.cgi-fcgi main/php_config.h
 %if %{with fpm}
 cp -pf php_config.h.fpm main/php_config.h
 %{__make} -f Makefile.fpm
- ./sapi/fpm/php-fpm -qn -m > /dev/null
+[ $(./sapi/fpm/php-fpm -n -m | grep cgi-fcgi) = "cgi-fcgi" ]
 %endif
 
 # CLI

@@ -131,7 +131,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 54
 
-%define		rel	0.14
+%define		rel	0.15
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2242,8 +2242,8 @@ for sapi in $sapis; do
 done
 
 # as we build each SAPI in own make, adjust php-config.in forehead
-sapis=$(awk '/^PHP_SAPI = /{print $3}' Makefile.* | sort -u | grep -v none | xargs)
-sed -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," "scripts/php-config.in"
+sapis=$(%{__sed} -rne 's/^PHP_INSTALLED_SAPIS = (.+)/\1/p' Makefile.* | tr ' ' '\n' | sort -u | xargs)
+%{__sed} -i -e "s,@PHP_INSTALLED_SAPIS@,$sapis," scripts/php-config.in
 
 # must make libphp_common first, so modules can link against it.
 cp -af php_config.h.cli main/php_config.h

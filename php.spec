@@ -527,21 +527,21 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
+Provides:	%{name}(debug) = %{php_debug}
+Provides:	%{name}(modules_api) = %{php_api_version}
+Provides:	%{name}(thread-safety) = %{zend_zts}
+Provides:	%{name}(zend_extension_api) = %{zend_extension_api}
+Provides:	%{name}(zend_module_api) = %{zend_module_api}
+Provides:	%{name}-date
+Provides:	%{name}-ereg
+Provides:	%{name}-reflection
+Provides:	%{name}-standard
 Provides:	php(date)
 Provides:	php(ereg)
 Provides:	php(hash)
 Provides:	php(libxml)
-Provides:	php(modules_api) = %{php_api_version}
 Provides:	php(reflection)
 Provides:	php(standard)
-Provides:	php(zend_extension_api) = %{zend_extension_api}
-Provides:	php(zend_module_api) = %{zend_module_api}
-Provides:	php-date
-Provides:	php-ereg
-Provides:	php-reflection
-Provides:	php-standard
-Provides:	php5(debug) = %{php_debug}
-Provides:	php5(thread-safety) = %{zend_zts}
 %{!?with_mysqlnd:Obsoletes:	php-mysqlnd}
 %{?with_pcre:%requires_ge_to	pcre pcre-devel}
 Obsoletes:	php-pecl-domxml
@@ -721,8 +721,8 @@ URL:		http://www.php.net/manual/en/book.dom.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dom)
 # it has some compatibility functions
+Provides:	%{name}-domxml = %{epoch}:%{version}-%{release}
 Provides:	php(domxml)
-Provides:	php-domxml = %{epoch}:%{version}-%{release}
 Obsoletes:	php-domxml <= 3:4.3.8-1
 
 %description dom

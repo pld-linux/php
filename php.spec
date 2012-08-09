@@ -2936,7 +2936,7 @@ fi
 %if %{with oci8}
 %files oci8
 %defattr(644,root,root,755)
-%doc ext/ico8/{CREDITS,README}
+%doc ext/oci8/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/oci8.ini
 %attr(755,root,root) %{php_extensiondir}/oci8.so
 %endif

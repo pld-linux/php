@@ -2577,6 +2577,19 @@ fi
 %post	common -p /sbin/ldconfig
 %postun	common -p /sbin/ldconfig
 
+%post common
+# PHP 5.3 requires timezone being setup, try setup it from tzdata
+if ! grep -q '^date.timezone[[:space:]]*=' %{_sysconfdir}/php.ini; then
+	if [ -f /etc/sysconfig/timezone ]; then
+		TIMEZONE=
+		. /etc/sysconfig/timezone
+	else
+		TIMEZONE=System/Localtime
+	fi
+
+	%{__sed} -i -e "s,^;date.timezone[[:space:]]*=.*,date.timezone = $TIMEZONE," %{_sysconfdir}/php.ini
+fi
+
 %posttrans common
 # minimizing apache restarts logics. we restart webserver:
 #

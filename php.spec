@@ -19,6 +19,10 @@
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
 # TODO:
+# - fileinfo extension bundles magic db in library: data_file.c (dump of magic.mgc) is 14M
+#   - 2.3M fileinfo.so php54-fileinfo-5.4.6-0.15.x86_64
+#   - 2.3M fileinfo.so php-fileinfo-5.3.16-1.x86_64
+#   -  13K fileinfo.so php-pecl-fileinfo-1.0.4-8.amd64
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
 # - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere

@@ -135,7 +135,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 54
 
-%define		rel	0.15
+%define		rel	0.16
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -222,7 +222,6 @@ Patch60:	%{orgname}-oracle-instantclient.patch
 Patch62:	mcrypt-libs.patch
 Patch63:	%{orgname}-mysql-nowarning.patch
 #Patch64:	%{orgname}-m4.patch # not needed on 5.4 branch
-# http://spot.fedorapeople.org/php-5.3.6-libzip.patch
 Patch65:	system-libzip.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -239,7 +238,7 @@ BuildRequires:	elfutils-devel
 #BuildRequires:	fcgi-devel
 #BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
-%{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10-3}
+%{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
 %{!?with_mysqlnd:BuildRequires:	mysql-devel}
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
@@ -1845,7 +1844,7 @@ Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%{?with_system_libzip:Requires:	libzip >= 0.10-3}
+%{?with_system_libzip:Requires:	libzip >= 0.10.1-2}
 Provides:	php(zip) = %{zipver}
 Obsoletes:	php-pecl-zip < %{zipver}
 

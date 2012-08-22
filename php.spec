@@ -54,8 +54,8 @@
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
 %bcond_without	curl		# without CURL extension module
-%bcond_without	filter		# without filter extension module
 %bcond_without	enchant		# without Enchant extension module
+%bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	kerberos5	# without Kerberos5 support
@@ -80,6 +80,7 @@
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
+%bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	apache1		# disable building Apache 1.3.x SAPI
@@ -259,7 +260,7 @@ BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
 #BuildRequires:	libtiff-devel
-BuildRequires:	libvpx-devel
+%{?with_webp:BuildRequires:	libvpx-devel}
 BuildRequires:	tokyocabinet-devel
 %if "%{pld_release}" != "ac"
 BuildRequires:	libtool >= 2:2.2
@@ -2174,7 +2175,7 @@ for sapi in $sapis; do
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
-	--with-vpx-dir=/usr \
+	%{?with_webp:--with-vpx-dir=/usr} \
 	--without-libexpat-dir \
 	--enable-posix=shared \
 	--enable-shared \

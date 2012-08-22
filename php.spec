@@ -275,7 +275,6 @@ BuildRequires:	apr-util-devel >= 1:1.0.0
 %endif
 %if %{with fpm}
 #BuildRequires:	judy-devel
-BuildRequires:	libevent-devel >= 1.4.7-3
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -477,7 +476,6 @@ Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	libevent >= 1.4.7-3
 Requires:	rc-scripts
 Provides:	user(http)
 Provides:	webserver(php) = %{version}

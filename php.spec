@@ -1,7 +1,6 @@
 # TODO 5.4:
 # - do not remove PatchX: definitions until merged to HEAD, needed for tracking their state
 # - check php-sapi-ini-file.patch for safe mode removal
-# - enable suhoshin patch (needs api porting)
 # - enable litespeed (needs api porting)
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
@@ -90,7 +89,7 @@
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_with	embed		# disable Embedded API
-%bcond_with	suhosin		# with suhosin patch
+%bcond_without	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_with	type_hints	# experimental support for strict typing/casting
@@ -1873,8 +1872,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q -n %{orgname}-%{version}
-# prep for suhosin patch
-%undos Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1

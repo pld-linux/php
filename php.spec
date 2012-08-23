@@ -58,6 +58,7 @@
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
+%bcond_without	intl		# without Intl extension module
 %bcond_without	kerberos5	# without Kerberos5 support
 %bcond_with	litespeed	# build litespeed module
 %bcond_without	ldap		# without LDAP extension module
@@ -253,7 +254,7 @@ BuildRequires:	gd-devel(imagerotate) = 5.2.0
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
-BuildRequires:	libicu-devel
+%{?with_intl:BuildRequires:	libicu-devel}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
@@ -2146,7 +2147,7 @@ for sapi in $sapis; do
 	--enable-fileinfo=shared \
 	--enable-ftp=shared \
 	--enable-gd-native-ttf \
-	--enable-intl=shared \
+	%{?with_intl:--enable-intl=shared} \
 	--enable-libxml \
 	--enable-mbstring=shared,all \
 	--enable-mbregex \
@@ -2856,11 +2857,13 @@ fi
 %attr(755,root,root) %{php_extensiondir}/interbase.so
 %endif
 
+%if %{with intl}
 %files intl
 %defattr(644,root,root,755)
 %doc ext/intl/{CREDITS,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/intl.ini
 %attr(755,root,root) %{php_extensiondir}/intl.so
+%endif
 
 %files json
 %defattr(644,root,root,755)

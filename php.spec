@@ -7,13 +7,6 @@
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
 # - uses libvpx for webp support, should use libwebp-devel instead?
-# - fpm -qn check fails, as it still loads /etc/php/php.ini
-# - co-install with php 5.3:
-#        file /etc/rc.d/init.d/php-fpm from install of php54-fpm-5.4.5-0.2.i686 conflicts with file from package php-fpm-5.3.14-1.i686
-#        file /usr/sbin/php-fpm from install of php54-fpm-5.4.5-0.2.i686 conflicts with file from package php-fpm-5.3.14-1.i686
-#        file /usr/share/man/man8/php-fpm.8.gz from install of php54-fpm-5.4.5-0.2.i686 conflicts with file from package php-fpm-5.3.14-1.i686
-#        file /usr/bin/php.cli from install of php54-cli-5.4.5-0.2.i686 conflicts with file from package php-cli-5.3.14-1.i686
-#        file /usr/share/man/man1/php.1.gz from install of php54-cli-5.4.5-0.2.i686 conflicts with file from package php-cli-5.3.14-1.i686
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only

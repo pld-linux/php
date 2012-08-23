@@ -2333,11 +2333,6 @@ cp -pf Makefile.cli Makefile
 exit 1
 %endif
 
-%if %{with tests}
-# Run tests, using the CLI SAPI
-cp -pf php_config.h.cli main/php_config.h
-cp -pf Makefile.cli Makefile
-
 cat <<'EOF' > run-tests.sh
 #!/bin/sh
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
@@ -2348,6 +2343,12 @@ unset TZ LANG LC_ALL || :
 	RUN_TESTS_SETTINGS="-q $*"
 EOF
 chmod +x run-tests.sh
+
+%if %{with tests}
+# Run tests, using the CLI SAPI
+cp -pf php_config.h.cli main/php_config.h
+cp -pf Makefile.cli Makefile
+
 ./run-tests.sh -w failed.log -s test.log
 
 # collect failed tests into cleanup script used in prep.

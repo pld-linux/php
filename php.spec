@@ -2471,10 +2471,9 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 
 # install CLI
 libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
-install sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.1
-echo ".so php.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
-
 ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
+cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
+echo ".so php.cli.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 %if %{with fcgi}

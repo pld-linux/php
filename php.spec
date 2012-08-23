@@ -128,7 +128,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 54
 
-%define		rel	0.16
+%define		rel	0.17
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -527,10 +527,12 @@ Provides:	%{name}(modules_api) = %{php_api_version}
 Provides:	%{name}(thread-safety) = %{zend_zts}
 Provides:	%{name}(zend_extension_api) = %{zend_extension_api}
 Provides:	%{name}(zend_module_api) = %{zend_module_api}
+Provides:	%{name}-core
 Provides:	%{name}-date
 Provides:	%{name}-ereg
 Provides:	%{name}-reflection
 Provides:	%{name}-standard
+Provides:	php(core) = %{version}
 Provides:	php(date)
 Provides:	php(ereg)
 Provides:	php(hash)

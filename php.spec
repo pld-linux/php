@@ -120,7 +120,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	13
+Release:	14
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -564,6 +564,7 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
+Provides:	php(core) = %{version}
 Provides:	php(date)
 Provides:	php(ereg)
 Provides:	php(libxml)
@@ -574,6 +575,7 @@ Provides:	php(reflection)
 Provides:	php(standard)
 Provides:	php(zend_extension_api) = %{zend_extension_api}
 Provides:	php(zend_module_api) = %{zend_module_api}
+Provides:	php-core
 Provides:	php-date
 Provides:	php-ereg
 %{?with_zend_multibyte:Provides:	php-mbstring = %{epoch}:%{version}-%{release}}
@@ -630,8 +632,8 @@ Requires:	libtool
 %endif
 %{?with_pcre:Requires:	pcre-devel >= 6.6}
 Requires:	shtool
-Obsoletes:	php-pear-devel
 Obsoletes:	php-devel
+Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel
 Obsoletes:	php53-devel
 Obsoletes:	php54-devel

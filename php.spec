@@ -110,7 +110,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	1
+%define		rel	2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -450,7 +450,7 @@ The php-embedded package contains a library which can be embedded into
 applications to provide PHP scripting language support.
 
 %description embedded -l pl.UTF-8
-Ten pakiet zawiera  bibliotekę, którą można osadzać w aplikacjach w
+Ten pakiet zawiera bibliotekę, którą można osadzać w aplikacjach w
 celu obsługi PHP jako języka skryptowego.
 
 %package program
@@ -503,10 +503,12 @@ Provides:	%{name}(modules_api) = %{php_api_version}
 Provides:	%{name}(thread-safety) = %{zend_zts}
 Provides:	%{name}(zend_extension_api) = %{zend_extension_api}
 Provides:	%{name}(zend_module_api) = %{zend_module_api}
+Provides:	%{name}-core
 Provides:	%{name}-date
 Provides:	%{name}-ereg
 Provides:	%{name}-reflection
 Provides:	%{name}-standard
+Provides:	php(core) = %{version}
 Provides:	php(date)
 Provides:	php(ereg)
 Provides:	php(hash)
@@ -548,8 +550,8 @@ Requires:	libtool >= 2:2.2
 %else
 Requires:	libtool
 %endif
-%{?with_pcre:Requires:	pcre-devel >= 8.10}
 %{?with_embed:Requires:	%{name}-embedded = %{epoch}:%{version}-%{release}}
+%{?with_pcre:Requires:	pcre-devel >= 8.10}
 Requires:	shtool
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel

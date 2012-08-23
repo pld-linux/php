@@ -1965,6 +1965,15 @@ sed -i -e 's#-fvisibility=hidden##g' configure*
 # says just "Terminated" twice and fails
 mv sapi/cli/tests/022.phpt{,.broken}
 
+# really dumb test, executable binary name is .libs/ something when building
+# https://bugs.php.net/bug.php?id=54514
+mv tests/basic/bug54514.phpt{,.disable}
+
+# breaks whole testsuite unexpectedly:
+# Fatal error: Call to undefined function gzencode() in run-tests.php on line 1714
+# probably broken as zlib is built as shared
+mv ext/soap/tests/server019.phpt{,disable}
+
 # php-5.3.3/ext/standard/tests/file/statpage.phpt
 %{__rm} ext/standard/tests/file/statpage.phpt
 

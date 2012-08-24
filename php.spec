@@ -1973,6 +1973,8 @@ mv tests/basic/bug54514.phpt{,.disable}
 # Fatal error: Call to undefined function gzencode() in run-tests.php on line 1714
 # probably broken as zlib is built as shared
 mv ext/soap/tests/server019.phpt{,disable}
+# Fatal error: Call to undefined function gzcompress() in run-tests.php on line 1728
+mv ext/soap/tests/server020.phpt{,disable}
 
 # runs out of memory and kills carme vserver
 # PASS Bug #39438 (Fatal error: Out of memory) [Zend/tests/bug39438.phpt]

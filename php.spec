@@ -2449,7 +2449,7 @@ cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 %endif
 
 # ensure that paths are correct for current php version and arch
-grep -El '/etc/php/|/usr/lib/php/' %{_sysconfdir}/*.ini | xargs -r \
+grep -El '/etc/php/|/usr/lib/php/' $RPM_BUILD_ROOT%{_sysconfdir}/*.ini | xargs -r \
 %{__sed} -i -e '
 	s#/usr/lib/php#%{php_extensiondir}#
 	s#/etc/php#%{_sysconfdir}#

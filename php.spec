@@ -1974,6 +1974,10 @@ mv tests/basic/bug54514.phpt{,.disable}
 # probably broken as zlib is built as shared
 mv ext/soap/tests/server019.phpt{,disable}
 
+# runs out of memory and kills carme vserver
+# PASS Bug #39438 (Fatal error: Out of memory) [Zend/tests/bug39438.phpt]
+mv Zend/tests/bug39438.phpt{,.disable}
+
 # php-5.3.3/ext/standard/tests/file/statpage.phpt
 %{__rm} ext/standard/tests/file/statpage.phpt
 

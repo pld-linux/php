@@ -1,4 +1,6 @@
 #!/bin/sh
+# timezone_location_get: Test that timezone_location_get returns a correct array of information
+mv ext/date/tests/timezone_location_get.phpt{,.skip}
 # DBA DB4 magic_quotes_runtime Test (info: DB4 handler used)
 mv ext/dba/tests/dba_db4_010.phpt{,.skip}
 # DBA TCADB handler test
@@ -147,5 +149,7 @@ mv ext/xmlrpc/tests/bug45556.phpt{,.skip}
 mv sapi/cgi/tests/apache_request_headers.phpt{,.skip}
 # show information about extension
 mv sapi/cli/tests/006.phpt{,.skip}
+# Bug #61546 (functions related to current script failed when chdir() in cli sapi)
+mv sapi/cli/tests/bug61546.phpt{,.skip}
 # Bug #60591 (Memory leak when access a non-exists file)
 mv sapi/cli/tests/php_cli_server_016.phpt{,.skip}

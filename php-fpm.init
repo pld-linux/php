@@ -28,7 +28,7 @@ start() {
 	fi
 
 	msg_starting "PHP FastCGI Process Manager (@processname@)"
-	daemon --pidfile $pidfile /usr/sbin/@processname@ --fpm-config /etc/php/php-fpm.conf
+	daemon --pidfile $pidfile /usr/sbin/@processname@ --fpm-config /etc/php/fpm.conf
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch $lockfile
 }

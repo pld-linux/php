@@ -110,6 +110,13 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
+%define		orgname	php
+%if "%{pld_release}" == "ac"
+%define		php_suffix 53
+%else
+%define		php_suffix %{nil}
+%endif
+
 %define		rel	2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -117,80 +124,80 @@ Summary(pl.UTF-8):	Język skryptowy PHP
 Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
-Name:		php
+Name:		%{orgname}%{php_suffix}
 Version:	5.3.16
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{name}-%{version}.tar.bz2
+Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
 # Source0-md5:	99cfd78531643027f60c900e792d21be
-Source2:	%{name}-mod_%{name}.conf
-Source3:	%{name}-cgi-fcgi.ini
-Source4:	%{name}-apache.ini
-Source5:	%{name}-cli.ini
+Source2:	%{orgname}-mod_%{orgname}.conf
+Source3:	%{orgname}-cgi-fcgi.ini
+Source4:	%{orgname}-apache.ini
+Source5:	%{orgname}-cli.ini
 # Taken from: http://browsers.garykeith.com/downloads.asp
-Source9:	%{name}_browscap.ini
-Source10:	%{name}-fpm.init
-Source11:	%{name}-fpm.logrotate
-Source12:	%{name}-branch.sh
+Source9:	%{orgname}_browscap.ini
+Source10:	%{orgname}-fpm.init
+Source11:	%{orgname}-fpm.logrotate
+Source12:	%{orgname}-branch.sh
 Source13:	dep-tests.sh
 Source14:	skip-tests.sh
-Source15:	http://litespeedtech.com/packages/lsapi/%{name}-litespeed-%{litespeed_version}.tgz
+Source15:	http://litespeedtech.com/packages/lsapi/%{orgname}-litespeed-%{litespeed_version}.tgz
 # Source15-md5:	9d58485d5fd6b5f5fefcec41b9ce283e
-Patch0:		%{name}-shared.patch
-Patch1:		%{name}-pldlogo.patch
-Patch2:		%{name}-mail.patch
-Patch3:		%{name}-link-libs.patch
-Patch4:		%{name}-libpq_fs_h_path.patch
-Patch5:		%{name}-filter-shared.patch
-Patch6:		%{name}-build_modules.patch
-Patch7:		%{name}-sapi-ini-file.patch
-Patch8:		%{name}-config-file-scan-dir.patch
-Patch9:		%{name}-sh.patch
-Patch10:	%{name}-ini.patch
+Patch0:		%{orgname}-shared.patch
+Patch1:		%{orgname}-pldlogo.patch
+Patch2:		%{orgname}-mail.patch
+Patch3:		%{orgname}-link-libs.patch
+Patch4:		%{orgname}-libpq_fs_h_path.patch
+Patch5:		%{orgname}-filter-shared.patch
+Patch6:		%{orgname}-build_modules.patch
+Patch7:		%{orgname}-sapi-ini-file.patch
+Patch8:		%{orgname}-config-file-scan-dir.patch
+Patch9:		%{orgname}-sh.patch
+Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 %if %{with type_hints}
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
-Patch14:	%{name}-no_pear_install.patch
-Patch15:	%{name}-zlib.patch
-Patch17:	%{name}-readline.patch
-Patch18:	%{name}-nohttpd.patch
-Patch19:	%{name}-gd_imagerotate_enable.patch
-Patch20:	%{name}-uint32_t.patch
-Patch21:	%{name}-dba-link.patch
-Patch22:	%{name}-both-apxs.patch
-Patch23:	%{name}-builddir.patch
-Patch24:	%{name}-zlib-for-getimagesize.patch
-Patch25:	%{name}-stupidapache_version.patch
-Patch26:	%{name}-pear.patch
-Patch27:	%{name}-config-dir.patch
-Patch29:	%{name}-fcgi-graceful.patch
-Patch31:	%{name}-fcgi-error_log-no-newlines.patch
-Patch34:	%{name}-libtool.patch
-Patch35:	%{name}-tds.patch
-Patch36:	%{name}-mysql-charsetphpini.patch
-Patch37:	%{name}-mysqli-charsetphpini.patch
-Patch38:	%{name}-pdo_mysql-charsetphpini.patch
-Patch39:	%{name}-use-prog_sendmail.patch
-Patch41:	%{name}-fpm-config.patch
-Patch42:	%{name}-fpm-shared.patch
-Patch43:	%{name}-silent-session-cleanup.patch
-Patch44:	%{name}-include_path.patch
-Patch45:	%{name}-imap-annotations.patch
-Patch46:	%{name}-imap-myrights.patch
+Patch14:	%{orgname}-no_pear_install.patch
+Patch15:	%{orgname}-zlib.patch
+Patch17:	%{orgname}-readline.patch
+Patch18:	%{orgname}-nohttpd.patch
+Patch19:	%{orgname}-gd_imagerotate_enable.patch
+Patch20:	%{orgname}-uint32_t.patch
+Patch21:	%{orgname}-dba-link.patch
+Patch22:	%{orgname}-both-apxs.patch
+Patch23:	%{orgname}-builddir.patch
+Patch24:	%{orgname}-zlib-for-getimagesize.patch
+Patch25:	%{orgname}-stupidapache_version.patch
+Patch26:	%{orgname}-pear.patch
+Patch27:	%{orgname}-config-dir.patch
+Patch29:	%{orgname}-fcgi-graceful.patch
+Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
+Patch34:	%{orgname}-libtool.patch
+Patch35:	%{orgname}-tds.patch
+Patch36:	%{orgname}-mysql-charsetphpini.patch
+Patch37:	%{orgname}-mysqli-charsetphpini.patch
+Patch38:	%{orgname}-pdo_mysql-charsetphpini.patch
+Patch39:	%{orgname}-use-prog_sendmail.patch
+Patch41:	%{orgname}-fpm-config.patch
+Patch42:	%{orgname}-fpm-shared.patch
+Patch43:	%{orgname}-silent-session-cleanup.patch
+Patch44:	%{orgname}-include_path.patch
+Patch45:	%{orgname}-imap-annotations.patch
+Patch46:	%{orgname}-imap-myrights.patch
 Patch47:	suhosin.patch
-Patch49:	%{name}-m4-divert.patch
+Patch49:	%{orgname}-m4-divert.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
-Patch59:	%{name}-systzdata.patch
-Patch60:	%{name}-oracle-instantclient.patch
+Patch59:	%{orgname}-systzdata.patch
+Patch60:	%{orgname}-oracle-instantclient.patch
 Patch62:	mcrypt-libs.patch
-Patch63:	%{name}-mysql-nowarning.patch
-Patch64:	%{name}-m4.patch
+Patch63:	%{orgname}-mysql-nowarning.patch
+Patch64:	%{orgname}-m4.patch
 # http://spot.fedorapeople.org/php-5.3.6-libzip.patch
 Patch65:	system-libzip.patch
 URL:		http://www.php.net/
@@ -278,8 +285,8 @@ BuildRequires:	apr-util-devel >= 1:1.0.0
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		php_sysconfdir		/etc/php
-%define		php_extensiondir	%{_libdir}/php
+%define		php_sysconfdir		/etc/%{name}
+%define		php_extensiondir	%{_libdir}/%{name}
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
@@ -363,7 +370,7 @@ PHP - це мова написання скриптів, що вбудовуют
 роботи з базами даних є доволі простим. Найбільш популярне
 використання PHP - заміна для CGI скриптів.
 
-%package -n apache1-mod_php
+%package -n apache1-mod_%{name}
 Summary:	PHP DSO module for Apache 1.3.x
 Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 1.3.x
 Group:		Development/Languages/PHP
@@ -375,13 +382,13 @@ Provides:	webserver(php) = %{version}
 Obsoletes:	apache-mod_php < 1:4.1.1
 Obsoletes:	phpfi
 
-%description -n apache1-mod_php
+%description -n apache1-mod_%{name}
 PHP as DSO module for Apache 1.3.x.
 
-%description -n apache1-mod_php -l pl.UTF-8
+%description -n apache1-mod_%{name} -l pl.UTF-8
 PHP jako moduł DSO (Dynamic Shared Object) dla Apache 1.3.x.
 
-%package -n apache-mod_php
+%package -n apache-mod_%{name}
 Summary:	PHP DSO module for Apache 2.x
 Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 2.x
 Group:		Development/Languages/PHP
@@ -391,10 +398,10 @@ Requires:	apache-mod_mime
 Provides:	webserver(php) = %{version}
 Obsoletes:	phpfi
 
-%description -n apache-mod_php
+%description -n apache-mod_%{name}
 PHP as DSO module for Apache 2.x.
 
-%description -n apache-mod_php -l pl.UTF-8
+%description -n apache-mod_%{name} -l pl.UTF-8
 PHP jako moduł DSO (Dynamic Shared Object) dla Apache 2.x.
 
 %package litespeed
@@ -550,11 +557,13 @@ Requires:	libtool >= 2:2.2
 %else
 Requires:	libtool
 %endif
-%{?with_embed:Requires:	%{name}-embedded = %{epoch}:%{version}-%{release}}
+%{?with_embed:Requires:	%{orgname}-embedded = %{epoch}:%{version}-%{release}}
 %{?with_pcre:Requires:	pcre-devel >= 8.10}
 Requires:	shtool
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel
+Obsoletes:	php52-devel
+Obsoletes:	php54-devel
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.
@@ -1687,7 +1696,7 @@ Summary:	Contains unit test files for PHP and extensions
 Summary(pl.UTF-8):	Zawiera pliki testów jednostkowych dla PHP i rozszerzeń
 Group:		Libraries
 URL:		http://qa.php.net/
-Requires:	%{name}-cli
+Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 
 %description tests
 This package contains unit tests for PHP and its extensions.
@@ -1871,7 +1880,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q
+%setup -q -n %{orgname}-%{version}
 # prep for suhosin patch
 %{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
 %patch0 -p1
@@ -2275,7 +2284,7 @@ cp -af Makefile.cli Makefile
 %if %{with cgi}
 cp -pf php_config.h.cgi-fcgi main/php_config.h
 %{__make} -f Makefile.cgi-fcgi
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = cgi-fcgi ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cgi/php-cgi -qn)" = "cgi-fcgi" ]
 %endif
 
 # PHP FPM
@@ -2288,7 +2297,7 @@ cp -pf php_config.h.fpm main/php_config.h
 # CLI
 cp -pf php_config.h.cli main/php_config.h
 %{__make} -f Makefile.cli
-[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = cli ] || exit 1
+[ "$(echo '<?=php_sapi_name();' | ./sapi/cli/php -qn)" = "cli" ]
 
 # check for stupid xml parse breakage where &lt; and &gt; just get lost in parse result
 ./sapi/cli/php -n -dextension_dir=modules -dextension=xml.so -r '$p = xml_parser_create(); xml_parse_into_struct($p, "<x>&lt;</x>", $vals, $index); exit((int )empty($vals[0]["value"]));'
@@ -2391,7 +2400,7 @@ libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT
 
 # install litespeed sapi
 %if %{with litespeed}
-libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/php.litespeed
+libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/%{name}.litespeed
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
@@ -2399,22 +2408,27 @@ libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
 # install CGI/FCGI
 %if %{with cgi}
 # install-cgi
-libtool --mode=install install -p sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
-ln -sf php.cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+libtool --mode=install install -p sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/%{name}.cgi
+ln -sf %{name}.cgi $RPM_BUILD_ROOT%{_bindir}/%{name}.fcgi
 cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
 
 # install FCGI PM
 %if %{with fpm}
-%{__make} -f Makefile.fpm install-fpm \
-	INSTALL_ROOT=$RPM_BUILD_ROOT
-# Makefile.fpm incorrectly installs libtool script instead of final binary so overwrite
-libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}
-
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/fpm.d}
-install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/php-fpm
+install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir},%{_datadir}/fpm}
+libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}/%{name}-fpm
+cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8/%{name}-fpm.8
+cp -p sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
+cp -p sapi/fpm/status.html $RPM_BUILD_ROOT%{_datadir}/fpm
+install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm
+%{__sed} -i -e '
+	s#/usr/lib/php#%{php_extensiondir}#
+	s#/etc/php#%{_sysconfdir}#
+	s#@processname@#%{name}-fpm#g
+' $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.conf
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
-cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/php-fpm
+cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 %endif
 
 # install Embedded API
@@ -2447,6 +2461,13 @@ cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
+
+# ensure that paths are correct for current php version and arch
+grep -El '/etc/php/|/usr/lib/php/' $RPM_BUILD_ROOT%{_sysconfdir}/*.ini | xargs -r \
+%{__sed} -i -e '
+	s#/usr/lib/php#%{php_extensiondir}#
+	s#/etc/php#%{_sysconfdir}#
+'
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 cp -p conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
@@ -2491,22 +2512,22 @@ sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_lib
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -n apache1-mod_php
+%post -n apache1-mod_%{name}
 if [ "$1" = "1" ]; then
 	%service -q apache restart
 fi
 
-%postun -n apache1-mod_php
+%postun -n apache1-mod_%{name}
 if [ "$1" = "0" ]; then
 	%service -q apache restart
 fi
 
-%post -n apache-mod_php
+%post -n apache-mod_%{name}
 if [ "$1" = "1" ]; then
 	%service -q httpd restart
 fi
 
-%postun -n apache-mod_php
+%postun -n apache-mod_%{name}
 if [ "$1" = "0" ]; then
 	%service -q httpd restart
 fi
@@ -2515,13 +2536,13 @@ fi
 %useradd -u 51 -r -s /bin/false -c "HTTP User" -g http http
 
 %post fpm
-/sbin/chkconfig --add php-fpm
-%service php-fpm restart
+/sbin/chkconfig --add %{name}-fpm
+%service %{name}-fpm restart
 
 %preun fpm
 if [ "$1" = 0 ]; then
-	%service php-fpm stop
-	/sbin/chkconfig --del php-fpm
+	%service %{name}-fpm stop
+	/sbin/chkconfig --del %{name}-fpm
 fi
 
 %postun fpm
@@ -2555,24 +2576,6 @@ fi
 # restart webserver at the end of transaction
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
 [ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
-
-%if %{with apache1}
-%triggerpostun -n apache1-mod_php -- php < 4:5.0.4-9.11
-sed -i -e '
-	/^AddType application\/x-httpd-php \.php/s,^,#,
-	/^\(Add\|Load\)Module.*php5\.\(so\|c\)/d
-' /etc/apache/apache.conf
-%service -q apache restart
-%endif
-
-%if %{with apache2}
-%triggerpostun -n apache-mod_php -- php < 4:5.0.4-7.1
-# for fixed php-SAPI.ini, the poor php-apache.ini was never read for apache2
-if [ -f %{_sysconfdir}/php-apache.ini.rpmsave ]; then
-	cp -f %{_sysconfdir}/php-apache2handler.ini{,.rpmnew}
-	mv -f %{_sysconfdir}/php-apache.ini.rpmsave %{_sysconfdir}/php-apache2handler.ini
-fi
-%endif
 
 # common macros called at extension post/postun scriptlet
 %define	extension_scripts() \
@@ -2659,7 +2662,7 @@ fi
 %extension_scripts zlib
 
 %if %{with apache1}
-%files -n apache1-mod_php
+%files -n apache1-mod_%{name}
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache.d
@@ -2668,7 +2671,7 @@ fi
 %endif
 
 %if %{with apache2}
-%files -n apache-mod_php
+%files -n apache-mod_%{name}
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache2handler.d
@@ -2679,7 +2682,7 @@ fi
 %if %{with litespeed}
 %files litespeed
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_sbindir}/php.litespeed
+%attr(755,root,root) %{_sbindir}/%{name}.litespeed
 %endif
 
 %if %{with cgi}
@@ -2687,8 +2690,8 @@ fi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cgi-fcgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
-%attr(755,root,root) %{_bindir}/php.cgi
-%attr(755,root,root) %{_bindir}/php.fcgi
+%attr(755,root,root) %{_bindir}/%{name}.cgi
+%attr(755,root,root) %{_bindir}/%{name}.fcgi
 %endif
 
 %if %{with embed}
@@ -2715,10 +2718,10 @@ fi
 %doc sapi/fpm/{CREDITS,LICENSE}
 %dir %{_sysconfdir}/fpm.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
-%attr(755,root,root) %{_sbindir}/php-fpm
-%{_mandir}/man8/php-fpm.8*
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/php-fpm
-%attr(754,root,root) /etc/rc.d/init.d/php-fpm
+%attr(755,root,root) %{_sbindir}/%{name}-fpm
+%{_mandir}/man8/%{name}-fpm.8*
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/%{name}-fpm
+%attr(754,root,root) /etc/rc.d/init.d/%{name}-fpm
 %dir %{_datadir}/fpm
 %{_datadir}/fpm/status.html
 %endif

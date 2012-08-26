@@ -115,6 +115,8 @@ mv ext/snmp/tests/snmpset-nomib.phpt{,.skip}
 mv ext/snmp/tests/snmpset.phpt{,.skip}
 # Function snmpwalk
 mv ext/snmp/tests/snmpwalk.phpt{,.skip}
+# SOAP Server 9: setclass and setpersistence(SOAP_PERSISTENCE_SESSION)
+mv ext/soap/tests/server009.phpt{,.skip}
 # Multicast support: IPv4 receive options
 mv ext/sockets/tests/mcast_ipv4_recv.phpt{,.skip}
 # Multicast support: IPv6 receive options

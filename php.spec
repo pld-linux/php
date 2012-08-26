@@ -229,7 +229,6 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 #BuildRequires:	fcgi-devel
-#BuildRequires:	flex
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
 %{!?with_mysqlnd:BuildRequires:	mysql-devel}

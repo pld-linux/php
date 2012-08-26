@@ -120,7 +120,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	16
+Release:	17
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -2217,7 +2217,7 @@ for sapi in $sapis; do
 %if %{with fpm}
 	--with-fpm-conf=%{_sysconfdir}/fpm.conf \
 	--with-fpm-log=/var/log/fpm.log \
-	--with-fpm-pid=/var/run/php/fpm.pid \
+	--with-fpm-pid=/var/run/php/%{name}-fpm.pid \
 %endif
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 	--with-pdo-dblib=shared \

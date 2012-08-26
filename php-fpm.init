@@ -17,8 +17,10 @@
 # Get network config
 . /etc/sysconfig/network
 
-pidfile=/var/run/php/php-fpm.pid
-lockfile=/var/lock/subsys/php-fpm
+configfile=/etc/php/php-fpm.conf
+lockfile=/var/lock/subsys/@processname@
+pidfile=$(sed -ne  's,^pid\s*=\s*\(.*\),\1,p' $configfile)
+pidfile=${pidfile:-/var/run/php/@processname@.pid}
 
 start() {
 	# Check if the service is already running?
@@ -27,8 +29,8 @@ start() {
 		return
 	fi
 
-	msg_starting "PHP FastCGI Process Manager"
-	daemon --pidfile $pidfile /usr/sbin/php-fpm --fpm-config /etc/php/php-fpm.conf
+	msg_starting "PHP FastCGI Process Manager (@processname@)"
+	daemon --pidfile $pidfile /usr/sbin/@processname@ --fpm-config $configfile
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch $lockfile
 }
@@ -95,7 +97,7 @@ case "$1" in
 	reload USR1 0
 	;;
   status)
-	status php-fpm
+	status  --pidfile $pidfile @processname@
 	RETVAL=$?
 	;;
   *)

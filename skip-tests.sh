@@ -6,11 +6,11 @@ mv ext/dba/tests/dba_db4_010.phpt{,.skip}
 # DBA TCADB handler test
 mv ext/dba/tests/dba_tcadb.phpt{,.skip}
 # enchant_broker_describe() function
-mv ext/enchant/tests/broker_describe.phpt{,.skip}
+$x86 && mv ext/enchant/tests/broker_describe.phpt{,.skip}
 # enchant_broker_request_dict() function
-mv ext/enchant/tests/broker_request_dict.phpt{,.skip}
+$x86 && mv ext/enchant/tests/broker_request_dict.phpt{,.skip}
 # bug #13181, leaving a context frees the broker resources
-mv ext/enchant/tests/bug13181.phpt{,.skip}
+$x86 && mv ext/enchant/tests/bug13181.phpt{,.skip}
 # Test ereg() function : basic functionality (with $regs)
 mv ext/ereg/tests/ereg_basic_001.phpt{,.skip}
 # Test ereg() function : basic functionality  (without $regs)
@@ -56,13 +56,15 @@ mv ext/ereg/tests/spliti_error_002.phpt{,.skip}
 # Test spliti() function : usage variations  - unexpected type for arg 1
 mv ext/ereg/tests/spliti_variation_001.phpt{,.skip}
 # Bug #60150 (Integer overflow during the parsing of invalid exif header)
-mv ext/exif/tests/bug60150.phpt{,.skip}
+$ix86 mv ext/exif/tests/bug60150.phpt{,.skip}
 # Bug #52209 (INPUT_ENV returns NULL for set variables (CLI))
 mv ext/filter/tests/bug52209.phpt{,.skip}
 # Bug #43073 (TrueType bounding box is wrong for angle<>0)
 mv ext/gd/tests/bug43073.phpt{,.skip}
 # Bug #48801 (Problem with imagettfbbox)
 mv ext/gd/tests/bug48801.phpt{,.skip}
+# PDO Common: PDORow + get_parent_class()
+$x8664 mv ext/pdo/tests/pdo_035.phpt{,.skip}
 # Bug #47415 PDO_Firebird segfaults when passing lowercased column name to bindColumn()
 mv ext/pdo_firebird/tests/bug_47415.phpt{,.skip}
 # PDO_Firebird: bug 48877 The "bindValue" and "bindParam" do not work for PDO Firebird if we use named parameters (:parameter).
@@ -77,8 +79,6 @@ mv ext/pdo_firebird/tests/ddl.phpt{,.skip}
 mv ext/pdo_firebird/tests/execute.phpt{,.skip}
 # PDO_Firebird: rowCount
 mv ext/pdo_firebird/tests/rowCount.phpt{,.skip}
-# PDO SQLite Feature Request #42589 (getColumnMeta() should also return table name)
-mv ext/pdo_sqlite/tests/bug_42589.phpt{,.skip}
 # Test posix_getgrgid() function : basic functionality
 mv ext/posix/tests/posix_getgrgid_basic.phpt{,.skip}
 # IPv6 support
@@ -140,7 +140,8 @@ mv ext/wddx/tests/005.phpt{,.skip}
 # xmlrpc_encode_request() and various arguments
 mv ext/xmlrpc/tests/002.phpt{,.skip}
 # Bug #40576 (double values are truncated to 6 decimal digits when encoding)
-mv ext/xmlrpc/tests/bug40576.phpt{,.skip}
+$ix86 mv ext/xmlrpc/tests/bug40576.phpt{,.skip}
+$x8664 mv ext/xmlrpc/tests/bug40576_64bit.phpt{,.skip}
 # Bug #45555 (Segfault with invalid non-string as register_introspection_callback)
 mv ext/xmlrpc/tests/bug45555.phpt{,.skip}
 # Bug #45556 (Return value from callback isn't freed)
@@ -150,6 +151,6 @@ mv sapi/cgi/tests/apache_request_headers.phpt{,.skip}
 # show information about extension
 mv sapi/cli/tests/006.phpt{,.skip}
 # Bug #61546 (functions related to current script failed when chdir() in cli sapi)
-mv sapi/cli/tests/bug61546.phpt{,.skip}
+$ix86 mv sapi/cli/tests/bug61546.phpt{,.skip}
 # Bug #60591 (Memory leak when access a non-exists file)
 mv sapi/cli/tests/php_cli_server_016.phpt{,.skip}

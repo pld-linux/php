@@ -1993,6 +1993,10 @@ mv Zend/tests/bug39438.phpt{,.disable}
 %{__rm} -r ext/sqlite3/tests
 %endif
 
+# skip XFAILs
+# no point testing stuff that is knowingly broken
+find -name '*.phpt' | xargs grep XFAIL -l | xargs rm -v
+
 env \
 %ifarch %{ix86}
 ix86= x8664=:

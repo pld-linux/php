@@ -2375,10 +2375,10 @@ sed -ne '/^FAILED TEST SUMMARY/,/^===/p' tests.log | sed -e '1,/^---/d;/^===/,$d
 sed -ne '/^via/d;/\[.*\]/{s/\t*\(.*\) \[\(.*\)\]\(.*\)/# \1\3\nmv \2{,.skip}/p}' tests-failed.log \
 	>> %{_sourcedir}/skip-tests.sh
 
-test ! -s failed.log
-
 # if on builders, dump test log
 tty -q || cat tests.log
+
+test ! -s failed.log
 %endif
 
 %install

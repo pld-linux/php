@@ -154,3 +154,21 @@ mv sapi/cli/tests/006.phpt{,.skip}
 $ix86 mv sapi/cli/tests/bug61546.phpt{,.skip}
 # Bug #60591 (Memory leak when access a non-exists file)
 mv sapi/cli/tests/php_cli_server_016.phpt{,.skip}
+
+# failing tests from builders (requiring DNS apparently)
+# PDO SQLite Feature Request #42589 (getColumnMeta() should also return table name)
+$ix86 mv ext/pdo_sqlite/tests/bug_42589.phpt{,.skip}
+# Bug #60749: SNMP module should not strip non-standard SNMP port from hostname
+mv ext/snmp/tests/bug60749.phpt{,.skip}
+# Wrong hostname
+mv ext/snmp/tests/wrong_hostname.phpt{,.skip}
+# ext/sockets - socket_bind - basic test
+mv ext/sockets/tests/socket_bind.phpt{,.skip}
+# gethostbyname() function - basic invalid parameter test
+mv ext/standard/tests/network/gethostbyname_basic002.phpt{,.skip}
+# gethostbyname() function - basic return valid ip address test
+mv ext/standard/tests/network/gethostbyname_error004.phpt{,.skip}
+# getmxrr() test
+mv ext/standard/tests/network/getmxrr.phpt{,.skip}
+# http-stream test
+mv ext/standard/tests/network/http-stream.phpt{,.skip}

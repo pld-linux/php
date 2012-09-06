@@ -216,6 +216,7 @@ Patch62:	mcrypt-libs.patch
 Patch63:	%{orgname}-mysql-nowarning.patch
 #Patch64:	%{orgname}-m4.patch # not needed on 5.4 branch
 Patch65:	system-libzip.patch
+Patch66:	php-db.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1927,6 +1928,7 @@ cp -p php.ini-production php.ini
 %patch62 -p1
 %patch63 -p1
 %{?with_system_libzip:%patch65 -p1}
+%patch66 -p1
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 

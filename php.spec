@@ -120,7 +120,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	19
+Release:	20
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -204,6 +204,7 @@ Patch60:	bug-60986.patch
 # http://spot.fedorapeople.org/php-5.3.6-libzip.patch
 Patch65:	system-libzip.patch
 Patch66:	bug-47930.patch
+Patch67:	php-db.patch
 # CENTALT patches
 # CVE
 Patch201: php-5.2.17-CVE-2011-2202.patch
@@ -1985,6 +1986,7 @@ done
 %patch60 -p4
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p2
+%patch67 -p1
 
 %patch201 -p1 -b .CVE-2011-2202
 %patch202 -p1 -b .CVE-2011-1938

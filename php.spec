@@ -1,7 +1,6 @@
 # TODO 5.4:
 # - do not remove PatchX: definitions until merged to HEAD, needed for tracking their state
 # - check php-sapi-ini-file.patch for safe mode removal
-# - enable litespeed (needs api porting)
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
@@ -52,7 +51,7 @@
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	intl		# without Intl extension module
 %bcond_without	kerberos5	# without Kerberos5 support
-%bcond_with	litespeed	# build litespeed module
+%bcond_without	litespeed	# build litespeed module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mm		# without mm support for session storage
@@ -89,7 +88,6 @@
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
-%define	litespeed_version	5.5
 
 # disable all sapis
 %if %{with gcov}
@@ -128,7 +126,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 54
 
-%define		rel	0.18
+%define		rel	0.19
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -154,9 +152,6 @@ Source11:	%{orgname}-fpm.logrotate
 Source12:	%{orgname}-branch.sh
 Source13:	dep-tests.sh
 Source14:	skip-tests.sh
-# Source15Download: http://litespeedtech.com/lsapi-downloads.html
-Source15:	http://litespeedtech.com/packages/lsapi/%{orgname}-litespeed-%{litespeed_version}.tgz
-# Source15-md5:	9d58485d5fd6b5f5fefcec41b9ce283e
 Patch0:		%{orgname}-shared.patch
 Patch1:		%{orgname}-pldlogo.patch
 Patch2:		%{orgname}-mail.patch
@@ -1929,8 +1924,6 @@ cp -p php.ini-production php.ini
 %patch63 -p1
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
-%{__rm} -r sapi/litespeed
-gzip -dc %{SOURCE15} | tar xf - -C sapi/
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

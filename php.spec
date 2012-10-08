@@ -126,7 +126,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 54
 
-%define		rel	0.19
+%define		rel	0.20
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2424,13 +2424,14 @@ cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8/%{name}-fpm.8
 cp -p sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm
+install -d $RPM_BUILD_ROOT/etc/logrotate.d
+cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
+
 %{__sed} -i -e '
 	s#/usr/lib/php#%{php_extensiondir}#
 	s#/etc/php#%{_sysconfdir}#
 	s#@processname@#%{name}-fpm#g
-' $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.conf
-install -d $RPM_BUILD_ROOT/etc/logrotate.d
-cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
+' $RPM_BUILD_ROOT{/etc/{rc.d/init.d/%{name}-fpm,logrotate.d/%{name}-fpm},%{_sysconfdir}/php-fpm.conf}
 %endif
 
 # install Embedded API

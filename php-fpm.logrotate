@@ -1,11 +1,10 @@
-/var/log/fpm.log
-/var/log/fpm-slow.log
+/var/log/@processname@.log
 {
 	notifempty
 	missingok
 	create 600 root root
 	sharedscripts
 	postrotate
-		/sbin/service php-fpm flush-logs > /dev/null
+		/sbin/service @processname@ flush-logs > /dev/null
 	endscript
 }

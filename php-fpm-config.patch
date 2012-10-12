@@ -1,5 +1,14 @@
---- php-5.3.17/sapi/fpm/php-fpm.conf.in~	2012-09-13 00:27:16.000000000 +0300
-+++ php-5.3.17/sapi/fpm/php-fpm.conf.in	2012-10-09 20:00:31.645362454 +0300
+--- php-5.3.17/sapi/fpm/php-fpm.conf.in	2012-10-09 20:00:31.645362454 +0300
++++ php-5.3.17/sapi/fpm/php-fpm.conf.in	2012-10-12 12:35:47.601602945 +0300
+@@ -12,7 +12,7 @@
+ ; Relative path can also be used. They will be prefixed by:
+ ;  - the global prefix if it's been set (-p arguement)
+ ;  - @prefix@ otherwise
+-;include=etc/fpm.d/*.conf
++;include=/etc/php/fpm.d/*.conf
+ 
+ ;;;;;;;;;;;;;;;;;;
+ ; Global Options ;
 @@ -22,14 +22,14 @@
  ; Pid file
  ; Note: the default prefix is @EXPANDED_LOCALSTATEDIR@

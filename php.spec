@@ -506,6 +506,11 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
+%if "%{pld_release}" == "ac"
+# postpone tree rebuild in ac
+Provides:	php5(debug) = %{php_debug}
+Provides:	php5(thread-safety) = %{zend_zts}
+%endif
 Provides:	%{name}(debug) = %{php_debug}
 Provides:	%{name}(modules_api) = %{php_api_version}
 Provides:	%{name}(thread-safety) = %{zend_zts}

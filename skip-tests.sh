@@ -164,8 +164,6 @@ mv ext/snmp/tests/bug60749.phpt{,.skip}
 mv ext/snmp/tests/wrong_hostname.phpt{,.skip}
 # ext/sockets - socket_bind - basic test
 mv ext/sockets/tests/socket_bind.phpt{,.skip}
-# gethostbyname() function - basic invalid parameter test
-mv ext/standard/tests/network/gethostbyname_basic002.phpt{,.skip}
 # gethostbyname() function - basic return valid ip address test
 mv ext/standard/tests/network/gethostbyname_error004.phpt{,.skip}
 # getmxrr() test

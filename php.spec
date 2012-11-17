@@ -124,9 +124,10 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define		orgname	php
-%define		php_suffix 54
+%define		php_suffix 55
 
-%define		rel	0.20
+%define		rel	0.1
+%define		subver	alpha1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -134,13 +135,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.4.8
-Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
+Version:	5.5.0
+Release:	%{rel}%{?subver:.%{subver}}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
-# Source0-md5:	bb8c816a9299be8995255ef70c63b800
+Source0:	http://downloads.php.net/dsp/%{orgname}-%{version}%{subver}.tar.xz
+# Source0-md5:	2fb61817fad8e059d6fc846c69803e2d
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -241,7 +242,7 @@ BuildRequires:	gd-devel(imagerotate) = 5.2.0
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel
 %{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
-%{?with_intl:BuildRequires:	libicu-devel}
+%{?with_intl:BuildRequires:	libicu-devel >= 4.4}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
@@ -276,6 +277,8 @@ BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.566
+BuildRequires:	tar >= 1:1.22
+BuildRequires:	xz
 %if %{with sqlite3} || %{with pdo_sqlite}
 BuildRequires:	sqlite3-devel >= 3.3.9
 %endif
@@ -302,19 +305,19 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20100412
-%define		zend_module_api		20100525
-%define		zend_extension_api	220100525
+%define		php_api_version		20121113
+%define		zend_module_api		20121113
+%define		zend_extension_api	220121113
 
 # Extension versions
 %define		bz2ver		1.0
 %define		enchantver	1.1.0
-%define		fileinfover	1.0.5
+%define		fileinfover	1.0.5-dev
 %define		hashver		1.0
 %define		intlver		1.1.0
 %define		jsonver		1.2.1
 %define		pharver		2.0.1
-%define		sqlite3ver	0.7
+%define		sqlite3ver	0.7-dev
 %define		zipver		1.11.0
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
@@ -1861,9 +1864,9 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{orgname}-%{version}
+%setup -q -n %{orgname}-%{version}%{?subver}
 %patch0 -p1
-%patch1 -p1
+#%patch1 -p1 # redo with _DATA_URI
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1

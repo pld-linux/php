@@ -126,7 +126,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 55
 
-%define		rel	0.1
+%define		rel	0.2
 %define		subver	alpha1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -1866,7 +1866,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %prep
 %setup -q -n %{orgname}-%{version}%{?subver}
 %patch0 -p1
-#%patch1 -p1 # redo with _DATA_URI
+%patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1

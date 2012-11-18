@@ -1,23 +1,20 @@
---- php-4.3.3RC3/ext/standard/info.c.orig	2003-06-19 18:43:41.000000000 +0200
-+++ php-4.3.3RC3/ext/standard/info.c	2003-08-16 21:37:18.705836072 +0200
-@@ -518,6 +518,21 @@
- 		PUTS(!sapi_module.phpinfo_as_text?"<br />":"\n");
- 		PUTS(zend_version);
+--- php-5.5.0alpha1/ext/standard/info.c~	2012-11-13 22:00:16.000000000 +0200
++++ php-5.5.0alpha1/ext/standard/info.c	2012-11-18 23:37:48.607735302 +0200
+@@ -794,6 +794,18 @@
+ 			zend_html_puts(zend_version, strlen(zend_version) TSRMLS_CC);
+ 		}
  		php_info_print_box_end();
 +		/* PLD Linux */
 +		php_info_print_box_start(0);
-+		if (expose_php && !sapi_module.phpinfo_as_text) {
-+			PUTS("<a href=\"http://www.pld-linux.org/\"><img src=\"");
-+			if (SG(request_info).request_uri) {
-+				PUTS(SG(request_info).request_uri);
-+			}
-+			PUTS("?="PLD_LOGO_GUID"\" border=\"0\" align=\"right\" alt=\"PLD logo\"></a>\n");
++		if (!sapi_module.phpinfo_as_text) {
++			php_info_print("<a href=\"http://www.pld-linux.org/\"><img src=\"");
++			php_info_print(PLD_LOGO_DATA_URI "\" border=\"0\" align=\"right\" alt=\"PLD Linux logo\"></a>\n");
 +		}
-+		PUTS("This server is using PLD Linux.");
++		php_info_print("This server is using PLD Linux.");
 +		if (!sapi_module.phpinfo_as_text)
-+			PUTS("<br />More information at <a href=\"http://www.pld-linux.org/\">http://www.pld-linux.org/</a>.<br />\n");
++			php_info_print("<br />More information at <a href=\"http://www.pld-linux.org/\">http://www.pld-linux.org/</a>.<br />\n");
 +		else
-+			PUTS("\nMore information at http://www.pld-linux.org/.\n");
++			php_info_print("\nMore information at http://www.pld-linux.org/.\n");
 +		php_info_print_box_end();
  		efree(php_uname);
  	}

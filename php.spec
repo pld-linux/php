@@ -117,7 +117,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		php_suffix %{nil}
 %endif
 
-%define		rel	3
+%define		rel	1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -125,13 +125,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.3.18
+Version:	5.3.19
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
-# Source0-md5:	52539c19d0f261560af3c030143dfa8f
+# Source0-md5:	e1d2a3ec7849d4b3032bd1abf1916aa4
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -202,6 +202,7 @@ Patch64:	%{orgname}-m4.patch
 Patch65:	system-libzip.patch
 Patch66:	%{orgname}-db.patch
 Patch67:	php-litespeed.patch
+Patch68:	php-test.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1957,6 +1958,7 @@ cp -p php.ini-production php.ini
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
+%patch68 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

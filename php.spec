@@ -2806,11 +2806,13 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
 
+%if %{with enchant}
 %files enchant
 %defattr(644,root,root,755)
 %doc ext/enchant/{CREDITS,docs/examples}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/enchant.ini
 %attr(755,root,root) %{php_extensiondir}/enchant.so
+%endif
 
 %files exif
 %defattr(644,root,root,755)

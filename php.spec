@@ -1399,6 +1399,7 @@ Suggests:	%{name}-cli
 Suggests:	%{name}-zlib
 Provides:	php(phar) = %{pharver}
 Obsoletes:	php-pecl-phar < %{pharver}
+Conflicts:	php-ioncube < 4.0.9
 
 %description phar
 This is a dynamic shared object (DSO) for PHP that will add phar

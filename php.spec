@@ -1397,9 +1397,9 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Suggests:	%{name}-cli
 # zlib is required by phar program, but as phar cli is optional should the dep be too
 Suggests:	%{name}-zlib
-Suggests:	php-program
 Provides:	php(phar) = %{pharver}
 Obsoletes:	php-pecl-phar < %{pharver}
 

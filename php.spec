@@ -120,7 +120,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	26
+Release:	27
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -206,6 +206,7 @@ Patch65:	system-libzip.patch
 Patch66:	bug-47930.patch
 Patch67:	php-db.patch
 Patch68:	php-libxml.patch
+Patch69:	bug-50563.patch
 # CENTALT patches
 # CVE
 Patch201: php-5.2.17-CVE-2011-2202.patch
@@ -1989,6 +1990,7 @@ done
 %patch66 -p2
 %patch67 -p1
 %patch68 -p1
+%patch69 -p4
 
 %patch201 -p1 -b .CVE-2011-2202
 %patch202 -p1 -b .CVE-2011-1938

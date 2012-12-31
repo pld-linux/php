@@ -1,0 +1,14 @@
+https://bugs.php.net/bug.php?id=50563
+
+do not throw warning as php 5.3.3 does not
+--- php/php-src/branches/PHP_5_3/ext/standard/url.c	2010/06/16 18:45:54	300500
++++ php/php-src/branches/PHP_5_3/ext/standard/url.c	2010/06/16 18:56:24	300501
+@@ -355,7 +355,7 @@
+ 
+ 	resource = php_url_parse_ex(str, str_len);
+ 	if (resource == NULL) {
+-		php_error_docref1(NULL TSRMLS_CC, str, E_WARNING, "Unable to parse URL");
++		/* @todo Find a method to determine why php_url_parse_ex() failed */
+ 		RETURN_FALSE;
+ 	}
+ 

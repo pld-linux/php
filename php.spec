@@ -2491,7 +2491,7 @@ cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{phpfn}.1
 echo ".so %{phpfn}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
 ln -sf %{phpfn} $RPM_BUILD_ROOT%{_bindir}/php
 
-sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
+cp -p php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 %if %{with fcgi}
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
@@ -2513,6 +2513,13 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 cp -a conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
+
+# ensure that paths are correct for current php version and arch
+grep -El '/etc/php/|/usr/lib/php/' $RPM_BUILD_ROOT%{_sysconfdir}/*.ini | xargs -r \
+%{__sed} -i -e '
+	s#/usr/lib/php#%{php_extensiondir}#g
+	s#/etc/php#%{_sysconfdir}#g
+'
 
 # per SAPI ini directories
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi,cli,cgi-fcgi,apache,apache2handler}.d

@@ -383,8 +383,8 @@ BuildRequires:	libevent-devel >= 1.4.7-3
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		php_sysconfdir		/etc/php
-%define		php_extensiondir	%{_libdir}/php
+%define		php_sysconfdir		/etc/%{name}
+%define		php_extensiondir	%{_libdir}/%{name}
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
@@ -541,6 +541,7 @@ Pakiet dostarczający dowiązanie symboliczne /usr/bin/php do PHP CLI.
 
 %package fpm
 Summary:	PHP FastCGI Process Manager
+Summary(pl.UTF-8):	PHP FastCGI Process Manager - zarządca procesów FastCGI
 Group:		Development/Languages/PHP
 URL:		http://www.php-fpm.org/
 Requires(post,preun):	/sbin/chkconfig
@@ -555,6 +556,9 @@ Provides:	webserver(php) = %{version}
 
 %description fpm
 PHP FastCGI Process Manager.
+
+%description fpm -l pl.UTF-8
+PHP FastCGI Process Manager - zarządca procesów FastCGI.
 
 %package common
 Summary:	Common files needed by both Apache modules and CGI/CLI SAPI-s
@@ -2451,11 +2455,11 @@ sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_c
 sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
 # install CGI
-libtool --silent --mode=install install sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.cgi
+libtool --mode=install install -p sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/%{name}.cgi
 
 # install FCGI
 %if %{with fcgi}
-libtool --silent --mode=install install sapi/fcgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/php.fcgi
+libtool --mode=install install -p sapi/fcgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/%{name}.fcgi
 %endif
 
 # install FCGI PM
@@ -2475,10 +2479,17 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 %endif
 
 # install CLI
-libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php.cli
-ln -sf php.cli $RPM_BUILD_ROOT%{_bindir}/php
-cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php.cli.1
-echo ".so php.cli.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
+# without suffix, install as php.cli
+%if "%{?php_suffix}" == ""
+%define	phpfn %{name}.cli
+%else
+%define	phpfn %{name}
+%endif
+libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/%{phpfn}
+ln -sf %{phpfn} $RPM_BUILD_ROOT%{_bindir}/php
+cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{phpfn}.1
+echo ".so %{phpfn}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
+ln -sf %{phpfn} $RPM_BUILD_ROOT%{_bindir}/php
 
 sed -e 's#%{_prefix}/lib/php#%{_libdir}/php#g' php.ini > $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 %if %{with fcgi}
@@ -2701,21 +2712,21 @@ fi
 %doc sapi/cgi/README.FastCGI
 %dir %{_sysconfdir}/cgi-fcgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
-%attr(755,root,root) %{_bindir}/php.fcgi
+%attr(755,root,root) %{_bindir}/%{name}.fcgi
 %endif
 
 %files cgi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cgi.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi.ini
-%attr(755,root,root) %{_bindir}/php.cgi
+%attr(755,root,root) %{_bindir}/%{name}.cgi
 
 %files cli
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cli.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
-%attr(755,root,root) %{_bindir}/php.cli
-%{_mandir}/man1/php.cli.1*
+%attr(755,root,root) %{_bindir}/%{phpfn}
+%{_mandir}/man1/%{phpfn}.1*
 
 %files program
 %defattr(644,root,root,755)

@@ -12,8 +12,8 @@
  PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
  
  PHP_SUBST(PHP_EXECUTABLE)
---- php-5.3.4/Makefile.global~	2010-12-12 23:08:32.000000000 +0200
-+++ php-5.3.4/Makefile.global	2010-12-12 23:09:31.246644108 +0200
+--- php-5.5.0alpha2/Makefile.global~	2013-01-02 15:26:29.000000000 +0200
++++ php-5.5.0alpha2/Makefile.global	2013-01-02 15:29:53.064968422 +0200
 @@ -77,7 +77,8 @@
  		done; \
  	fi
@@ -37,7 +37,7 @@
  	fi`
  PHP_DEPRECATED_DIRECTIVES_REGEX = '^(define_syslog_variables|register_(globals|long_arrays)?|safe_mode|magic_quotes_(gpc|runtime|sybase)?|(zend_)?extension(_debug)?(_ts)?)[\t\ ]*='
  
-@@ -114,7 +114,10 @@
+@@ -118,7 +118,10 @@
  		TEST_PHP_EXECUTABLE=$(PHP_EXECUTABLE) \
  		TEST_PHP_SRCDIR=$(top_srcdir) \
  		CC="$(CC)" \
@@ -46,9 +46,9 @@
 +			-d extension_dir=$(top_builddir)/modules/ -d 'extension=$(EXTENSION_DIR)/pcre.$(SHLIB_DL_SUFFIX_NAME)' \
 +			$(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini \
 +			-d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) $(RUN_TESTS_SETTINGS) $(TESTS); \
+ 		TEST_RESULT_EXIT_CODE=$$?; \
  		rm $(top_builddir)/tmp-php.ini; \
- 	else \
- 		echo "ERROR: Cannot run tests without CLI sapi."; \
+ 		exit $$TEST_RESULT_EXIT_CODE; \
 --- php-5.3.2/Makefile.global	2010-03-16 16:31:36.972576955 +0200
 +++ php-5.3.2/Makefile.global	2010-03-16 16:31:36.972576955 +0200
 @@ -296,7 +296,7 @@

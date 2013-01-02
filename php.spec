@@ -126,8 +126,8 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 55
 
-%define		rel	0.2
-%define		subver	alpha1
+%define		rel	0.3
+%define		subver	alpha2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -141,7 +141,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://downloads.php.net/dsp/%{orgname}-%{version}%{subver}.tar.xz
-# Source0-md5:	2fb61817fad8e059d6fc846c69803e2d
+# Source0-md5:	e634cdb6cb0d5069e8a27d93fb2efda0
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -306,8 +306,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20121113
-%define		zend_module_api		20121113
-%define		zend_extension_api	220121113
+%define		zend_module_api		20121212
+%define		zend_extension_api	220121212
 
 # Extension versions
 %define		bz2ver		1.0

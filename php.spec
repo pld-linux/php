@@ -117,7 +117,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		php_suffix %{nil}
 %endif
 
-%define		rel	1
+%define		rel	2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -426,7 +426,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	%{name}-fcgi = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
 Provides:	php(fcgi)
-Provides:	webserver(php)
+Provides:	webserver(php) = %{version}
 Obsoletes:	php-fcgi < 4:5.3.0
 
 %description cgi

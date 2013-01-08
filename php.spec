@@ -437,7 +437,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	%{name}-fcgi = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
 Provides:	php(fcgi)
-Provides:	webserver(php)
+Provides:	webserver(php) = %{version}
 Obsoletes:	php-fcgi < 4:5.3.0
 
 %description cgi

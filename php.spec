@@ -568,7 +568,7 @@ Summary(uk.UTF-8):	Бібліотеки спільного використан�
 Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
-Requires:	php-dirs
+Requires:	php-dirs >= 1.3
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
 Provides:	php(core) = %{version}
@@ -2226,7 +2226,7 @@ for sapi in $sapis; do
 	--enable-xmlwriter=shared \
 %if %{with fpm}
 	--with-fpm-conf=%{_sysconfdir}/fpm.conf \
-	--with-fpm-log=/var/log/fpm.log \
+	--with-fpm-log=/var/log/php/%{name}-fpm.log \
 	--with-fpm-pid=/var/run/php/%{name}-fpm.pid \
 %endif
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}

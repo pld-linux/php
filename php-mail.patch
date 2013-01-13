@@ -1,14 +1,5 @@
 --- php-5.2.0/ext/standard/mail.c	2006-12-01 14:20:27.881416250 +0100
 +++ php-5.2.4/ext/standard/mail.c	2007-08-31 19:25:50.777713042 +0300
-@@ -21,6 +21,8 @@
- #include <stdlib.h>
- #include <ctype.h>
- #include <stdio.h>
-+#include <syslog.h>
-+#include <string.h>
- #include "php.h"
- #include "ext/standard/info.h"
- 
 @@ -35,6 +37,8 @@
  #include "php_ini.h"
  #include "safe_mode.h"
@@ -44,8 +35,8 @@
 -		fprintf(sendmail, "To: %s\n", to);
 -		fprintf(sendmail, "Subject: %s\n", subject);
 +		TSRMLS_FETCH();
-+		
-+		if ((to != NULL) && (strlen(to)!=0)) { 
++
++		if ((to != NULL) && (strlen(to)!=0)) {
 +			fprintf(sendmail, "To: %s\n", to);
 +		}
 +		if ((subject != NULL) && (strlen(subject)!=0)) {
@@ -55,7 +46,7 @@
 +		if (PG(http_globals)[TRACK_VARS_SERVER]) {
 +			zval **remote_addr, **server_name, **server_port,
 +				**script_name, **http_user_agent;
-+			
++
 +			if (zend_hash_find(PG(http_globals)[TRACK_VARS_SERVER]->value.ht, "REMOTE_ADDR", sizeof("REMOTE_ADDR"), (void **) &remote_addr)==SUCCESS) {
 +				convert_to_string_ex(remote_addr);
 +				fprintf(sendmail, "HTTP-Posting-Client: %s\n", Z_STRVAL_PP(remote_addr));
@@ -66,7 +57,7 @@
 +				if (zend_hash_find(PG(http_globals)[TRACK_VARS_SERVER]->value.ht, "SERVER_PORT", sizeof("SERVER_PORT"), (void **) &server_port)==SUCCESS) {
 +					convert_to_string_ex(server_port);
 +					fprintf(sendmail, ":%s", Z_STRVAL_PP(server_port));
-+				}	
++				}
 +				if (zend_hash_find(PG(http_globals)[TRACK_VARS_SERVER]->value.ht, "SCRIPT_NAME", sizeof("SCRIPT_NAME"), (void **) &script_name)==SUCCESS) {
 +					convert_to_string_ex(script_name);
 +					fprintf(sendmail, "%s", Z_STRVAL_PP(script_name));

@@ -202,6 +202,7 @@ Patch64:	%{orgname}-m4.patch
 Patch65:	system-libzip.patch
 Patch66:	%{orgname}-db.patch
 Patch67:	php-litespeed.patch
+Patch68:	file-magic.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -215,6 +216,7 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 #BuildRequires:	fcgi-devel
+BuildRequires:	file
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10-3}
 BuildRequires:	mysql-devel
@@ -1958,8 +1960,13 @@ cp -p php.ini-production php.ini
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
+%patch68 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
+
+# somewhy php devs have embedded magic database into php extension. yuck!
+# rebuild data file for now
+mv ext/fileinfo/data_file.c{,.php-src}
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

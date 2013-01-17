@@ -14,7 +14,7 @@
  ; Note: the default prefix is @EXPANDED_LOCALSTATEDIR@
  ; Default Value: none
 -;pid = run/php-fpm.pid
-+pid = /var/run/php/@processname@.pid
++pid = /var/run/@processname@.pid
  
  ; Error log file
  ; If it's set to "syslog", log is sent to syslogd instead of being written

@@ -1,5 +1,5 @@
-/var/log/fpm.log
-/var/log/fpm-slow.log
+/var/log/php/@processname@.log
+/var/log/php/@processname@-slow.log
 {
 	notifempty
 	missingok

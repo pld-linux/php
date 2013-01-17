@@ -1,4 +1,4 @@
-/var/log/@processname@.log
+/var/log/php/@processname@.log
 {
 	notifempty
 	missingok

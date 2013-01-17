@@ -8,4 +8,4 @@ rebuild data file for now
  $(builddir)/libmagic/apprentice.lo: $(srcdir)/data_file.c
 +MIME_MAGIC_DB ?= /usr/share/misc/magic.mgc
 +$(srcdir)/data_file.c: $(MIME_MAGIC_DB) $(SAPI_CLI_PATH)
-+	$(SAPI_CLI_PATH) $(srcdir)/create_data_file.php $< > $@
++	$(SAPI_CLI_PATH) -n -dsafe_mode=off $(srcdir)/create_data_file.php $< > $@

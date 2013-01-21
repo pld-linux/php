@@ -568,7 +568,7 @@ Summary(uk.UTF-8):	Бібліотеки спільного використан�
 Group:		Libraries
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
-Requires:	php-dirs >= 1.3
+Requires:	php-dirs >= 1.4
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
 Provides:	php(core) = %{version}

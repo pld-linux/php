@@ -117,7 +117,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		php_suffix %{nil}
 %endif
 
-%define		rel	2
+%define		rel	3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -505,7 +505,7 @@ Group:		Libraries
 Requires(post):	sed >= 4.0
 # because of dlclose() bugs in glibc <= 2.3.4 causing SEGVs on exit
 Requires:	glibc >= 6:2.3.5
-Requires:	php-dirs >= 1.3
+Requires:	php-dirs >= 1.4
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
 %if "%{pld_release}" == "ac"

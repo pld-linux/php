@@ -184,7 +184,7 @@
  ; Sets the directory name where SOAP extension will put cache files.
  ; http://php.net/soap.wsdl-cache-dir
 -soap.wsdl_cache_dir="/tmp"
-+soap.wsdl_cache_dir="/var/run/php"
++soap.wsdl_cache_dir="/var/cache/php"
  
  ; (time to live) Sets the number of second while cached file will be used
  ; instead of original one.

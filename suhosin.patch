@@ -4749,9 +4749,8 @@ diff -Nura php-5.3.9/main/php_config.h.in suhosin-patch-5.3.9-0.9.10/main/php_co
  /* Whether you have AOLserver */
  #undef HAVE_AOLSERVER
  
-diff -Nura php-5.3.9/main/php_logos.c suhosin-patch-5.3.9-0.9.10/main/php_logos.c
---- php-5.3.9/main/php_logos.c	2012-01-01 14:15:04.000000000 +0100
-+++ suhosin-patch-5.3.9-0.9.10/main/php_logos.c	2012-01-11 19:29:07.000000000 +0100
+--- php-5.3.21/main/php_logos.c~	2013-01-22 23:40:21.000000000 +0200
++++ php-5.3.21/main/php_logos.c	2013-01-22 23:41:14.071814355 +0200
 @@ -50,6 +50,10 @@
  	return zend_hash_del(&phpinfo_logo_hash, logo_string, strlen(logo_string));
  }
@@ -4763,14 +4762,14 @@ diff -Nura php-5.3.9/main/php_logos.c suhosin-patch-5.3.9-0.9.10/main/php_logos.
  int php_init_info_logos(void)
  {
  	if(zend_hash_init(&phpinfo_logo_hash, 0, NULL, NULL, 1)==FAILURE) 
-@@ -58,7 +62,9 @@
- 	php_register_info_logo(PHP_LOGO_GUID    , "image/gif", php_logo    , sizeof(php_logo));
- 	php_register_info_logo(PHP_EGG_LOGO_GUID, "image/gif", php_egg_logo, sizeof(php_egg_logo));
+@@ -64,6 +64,10 @@
  	php_register_info_logo(ZEND_LOGO_GUID   , "image/gif", zend_logo   , sizeof(zend_logo));
--
+ 	php_register_info_logo(PLD_LOGO_GUID    , "image/png", pld_logo    , sizeof(pld_logo));
+ 
 +#if SUHOSIN_PATCH
 +	php_register_info_logo(SUHOSIN_LOGO_GUID, "image/jpeg", suhosin_logo   , sizeof(suhosin_logo));
 +#endif
++
  	return SUCCESS;
  }
  

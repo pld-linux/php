@@ -5706,15 +5706,15 @@ diff -Nura php-5.3.9/sapi/cgi/cgi_main.c suhosin-patch-5.3.9-0.9.10/sapi/cgi/cgi
  							}
 +#if SUHOSIN_PATCH
 +#if ZEND_DEBUG
-+							php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2012 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
++							php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
 +#else
-+							php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s)\nCopyright (c) 1997-2012 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
++							php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
 +#endif
 +#else
  #if ZEND_DEBUG
- 							php_printf("PHP %s (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2012 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
+ 							php_printf("PHP %s (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
  #else
- 							php_printf("PHP %s (%s) (built: %s %s)\nCopyright (c) 1997-2012 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
+ 							php_printf("PHP %s (%s) (built: %s %s)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
  #endif
 +#endif
  							php_request_shutdown((void *) 0);
@@ -5727,12 +5727,12 @@ diff -Nura php-5.3.9/sapi/cli/php_cli.c suhosin-patch-5.3.9-0.9.10/sapi/cli/php_
  				}
  
  				request_started = 1;
--				php_printf("PHP %s (%s) (built: %s %s) %s\nCopyright (c) 1997-2012 The PHP Group\n%s",
+-				php_printf("PHP %s (%s) (built: %s %s) %s\nCopyright (c) 1997-2013 The PHP Group\n%s",
 +				php_printf("PHP %s "
 +#if SUHOSIN_PATCH
 +					"with Suhosin-Patch "
 +#endif
-+					"(%s) (built: %s %s) %s\nCopyright (c) 1997-2012 The PHP Group\n%s",
++					"(%s) (built: %s %s) %s\nCopyright (c) 1997-2013 The PHP Group\n%s",
  					PHP_VERSION, sapi_module.name, __DATE__, __TIME__,
  #if ZEND_DEBUG && defined(HAVE_GCOV)
  					"(DEBUG GCOV)",
@@ -5745,15 +5745,15 @@ diff -Nura php-5.3.9/sapi/litespeed/lsapi_main.c suhosin-patch-5.3.9-0.9.10/sapi
                  if (php_request_startup(TSRMLS_C) != FAILURE) {
 +#if SUHOSIN_PATCH
 +  #if ZEND_DEBUG
-+					php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2011 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
++					php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
 +  #else
-+					php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s)\nCopyright (c) 1997-2011 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
++					php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
 +  #endif
 +#else					
  #if ZEND_DEBUG
-                     php_printf("PHP %s (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2004 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
+                     php_printf("PHP %s (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
  #else
-                     php_printf("PHP %s (%s) (built: %s %s)\nCopyright (c) 1997-2004 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
+                     php_printf("PHP %s (%s) (built: %s %s)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
  #endif
 +#endif
  #ifdef PHP_OUTPUT_NEWAPI
@@ -5767,9 +5767,9 @@ diff -Nura php-5.3.9/sapi/milter/php_milter.c suhosin-patch-5.3.9-0.9.10/sapi/mi
  				SG(headers_sent) = 1;
  				SG(request_info).no_headers = 1;
 +#if SUHOSIN_PATCH
-+				php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s)\nCopyright (c) 1997-2012 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
++				php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
 +#else
- 				php_printf("PHP %s (%s) (built: %s %s)\nCopyright (c) 1997-2012 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
+ 				php_printf("PHP %s (%s) (built: %s %s)\nCopyright (c) 1997-2013 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
 +#endif
  				php_end_ob_buffers(1 TSRMLS_CC);
  				exit(1);

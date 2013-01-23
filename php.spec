@@ -2227,7 +2227,7 @@ for sapi in $sapis; do
 %if %{with fpm}
 	--with-fpm-conf=%{_sysconfdir}/fpm.conf \
 	--with-fpm-log=/var/log/php/%{name}-fpm.log \
-	--with-fpm-pid=/var/run/php/%{name}-fpm.pid \
+	--with-fpm-pid=/var/run/%{name}-fpm.pid \
 %endif
 %if %{with mssql} || %{with sybase} || %{with sybase_ct}
 	--with-pdo-dblib=shared \

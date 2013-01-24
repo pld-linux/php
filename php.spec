@@ -565,7 +565,7 @@ Requires:	libtool >= 2:2.2
 %else
 Requires:	libtool
 %endif
-%{?with_embed:Requires:	%{orgname}-embedded = %{epoch}:%{version}-%{release}}
+%{?with_embed:Requires:	%{name}-embedded = %{epoch}:%{version}-%{release}}
 %{?with_pcre:Requires:	pcre-devel >= 8.10}
 Requires:	shtool
 Obsoletes:	php-pear-devel

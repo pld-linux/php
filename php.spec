@@ -1958,13 +1958,17 @@ cp -p php.ini-production php.ini
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
+%if "%{pld_release}" != "ac"
 %patch68 -p1
+%endif
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
+%if "%{pld_release}" != "ac"
 # somewhy php devs have embedded magic database into php extension. yuck!
 # rebuild data file for now
 mv ext/fileinfo/data_file.c{,.php-src}
+%endif
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

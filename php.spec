@@ -113,6 +113,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %if "%{pld_release}" == "ac_"
 %define		php_suffix 53
+%define		_noautoreqdep libphp_common.*
 %else
 %define		php_suffix %{nil}
 %endif

@@ -126,13 +126,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.3.21
+Version:	5.3.22
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
-# Source0-md5:	1b214fc19bb5f5c0902ba27c74d5f4a2
+# Source0-md5:	bf351426fc7f97aa13914062958a6100
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -203,7 +203,6 @@ Patch64:	%{orgname}-m4.patch
 Patch65:	system-libzip.patch
 Patch66:	%{orgname}-db.patch
 Patch67:	php-litespeed.patch
-Patch68:	file-magic.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1959,17 +1958,8 @@ cp -p php.ini-production php.ini
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
-%if "%{pld_release}" != "ac"
-%patch68 -p1
-%endif
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
-
-%if "%{pld_release}" != "ac"
-# somewhy php devs have embedded magic database into php extension. yuck!
-# rebuild data file for now
-mv ext/fileinfo/data_file.c{,.php-src}
-%endif
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

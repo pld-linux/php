@@ -120,7 +120,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	27
+Release:	28
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -2080,7 +2080,8 @@ done
 
 %patch400 -p1 -b .php-5.2-max-input-vars
 %patch401 -p1 -b .bug-323007
-%patch402 -p1 -b .bug-323016
+# causes regression -> magic_quotes_gpc setting cannot be changed
+#%%patch402 -p1 -b .bug-323016
 
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4

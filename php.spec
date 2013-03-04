@@ -427,6 +427,9 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
 Provides:	webserver(php) = %{version}
+%if "%{pld_release}" != "ac"
+Conflicts:	logrotate < 3.8.0
+%endif
 
 %description cgi
 php as CGI program.
@@ -2320,6 +2323,9 @@ install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
 cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
+%if "%{pld_release}" == "ac"
+%{__sed} -i -e '/su/d' $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
+%endif
 
 %{__sed} -i -e '
 	s#/usr/lib/php#%{php_extensiondir}#

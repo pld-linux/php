@@ -1,6 +1,7 @@
 /var/log/php/@processname@.log
 /var/log/php/@processname@-slow.log
 {
+	su root http
 	notifempty
 	missingok
 	create 600 root root

@@ -120,7 +120,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	28
+Release:	29
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -293,6 +293,7 @@ Patch374:	php-5.2.17-bug-55478.patch
 Patch375:	php-5.2.17-bug-319457.patch
 # Bug-55776 CVE-2012-0788
 Patch376:	php-5.2.17-bug-55776.patch
+Patch377:	php-crypt-null.patch
 
 #php-5.2-max-input-vars patch
 Patch400:	php-5.2.17-max-input-vars.patch
@@ -2077,6 +2078,7 @@ done
 %patch374 -p1 -b .bug-55478
 %patch375 -p1 -b .bug-319457
 %patch376 -p1 -b .bug-55776
+%patch377 -p1
 
 %patch400 -p1 -b .php-5.2-max-input-vars
 %patch401 -p1 -b .bug-323007

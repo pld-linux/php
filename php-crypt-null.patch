@@ -1,0 +1,16 @@
+--- php-5.2.17/ext/standard/crypt.c~	2013-03-25 17:26:27.000000000 +0100
++++ php-5.2.17/ext/standard/crypt.c	2013-03-25 17:27:42.866436012 +0100
+@@ -163,7 +163,12 @@
+ 		RETURN_STRING(crypt_r(str, salt, &buffer), 1);
+ 	}
+ #else
+-	RETURN_STRING(crypt(str, salt), 1);
++	crypt_res = crypt(str, salt);
++	if (!crypt_res) {
++		RETURN_FALSE;
++	} else {
++		RETURN_STRING(crypt_res, 1);
++	}
+ #endif
+ }
+ /* }}} */

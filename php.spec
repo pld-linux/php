@@ -120,7 +120,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	30
+Release:	31
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -2496,7 +2496,7 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 libtool --silent --mode=install install sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/%{phpfn}
 ln -sf %{phpfn} $RPM_BUILD_ROOT%{_bindir}/php
 cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{phpfn}.1
-echo ".so %{phpfn}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
+echo ".so man1/%{phpfn}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
 ln -sf %{phpfn} $RPM_BUILD_ROOT%{_bindir}/php
 
 cp -p php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini

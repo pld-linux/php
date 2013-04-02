@@ -60,6 +60,7 @@
 %bcond_with	mysqlnd		# with mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	odbc		# without ODBC extension module
+%bcond_without	opcache		# without Enable Zend OPcache extension support
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
 %bcond_without	pdo_sqlite	# without PDO SQLite extension module
@@ -127,7 +128,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		php_suffix 55
 
 %define		rel	0.3
-%define		subver	alpha6
+%define		subver	beta1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -141,7 +142,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://downloads.php.net/dsp/%{orgname}-%{version}%{subver}.tar.xz
-# Source0-md5:	c2aa16727f554fc4a1fda7db09d251f2
+# Source0-md5:	19b4558c63660ecb9c2fc71c4eb0e0f5
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -316,6 +317,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		hashver		1.0
 %define		intlver		1.1.0
 %define		jsonver		1.2.1
+%define		opcachever	7.0.1-dev
 %define		pharver		2.0.1
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.11.0
@@ -1183,6 +1185,21 @@ Moduł PHP ze wsparciem dla ODBC.
 
 %description odbc -l pt_BR.UTF-8
 Um módulo para aplicações PHP que usam ODBC.
+
+%package opcache
+Summary:	Zend Optimizer+ - PHP code optimizer
+Group:		Libraries
+URL:		https://wiki.php.net/rfc/optimizerplus
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(opcache) = %{opcachever}
+
+%description opcache
+The Zend OPcache provides faster PHP execution through opcode caching
+and optimization. It improves PHP performance by storing precompiled
+script bytecode in the shared memory. This eliminates the stages of
+reading code from the disk and compiling it on future access. In
+addition, it applies a few bytecode optimization patterns that make
+code execution faster.
 
 %package openssl
 Summary:	OpenSSL extension module for PHP
@@ -2058,6 +2075,12 @@ if test "$ver" != "%{jsonver}"; then
 	: Update the jsonver macro and rebuild.
 	exit 1
 fi
+ver=$(sed -n '/#define ACCELERATOR_VERSION /{s/.* "//;s/".*$//;p}' ext/opcache/ZendAccelerator.h)
+if test "$ver" != "%{opcachever}"; then
+	: Error: Upstream Zend Opcachge version is now ${ver}, expecting %{opcachever}.
+	: Update the opcachever macro and rebuild.
+	exit 1
+fi
 ver=$(sed -rne 's,.*<version>(.+)</version>,\1,p' ext/bz2/package.xml)
 if test "$ver" != "%{bz2ver}"; then
 	: Error: Upstream BZIP2 version is now ${ver}, expecting %{bz2ver}.
@@ -2235,6 +2258,7 @@ for sapi in $sapis; do
 	--with-mysql=shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_oci8:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
+	%{?with_opcache:--enable-opcache=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \
 	--with-tcadb=/usr \
@@ -2318,6 +2342,9 @@ install -d conf.d
 generate_inifiles() {
 	for so in modules/*.so; do
 		mod=$(basename $so .so)
+		ext=extension
+		# opcache.so is zend extension
+		nm $so | grep -q zend_extension_entry && ext=zend_extension
 		conf="$mod.ini"
 		# xml needs to be loaded before wddx
 		[ "$mod" = "wddx" ] && conf="xml_$mod.ini"
@@ -2331,8 +2358,8 @@ generate_inifiles() {
 		[ "$mod" = "mysqlnd" ] && conf="MySQLND.ini"
 		echo "+ $conf"
 		cat > conf.d/$conf <<-EOF
-			; Enable $mod extension module
-			extension=$mod.so
+			; Enable $mod $ext module
+			$ext=$mod.so
 		EOF
 	done
 }
@@ -2638,6 +2665,7 @@ fi
 %extension_scripts mysqlnd
 %extension_scripts oci8
 %extension_scripts odbc
+%extension_scripts opcache
 %extension_scripts openssl
 %extension_scripts pcre
 %extension_scripts pdo
@@ -2972,6 +3000,14 @@ fi
 %doc ext/odbc/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/odbc.ini
 %attr(755,root,root) %{php_extensiondir}/odbc.so
+%endif
+
+%if %{with opcache}
+%files opcache
+%defattr(644,root,root,755)
+%doc ext/opcache/README
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/opcache.ini
+%attr(755,root,root) %{php_extensiondir}/opcache.so
 %endif
 
 %if %{with openssl}

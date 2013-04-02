@@ -34,7 +34,7 @@ conf_dir=${CONFIG_DIR:-$(php-config --sysconfdir)/conf.d $(php-config --sysconfd
 tmpini=$(mktemp)
 
 # poldek --sn ac-ready -u php-*
-for ext in $ext_dir/*.so; do
+for ext in ${1:-$ext_dir/*.so}; do
 	[ -f $ext ] || continue
 	ext=${ext##*/}; ext=${ext%.so}
 
@@ -44,7 +44,10 @@ for ext in $ext_dir/*.so; do
 
 	echo -n "$ext (deps: ${deps# })..."
 
-	grep -rlE '^extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_CTYPE=C LC_ALL= sort | xargs cat > $tmpini
+	# special: opcache is listed as "Zend Opcache"
+	[ "$ext" = "opcache" ] && ext="zend opcache"
+
+	grep -rlE '^(zend_)?extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_CTYPE=C LC_ALL= sort | xargs cat > $tmpini
 	$php -n -d extension_dir=$ext_dir -c $tmpini -r "exit(extension_loaded('${ext}') ? 0 : 1);"
 	rc=$?
 	if [ $rc = 0 ]; then

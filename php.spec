@@ -120,7 +120,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	32
+Release:	33
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -210,6 +210,7 @@ Patch67:	php-db.patch
 Patch68:	php-libxml.patch
 Patch69:	bug-50563.patch
 Patch70:	php-crypt-null.patch
+Patch71:	php-apache24.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -1920,6 +1921,7 @@ done
 %patch68 -p1
 %patch69 -p4
 %patch70 -p1
+%patch71 -p1
 
 # Bugfix backport from 5.3.6
 %patch311 -p1 -b .bug-47435
@@ -2030,16 +2032,17 @@ for sapi in $sapis; do
 		sapi_args='--disable-cli --enable-fastcgi --enable-force-cgi-redirect --enable-fpm'
 		;;
 	apxs1)
-		ver=$(rpm -q --qf '%{V}' apache1-devel)
-		sapi_args="--disable-cli --with-apxs=%{apxs1} --with-apache-version=$ver"
+		apache_ver=$(rpm -q --qf '%{V}' apache1-devel)
+		sapi_args="--disable-cli --with-apxs=%{apxs1} --with-apache-version=$apache_ver"
 		;;
 	apxs2)
-		ver=$(rpm -q --qf '%{V}' apache-devel)
-		sapi_args="--disable-cli --with-apxs2=%{apxs2} --with-apache-version=$ver"
+		apache_ver=$(rpm -q --qf '%{V}' apache-devel)
+		sapi_args="--disable-cli --with-apxs2=%{apxs2} --with-apache-version=$apache_ver"
 		;;
 	esac
 
 	%configure \
+	FORCE_APACHE_VERSION="${apache_ver}" \
 	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"
 	--cache-file=config.cache \

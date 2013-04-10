@@ -1,0 +1,140 @@
+commit 949ef40139a008c9bbf387a677018f3a85fbf75a
+Author: Christopher Jones <sixd@php.net>
+Date:   Fri Mar 2 00:07:41 2012 +0000
+
+    Fixed bug #61172 (Add Apache 2.4 support)
+
+diff --git a/configure.in b/configure.in
+index 7ed2d93..8f579ef 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1550,6 +1550,21 @@ cat <<X
+ X
+   fi
+ 
++  if test "$PHP_SAPI" = "apache2handler" || test "$PHP_SAPI" = "apache2filter"; then
++    if test "$APACHE_VERSION" -ge 2004001; then
++      if test -z "$APACHE_THREADED_MPM"; then
++cat <<X
+++--------------------------------------------------------------------+
++|                        *** WARNING ***                             |
++|                                                                    |
++| You have built PHP for Apache's current non-threaded MPM.          |
++| If you change Apache to use a threaded MPM you must reconfigure    |
++| PHP with --enable-maintainer-zts                                   |
++X
++      fi
++    fi
++  fi
++
+   # Warn about linking Apache with libpthread if oci8 extension is enabled on linux.
+   if test "$PHP_OCI8" != "no"; then
+     if test "$PHP_SAPI" = "apache"; then
+diff --git a/sapi/apache2filter/config.m4 b/sapi/apache2filter/config.m4
+index b10720a..c49488d 100644
+--- a/sapi/apache2filter/config.m4
++++ b/sapi/apache2filter/config.m4
+@@ -39,7 +39,6 @@ if test "$PHP_APXS2FILTER" != "no"; then
+   APXS_BINDIR=`$APXS -q BINDIR`
+   APXS_HTTPD=`$APXS -q SBINDIR`/`$APXS -q TARGET`
+   APXS_CFLAGS=`$APXS -q CFLAGS`
+-  APXS_MPM=`$APXS -q MPM_NAME`
+   APU_BINDIR=`$APXS -q APU_BINDIR`
+   APR_BINDIR=`$APXS -q APR_BINDIR`
+ 
+@@ -118,8 +117,16 @@ if test "$PHP_APXS2FILTER" != "no"; then
+     ;;
+   esac
+ 
+-  if test "$APXS_MPM" != "prefork"; then
+-    PHP_BUILD_THREAD_SAFE
++  if test "$APACHE_VERSION" -lt 2004001; then
++    APXS_MPM=`$APXS -q MPM_NAME`
++    if test "$APXS_MPM" != "prefork" && test "$APXS_MPM" != "peruser" && test "$APXS_MPM" != "itk"; then
++      PHP_BUILD_THREAD_SAFE
++    fi
++  else
++    APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`
++    if test -n "$APACHE_THREADED_MPM"; then
++      PHP_BUILD_THREAD_SAFE
++    fi
+   fi
+   AC_MSG_RESULT(yes)
+   PHP_SUBST(APXS)
+diff --git a/sapi/apache2handler/config.m4 b/sapi/apache2handler/config.m4
+index 9521790..702f91f 100644
+--- a/sapi/apache2handler/config.m4
++++ b/sapi/apache2handler/config.m4
+@@ -38,7 +38,6 @@ if test "$PHP_APXS2" != "no"; then
+   APXS_BINDIR=`$APXS -q BINDIR`
+   APXS_HTTPD=`$APXS -q SBINDIR`/`$APXS -q TARGET`
+   APXS_CFLAGS=`$APXS -q CFLAGS`
+-  APXS_MPM=`$APXS -q MPM_NAME`
+   APU_BINDIR=`$APXS -q APU_BINDIR`
+   APR_BINDIR=`$APXS -q APR_BINDIR`
+ 
+@@ -117,8 +116,16 @@ if test "$PHP_APXS2" != "no"; then
+     ;;
+   esac
+ 
+-  if test "$APXS_MPM" != "prefork"; then
+-    PHP_BUILD_THREAD_SAFE
++  if test "$APACHE_VERSION" -lt 2004001; then
++    APXS_MPM=`$APXS -q MPM_NAME`
++    if test "$APXS_MPM" != "prefork" && test "$APXS_MPM" != "peruser" && test "$APXS_MPM" != "itk"; then
++      PHP_BUILD_THREAD_SAFE
++    fi
++  else
++    APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`
++    if test -n "$APACHE_THREADED_MPM"; then
++      PHP_BUILD_THREAD_SAFE
++    fi
+   fi
+   AC_MSG_RESULT(yes)
+   PHP_SUBST(APXS)
+commit 019bdff3951f415e2d5c44933da30a4669c628e8
+Author: Pierre Joye <pierre.php@gmail.com>
+Date:   Tue Nov 13 19:34:00 2012 +0100
+
+    Enabled apache 2.4 handler build option
+
+diff --git a/sapi/apache2handler/config.w32 b/sapi/apache2handler/config.w32
+index 2f2084c..d09e165 100644
+--- a/sapi/apache2handler/config.w32
++++ b/sapi/apache2handler/config.w32
+@@ -37,3 +37,22 @@ if (PHP_APACHE2_2HANDLER != "no") {
+ 		WARNING("Could not find apache2.2 libraries/headers");
+ 	}
+ }
++
++ARG_ENABLE('apache2-4handler', 'Build Apache 2.4.x handler', 'no');
++if (PHP_APACHE2_4HANDLER != "no") {
++	if (PHP_ZTS == "no") {
++		WARNING("Apache 2.4 module requires an --enable-zts build of PHP on windows");
++	} else if (CHECK_HEADER_ADD_INCLUDE("httpd.h", "CFLAGS_APACHE2_4HANDLER", PHP_PHP_BUILD + "\\include\\apache2_4") &&
++			CHECK_LIB("libhttpd.lib", "apache2_4handler", PHP_PHP_BUILD + "\\lib\\apache2_4") &&
++			CHECK_LIB("libapr-1.lib", "apache2_4handler", PHP_PHP_BUILD + "\\lib\\apache2_4") &&
++			CHECK_LIB("libaprutil-1.lib", "apache2_4handler", PHP_PHP_BUILD + "\\lib\\apache2_4")
++			) {
++		SAPI('apache2_4handler', 'mod_php5.c sapi_apache2.c apache_config.c php_functions.c',
++				'php' + PHP_VERSION + 'apache2_4.dll',
++				'/D PHP_APACHE2_EXPORTS /I win32',
++				'sapi\\apache2handler');
++	} else {
++		WARNING("Could not find apache 2.4 libraries/headers");
++	}
++}
++
+--- php-5.2.17/acinclude.m4~	2013-04-10 12:57:07.000000000 +0200
++++ php-5.2.17/acinclude.m4	2013-04-10 13:22:13.515018845 +0200
+@@ -2586,6 +2586,9 @@
+ dnl
+ AC_DEFUN([PHP_AP_EXTRACT_VERSION],[
+   ac_output=`$1 -v 2>&1 | grep version`
++  if test -n "$FORCE_APACHE_VERSION"; then
++    ac_output="Server version: Apache/${FORCE_APACHE_VERSION} (PLD/Linux)"
++  fi
+   ac_IFS=$IFS
+ IFS="- /.
+ "
+

@@ -118,7 +118,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		php_suffix %{nil}
 %endif
 
-%define		rel	2
+%define		rel	1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -126,13 +126,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.3.23
+Version:	5.3.24
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
-# Source0-md5:	ab7bd1dd3bbc8364cb9fcaa2d79fb502
+# Source0-md5:	9820604df98c648297dcd31ffb8214e8
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini

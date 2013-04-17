@@ -1,5 +1,5 @@
---- php-5.3.1/ext/pcre/config0.m4	2009-11-27 08:19:08.836025192 +0000
-+++ php-5.3.1/ext/pcre/config0.m4	2009-11-30 22:09:24.385647500 +0000
+--- php-5.3.1/ext/pcre/config0.m4	2009-11-30 22:09:24.385647500 +0000
++++ php-5.3.24/ext/pcre/config0.m4	2013-04-17 13:37:52.761509001 +0300
 @@ -11,7 +11,7 @@
  
    if test "$PHP_PCRE_REGEX" != "yes" && test "$PHP_PCRE_REGEX" != "no"; then
@@ -18,7 +18,7 @@
        test -f $j/libpcre.a || test -f $j/libpcre.$SHLIB_SUFFIX_NAME && PCRE_LIBDIR=$j
      done
      
-@@ -43,12 +43,13 @@
+@@ -43,12 +43,14 @@
        AC_MSG_ERROR([The PCRE extension requires PCRE library version >= 6.6])
      fi
  
@@ -29,20 +29,12 @@
      PHP_ADD_INCLUDE($PCRE_INCDIR)
 -    PHP_NEW_EXTENSION(pcre, php_pcre.c, no)
 +    PHP_NEW_EXTENSION(pcre, php_pcre.c, $ext_shared)
++    PHP_SUBST(PCRE_SHARED_LIBADD)
      PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h])
 +    EXTRA_LIBS="$EXTRA_LIBS -lpcre"
    else
      AC_MSG_CHECKING([for PCRE library to use])
      AC_MSG_RESULT([bundled])
-@@ -59,7 +60,7 @@
-     				 pcrelib/pcre_ord2utf8.c pcrelib/pcre_refcount.c pcrelib/pcre_study.c \
-     				 pcrelib/pcre_tables.c pcrelib/pcre_try_flipped.c pcrelib/pcre_valid_utf8.c \
-     				 pcrelib/pcre_version.c pcrelib/pcre_xclass.c"
--    PHP_NEW_EXTENSION(pcre, $pcrelib_sources php_pcre.c, no,,-I@ext_srcdir@/pcrelib)
-+    PHP_NEW_EXTENSION(pcre, $pcrelib_sources php_pcre.c, $ext_shared,,-I@ext_srcdir@/pcrelib)
-     PHP_ADD_BUILD_DIR($ext_builddir/pcrelib)
-     PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h pcrelib/])
-     AC_DEFINE(HAVE_BUNDLED_PCRE, 1, [ ])
 --- php-5.3.1/ext/pcre/php_pcre.h	2009-11-30 20:59:04.046581246 +0200
 +++ php-5.3.1.pcre/ext/pcre/php_pcre.h	2009-11-30 21:38:06.435493243 +0000
 @@ -34,7 +34,12 @@

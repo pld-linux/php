@@ -128,7 +128,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		php_suffix 55
 
 %define		rel	0.3
-%define		subver	beta2
+%define		subver	beta4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -142,7 +142,7 @@ Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://downloads.php.net/dsp/%{orgname}-%{version}%{subver}.tar.xz
-# Source0-md5:	8080295ce454455bff08a10eaa0896aa
+# Source0-md5:	cba102154280dd16462150232dad9487
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini

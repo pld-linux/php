@@ -2289,18 +2289,21 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 %{__make} install-headers install-build install-modules install-programs \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
+# version suffix
+v=$(echo %{version} | cut -d. -f1-2)
+
 # install Apache1 DSO module
 %if %{with apache1}
-libtool --silent --mode=install install sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
-mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-%{version}}.so
-ln -s libphp5-%{version}.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.so
+libtool --mode=install install -p sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
+mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-$v}.so
+ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.so
 %endif
 
 # install Apache2 DSO module
 %if %{with apache2}
-libtool --silent --mode=install install sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
-mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-%{version}}.so
-ln -s libphp5-%{version}.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
+libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
+mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-$v}.so
+ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
 %endif
 
 libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
@@ -2561,7 +2564,7 @@ fi
 %dir %{_sysconfdir}/apache.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
 %attr(755,root,root) %{_libdir}/apache1/libphp5.so
-%attr(755,root,root) %{_libdir}/apache1/libphp5-%{version}.so
+%attr(755,root,root) %{_libdir}/apache1/libphp5-*.*.so
 %endif
 
 %if %{with apache2}
@@ -2571,7 +2574,7 @@ fi
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
-%attr(755,root,root) %{_libdir}/apache/libphp5-%{version}.so
+%attr(755,root,root) %{_libdir}/apache/libphp5-*.*.so
 %endif
 
 %if %{with fcgi}

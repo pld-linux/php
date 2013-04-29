@@ -2400,18 +2400,21 @@ cp -pf Makefile.cli Makefile
 # make link relative
 ln -sfn phar.phar $RPM_BUILD_ROOT%{_bindir}/phar
 
+# version suffix
+v=$(echo %{version} | cut -d. -f1-2)
+
 # install Apache1 DSO module
 %if %{with apache1}
 libtool --mode=install install -p sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
-mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-%{version}}.so
-ln -s libphp5-%{version}.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.so
+mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-$v}.so
+ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.so
 %endif
 
 # install Apache2 DSO module
 %if %{with apache2}
 libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
-mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-%{version}}.so
-ln -s libphp5-%{version}.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
+mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-$v}.so
+ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
 %endif
 
 # install litespeed sapi
@@ -2694,7 +2697,7 @@ fi
 %dir %{_sysconfdir}/apache.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
 %attr(755,root,root) %{_libdir}/apache1/libphp5.so
-%attr(755,root,root) %{_libdir}/apache1/libphp5-%{version}.so
+%attr(755,root,root) %{_libdir}/apache1/libphp5-*.*.so
 %endif
 
 %if %{with apache2}
@@ -2704,7 +2707,7 @@ fi
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
 %attr(755,root,root) %{_libdir}/apache/libphp5.so
-%attr(755,root,root) %{_libdir}/apache/libphp5-%{version}.so
+%attr(755,root,root) %{_libdir}/apache/libphp5-*.*.so
 %endif
 
 %if %{with litespeed}

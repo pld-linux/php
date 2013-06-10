@@ -1,5 +1,5 @@
---- php-5.2.5_p20080206.orig/ext/mysql/php_mysql.c	2008-02-06 14:22:57.652600900 +0100
-+++ php-5.2.5_p20080206/ext/mysql/php_mysql.c	2008-02-06 14:24:40.216655403 +0100
+--- php-5.4.16/ext/mysql/php_mysql.c~	2013-06-10 14:41:59.000000000 +0300
++++ php-5.4.16/ext/mysql/php_mysql.c	2013-06-10 14:42:50.048809174 +0300
 @@ -360,6 +360,7 @@
  	PHP_INI_ENTRY("mysql.default_port",				NULL,	PHP_INI_ALL,		OnMySQLPort)
  	STD_PHP_INI_ENTRY("mysql.default_socket",		NULL,	PHP_INI_ALL,		OnUpdateStringUnempty,	default_socket,	zend_mysql_globals,		mysql_globals)
@@ -16,14 +16,14 @@
  	mysql_globals->trace_mode = 0;
  	mysql_globals->result_allocated = 0;
  }
-@@ -515,6 +517,7 @@
+@@ -723,6 +723,7 @@
  {
  	char *user=NULL, *passwd=NULL, *host_and_port=NULL, *socket=NULL, *tmp=NULL, *host=NULL;
- 	int  user_len, passwd_len, host_len;
+ 	int  user_len = 0, passwd_len = 0, host_len = 0;
 +	char *connect_charset=NULL;
  	char *hashed_details=NULL;
  	int hashed_details_length, port = MYSQL_PORT;
- 	int client_flags = 0;
+ 	long client_flags = 0;
 @@ -527,6 +530,7 @@
  
  

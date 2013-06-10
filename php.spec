@@ -32,7 +32,7 @@
 %bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
-%bcond_with	default_php	# use this PHP as default PHP in distro (distro default is set below)
+%bcond_without	default_php	# use this PHP as default PHP in distro
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	enchant		# without Enchant extension module
@@ -113,8 +113,10 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 
 %if "%{pld_release}" == "ac"
 %define		_noautoreqdep libphp_common.*
-%else
-%define		with_default_php	1
+# if commandline --with was given. respect that
+%if 0%{!?_with_default_php:1}
+%undefine	with_default_php
+%endif
 %endif
 
 %define		rel	1

@@ -32,6 +32,7 @@
 %bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
+%bcond_with	default_php	# use this PHP as default PHP in distro (distro default is set below)
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	enchant		# without Enchant extension module
@@ -110,15 +111,15 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		orgname	php
 %if "%{pld_release}" == "ac"
-%define		php_suffix 53
 %define		_noautoreqdep libphp_common.*
 %else
-%define		php_suffix %{nil}
+%define		with_default_php	1
 %endif
 
 %define		rel	1
+%define		orgname	php
+%define		php_suffix %{!?with_default_php:53}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP

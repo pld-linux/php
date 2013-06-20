@@ -129,8 +129,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		orgname	php
 %define		php_suffix 55
 
-%define		rel	0.3
-%define		subver	RC3
+%define		rel	0.4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -139,12 +138,12 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.5.0
-Release:	%{rel}%{?subver:.%{subver}}%{?with_type_hints:.th}%{?with_oci8:.oci}
+Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://downloads.php.net/dsp/%{orgname}-%{version}%{subver}.tar.xz
-# Source0-md5:	1221aff0c050611d5ec04d73349f9db6
+Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
+# Source0-md5:	daf2d54e79def9fd0fb2ac7dfcefb7f3
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -1886,7 +1885,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{orgname}-%{version}%{?subver}
+%setup -q -n %{orgname}-%{version}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1

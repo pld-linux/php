@@ -3833,8 +3833,8 @@ the following modifications have been made:
  #endif /* ZEND_ERRORS_H */
  
  /*
---- a/Zend/zend_hash.c
-+++ b/Zend/zend_hash.c
+--- php-5.5.0/Zend/zend_hash.c~	2013-06-20 23:57:44.000000000 +0300
++++ php-5.5.0/Zend/zend_hash.c	2013-06-20 23:58:38.383348644 +0300
 @@ -21,6 +21,7 @@
  
  #include "zend.h"
@@ -4075,10 +4075,10 @@ the following modifications have been made:
  			if (ht->pDestructor) {
  				ht->pDestructor(p->pData);
  			}
-@@ -527,6 +725,7 @@ ZEND_API int zend_hash_del_key_or_index(
- 			if (ht->pInternalPointer == p) {
+@@ -726,6 +726,7 @@
  				ht->pInternalPointer = p->pListNext;
  			}
+ 			ht->nNumOfElements--;
 +			zend_hash_check_destructor(ht->pDestructor);
  			if (ht->pDestructor) {
  				ht->pDestructor(p->pData);

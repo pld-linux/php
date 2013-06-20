@@ -1,5 +1,6 @@
 # TODO 5.5:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
+# - build with system libgd 2.1, see 73c5128
 # TODO 5.4:
 # - do not remove PatchX: definitions until merged to HEAD, needed for tracking their state
 # - check php-sapi-ini-file.patch for safe mode removal

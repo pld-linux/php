@@ -310,6 +310,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		1.2.1
 %define		pharver		2.0.1
 %define		sqlitever	2.0-dev
+%define		sqlite3ver	0.7-dev
 %define		zipver		1.11.0
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
@@ -1623,7 +1624,7 @@ Summary(pl.UTF-8):	Moduł SQLite3 dla PHP
 Group:		Libraries
 URL:		http://php.net/manual/en/book.sqlite3.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(sqlite3)
+Provides:	php(sqlite3) = %{sqlite3ver}
 
 %description sqlite3
 SQLite is a C library that implements an embeddable SQL database
@@ -2041,6 +2042,12 @@ ver=$(sed -n '/#define PHP_PHAR_VERSION /{s/.* "//;s/".*$//;p}' ext/phar/php_pha
 if test "$ver" != "%{pharver}"; then
 	: Error: Upstream PHAR version is now ${ver}, expecting %{pharver}.
 	: Update the pharver macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHP_SQLITE3_VERSION/{s/.* "//;s/".*$//;p}' ext/sqlite3/php_sqlite3.h)
+if test "$ver" != "%{sqlite3ver}"; then
+	: Error: Upstream Sqlite3 version is now ${ver}, expecting %{sqlite3ver}.
+	: Update the sqlite3ver macro and rebuild.
 	exit 1
 fi
 ver=$(sed -n '/#define PHP_ZIP_VERSION_STRING /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
@@ -2828,6 +2835,7 @@ fi
 
 %files dba
 %defattr(644,root,root,755)
+%doc ext/dba/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dba.ini
 %attr(755,root,root) %{php_extensiondir}/dba.so
 

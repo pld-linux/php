@@ -44,6 +44,7 @@
 %bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
+%bcond_with	default_php	# use this PHP as default PHP in distro
 %bcond_without	curl		# without CURL extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	filter		# without filter extension module
@@ -123,10 +124,10 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		orgname	php
-%define		php_suffix 54
-
 %define		rel	1
+%define		orgname	php
+%define		ver_suffix 54
+%define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2457,10 +2458,11 @@ cp -p sapi/embed/php_embed.h $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
 %endif
 
 # install CLI
-libtool --mode=install install -p sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/%{name}
-cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{name}.1
-echo ".so %{name}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
-ln -sf %{name} $RPM_BUILD_ROOT%{_bindir}/php
+# versioned suffix is always installed
+libtool --mode=install install -p sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php%{ver_suffix}
+cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php%{ver_suffix}.1
+echo ".so php%{ver_suffix}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
+ln -sf php%{ver_suffix} $RPM_BUILD_ROOT%{_bindir}/php
 
 cp -p php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
@@ -2722,8 +2724,8 @@ fi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cli.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
-%attr(755,root,root) %{_bindir}/%{name}
-%{_mandir}/man1/%{name}.1*
+%attr(755,root,root) %{_bindir}/php%{ver_suffix}
+%{_mandir}/man1/php%{ver_suffix}.1*
 
 %files program
 %defattr(644,root,root,755)
@@ -2961,7 +2963,7 @@ fi
 %if %{with oci8}
 %files oci8
 %defattr(644,root,root,755)
-%doc ext/ico8/{CREDITS,README}
+%doc ext/oci8/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/oci8.ini
 %attr(755,root,root) %{php_extensiondir}/oci8.so
 %endif

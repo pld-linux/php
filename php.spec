@@ -121,7 +121,8 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 
 %define		rel	1
 %define		orgname	php
-%define		php_suffix %{!?with_default_php:53}
+%define		ver_suffix 53
+%define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2466,16 +2467,16 @@ cp -p sapi/embed/php_embed.h $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
 %endif
 
 # install CLI
-# without suffix, install as php.cli
-%if "%{?php_suffix}" == ""
-%define	phpfn %{name}.cli
-%else
-%define	phpfn %{name}
+# versioned suffix is always installed
+libtool --mode=install install -p sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/php%{ver_suffix}
+cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/php%{ver_suffix}.1
+echo ".so php%{ver_suffix}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
+ln -sf php%{ver_suffix} $RPM_BUILD_ROOT%{_bindir}/php
+
+# .cli extension is installed only if default php.spec in distro for legacy purposes
+%if "%{?php_suffix}" == "" && "%{pld_release}" != "ac"
+ln -s php%{ver_suffix} $RPM_BUILD_ROOT%{_bindir}/php.cli
 %endif
-libtool --mode=install install -p sapi/cli/php $RPM_BUILD_ROOT%{_bindir}/%{phpfn}
-cp -p sapi/cli/php.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{phpfn}.1
-echo ".so %{phpfn}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
-ln -sf %{phpfn} $RPM_BUILD_ROOT%{_bindir}/php
 
 cp -p php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
@@ -2738,8 +2739,13 @@ fi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cli.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
-%attr(755,root,root) %{_bindir}/%{phpfn}
-%{_mandir}/man1/%{phpfn}.1*
+%attr(755,root,root) %{_bindir}/php%{ver_suffix}
+%{_mandir}/man1/php%{ver_suffix}.1*
+
+# legacy. do we really need it?
+%if "%{?php_suffix}" == "" && "%{pld_release}" != "ac"
+%attr(755,root,root) %{_bindir}/php.cli
+%endif
 
 %files program
 %defattr(644,root,root,755)

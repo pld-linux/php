@@ -128,7 +128,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.4
+%define		rel	1
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -139,13 +139,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.5.0
+Version:	5.5.1
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
-# Source0-md5:	daf2d54e79def9fd0fb2ac7dfcefb7f3
+# Source0-md5:	e6520ba8f86e03451f1e9226ca2be681
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -166,7 +166,7 @@ Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		%{orgname}-config-file-scan-dir.patch
-Patch9:		%{orgname}-sh.patch
+
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 %if %{with type_hints}
@@ -1897,7 +1897,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch6 -p1
 %patch8 -p1
 %patch7 -p1
-%patch9 -p1
+
 cp -p php.ini-production php.ini
 %patch10 -p1
 %if %{with type_hints}

@@ -135,13 +135,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.4.17
+Version:	5.4.18
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
-# Source0-md5:	1e027e99e2a874310fd518e87e3947af
+# Source0-md5:	b2e185b46b22a48a385cf21a0dc76e65
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -162,7 +162,6 @@ Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		%{orgname}-config-file-scan-dir.patch
-Patch9:		%{orgname}-sh.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 %if %{with type_hints}
@@ -1876,7 +1875,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch6 -p1
 %patch8 -p1
 %patch7 -p1
-%patch9 -p1
 cp -p php.ini-production php.ini
 %patch10 -p1
 %if %{with type_hints}

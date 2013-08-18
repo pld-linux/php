@@ -113,6 +113,8 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		php_suffix %{nil}
 %endif
 
+%define	rel		1
+%define	backport_date	20130717
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -121,7 +123,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.2.17
-Release:	34
+Release:	%{backport_date}.%{rel}
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -142,8 +144,8 @@ Source11:	%{orgname}-fpm.logrotate
 Source12:	%{orgname}-branch.sh
 Source13:	dep-tests.sh
 Source14:	skip-tests.sh
-Patch100:	https://php52-backports.googlecode.com/files/php52-backports-20130320.patch
-# Patch100-md5:	8428acfb94d5804e00333db01f7cd8dd
+Patch100:	https://php52-backports.googlecode.com/files/php52-backports-%{backport_date}.patch
+# Patch100-md5:	80014a8f7894d4e893a8b1292b8b3032
 Patch0:		%{orgname}-shared.patch
 Patch1:		%{orgname}-pldlogo.patch
 Patch2:		%{orgname}-mail.patch
@@ -208,7 +210,6 @@ Patch60:	bug-60986.patch
 Patch65:	system-libzip.patch
 Patch66:	bug-47930.patch
 Patch67:	php-db.patch
-Patch68:	php-libxml.patch
 Patch69:	bug-50563.patch
 Patch70:	php-crypt-null.patch
 Patch71:	php-apache24.patch
@@ -1922,7 +1923,6 @@ done
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p2
 %patch67 -p1
-%patch68 -p1
 %patch69 -p4
 %patch70 -p1
 %patch71 -p1

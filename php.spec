@@ -33,6 +33,7 @@
 %bcond_with	system_libzip	# with system libzip (reported broken: https://bugs.php.net/bug.php?id=60100)
 %bcond_with	gd_jis_conv	# causes imagettfbbox(): any2eucjp(): invalid code in input string when internal gd used
 %bcond_with	zend_multibyte		# enable zend multibyte, mbstring can't be shared then anymore
+%bcond_with	default_php	# use this PHP as default PHP in distro
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
@@ -101,20 +102,20 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 
 %if "%{pld_release}" == "ac"
 %define		magic_mime	/usr/share/file/magic.mime
+%define		_noautoreqdep libphp_common.*
+# if commandline --without was given. respect that
+%if 0%{!?_without_default_php:1}
+%define		with_default_php	1
+%endif
 %else
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
+%define		rel		1
 %define		orgname	php
-%if "%{pld_release}" == "th"
-%define		php_suffix 52
-%define		_noautoreqdep libphp_common.*
-%else
-%define		php_suffix %{nil}
-%endif
-
-%define	rel		1
-%define	backport_date	20130717
+%define		ver_suffix 52
+%define		php_suffix %{!?with_default_php:%{ver_suffix}}
+%define		backport_date	20130717
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP

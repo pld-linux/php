@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	1
+%define		rel	2
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -193,6 +193,7 @@ Patch44:	%{orgname}-include_path.patch
 Patch45:	%{orgname}-imap-annotations.patch
 Patch46:	%{orgname}-imap-myrights.patch
 Patch47:	suhosin.patch
+Patch48:	php-bug-60598.patch
 Patch49:	%{orgname}-m4-divert.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
@@ -1950,6 +1951,7 @@ cp -p php.ini-production php.ini
 %if %{with suhosin}
 %patch47 -p1
 %endif
+%patch48 -p1
 %patch49 -p1
 %patch50 -p1
 %patch51 -p1

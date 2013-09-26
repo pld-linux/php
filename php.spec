@@ -135,13 +135,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.4.19
+Version:	5.4.20
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
-# Source0-md5:	f06f99b9872b503758adab5ba7a7e755
+# Source0-md5:	e25db5592ed14842b4239be9d990cce8
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -212,7 +212,6 @@ Patch63:	%{orgname}-mysql-nowarning.patch
 #Patch64:	%{orgname}-m4.patch # not needed on 5.4 branch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
-Patch67:	php-bug-60598.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1928,7 +1927,6 @@ cp -p php.ini-production php.ini
 %patch63 -p1
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
-%patch67 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

@@ -119,7 +119,24 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	4
+# define subpackages
+%define	package(n:l:) \
+%%package %{!?-n:%1}%{?-n:-n %{-n*}} %{-l:-l %{-l*}} \
+Requires: %{!?-n:php(%1)}%{?-n:%(echo %{-n*} | sed -e 's,%{php_suffix}$,,')} \
+\
+%{nil}
+
+%define	description(n:l:) \
+%if 0%{?1:%{!?-l:1}}%{?-n:%{!?-l:1}} && %(echo "%{1}" | grep -qE '^(devel|program|test|embedded)'; echo $?) \
+%%files %{!?-n:%{?1}}%{?-n:-n %{-n*}} \
+%endif \
+%%description %{!?-n:%{?1}}%{?-n:-n %{-n*}} %{-l:-l %{-l*}} \
+\
+Virtual package providing %{!?-n:PHP %{?1}}%{?-n:%{-n*}} installation. \
+\
+%{nil}
+
+%define		rel	5
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -135,6 +152,7 @@ Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
+%if 0
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
 # Source0-md5:	25ae23a5b9615fe8d33de5b63e1bb788
 Source2:	%{orgname}-mod_%{orgname}.conf
@@ -291,6 +309,7 @@ BuildRequires:	apr-util-devel >= 1:1.0.0
 %if %{with fpm}
 #BuildRequires:	judy-devel
 %endif
+%endif # big fat if-statement
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		php_sysconfdir		/etc/%{name}
@@ -1899,6 +1918,9 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
+%if 1
+%setup -qcT
+%else
 %setup -q -n %{orgname}-%{version}
 %patch0 -p1
 %patch1 -p1
@@ -3300,3 +3322,5 @@ fi
 %doc ext/zlib/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zlib.ini
 %attr(755,root,root) %{php_extensiondir}/zlib.so
+
+%endif # big if-statement started in %prep

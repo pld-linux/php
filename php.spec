@@ -2390,6 +2390,7 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 cp -pf php_config.h.cli main/php_config.h
 cp -pf Makefile.cli Makefile
 %{__make} install \
+	phpbuilddir=%{_libdir}/%{name}/build \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
 # make link relative
@@ -2498,16 +2499,17 @@ mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 %if "%{pld_release}" != "ac"
-	ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
+	ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/%{name}/build
 	for i in libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4; do
-		ln -snf %{_aclocaldir}/${i} $RPM_BUILD_ROOT%{_libdir}/php/build
+		ln -snf %{_aclocaldir}/${i} $RPM_BUILD_ROOT%{_libdir}/%{name}/build
 	done
-	ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+	ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/%{name}/build
 %else
-	ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
-	ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+	ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/%{name}/build
+	ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/%{name}/build
 %endif
-ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/%{name}/build
+sed -i -e '/^phpdir/ s,/php/build,/%{name}/build,' $RPM_BUILD_ROOT%{_bindir}/phpize
 
 # for php-pecl-mailparse
 install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring
@@ -2525,7 +2527,7 @@ sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_c
 sed -i -e "/dependency_libs/ s,/[^ ]*/libs/libphp_common.la,%{_libdir}/libphp_common.la," $RPM_BUILD_ROOT%{_libdir}/libphp5.la
 %endif
 # better solution?
-sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
+sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/acinclude.m4
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -2763,7 +2765,7 @@ fi
 %attr(755,root,root) %{_libdir}/libphp_common.so
 %{_libdir}/libphp_common.la
 %{_includedir}/php
-%{_libdir}/php/build
+%{_libdir}/%{name}/build
 %{_mandir}/man1/php-config.1*
 %{_mandir}/man1/phpize.1*
 %if %{with embed}

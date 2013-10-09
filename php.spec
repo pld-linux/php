@@ -2292,6 +2292,7 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 
 # install the Apache modules' files
 %{__make} install-headers install-build install-modules install-programs \
+	phpbuilddir=%{_libdir}/%{name}/build \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
 # version suffix
@@ -2310,12 +2311,6 @@ libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT
 mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-$v}.so
 ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
 %endif
-
-libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
-# fix install paths, avoid evil rpaths
-sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
-# better solution?
-sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/php/build/acinclude.m4
 
 # install CGI
 libtool --mode=install install -p sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/%{name}.cgi
@@ -2396,16 +2391,17 @@ mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/{ncurses,readline}.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 %if "%{pld_release}" != "ac"
-	ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/php/build
+	ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/%{name}/build
 	for i in libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4; do
-		ln -snf %{_aclocaldir}/${i} $RPM_BUILD_ROOT%{_libdir}/php/build
+		ln -snf %{_aclocaldir}/${i} $RPM_BUILD_ROOT%{_libdir}/%{name}/build
 	done
-	ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+	ln -snf %{_datadir}/libtool/config/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/%{name}/build
 %else
-	ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/php/build
-	ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/php/build
+	ln -snf %{_aclocaldir}/libtool.m4 $RPM_BUILD_ROOT%{_libdir}/%{name}/build
+	ln -snf %{_datadir}/libtool/ltmain.sh $RPM_BUILD_ROOT%{_libdir}/%{name}/build
 %endif
-ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/php/build
+ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/%{name}/build
+sed -i -e '/^phpdir/ s,/php/build,/%{name}/build,' $RPM_BUILD_ROOT%{_bindir}/phpize
 
 # as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h
 # isn't installed by install-headers make target, we do it manually here.
@@ -2419,6 +2415,12 @@ cp -a ext/mbstring/libmbfl/mbfl/*.h $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstri
 install -d $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 install -p run-tests.php $RPM_BUILD_ROOT%{php_data_dir}/tests/php/run-tests.php
 cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
+
+libtool --silent --mode=install install libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+# fix install paths, avoid evil rpaths
+sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
+# better solution?
+sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/acinclude.m4
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -2643,7 +2645,7 @@ fi
 %attr(755,root,root) %{_libdir}/libphp_common.so
 %{_libdir}/libphp_common.la
 %{_includedir}/php
-%{_libdir}/php/build
+%{_libdir}/%{name}/build
 %{_mandir}/man1/php-config.1*
 %{_mandir}/man1/phpize.1*
 

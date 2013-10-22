@@ -111,7 +111,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel		1
+%define		rel		2
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -214,6 +214,7 @@ Patch67:	php-db.patch
 Patch69:	bug-50563.patch
 Patch70:	php-crypt-null.patch
 Patch71:	php-apache24.patch
+Patch72:	exif-crash-bug-36.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -1927,6 +1928,7 @@ done
 %patch69 -p4
 %patch70 -p1
 %patch71 -p1
+%patch72 -p1
 
 # Bugfix backport from 5.3.6
 %patch311 -p1 -b .bug-47435

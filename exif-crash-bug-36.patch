@@ -1,0 +1,13 @@
+https://code.google.com/p/php52-backports/issues/detail?id=36
+fix crashes on amd64 on ac (glibc 2.3.6)
+--- php-5.2.17/ext/exif/exif.c~	2013-10-22 16:16:26.000000000 +0300
++++ php-5.2.17/ext/exif/exif.c	2013-10-22 16:16:29.959714312 +0300
+@@ -2746,7 +2746,7 @@
+ {
+ 	int de, i=0, section_index = SECTION_MAKERNOTE;
+ 	int NumDirEntries, old_motorola_intel;
+-	size_t offset_diff;
++	int offset_diff;
+ 	const maker_note_type *maker_note;
+ 	char *dir_start;
+ 

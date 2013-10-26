@@ -1424,6 +1424,7 @@ Summary(pl.UTF-8):	Moduł session dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Suggests:	%{name}-hash = %{epoch}:%{version}-%{release}
+Suggests:	tmpwatch
 Provides:	php(session)
 
 %description session

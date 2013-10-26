@@ -139,7 +139,7 @@ Virtual package providing %{!?-n:PHP %{?1}}%{?-n:%{-n*}} installation. \
 \
 %{nil}
 
-%define		rel	5
+%define		rel	6
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}

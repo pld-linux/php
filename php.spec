@@ -1922,7 +1922,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %if 1
-%setup -qcT
+%setup -qcT -n virtual-php-%{version}
 %else
 %setup -q -n %{orgname}-%{version}
 %patch0 -p1

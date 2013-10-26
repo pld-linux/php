@@ -125,7 +125,9 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 # define subpackages
 %define	package(n:l:) \
 %%package %{!?-n:%1}%{?-n:-n %{-n*}} %{-l:-l %{-l*}} \
+%if %(echo "%{1}" | grep -qE 'common'; echo $?) \
 Requires: %{!?-n:php(%1)}%{?-n:%(echo %{-n*} | sed -e 's,%{php_suffix}$,,')} \
+%endif \
 \
 %{nil}
 

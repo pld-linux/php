@@ -119,6 +119,9 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
+# disable rpm generated debug package
+%define		_enable_debug_packages	0
+
 # define subpackages
 %define	package(n:l:) \
 %%package %{!?-n:%1}%{?-n:-n %{-n*}} %{-l:-l %{-l*}} \

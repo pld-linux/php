@@ -1483,6 +1483,7 @@ Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Suggests:	%{name}-hash = %{epoch}:%{version}-%{release}
+Suggests:	tmpwatch
 Provides:	php(session)
 
 %description session

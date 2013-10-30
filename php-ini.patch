@@ -1,5 +1,5 @@
 --- php-5.3.20/php.ini	2013-01-22 23:20:03.433447006 +0200
-+++ php-5.3.20/php.ini	2013-01-22 23:20:03.433447006 +0200
++++ php-5.3.27/php.ini	2013-10-30 15:42:32.437287449 +0200
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -21,6 +21,15 @@
  
  ;;;;;;;;;;;;;;;;;;;
  ; Quick Reference ;
+@@ -198,7 +212,7 @@
+ ;user_ini.filename = ".user.ini"
+ 
+ ; To disable this feature set this option to empty value
+-;user_ini.filename =
++user_ini.filename =
+ 
+ ; TTL for user-defined php.ini files (time-to-live) in seconds. Default is 300 seconds (5 minutes)
+ ;user_ini.cache_ttl = 300
 @@ -223,7 +237,7 @@
  ; Development Value: Off
  ; Production Value: Off

@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	5
+%define		rel	6
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -208,6 +208,7 @@ Patch64:	%{orgname}-m4.patch
 Patch65:	system-libzip.patch
 Patch66:	%{orgname}-db.patch
 Patch67:	php-litespeed.patch
+Patch68:	mysql-lib-ver-mismatch.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1969,6 +1970,7 @@ cp -p php.ini-production php.ini
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
+%patch68 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

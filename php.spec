@@ -128,7 +128,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	3
+%define		rel	1
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -139,13 +139,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.5.4
+Version:	5.5.6
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	32c1dc56701d21def91a39a312392b54
+# Source0-md5:	77ad90035931aacb95d11318b09c12ca
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -321,7 +321,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		intlver		1.1.0
 %define		jsonver		1.2.1
 %define		opcachever	7.0.3-dev
-%define		pharver		2.0.1
+%define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.11.0
 
@@ -3120,6 +3120,8 @@ fi
 %attr(755,root,root) %{php_extensiondir}/phar.so
 %attr(755,root,root) %{_bindir}/phar
 %attr(755,root,root) %{_bindir}/phar.phar
+%{_mandir}/man1/phar.1*
+%{_mandir}/man1/phar.phar.1
 %endif
 
 %files posix

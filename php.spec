@@ -219,6 +219,7 @@ Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-freetype.patch
+Patch69:	fpm-conf-split.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1956,6 +1957,7 @@ cp -p php.ini-production php.ini
 %patch66 -p1
 %patch67 -p1
 %patch68 -p1
+%patch69 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -2472,6 +2474,7 @@ install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
 libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}/%{name}-fpm
 cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8/%{name}-fpm.8
 cp -p sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
+cp -p sapi/fpm/php-fpm.conf-d $RPM_BUILD_ROOT%{_sysconfdir}/fpm.d/www.conf
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
@@ -2484,7 +2487,7 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 	s#/usr/lib/php#%{php_extensiondir}#
 	s#/etc/php#%{_sysconfdir}#
 	s#@processname@#%{name}-fpm#g
-' $RPM_BUILD_ROOT{/etc/{rc.d/init.d/%{name}-fpm,logrotate.d/%{name}-fpm},%{_sysconfdir}/php-fpm.conf}
+' $RPM_BUILD_ROOT{/etc/{rc.d/init.d/%{name}-fpm,logrotate.d/%{name}-fpm},%{_sysconfdir}/php-fpm.conf,%{_sysconfdir}/fpm.d/www.conf}
 %endif
 
 # install Embedded API
@@ -2778,6 +2781,7 @@ fi
 %doc sapi/fpm/{CREDITS,LICENSE}
 %dir %{_sysconfdir}/fpm.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fpm.d/www.conf
 %attr(755,root,root) %{_sbindir}/%{name}-fpm
 %{_mandir}/man8/%{name}-fpm.8*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/%{name}-fpm

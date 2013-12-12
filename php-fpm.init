@@ -22,6 +22,43 @@ lockfile=/var/lock/subsys/@processname@
 pidfile=$(sed -ne  's,^pid\s*=\s*\(.*\),\1,p' $configfile)
 pidfile=${pidfile:-/var/run/@processname@.pid}
 
+# configtest itself
+# must return non-zero if check failed
+# output is discarded if checkconfig is ran without details
+configtest() {
+	/usr/sbin/@processname@ --fpm-config $configfile -t
+	return $?
+}
+
+# wrapper for configtest
+checkconfig() {
+	local details=${1:-0}
+
+	if [ $details = 1 ]; then
+		# run config test and display report (status action)
+		show "Checking %s configuration" "PHP FastCGI Process Manager"; busy
+		local out
+		out=$(configtest 2>&1)
+		RETVAL=$?
+		if [ $RETVAL = 0 ]; then
+			ok
+		else
+			fail
+		fi
+		[ "$out" ] && echo >&2 "$out"
+	else
+		# run config test and abort with nice message if failed
+		# (for actions checking status before action).
+		configtest >/dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL != 0 ]; then
+			show "Checking %s configuration" "PHP FastCGI Process Manager"; fail
+			nls 'Configuration test failed. See details with %s "checkconfig"' $0
+			exit $RETVAL
+		fi
+	fi
+}
+
 start() {
 	# Check if the service is already running?
 	if [ -f $lockfile ]; then
@@ -29,6 +66,7 @@ start() {
 		return
 	fi
 
+	checkconfig
 	msg_starting "PHP FastCGI Process Manager (@processname@)"
 	daemon --redirfds --pidfile $pidfile /usr/sbin/@processname@ --fpm-config $configfile
 	RETVAL=$?
@@ -58,6 +96,7 @@ reload() {
 		return
 	fi
 
+	checkconfig
 	msg_reloading "PHP FastCGI Process Manager (@processname@)"
 	killproc --pidfile $pidfile @processname@ -$sig
 	RETVAL=$?
@@ -70,6 +109,7 @@ condrestart() {
 		return
 	fi
 
+	checkconfig
 	stop
 	start
 }
@@ -93,6 +133,9 @@ case "$1" in
   reload|force-reload)
 	reload USR2 7
 	;;
+  checkconfig|configtest)
+	checkconfig 1
+	;;
   flush-logs|logrotate)
 	reload USR1 0
 	;;
@@ -101,7 +144,7 @@ case "$1" in
 	RETVAL=$?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|flush-logs|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|flush-logs|checkconfig|status}"
 	exit 3
 	;;
 esac

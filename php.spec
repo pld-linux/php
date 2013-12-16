@@ -139,13 +139,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.5.6
+Version:	5.5.7
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	77ad90035931aacb95d11318b09c12ca
+# Source0-md5:	0c02437f661105221e99a301a5275a41
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -218,6 +218,7 @@ Patch63:	%{orgname}-mysql-nowarning.patch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
+Patch68:	php-freetype.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -239,7 +240,7 @@ BuildRequires:	sed >= 4.0
 %if %{with mssql} || %{with sybase_ct}
 BuildRequires:	freetds-devel >= 0.82
 %endif
-BuildRequires:	freetype-devel >= 2.0
+BuildRequires:	freetype-devel >= 2.5.1
 %if %{with system_gd}
 BuildRequires:	gd-devel >= 2.1
 %endif
@@ -1954,6 +1955,7 @@ cp -p php.ini-production php.ini
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
 %patch67 -p1
+%patch68 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

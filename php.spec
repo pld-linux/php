@@ -2105,6 +2105,8 @@ export EXTENSION_DIR="%{php_extensiondir}"
 if [ ! -f _built-conf ]; then
 	# now remove Makefile copies
 	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs1,apxs2,litespeed}
+	# force regeneration
+	touch Zend/zend_language_parser.y
 	%{__libtoolize}
 	%{__aclocal}
 	cp -f /usr/share/automake/config.* .

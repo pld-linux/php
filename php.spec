@@ -2298,7 +2298,7 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 	$RPM_BUILD_ROOT%{_mandir}/man1 \
 
 # install the Apache modules' files
-%{__make} install-headers install-build install-modules install-programs \
+%{__make} -j1 install-headers install-build install-modules install-programs \
 	phpbuilddir=%{_libdir}/%{name}/build \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 

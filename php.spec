@@ -216,6 +216,7 @@ Patch70:	php-crypt-null.patch
 Patch71:	php-apache24.patch
 Patch72:	exif-crash-bug-36.patch
 Patch73:	CVE-2013-6420.patch
+Patch74:	CVE-2013-4073.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -1932,6 +1933,7 @@ done
 %patch71 -p1
 %patch72 -p1
 %patch73 -p1
+%patch74 -p1
 
 # Bugfix backport from 5.3.6
 %patch311 -p1 -b .bug-47435

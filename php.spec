@@ -218,7 +218,7 @@ Patch63:	%{orgname}-mysql-nowarning.patch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
-Patch68:	php-freetype.patch
+
 Patch69:	fpm-conf-split.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1956,7 +1956,7 @@ cp -p php.ini-production php.ini
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
 %patch67 -p1
-#%patch68 -p1
+
 %patch69 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4

@@ -51,7 +51,7 @@
 +		if ((subject != NULL) && (strlen(subject)!=0)) {
 +			fprintf(sendmail, "Subject: %s\n", subject);
 +		}
-+
++		zend_is_auto_global(ZEND_STRL("_SERVER") TSRMLS_CC);
 +		if (PG(http_globals)[TRACK_VARS_SERVER]) {
 +			zval **remote_addr, **server_name, **server_port,
 +				**script_name, **http_user_agent;

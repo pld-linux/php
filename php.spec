@@ -139,13 +139,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.5.9
+Version:	5.5.10
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	139e2ac02fddd4c80cc31de000c6f7e3
+# Source0-md5:	ff7ac75abd986f591fd6fc8e997be33e
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -165,7 +165,6 @@ Patch4:		%{orgname}-libpq_fs_h_path.patch
 Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
-Patch8:		%{orgname}-config-file-scan-dir.patch
 
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
@@ -318,7 +317,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # Extension versions
 %define		bz2ver		1.0
 %define		enchantver	1.1.0
-%define		fileinfover	1.0.5-dev
+%define		fileinfover	1.0.5
 %define		hashver		1.0
 %define		intlver		1.1.0
 %define		jsonver		1.2.1
@@ -1900,7 +1899,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%patch8 -p1
 %patch7 -p1
 
 cp -p php.ini-production php.ini

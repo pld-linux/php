@@ -52,28 +52,30 @@
  	}
  
  	if (free_ini_search_path) {
-@@ -627,12 +627,14 @@
+@@ -645,13 +645,15 @@ int php_init_config(TSRMLS_D)
  		zend_llist scanned_ini_list;
  		zend_llist_element *element;
  		int l, total_l = 0;
 +		const char *fmt = "%s:" PHP_CONFIG_FILE_PATH "/%s.d";
+ 		char *bufpath, *debpath, *endpath;
+ 		int lenpath;
  
- 		/* List of found ini files */
  		zend_llist_init(&scanned_ini_list, sizeof(char *), (llist_dtor_func_t) free_estring, 1);
+ 		memset(&fh2, 0, sizeof(fh2));
  
- 		/* Split by paths_separator and load ini-files from all paths */
--		path_copy = estrdup(php_ini_scanned_path);
-+		path_copy = emalloc(strlen(php_ini_scanned_path) + strlen(fmt) + strlen(sapi_module.name));
-+		sprintf(path_copy, fmt, php_ini_scanned_path, sapi_module.name);
- 		ini_path  = php_strtok_r(path_copy, paths_separator, &last);
+-		bufpath = estrdup(php_ini_scanned_path);
++		bufpath = emalloc(strlen(php_ini_scanned_path) + strlen(fmt) + strlen(sapi_module.name));
++		sprintf(bufpath, fmt, php_ini_scanned_path, sapi_module.name);
+ 		for (debpath = bufpath ; debpath ; debpath=endpath) {
+ 			endpath = strchr(debpath, DEFAULT_DIR_SEPARATOR);
+ 			if (endpath) {
+@@ -664,7 +666,7 @@ int php_init_config(TSRMLS_D)
+ 			}
+ 			lenpath = strlen(debpath);
  
- 		while (ini_path != NULL) {
-@@ -636,7 +653,7 @@
- 			struct dirent **namelist;
- 			int ini_path_len = strlen(ini_path);
- 
--			if ((ndir = php_scandir(ini_path, &namelist, 0, php_alphasort)) > 0) {
-+			if ((ndir = php_scandir(ini_path, &namelist, 0, php_csort)) > 0) {
- 				memset(&fh2, 0, sizeof(fh2));
+-			if (lenpath > 0 && (ndir = php_scandir(debpath, &namelist, 0, php_alphasort)) > 0) {
++			if (lenpath > 0 && (ndir = php_scandir(debpath, &namelist, 0, php_csort)) > 0) {
  
  				for (i = 0; i < ndir; i++) {
+ 
+

@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	3
+%define		rel	4
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -537,7 +537,6 @@ Provides:	%{name}-standard
 Provides:	php(core) = %{version}
 Provides:	php(date)
 Provides:	php(ereg)
-Provides:	php(hash)
 Provides:	php(libxml)
 Provides:	php(reflection)
 Provides:	php(standard)

@@ -128,7 +128,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	4
+%define		rel	5
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -551,6 +551,7 @@ Provides:	php(standard)
 %{?with_pcre:%requires_ge_to	pcre pcre-devel}
 Obsoletes:	php-pecl-domxml
 Conflicts:	php4-common < 3:4.4.4-8
+Conflicts:	php55-common < 4:5.5.10-4
 Conflicts:	rpm < 4.4.2-0.2
 
 %description common

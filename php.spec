@@ -2008,6 +2008,7 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/soap/interop
 %{__rm} -r ext/xmlrpc/libxmlrpc
 #%{__rm} -r ext/zip/lib
+%{__rm} ext/date/lib/timezonedb.h
 
 cp -pf Zend/LICENSE{,.Zend}
 install -p %{SOURCE13} dep-tests.sh

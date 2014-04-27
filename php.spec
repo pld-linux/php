@@ -1,4 +1,5 @@
-# TODO 5.5:
+# TODO 5.6:
+# - phpdbg: link with libphp_common
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
 # TODO 5.4:
@@ -40,6 +41,7 @@
 #+ereg
 # libxml
 # Reflection
+# standard
 #
 # Conditional build:
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
@@ -128,10 +130,11 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	5
+%define		rel	0.1
 %define		orgname	php
-%define		ver_suffix 55
+%define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
+%define		subver	beta1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -139,13 +142,14 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.5.10
+Version:	5.6.0
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	ff7ac75abd986f591fd6fc8e997be33e
+#Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	http://downloads.php.net/tyrael/php-%{version}%{subver}.tar.xz
+# Source0-md5:	08321c0d7315db679aa255081b8615b2
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -217,8 +221,9 @@ Patch63:	%{orgname}-mysql-nowarning.patch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
-
 Patch69:	fpm-conf-split.patch
+Patch70:	http://git.php.net/?p=php-src.git;a=patch;h=22611b8d3774cff379cc51666842ab4b8a2eaf7f;/printf-format.patch
+Patch71:	https://github.com/krakjoe/phpdbg/commit/1c0fccfc9abaaea02ae717547bc3b69fcb2de86c.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -310,9 +315,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20121113
-%define		zend_module_api		20121212
-%define		zend_extension_api	220121212
+%define		php_api_version		20131106
+%define		zend_module_api		20131226
+%define		zend_extension_api	220131226
 
 # Extension versions
 %define		bz2ver		1.0
@@ -321,10 +326,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		hashver		1.0
 %define		intlver		1.1.0
 %define		jsonver		1.2.1
-%define		opcachever	7.0.3
+%define		opcachever	7.0.4-dev
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
-%define		zipver		1.11.0
+%define		zipver		1.12.4
+%define		phpdbgver	0.3.2
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -518,6 +524,22 @@ PHP FastCGI Process Manager.
 
 %description fpm -l pl.UTF-8
 PHP FastCGI Process Manager - zarządca procesów FastCGI.
+
+%package phpdbg
+Summary:	The debugging platform for PHP 5.4+
+Group:		Development/Languages/PHP
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(phpdbg) = %{phpdbgver}
+
+%description phpdbg
+phpdbg - The interactive PHP debugger.
+
+Implemented as a SAPI module, phpdbg can excert complete control over
+the environment without impacting the functionality or performance of
+your code.
+
+phpdbg aims to be a lightweight, powerful, easy to use debugging
+platform for PHP 5.4+
 
 %package common
 Summary:	Common files needed by both Apache modules and CGI/CLI SAPIs
@@ -1893,7 +1915,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{orgname}-%{version}
+%setup -q -n %{orgname}-%{version}%{?subver}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1958,6 +1980,10 @@ cp -p php.ini-production php.ini
 %patch67 -p1
 
 %patch69 -p1
+%patch70 -p1
+cd sapi/phpdbg
+%patch71 -p1
+cd -
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -2073,7 +2099,7 @@ if test "$ver" != "%{sqlite3ver}"; then
 	: Update the sqlite3ver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_ZIP_VERSION_STRING /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
+ver=$(sed -n '/#define PHP_ZIP_VERSION /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
 if test "$ver" != "%{zipver}"; then
 	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.
 	: Update the zipver macro and rebuild.
@@ -2085,9 +2111,15 @@ if test "$ver" != "%{jsonver}"; then
 	: Update the jsonver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define ACCELERATOR_VERSION /{s/.* "//;s/".*$//;p}' ext/opcache/ZendAccelerator.h)
+ver=$(sed -n '/#define PHP_ZENDOPCACHE_VERSION /{s/.* "//;s/".*$//;p}' ext/opcache/ZendAccelerator.h)
 if test "$ver" != "%{opcachever}"; then
-	: Error: Upstream Zend Opcachge version is now ${ver}, expecting %{opcachever}.
+	: Error: Upstream Zend Opcache version is now ${ver}, expecting %{opcachever}.
+	: Update the opcachever macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHPDBG_VERSION /{s/.* "//;s/".*$//;p}' sapi/phpdbg/phpdbg.h)
+if test "$ver" != "%{phpdbgver}"; then
+	: Error: Upstream phpdbg version is now ${ver}, expecting %{phpdbgver}.
 	: Update the opcachever macro and rebuild.
 	exit 1
 fi
@@ -2788,9 +2820,13 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/%{name}-fpm
 %endif
 
+%files phpdbg
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/phpdbg
+
 %files common
 %defattr(644,root,root,755)
-%doc CREDITS EXTENSIONS LICENSE NEWS README.{PHP4-TO-PHP5-THIN-CHANGES,namespaces} UPGRADING* Zend/{LICENSE.Zend,ZEND_CHANGES} php.ini-*
+%doc CREDITS EXTENSIONS LICENSE NEWS README.namespaces UPGRADING* Zend/{LICENSE.Zend,ZEND_CHANGES} php.ini-*
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
@@ -2802,7 +2838,7 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%doc CODING_STANDARDS README.{EXTENSIONS,EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
+%doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so

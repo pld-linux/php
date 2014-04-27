@@ -15,7 +15,7 @@
  ;;;;;;;;;;;;;;;;;;
  ; Global Options ;
  ;;;;;;;;;;;;;;;;;;
-@@ -124,395 +116,10 @@
+@@ -116,404 +116,10 @@
  ; used in logs and stats. There is no limitation on the number of pools which
  ; FPM can handle. Your system will tell you anyway :)
  
@@ -370,6 +370,15 @@
 -; Default Value: no
 -;catch_workers_output = yes
 -
+-; Clear environment in FPM workers
+-; Prevents arbitrary environment variables from reaching FPM worker processes
+-; by clearing the environment in workers before env vars specified in this
+-; pool configuration are added.
+-; Setting to "no" will make all environment variables available to PHP code
+-; via getenv(), $_ENV and $_SERVER.
+-; Default Value: yes
+-;clear_env = no
+-
 -; Limits the extensions of the main script FPM will allow to parse. This can
 -; prevent configuration mistakes on the web server side. You should only limit
 -; FPM to .php extensions to prevent malicious users to use other extensions to
@@ -419,8 +428,8 @@
 +;  - @prefix@ otherwise
 +include=/etc/php/fpm.d/*.conf
 --- /dev/null	2007-02-13 18:29:53.000000000 +0200
-+++ php-5.5.7/sapi/fpm/php-fpm.conf-d.in	2013-12-16 17:58:04.073218925 +0200
-@@ -0,0 +1,395 @@
++++ php-5.6.0beta1/sapi/fpm/php-fpm.conf-d.in	2014-04-21 21:58:46.191751631 +0300
+@@ -0,0 +1,403 @@
 +; vim:ft=dosini
 +;
 +; Start a new pool named 'www'.
@@ -774,6 +783,15 @@
 +; Default Value: no
 +;catch_workers_output = yes
 +
++; Clear environment in FPM workers
++; Prevents arbitrary environment variables from reaching FPM worker processes
++; by clearing the environment in workers before env vars specified in this
++; pool configuration are added.
++; Setting to "no" will make all environment variables available to PHP code
++; via getenv(), $_ENV and $_SERVER.
++; Default Value: yes
++;clear_env = no
++
 +; Limits the extensions of the main script FPM will allow to parse. This can
 +; prevent configuration mistakes on the web server side. You should only limit
 +; FPM to .php extensions to prevent malicious users to use other extensions to
@@ -815,7 +833,6 @@
 +;php_admin_value[error_log] = /var/log/fpm-php.www.log
 +;php_admin_flag[log_errors] = on
 +;php_admin_value[memory_limit] = 32M
-+
 --- php-5.5.7/sapi/fpm/config.m4~	2013-12-16 17:57:03.000000000 +0200
 +++ php-5.5.7/sapi/fpm/config.m4	2013-12-16 18:00:34.936527309 +0200
 @@ -609,7 +609,7 @@

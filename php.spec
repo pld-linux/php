@@ -128,7 +128,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	5
+%define		rel	1
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -139,13 +139,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.5.10
+Version:	5.5.11
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	ff7ac75abd986f591fd6fc8e997be33e
+# Source0-md5:	1559ef6444d5020670ec52ea752501ee
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -321,7 +321,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		hashver		1.0
 %define		intlver		1.1.0
 %define		jsonver		1.2.1
-%define		opcachever	7.0.3
+%define		opcachever	7.0.4-dev
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.11.0
@@ -1982,6 +1982,7 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/soap/interop
 %{__rm} -r ext/xmlrpc/libxmlrpc
 #%{__rm} -r ext/zip/lib
+%{__rm} ext/date/lib/timezonedb.h
 
 cp -pf Zend/LICENSE{,.Zend}
 install -p %{SOURCE13} dep-tests.sh
@@ -2085,9 +2086,9 @@ if test "$ver" != "%{jsonver}"; then
 	: Update the jsonver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define ACCELERATOR_VERSION /{s/.* "//;s/".*$//;p}' ext/opcache/ZendAccelerator.h)
+ver=$(sed -n '/#define PHP_ZENDOPCACHE_VERSION /{s/.* "//;s/".*$//;p}' ext/opcache/ZendAccelerator.h)
 if test "$ver" != "%{opcachever}"; then
-	: Error: Upstream Zend Opcachge version is now ${ver}, expecting %{opcachever}.
+	: Error: Upstream Zend Opcache version is now ${ver}, expecting %{opcachever}.
 	: Update the opcachever macro and rebuild.
 	exit 1
 fi

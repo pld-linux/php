@@ -580,6 +580,7 @@ Obsoletes:	php-devel
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel
 Obsoletes:	php52-devel
+Obsoletes:	php53-devel
 Obsoletes:	php55-devel
 
 %description devel

@@ -87,7 +87,7 @@
 %bcond_with	zts		# Zend Thread Safety
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
-%bcond_with	embed		# disable Embedded API
+%bcond_without	embed		# disable Embedded API
 %bcond_without	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
@@ -2202,7 +2202,7 @@ for sapi in $sapis; do
 		sapi_args='--disable-cli --enable-fpm'
 		;;
 	embed)
-		sapi_args='--disable-cli --enable-embed'
+		sapi_args='--disable-cli --disable-cgi --enable-embed'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
@@ -2528,9 +2528,10 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 
 # install Embedded API
 %if %{with embed}
-%{__make} -f Makefile.embed install-sapi INSTALL_ROOT=$RPM_BUILD_ROOT
 # we could use install-headers from Makefile.embed, but that would reinstall all headers
+# install-sapi installs to wrong dir, so just do it all manually
 install -d $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
+install -p libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}
 cp -p sapi/embed/php_embed.h $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
 %endif
 
@@ -2599,10 +2600,6 @@ cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
 # fix install paths, avoid evil rpaths
 sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
-%if %{with embed}
-# libphp5.la contains our buildroot in dependency_libs
-sed -i -e "/dependency_libs/ s,/[^ ]*/libs/libphp_common.la,%{_libdir}/libphp_common.la," $RPM_BUILD_ROOT%{_libdir}/libphp5.la
-%endif
 # better solution?
 sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/acinclude.m4
 
@@ -2796,7 +2793,7 @@ fi
 %if %{with embed}
 %files embedded
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libphp5-%{version}.so
+%attr(755,root,root) %{_libdir}/libphp5.so
 %endif
 
 %files cli
@@ -2851,11 +2848,6 @@ fi
 %{_libdir}/%{name}/build
 %{_mandir}/man1/php-config.1*
 %{_mandir}/man1/phpize.1*
-%if %{with embed}
-# embedded
-%{_libdir}/libphp5.so
-%{_libdir}/libphp5.la
-%endif
 
 %files bcmath
 %defattr(644,root,root,755)

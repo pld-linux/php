@@ -88,6 +88,7 @@
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_without	embed		# disable Embedded API
+%bcond_without	phpdbg		# disable phpdbg SAPI
 %bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
@@ -130,11 +131,11 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.1
+%define		rel	0.2
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
-%define		subver	beta1
+%define		subver	beta2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -149,7 +150,7 @@ License:	PHP
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	http://downloads.php.net/tyrael/php-%{version}%{subver}.tar.xz
-# Source0-md5:	08321c0d7315db679aa255081b8615b2
+# Source0-md5:	3c355bc98c9c4eefacd5ef15e36574c7
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -222,8 +223,6 @@ Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 Patch69:	fpm-conf-split.patch
-Patch70:	http://git.php.net/?p=php-src.git;a=patch;h=22611b8d3774cff379cc51666842ab4b8a2eaf7f;/printf-format.patch
-Patch71:	https://github.com/krakjoe/phpdbg/commit/1c0fccfc9abaaea02ae717547bc3b69fcb2de86c.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -330,7 +329,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.12.4
-%define		phpdbgver	0.3.2
+%define		phpdbgver	0.4.0
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -1978,12 +1977,7 @@ cp -p php.ini-production php.ini
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
 %patch67 -p1
-
 %patch69 -p1
-%patch70 -p1
-cd sapi/phpdbg
-%patch71 -p1
-cd -
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -2355,6 +2349,10 @@ cp -af Makefile.cli Makefile
 
 %if %{with litespeed}
 %{__make} -f Makefile.litespeed litespeed
+%endif
+
+%if %{with embed}
+%{__make} -f Makefile.embed libphp5.la
 %endif
 
 # CGI/FCGI
@@ -2821,9 +2819,11 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/%{name}-fpm
 %endif
 
+%if %{with phpdbg}
 %files phpdbg
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/phpdbg
+%endif
 
 %files common
 %defattr(644,root,root,755)

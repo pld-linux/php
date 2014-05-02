@@ -2440,7 +2440,8 @@ chmod +x run-tests.sh
 cp -pf php_config.h.cli main/php_config.h
 cp -pf Makefile.cli Makefile
 
-./run-tests.sh -w failed.log -s tests.log
+./run-tests.sh -w failed.log -s tests.log || {
+rc=$?
 
 # collect failed tests into cleanup script used in prep.
 sed -ne '/^FAILED TEST SUMMARY/,/^===/p' tests.log | sed -e '1,/^---/d;/^===/,$d' > tests-failed.log
@@ -2451,6 +2452,8 @@ sed -ne '/^via/d;/\[.*\]/{s/\t*\(.*\) \[\(.*\)\]\(.*\)/# \1\3\nmv \2{,.skip}/p}'
 tty -q || cat tests.log
 
 test ! -s failed.log
+exit $rc
+}
 %endif
 
 %install

@@ -88,7 +88,7 @@
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_without	embed		# disable Embedded API
-%bcond_without	suhosin		# with suhosin patch
+%bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_with	type_hints	# experimental support for strict typing/casting

@@ -2199,21 +2199,21 @@ for sapi in $sapis; do
 		sapi_args='--disable-cgi %{?with_gcov:--enable-gcov}'
 	;;
 	fpm)
-		sapi_args='--disable-cli --enable-fpm'
+		sapi_args='--disable-cli --disable-cgi --enable-fpm'
 		;;
 	embed)
 		sapi_args='--disable-cli --disable-cgi --enable-embed'
 		;;
 	apxs1)
 		ver=$(rpm -q --qf '%{V}' apache1-devel)
-		sapi_args="--disable-cli --with-apxs=%{apxs1} --with-apache-version=$ver"
+		sapi_args="--disable-cli --disable-cgi --with-apxs=%{apxs1} --with-apache-version=$ver"
 	;;
 	apxs2)
 		ver=$(rpm -q --qf '%{V}' apache-devel)
-		sapi_args="--disable-cli --with-apxs2=%{apxs2} --with-apache-version=$ver"
+		sapi_args="--disable-cli --disable-cgi --with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	litespeed)
-		sapi_args='--with-litespeed'
+		sapi_args='--disable-cli --disable-cgi --with-litespeed '
 	;;
 	esac
 
@@ -2354,7 +2354,7 @@ cp -af Makefile.cli Makefile
 %endif
 
 %if %{with litespeed}
-%{__make} -f Makefile.litespeed
+%{__make} -f Makefile.litespeed litespeed
 %endif
 
 # CGI/FCGI

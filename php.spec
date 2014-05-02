@@ -2175,6 +2175,9 @@ embed
 %if %{with apache1}
 apxs1
 %endif
+%if %{with phpdbg}
+phpdbg
+%endif
 %if %{with apache2}
 apxs2
 %endif
@@ -2207,7 +2210,10 @@ for sapi in $sapis; do
 		sapi_args="--disable-cli --disable-cgi --with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	litespeed)
-		sapi_args='--disable-cli --disable-cgi --with-litespeed '
+		sapi_args='--disable-cli --disable-cgi --with-litespeed'
+	;;
+	phpdbg)
+		sapi_args='--disable-cli --disable-cgi --enable-phpdbg %{?debug:--enable-phpdbg-debug}'
 	;;
 	esac
 
@@ -2355,6 +2361,10 @@ cp -af Makefile.cli Makefile
 %{__make} -f Makefile.embed libphp5.la
 %endif
 
+%if %{with phpdbg}
+%{__make} -f Makefile.phpdbg phpdbg
+%endif
+
 # CGI/FCGI
 %if %{with cgi}
 cp -pf php_config.h.cgi-fcgi main/php_config.h
@@ -2490,6 +2500,11 @@ ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
 # install litespeed sapi
 %if %{with litespeed}
 libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/%{name}.litespeed
+%endif
+
+%if %{with phpdbg}
+%{__make} -f Makefile.phpdbg install-phpdbg \
+	INSTALL_ROOT=$RPM_BUILD_ROOT
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}

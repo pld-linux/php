@@ -44,7 +44,7 @@
 # Conditional build:
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
-%bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
+%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
 %bcond_without	default_php	# use this PHP as default PHP in distro
@@ -271,7 +271,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
-%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}
+%{?with_oci8:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 8.10}
 BuildRequires:	pkgconfig

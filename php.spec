@@ -2,13 +2,11 @@
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
 # TODO 5.4:
-# - do not remove PatchX: definitions until merged to HEAD, needed for tracking their state
 # - check php-sapi-ini-file.patch for safe mode removal
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
-# - uses libvpx for webp support, should use libwebp-devel instead?
 # NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
@@ -45,7 +43,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
-%bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
+%bcond_with	system_gd	# with system gd (imageantialias function is missing then)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
 %bcond_without	default_php	# use this PHP as default PHP in distro
 %bcond_without	curl		# without CURL extension module
@@ -172,10 +170,8 @@ Patch11:	embed.patch
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
 Patch14:	%{orgname}-no_pear_install.patch
-#Patch15:	%{orgname}-zlib.patch # no longer needed?
 Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
-Patch19:	%{orgname}-gd_imagerotate_enable.patch
 Patch20:	%{orgname}-uint32_t.patch
 Patch21:	%{orgname}-dba-link.patch
 Patch22:	%{orgname}-both-apxs.patch
@@ -186,7 +182,6 @@ Patch26:	%{orgname}-pear.patch
 Patch27:	%{orgname}-config-dir.patch
 Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
-#Patch32:	%{orgname}-curl-limit-speed.patch # applied upstream
 Patch34:	%{orgname}-libtool.patch
 Patch35:	%{orgname}-tds.patch
 Patch36:	%{orgname}-mysql-charsetphpini.patch
@@ -200,20 +195,15 @@ Patch44:	%{orgname}-include_path.patch
 Patch45:	%{orgname}-imap-annotations.patch
 Patch46:	%{orgname}-imap-myrights.patch
 Patch47:	suhosin.patch
-#Patch49:	%{orgname}-m4-divert.patch # no longer needed, upstream supports new ac
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
-#Patch54:	mysqlnd-shared.patch # shared build supported upstream
 Patch55:	bug-52078-fileinode.patch
-#Patch57:	bug-52448.patch # outdated
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
-#Patch61:	%{orgname}-krb5-ac.patch # not needed on 5.4 anymore
 Patch62:	mcrypt-libs.patch
 Patch63:	%{orgname}-mysql-nowarning.patch
-#Patch64:	%{orgname}-m4.patch # not needed on 5.4 branch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
@@ -231,7 +221,6 @@ BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
-#BuildRequires:	fcgi-devel
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
 %{!?with_mysqlnd:BuildRequires:	mysql-devel}
@@ -252,7 +241,6 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
-#BuildRequires:	libtiff-devel
 %{?with_webp:BuildRequires:	libvpx-devel}
 BuildRequires:	tokyocabinet-devel
 %if "%{pld_release}" != "ac"
@@ -260,7 +248,6 @@ BuildRequires:	libtool >= 2:2.2
 %else
 BuildRequires:	libtool >= 1.4.3
 %endif
-#BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
@@ -299,9 +286,6 @@ BuildRequires:	apache1-devel
 BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
-%endif
-%if %{with fpm}
-#BuildRequires:	judy-devel
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -856,9 +840,8 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.image.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %if %{with system_gd}
-Requires:	gd >= 2.0.28-4
+Requires:	gd >= 2.1
 Requires:	gd(gif)
-Requires:	gd(imagerotate) = 5.2.0
 %endif
 Provides:	php(gd)
 
@@ -1859,8 +1842,8 @@ URL:		http://www.php.net/manual/en/book.xsl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
-# actually not true, functionality is similar, but API differs
 Provides:	php(xsl)
+# actually not true, functionality is similar, but API differs
 Obsoletes:	php-xslt <= 3:4.3.8-1
 
 %description xsl
@@ -1921,9 +1904,6 @@ cp -p php.ini-production php.ini
 %patch14 -p1
 %patch17 -p1
 %patch18 -p1
-%if %{with system_gd}
-%patch19 -p1
-%endif
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1

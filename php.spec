@@ -1196,6 +1196,7 @@ Um módulo para aplicações PHP que usam ODBC.
 
 %package opcache
 Summary:	Zend Optimizer+ - PHP code optimizer
+Summary(pl.UTF-8):	Zend Optimizer+ - optymalizator kodu PHP
 Group:		Libraries
 URL:		https://wiki.php.net/rfc/optimizerplus
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1208,6 +1209,14 @@ script bytecode in the shared memory. This eliminates the stages of
 reading code from the disk and compiling it on future access. In
 addition, it applies a few bytecode optimization patterns that make
 code execution faster.
+
+%description opcache -l pl.UTF-8
+Zend OPcache zapewnia szybsze wykonywanie kodu PHP dzięki buforowaniu
+i optymalizacji na poziomie opcode'ów. Poprawia wydajność PHP
+przechowując prekompilowany bajtkod skryptu w pamięci współdzielonej.
+Eliminuje etapy odczytu kodu z dysku i kompilacji przy późniejszym
+dostępie. Ponadto wykonuje kilka wzorców optymalizacji bajtkodu,
+czyniąc wykonywanie kodu szybszym.
 
 %package openssl
 Summary:	OpenSSL extension module for PHP

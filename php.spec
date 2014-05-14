@@ -385,6 +385,7 @@ Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime
 Provides:	webserver(php) = %{version}
 Obsoletes:	apache-mod_php < 1:4.1.1
+Obsoletes:	apache1-mod_php < 4:5.3.28-7
 Obsoletes:	phpfi
 
 %description -n apache1-mod_%{name}
@@ -401,6 +402,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache(modules-api) = %{apache_modules_api}
 Requires:	apache-mod_mime
 Provides:	webserver(php) = %{version}
+Obsoletes:	apache-mod_php < 4:5.3.28-7
 Obsoletes:	phpfi
 
 %description -n apache-mod_%{name}
@@ -416,6 +418,7 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(litespeed)
 Provides:	webserver(php) = %{version}
+Obsoletes:	php-litespeed < 4:5.3.28-7
 
 %description litespeed
 PHP for litespeed HTTP server.
@@ -432,6 +435,7 @@ Provides:	%{name}-fcgi = %{epoch}:%{version}-%{release}
 Provides:	php(cgi)
 Provides:	php(fcgi)
 Provides:	webserver(php) = %{version}
+Obsoletes:	php-cgi < 4:5.3.28-7
 Obsoletes:	php-fcgi < 4:5.3.0
 %if "%{pld_release}" != "ac"
 Conflicts:	logrotate < 3.8.0
@@ -448,6 +452,7 @@ Summary:	PHP as CLI interpreter
 Summary(pl.UTF-8):	PHP jako interpreter działający z linii poleceń
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Obsoletes:	php-cli < 4:5.3.28-7
 
 %description cli
 PHP as CLI interpreter.
@@ -460,6 +465,7 @@ Summary:	PHP library for embedding in applications
 Summary(pl.UTF-8):	Biblioteka PHP do osadzania w aplikacjach
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Obsoletes:	php-embedded < 4:5.3.28-7
 
 %description embedded
 The php-embedded package contains a library which can be embedded into
@@ -496,6 +502,7 @@ Requires:	rc-scripts
 Provides:	php(fpm)
 Provides:	user(http)
 Provides:	webserver(php) = %{version}
+Obsoletes:	php-fpm < 4:5.3.28-7
 
 %description fpm
 PHP FastCGI Process Manager.
@@ -533,6 +540,7 @@ Provides:	php(reflection)
 Provides:	php(standard)
 %{!?with_mysqlnd:Obsoletes:	php-mysqlnd}
 %{?with_pcre:%requires_ge_to	pcre pcre-devel}
+Obsoletes:	php-common < 4:5.3.28-7
 Obsoletes:	php-pecl-domxml
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	php55-common < 4:5.5.10-4
@@ -616,6 +624,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.bc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(bcmath)
+Obsoletes:	php-bcmath < 4:5.3.28-7
 
 %description bcmath
 This is a dynamic shared object (DSO) for PHP that will add bc style
@@ -634,6 +643,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(bz2) = %{bz2ver}
 Provides:	php(bzip2)
 Provides:	php-bzip2 = %{epoch}:%{version}-%{release}
+Obsoletes:	php-bz2 < 4:5.3.28-7
 Obsoletes:	php-bzip2 < 4:5.2.14-3
 Obsoletes:	php-pecl-bz2 < %{bz2ver}
 
@@ -651,6 +661,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.calendar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(calendar)
+Obsoletes:	php-calendar < 4:5.3.28-7
 
 %description calendar
 This is a dynamic shared object (DSO) for PHP that will add calendar
@@ -666,6 +677,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.ctype.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ctype)
+Obsoletes:	php-ctype < 4:5.3.28-7
 
 %description ctype
 This is a dynamic shared object (DSO) for PHP that will add ctype
@@ -681,6 +693,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.curl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(curl)
+Obsoletes:	php-curl < 4:5.3.28-7
 
 %description curl
 This is a dynamic shared object (DSO) for PHP that will add curl
@@ -696,6 +709,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.dba.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dba)
+Obsoletes:	php-dba < 4:5.3.28-7
 
 %description dba
 This is a dynamic shared object (DSO) for PHP that will add flat-file
@@ -715,6 +729,7 @@ Provides:	php(dom)
 # it has some compatibility functions
 Provides:	%{name}-domxml = %{epoch}:%{version}-%{release}
 Provides:	php(domxml)
+Obsoletes:	php-dom < 4:5.3.28-7
 Obsoletes:	php-domxml <= 3:4.3.8-1
 
 %description dom
@@ -731,6 +746,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.exif.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(enchant) = %{enchantver}
+Obsoletes:	php-enchant < 4:5.3.28-7
 Obsoletes:	php-pecl-enchant < %{enchantver}
 
 %description enchant
@@ -760,6 +776,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.exif.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(exif)
+Obsoletes:	php-exif < 4:5.3.28-7
 
 %description exif
 This is a dynamic shared object (DSO) for PHP that will add EXIF tags
@@ -776,6 +793,7 @@ URL:		http://www.php.net/manual/en/book.fileinfo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(fileinfo) = %{fileinfover}
+Obsoletes:	php-fileinfo < 4:5.3.28-7
 Obsoletes:	php-mime_magic
 Obsoletes:	php-pecl-fileinfo < %{fileinfover}
 
@@ -802,6 +820,7 @@ URL:		http://www.php.net/manual/en/book.filter.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(filter)
+Obsoletes:	php-filter < 4:5.3.28-7
 Obsoletes:	php-pecl-filter
 
 %description filter
@@ -825,6 +844,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.ftp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ftp)
+Obsoletes:	php-ftp < 4:5.3.28-7
 
 %description ftp
 This is a dynamic shared object (DSO) for PHP that will add FTP
@@ -844,6 +864,7 @@ Requires:	gd >= 2.1
 Requires:	gd(gif)
 %endif
 Provides:	php(gd)
+Obsoletes:	php-gd < 4:5.3.28-7
 
 %description gd
 This is a dynamic shared object (DSO) for PHP that will add GD
@@ -860,6 +881,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.gettext.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(gettext)
+Obsoletes:	php-gettext < 4:5.3.28-7
 
 %description gettext
 This is a dynamic shared object (DSO) for PHP that will add gettext
@@ -875,6 +897,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.gmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(gmp)
+Obsoletes:	php-gmp < 4:5.3.28-7
 
 %description gmp
 This is a dynamic shared object (DSO) for PHP that will add arbitrary
@@ -896,6 +919,7 @@ Provides:	php(mhash)
 Provides:	php-mhash = %{epoch}:%{version}-%{release}
 Obsoletes:	php-mhash < 4:5.3.0
 %endif
+Obsoletes:	php-hash < 4:5.3.28-7
 Obsoletes:	php-pecl-hash < %{hashver}
 
 %description hash
@@ -915,6 +939,7 @@ Requires:	%{_libdir}/gconv
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	iconv
 Provides:	php(iconv)
+Obsoletes:	php-iconv < 4:5.3.28-7
 
 %description iconv
 This is a dynamic shared object (DSO) for PHP that will add iconv
@@ -933,6 +958,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Requires:	imap-lib >= 1:2007e-2
 Provides:	php(imap)
+Obsoletes:	php-imap < 4:5.3.28-7
 
 %description imap
 This is a dynamic shared object (DSO) for PHP that will add IMAP
@@ -955,6 +981,7 @@ URL:		http://www.php.net/manual/en/book.ibase.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %endif
 Provides:	php(interbase)
+Obsoletes:	php-interbase < 4:5.3.28-7
 
 %description interbase
 This is a dynamic shared object (DSO) for PHP that will add InterBase
@@ -970,6 +997,7 @@ Group:		Libraries
 URL:		http://www.php.net/intl
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(intl) = %{intlver}
+Obsoletes:	php-intl < 4:5.3.28-7
 Obsoletes:	php-pecl-intl < %{intlver}
 
 %description intl
@@ -991,6 +1019,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.json.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(json) = %{jsonver}
+Obsoletes:	php-json < 4:5.3.28-7
 Obsoletes:	php-pecl-json < %{jsonver}
 
 %description json
@@ -1009,6 +1038,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.ldap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ldap)
+Obsoletes:	php-ldap < 4:5.3.28-7
 
 %description ldap
 This is a dynamic shared object (DSO) for PHP that will add LDAP
@@ -1027,6 +1057,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.mbstring.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mbstring)
+Obsoletes:	php-mbstring < 4:5.3.28-7
 
 %description mbstring
 This is a dynamic shared object (DSO) for PHP that will add multibyte
@@ -1042,6 +1073,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.mcrypt.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mcrypt)
+Obsoletes:	php-mcrypt < 4:5.3.28-7
 
 %description mcrypt
 This is a dynamic shared object (DSO) for PHP that will add mcrypt
@@ -1057,6 +1089,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.mssql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mssql)
+Obsoletes:	php-mssql < 4:5.3.28-7
 
 %description mssql
 This is a dynamic shared object (DSO) for PHP that will add MS SQL
@@ -1075,6 +1108,7 @@ URL:		http://www.php.net/manual/en/book.mysql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Provides:	php(mysql)
+Obsoletes:	php-mysql < 4:5.3.28-7
 
 %description mysql
 This is a dynamic shared object (DSO) for PHP that will add MySQL
@@ -1095,6 +1129,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(mysqli)
+Obsoletes:	php-mysqli < 4:5.3.28-7
 
 %description mysqli
 This is a dynamic shared object (DSO) for PHP that will add MySQLi
@@ -1113,6 +1148,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.mysqlnd.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mysqlnd)
+Obsoletes:	php-mysqlnd < 4:5.3.28-7
 
 %description mysqlnd
 MySQL Native Driver is a replacement for the MySQL Client Library
@@ -1150,6 +1186,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.oci8.php
 %{?requires_php_extension}
 Provides:	php(oci8)
+Obsoletes:	php-oci8 < 4:5.3.28-7
 
 %description oci8
 This is a dynamic shared object (DSO) for PHP that will add Oracle 7,
@@ -1168,6 +1205,7 @@ URL:		http://www.php.net/manual/en/book.uodbc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	unixODBC >= 2.1.1-3
 Provides:	php(odbc)
+Obsoletes:	php-odbc < 4:5.3.28-7
 
 %description odbc
 This is a dynamic shared object (DSO) for PHP that will add ODBC
@@ -1210,6 +1248,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.openssl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(openssl)
+Obsoletes:	php-openssl < 4:5.3.28-7
 
 %description openssl
 This is a dynamic shared object (DSO) for PHP that will add OpenSSL
@@ -1225,6 +1264,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.pcntl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pcntl)
+Obsoletes:	php-pcntl < 4:5.3.28-7
 
 %description pcntl
 This is a dynamic shared object (DSO) for PHP that will add process
@@ -1241,6 +1281,7 @@ Summary(pl.UTF-8):	Moduł PCRE dla PHP
 Group:		Libraries
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pcre)
+Obsoletes:	php-pcre < 4:5.3.28-7
 
 %description pcre
 This is a dynamic shared object (DSO) for PHP that will add Perl
@@ -1258,6 +1299,7 @@ URL:		http://www.php.net/manual/en/book.pdo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(pdo)
+Obsoletes:	php-pdo < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO
 
 %description pdo
@@ -1275,6 +1317,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-dblib.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(dblib)
+Obsoletes:	php-pdo-dblib < 4:5.3.28-7
 
 %description pdo-dblib
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1292,6 +1335,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-firebird.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-firebird)
+Obsoletes:	php-pdo-firebird < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_FIREBIRD
 
 %description pdo-firebird
@@ -1311,6 +1355,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-mysql)
+Obsoletes:	php-pdo-mysql < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_MYSQL
 
 %description pdo-mysql
@@ -1329,6 +1374,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-oci.php
 %{?requires_php_extension}
 %{?requires_php_pdo_module}
 Provides:	php(pdo-oci)
+Obsoletes:	php-pdo-oci < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_OCI
 
 %description pdo-oci
@@ -1347,6 +1393,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-odbc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-odbc)
+Obsoletes:	php-pdo-odbc < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_ODBC
 
 %description pdo-odbc
@@ -1366,6 +1413,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-pgsql)
 Provides:	php-pecl-PDO_PGSQL
+Obsoletes:	php-pdo-pgsql < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_PGSQL < 4:5.2.1-2
 
 %description pdo-pgsql
@@ -1384,6 +1432,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-sqlite)
+Obsoletes:	php-pdo-sqlite < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_SQLITE
 
 %description pdo-sqlite
@@ -1401,6 +1450,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.pgsql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pgsql)
+Obsoletes:	php-pgsql < 4:5.3.28-7
 
 %description pgsql
 This is a dynamic shared object (DSO) for PHP that will add PostgreSQL
@@ -1424,6 +1474,7 @@ Suggests:	%{name}-cli
 Suggests:	%{name}-zlib
 Provides:	php(phar) = %{pharver}
 Obsoletes:	php-pecl-phar < %{pharver}
+Obsoletes:	php-phar < 4:5.3.28-7
 Conflicts:	php-ioncube < 4.0.9
 
 %description phar
@@ -1440,6 +1491,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.posix.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(posix)
+Obsoletes:	php-posix < 4:5.3.28-7
 
 %description posix
 This is a dynamic shared object (DSO) for PHP that will add POSIX
@@ -1455,6 +1507,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.pspell.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pspell)
+Obsoletes:	php-pspell < 4:5.3.28-7
 
 %description pspell
 This is a dynamic shared object (DSO) for PHP that will add pspell
@@ -1472,6 +1525,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.readline.php
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Provides:	php(readline)
+Obsoletes:	php-readline < 4:5.3.28-7
 
 %description readline
 This PHP module adds support for readline functions (only for cli and
@@ -1488,6 +1542,7 @@ URL:		http://www.php.net/manual/en/book.recode.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	recode >= 3.5d-3
 Provides:	php(recode)
+Obsoletes:	php-recode < 4:5.3.28-7
 
 %description recode
 This is a dynamic shared object (DSO) for PHP that will add recode
@@ -1506,6 +1561,7 @@ Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Suggests:	%{name}-hash = %{epoch}:%{version}-%{release}
 Suggests:	tmpwatch
 Provides:	php(session)
+Obsoletes:	php-session < 4:5.3.28-7
 
 %description session
 This is a dynamic shared object (DSO) for PHP that will add session
@@ -1521,6 +1577,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.shmop.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(shmop)
+Obsoletes:	php-shmop < 4:5.3.28-7
 
 %description shmop
 This is a dynamic shared object (DSO) for PHP that will add Shared
@@ -1537,6 +1594,7 @@ URL:		http://www.php.net/manual/en/book.simplexml.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
+Obsoletes:	php-simplexml < 4:5.3.28-7
 
 %description simplexml
 This is a dynamic shared object (DSO) for PHP that will add Simple XML
@@ -1554,6 +1612,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-sockets = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(snmp)
+Obsoletes:	php-snmp < 4:5.3.28-7
 
 %description snmp
 This is a dynamic shared object (DSO) for PHP that will add SNMP
@@ -1569,6 +1628,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.soap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(soap)
+Obsoletes:	php-soap < 4:5.3.28-7
 
 %description soap
 This is a dynamic shared object (DSO) for PHP that will add SOAP/WSDL
@@ -1584,6 +1644,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.sockets.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sockets)
+Obsoletes:	php-sockets < 4:5.3.28-7
 
 %description sockets
 This is a dynamic shared object (DSO) for PHP that will add sockets
@@ -1601,6 +1662,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	php(spl)
+Obsoletes:	php-spl < 4:5.3.28-7
 
 %description spl
 This is a dynamic shared object (DSO) for PHP that will add Standard
@@ -1616,6 +1678,7 @@ Group:		Libraries
 URL:		http://php.net/manual/en/book.sqlite3.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite3) = %{sqlite3ver}
+Obsoletes:	php-sqlite3 < 4:5.3.28-7
 
 %description sqlite3
 SQLite is a C library that implements an embeddable SQL database
@@ -1645,6 +1708,7 @@ URL:		http://www.php.net/manual/en/book.sybase.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sybase-ct)
 Obsoletes:	php-sybase
+Obsoletes:	php-sybase-ct < 4:5.3.28-7
 
 %description sybase-ct
 This is a dynamic shared object (DSO) for PHP that will add Sybase and
@@ -1661,6 +1725,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.sem.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvmsg)
+Obsoletes:	php-sysvmsg < 4:5.3.28-7
 
 %description sysvmsg
 This is a dynamic shared object (DSO) for PHP that will add SysV
@@ -1676,6 +1741,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.sem.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvsem)
+Obsoletes:	php-sysvsem < 4:5.3.28-7
 
 %description sysvsem
 This is a dynamic shared object (DSO) for PHP that will add SysV
@@ -1691,6 +1757,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.shmop.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvshm)
+Obsoletes:	php-sysvshm < 4:5.3.28-7
 
 %description sysvshm
 This is a dynamic shared object (DSO) for PHP that will add SysV
@@ -1720,6 +1787,7 @@ URL:		http://www.php.net/manual/en/book.tidy.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	tidy
 Provides:	php(tidy)
+Obsoletes:	php-tidy < 4:5.3.28-7
 
 %description tidy
 This is a dynamic shared object (DSO) for PHP that will add Tidy
@@ -1735,6 +1803,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.tokenizer.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(tokenizer)
+Obsoletes:	php-tokenizer < 4:5.3.28-7
 
 %description tokenizer
 This is a dynamic shared object (DSO) for PHP that will add tokenizer
@@ -1755,6 +1824,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 #Requires:	%{name}-session = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(wddx)
+Obsoletes:	php-wddx < 4:5.3.28-7
 
 %description wddx
 This is a dynamic shared object (DSO) for PHP that will add wddx
@@ -1770,6 +1840,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.xml.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xml)
+Obsoletes:	php-xml < 4:5.3.28-7
 
 %description xml
 This is a dynamic shared object (DSO) for PHP that will add XML
@@ -1789,6 +1860,7 @@ URL:		http://www.php.net/manual/en/book.xmlreader.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Suggests:	%{name}-dom = %{epoch}:%{version}-%{release}
 Provides:	php(xmlreader)
+Obsoletes:	php-xmlreader < 4:5.3.28-7
 
 %description xmlreader
 This is a dynamic shared object (DSO) for PHP that will add XML Reader
@@ -1809,6 +1881,7 @@ URL:		http://www.php.net/manual/en/book.xmlrpc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
 Provides:	php(xmlrpc)
+Obsoletes:	php-xmlrpc < 4:5.3.28-7
 
 %description xmlrpc
 This is a dynamic shared object (DSO) for PHP that will add XMLRPC
@@ -1825,6 +1898,7 @@ URL:		http://www.php.net/manual/en/book.xmlwriter.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xmlwriter)
 Obsoletes:	php-pecl-xmlwriter
+Obsoletes:	php-xmlwriter < 4:5.3.28-7
 
 %description xmlwriter
 This extension wraps the libxml xmlWriter API. Represents a writer
@@ -1845,6 +1919,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.0.18
 Provides:	php(xsl)
+Obsoletes:	php-xsl < 4:5.3.28-7
 # actually not true, functionality is similar, but API differs
 Obsoletes:	php-xslt <= 3:4.3.8-1
 
@@ -1864,6 +1939,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %{?with_system_libzip:Requires:	libzip >= 0.10.1-2}
 Provides:	php(zip) = %{zipver}
 Obsoletes:	php-pecl-zip < %{zipver}
+Obsoletes:	php-zip < 4:5.3.28-7
 
 %description zip
 Zip is an extension to create, modify and read zip files.
@@ -1879,6 +1955,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.zlib.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zlib)
+Obsoletes:	php-zlib < 4:5.3.28-7
 
 %description zlib
 This is a dynamic shared object (DSO) for PHP that will add zlib

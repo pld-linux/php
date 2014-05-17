@@ -63,6 +63,7 @@
 %bcond_without	apache1		# disable building Apache 1.3.x SAPI
 %bcond_without	apache2		# disable building Apache 2.x SAPI
 %bcond_with	zts		# Zend Thread Safety
+%bcond_with	lfs		# Build with FILE_OFFSET_BITS=64
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_without	embed		# disable Embedded API
@@ -81,6 +82,11 @@
 %undefine	with_apache2
 %undefine	with_cgi
 %undefine	with_litespeed
+%endif
+
+%ifnarch %{ix86} x32
+# has no effect on 64bit systems
+%undefine	with_lfs
 %endif
 
 # mm is not thread safe
@@ -2243,8 +2249,10 @@ if [ ! -f _built-conf ]; then
 	touch _built-conf
 fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
-export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
-	-I%{_includedir}/xmlrpc-epi"
+export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} -I%{_includedir}/xmlrpc-epi"
+%if %{with lfs}
+CPPFLAGS="$CPPFLAGS $(getconf LFS_CFLAGS)"
+%endif
 
 sapis="
 cli

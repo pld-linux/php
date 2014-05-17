@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	8
+%define		rel	9
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -385,7 +385,6 @@ PHP - це мова написання скриптів, що вбудовуют
 Summary:	PHP DSO module for Apache 1.3.x
 Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 1.3.x
 Group:		Development/Languages/PHP
-Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime
@@ -2710,6 +2709,24 @@ fi
 # restart webserver at the end of transaction
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
 [ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
+
+%triggerpostun common -- php-common < 4:5.3.28-7
+# migrate configs /etc/php/conf.d -> /etc/phpXY/conf.d/
+# do config migration in php-common trigger, as the trigger is ran after all packages are upgraded
+# this way we can stick to one trigger, instead of attaching one for each (sub)package!
+for f in /etc/php/*.ini.rpmsave /etc/php/*.d/*.ini.rpmsave; do
+	test -f "$f" || continue
+	bn=${f#/etc/php/}
+	dn=${bn%/*}
+	fn=${bn#*/}
+	test "$dn" = "$fn" && dn=
+	fn=${fn%.rpmsave}
+	nf=%{_sysconfdir}/$dn/$fn
+	test -f "$nf" || continue
+	cp -vf $nf{,.rpmnew}
+	mv -vf $f $nf
+	%{__sed} -i -e 's#%{_libdir}/php#%{_libdir}/%{name}#' $nf
+done
 
 # common macros called at extension post/postun scriptlet
 %define	extension_scripts() \

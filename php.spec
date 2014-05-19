@@ -2724,7 +2724,10 @@ for f in /etc/php/*.ini.rpmsave /etc/php/*.d/*.ini.rpmsave; do
 	test -f "$nf" || continue
 	cp -vf $nf{,.rpmnew}
 	mv -vf $f $nf
-	%{__sed} -i -e 's#%{_libdir}/php#%{_libdir}/%{name}#' $nf
+	%{__sed} -i -e '
+		s#%{_libdir}/php#%{_libdir}/%{name}#
+		s#/etc/php#%{_sysconfdir}#
+	' $nf
 done
 
 # common macros called at extension post/postun scriptlet

@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	9
+%define		rel	10
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2725,7 +2725,10 @@ for f in /etc/php/*.ini.rpmsave /etc/php/*.d/*.ini.rpmsave; do
 	test -f "$nf" || continue
 	cp -vf $nf{,.rpmnew}
 	mv -vf $f $nf
-	%{__sed} -i -e 's#%{_libdir}/php#%{_libdir}/%{name}#' $nf
+	%{__sed} -i -e '
+		s#%{_libdir}/php#%{_libdir}/%{name}#
+		s#/etc/php#%{_sysconfdir}#
+	' $nf
 done
 
 # common macros called at extension post/postun scriptlet

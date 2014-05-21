@@ -138,7 +138,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.5.12
-Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
+Release:	%{rel}%{?with_type_hints:.th}
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -949,9 +949,12 @@ Summary:	InterBase/Firebird database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych InterBase/Firebird dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.ibase.php
+%if %{with interbase_inst}
+%{?requires_php_extension}
+%else
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+%endif
 Provides:	php(interbase)
-%{?with_interbase_inst:Autoreq:	false}
 
 %description interbase
 This is a dynamic shared object (DSO) for PHP that will add InterBase
@@ -1145,9 +1148,8 @@ Summary:	Oracle 8+ database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych Oracle 8+ dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.oci8.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+%{?requires_php_extension}
 Provides:	php(oci8)
-AutoReq:	false
 
 %description oci8
 This is a dynamic shared object (DSO) for PHP that will add Oracle 7,
@@ -1324,8 +1326,8 @@ Summary:	PHP Data Objects (PDO) Oracle support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą Oracle'a
 Group:		Libraries
 URL:		http://www.php.net/manual/en/ref.pdo-oci.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+%{?requires_php_extension}
+%{?requires_php_pdo_module}
 Provides:	php(pdo-oci)
 Obsoletes:	php-pecl-PDO_OCI
 

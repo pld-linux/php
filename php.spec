@@ -1875,7 +1875,7 @@ Summary(pl.UTF-8):	Moduł XML Reader dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.xmlreader.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Suggests:	%{name}-dom = %{epoch}:%{version}-%{release}
+Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
 Provides:	php(xmlreader)
 Obsoletes:	php-xmlreader < 4:5.3.28-7
 

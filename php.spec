@@ -297,6 +297,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		php_api_version		20121113
 %define		zend_module_api		20121212
 %define		zend_extension_api	220121212
+%define		php_pdo_api_version	20080721
 
 # Extension versions
 %define		bz2ver		1.0
@@ -310,7 +311,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.11.0
 
-%define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
+%define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
 
 %if %{with gcov}
@@ -524,7 +525,7 @@ Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
 Provides:	%{name}(debug) = %{php_debug}
 Provides:	%{name}(modules_api) = %{php_api_version}
-Provides:	%{name}(thread-safety) = %{zend_zts}
+Provides:	%{name}(thread-safety) = %{_zend_zts}
 Provides:	%{name}(zend_extension_api) = %{zend_extension_api}
 Provides:	%{name}(zend_module_api) = %{zend_module_api}
 Provides:	%{name}-core
@@ -1298,6 +1299,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.pdo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Provides:	%{name}(PDO_API) = %{php_pdo_api_version}
 Provides:	php(pdo)
 Obsoletes:	php-pdo < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO
@@ -2121,6 +2123,12 @@ fi
 API=$(awk '/#define ZEND_EXTENSION_API_NO/{print $3}' Zend/zend_extensions.h)
 if [ $API != %{zend_extension_api} ]; then
 	echo "Set %%define zend_extension_api to $API and re-run."
+	exit 1
+fi
+
+API=$(awk '/#define PDO_DRIVER_API/{print $3}' ext/pdo/php_pdo_driver.h)
+if [ $API != %{php_pdo_api_version} ]; then
+	echo "Set %%define php_pdo_api_version to $API and re-run."
 	exit 1
 fi
 

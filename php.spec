@@ -49,7 +49,7 @@
 %bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
-%bcond_without	default_php	# use this PHP as default PHP in distro
+%bcond_with	default_php	# use this PHP as default PHP in distro
 %bcond_without	curl		# without CURL extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	filter		# without filter extension module

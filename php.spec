@@ -2362,7 +2362,9 @@ cp -af Makefile.cli Makefile
 %endif
 
 %if %{with phpdbg}
-%{__make} -f Makefile.phpdbg phpdbg
+# PHP_READLINE_LIBS is empty, so force readline here
+%{__make} -f Makefile.phpdbg phpdbg \
+	PHPDBG_EXTRA_LIBS=-lreadline
 %endif
 
 # CGI/FCGI

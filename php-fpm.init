@@ -62,7 +62,7 @@ checkconfig() {
 start() {
 	# Check if the service is already running?
 	if [ -f $lockfile ]; then
-		msg_already_running "PHP FastCGI Process Manager"
+		msg_already_running "PHP FastCGI Process Manager (@processname@)"
 		return
 	fi
 
@@ -75,12 +75,12 @@ start() {
 
 stop() {
 	if [ ! -f $lockfile ]; then
-		msg_not_running "PHP FastCGI Process Manager"
+		msg_not_running "PHP FastCGI Process Manager (@processname@)"
 		return
 	fi
 
 	# Stop daemons.
-	msg_stopping "PHP FastCGI Process Manager"
+	msg_stopping "PHP FastCGI Process Manager (@processname@)"
 	# always gracefully shut down @processname@
 	/sbin/start-stop-daemon -q --stop -s QUIT --retry QUIT/600/TERM/10 --pidfile $pidfile
 	[ "$?" -eq 0 ] && ok || fail
@@ -91,20 +91,20 @@ reload() {
 	local sig=${1:-HUP}
 	local retnr=${2:-7}
 	if [ ! -f $lockfile ]; then
-		msg_not_running "PHP FastCGI Process Manager"
+		msg_not_running "PHP FastCGI Process Manager (@processname@)"
 		RETVAL=$retnr
 		return
 	fi
 
 	checkconfig
-	msg_reloading "PHP FastCGI Process Manager"
+	msg_reloading "PHP FastCGI Process Manager (@processname@)"
 	killproc --pidfile $pidfile @processname@ -$sig
 	RETVAL=$?
 }
 
 condrestart() {
 	if [ ! -f $lockfile ]; then
-		msg_not_running "PHP FastCGI Process Manager"
+		msg_not_running "PHP FastCGI Process Manager (@processname@)"
 		RETVAL=$1
 		return
 	fi

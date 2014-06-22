@@ -126,7 +126,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	1
+%define		rel	2
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -578,6 +578,7 @@ Requires:	libtool
 %endif
 %{?with_pcre:Requires:	pcre-devel >= 8.10}
 Requires:	shtool
+Provides:	php-devel = %{epoch}:%{version}-%{release}
 Obsoletes:	php-devel
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel

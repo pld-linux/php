@@ -28,7 +28,8 @@
 # Conditional build:
 %bcond_with	fdf		# with FDF (PDF forms) module		(BR: proprietary lib)
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
-%bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
+%bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
+%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	system_libzip	# with system libzip (reported broken: https://bugs.php.net/bug.php?id=60100)
 %bcond_with	gd_jis_conv	# causes imagettfbbox(): any2eucjp(): invalid code in input string when internal gd used
@@ -269,17 +270,18 @@ BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mhash:BuildRequires:	mhash-devel}
+%{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_ming:BuildRequires:	ming-devel >= 0.3}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 BuildRequires:	mysql-devel >= 4.0.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1}
 BuildRequires:	ncurses-ext-devel
+%{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 0.9.7d
 %endif
-%{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
-%{?with_snmp:%{?with_tests:mibs-net-snmp}}
+%{?with_oci:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 6.6}
 BuildRequires:	pkgconfig
@@ -321,7 +323,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
 
-%if %{with oci8}
+%if %{with oci}
 # ORACLE_HOME is required for oci8 ext to build
 %define _preserve_env %_preserve_env_base ORACLE_HOME
 %endif
@@ -2099,7 +2101,7 @@ for sapi in $sapis; do
 	--with-pdo-firebird=shared,/usr \
 %endif
 	--with-pdo-mysql=shared \
-	%{?with_oci8:--with-pdo-oci=shared} \
+	%{?with_oci:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_sqlite:--with-pdo-sqlite=shared,/usr} \
@@ -2147,7 +2149,7 @@ for sapi in $sapis; do
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	%{?with_mysqli:--with-mysqli=shared} \
 	--with-ncurses=shared \
-	%{?with_oci8:--with-oci8=shared} \
+	%{?with_oci:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-kerberos \
 	%{!?with_pcre:--without-pcre-regex}%{?with_pcre:--with-pcre-regex=shared,/usr} \
@@ -2831,7 +2833,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/ncurses.ini
 %attr(755,root,root) %{php_extensiondir}/ncurses.so
 
-%if %{with oci8}
+%if %{with oci}
 %files oci8
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/oci8.ini
@@ -2888,7 +2890,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_mysql.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_mysql.so
 
-%if %{with oci8}
+%if %{with oci}
 %files pdo-oci
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_oci.ini

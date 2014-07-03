@@ -45,8 +45,8 @@
 #
 # Conditional build:
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
-%bcond_with	oci8		# with Oracle oci8 extension module	(BR: proprietary libs)
-%bcond_with	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
+%bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
+%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
 %bcond_with	default_php	# use this PHP as default PHP in distro
@@ -144,7 +144,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.6.0
-Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
+Release:	%{rel}%{?with_type_hints:.th}
 Epoch:		4
 License:	PHP
 Group:		Libraries
@@ -275,7 +275,7 @@ BuildRequires:	openssl-devel >= 0.9.7d
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
-%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}
+%{?with_oci:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 8.10}
 BuildRequires:	pkgconfig
@@ -338,7 +338,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %undefine	with_ccache
 %endif
 
-%if %{with oci8}
+%if %{with oci}
 # ORACLE_HOME is required for oci8 ext to build
 %define _preserve_env %_preserve_env_base ORACLE_HOME
 %endif
@@ -2260,7 +2260,7 @@ for sapi in $sapis; do
 	%{?with_mhash:--with-mhash=yes} \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	--with-pdo-mysql=shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd} \
-	%{?with_oci8:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
+	%{?with_oci:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
@@ -2300,7 +2300,7 @@ for sapi in $sapis; do
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
 	--with-mysql=shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
-	%{?with_oci8:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
+	%{?with_oci:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_opcache:--enable-opcache=shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \
@@ -3053,7 +3053,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/mysqlnd.so
 %endif
 
-%if %{with oci8}
+%if %{with oci}
 %files oci8
 %defattr(644,root,root,755)
 %doc ext/oci8/{CREDITS,README}
@@ -3127,7 +3127,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_mysql.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_mysql.so
 
-%if %{with oci8}
+%if %{with oci}
 %files pdo-oci
 %defattr(644,root,root,755)
 %doc ext/pdo_oci/CREDITS

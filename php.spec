@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	11
+%define		rel	12
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -165,6 +165,7 @@ Patch11:	embed.patch
 %if %{with type_hints}
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
+Patch13:	php-secbug-67498.patch
 Patch14:	%{orgname}-no_pear_install.patch
 Patch15:	%{orgname}-zlib.patch
 Patch17:	%{orgname}-readline.patch
@@ -1999,6 +2000,7 @@ cp -p php.ini-production php.ini
 %if %{with type_hints}
 %patch12 -p0
 %endif
+%patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch17 -p1

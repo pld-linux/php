@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	12
+%define		rel	1
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -130,13 +130,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.3.28
+Version:	5.3.29
 Release:	%{rel}%{?with_type_hints:.th}%{?with_oci8:.oci}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
-# Source0-md5:	56ff88934e068d142d6c0deefd1f396b
+# Source0-md5:	9469e240cbe6ac865aeaec89b253dd30
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -165,7 +165,6 @@ Patch11:	embed.patch
 %if %{with type_hints}
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
-Patch13:	php-secbug-67498.patch
 Patch14:	%{orgname}-no_pear_install.patch
 Patch15:	%{orgname}-zlib.patch
 Patch17:	%{orgname}-readline.patch
@@ -2000,7 +1999,6 @@ cp -p php.ini-production php.ini
 %if %{with type_hints}
 %patch12 -p0
 %endif
-%patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch17 -p1

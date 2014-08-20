@@ -12,8 +12,8 @@
  PHP_SUBST(PHP_MODULES)
  PHP_SUBST(PHP_ZEND_EX)
  
---- php-5.3.8/Makefile.global~	2011-10-14 08:58:00.288329595 +0300
-+++ php-5.3.8/Makefile.global	2011-10-14 08:50:16.670234576 +0300
+--- php-5.3.29/Makefile.global~	2014-08-19 16:59:48.000000000 +0300
++++ php-5.3.29/Makefile.global	2014-08-19 17:47:47.112627301 +0300
 @@ -77,8 +77,15 @@
  		done; \
  	fi
@@ -31,15 +31,14 @@
  	if test "x$(PHP_MODULES)" != "x"; then \
  		for i in $(PHP_MODULES)""; do \
  			. $$i; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
-@@ -107,7 +114,10 @@
+@@ -114,7 +114,9 @@
  		TEST_PHP_EXECUTABLE=$(PHP_EXECUTABLE) \
  		TEST_PHP_SRCDIR=$(top_srcdir) \
  		CC="$(CC)" \
 -			$(PHP_EXECUTABLE) -n -c $(top_builddir)/tmp-php.ini $(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini -d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) $(TESTS); \
-+			$(PHP_EXECUTABLE) -n -c $(top_builddir)/tmp-php.ini \
 +			-d extension_dir=$(top_builddir)/modules/ -d 'extension=$(EXTENSION_DIR)/pcre.$(SHLIB_DL_SUFFIX_NAME)' \
-+			$(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini \
-+			-d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) $(RUN_TESTS_SETTINGS) $(TESTS); \
++			$(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini -d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) \
++			$(RUN_TESTS_SETTINGS) $(TESTS); \
+ 		TEST_RESULT_EXIT_CODE=$$?; \
  		rm $(top_builddir)/tmp-php.ini; \
- 	else \
- 		echo "ERROR: Cannot run tests without CLI sapi."; \
+ 		exit $$TEST_RESULT_EXIT_CODE; \

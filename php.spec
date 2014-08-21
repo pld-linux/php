@@ -89,6 +89,7 @@
 %bcond_without	fpm		# disable FPM
 %bcond_without	embed		# disable Embedded API
 %bcond_without	phpdbg		# disable phpdbg SAPI
+%bcond_with	milter		# disable Milter SAPI
 %bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
@@ -108,6 +109,11 @@
 # mm is not thread safe
 %if %{with zts}
 %undefine	with_mm
+%endif
+
+# milter requires ZTS
+%if %{with milter} && %{without zts}
+%undefine	with_milter
 %endif
 
 %ifnarch %{ix86} %{x8664} sparc sparcv9 alpha
@@ -170,6 +176,7 @@ Patch4:		%{orgname}-libpq_fs_h_path.patch
 Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
+Patch8:		milter.patch
 
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
@@ -1915,6 +1922,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q -n %{orgname}-%{version}%{?subver}
+cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1923,8 +1931,8 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 
-cp -p php.ini-production php.ini
 %patch10 -p1
 %if %{with type_hints}
 %patch12 -p0
@@ -2147,7 +2155,7 @@ export EXTENSION_DIR="%{php_extensiondir}"
 # configure once (for faster debugging purposes)
 if [ ! -f _built-conf ]; then
 	# now remove Makefile copies
-	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs1,apxs2,litespeed}
+	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs1,apxs2,litespeed,phpdbg,milter}
 	%{__libtoolize}
 	%{__aclocal}
 	cp -f /usr/share/automake/config.* .
@@ -2175,11 +2183,14 @@ embed
 %if %{with apache1}
 apxs1
 %endif
+%if %{with apache2}
+apxs2
+%endif
 %if %{with phpdbg}
 phpdbg
 %endif
-%if %{with apache2}
-apxs2
+%if %{with milter}
+milter
 %endif
 "
 for sapi in $sapis; do
@@ -2214,6 +2225,9 @@ for sapi in $sapis; do
 	;;
 	phpdbg)
 		sapi_args='--disable-cli --disable-cgi --enable-phpdbg %{?debug:--enable-phpdbg-debug}'
+	;;
+	milter)
+		sapi_args='--disable-cli --disable-cgi --with-milter'
 	;;
 	esac
 
@@ -2367,6 +2381,10 @@ cp -af Makefile.cli Makefile
 	PHPDBG_EXTRA_LIBS=-lreadline
 %endif
 
+%if %{with milter}
+%{__make} -f Makefile.milter milter
+%endif
+
 # CGI/FCGI
 %if %{with cgi}
 cp -pf php_config.h.cgi-fcgi main/php_config.h
@@ -2506,6 +2524,11 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 
 %if %{with phpdbg}
 %{__make} -f Makefile.phpdbg install-phpdbg \
+	INSTALL_ROOT=$RPM_BUILD_ROOT
+%endif
+
+%if %{with milter}
+%{__make} -f Makefile.milter install-milter \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 %endif
 
@@ -2840,6 +2863,12 @@ fi
 %files phpdbg
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/phpdbg
+%endif
+
+%if %{with milter}
+%files milter
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/php-milter
 %endif
 
 %files common

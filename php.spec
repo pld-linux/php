@@ -177,7 +177,7 @@ Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		milter.patch
-
+Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 %if %{with type_hints}
@@ -1932,7 +1932,7 @@ cp -p php.ini-production php.ini
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-
+%patch9 -p1
 %patch10 -p1
 %if %{with type_hints}
 %patch12 -p0

@@ -2935,6 +2935,7 @@ fi
 %files dom
 %defattr(644,root,root,755)
 %doc ext/dom/{CREDITS,TODO}
+%doc ext/dom/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
 
@@ -3252,6 +3253,7 @@ fi
 %files simplexml
 %defattr(644,root,root,755)
 %doc ext/simplexml/{CREDITS,README}
+%doc ext/simplexml/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
 
@@ -3277,7 +3279,8 @@ fi
 
 %files spl
 %defattr(644,root,root,755)
-%doc ext/spl/{CREDITS,README,TODO,examples}
+%doc ext/spl/{CREDITS,README,TODO}
+%doc ext/spl/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
 %attr(755,root,root) %{php_extensiondir}/spl.so
 
@@ -3334,6 +3337,7 @@ fi
 %files tidy
 %defattr(644,root,root,755)
 %doc ext/tidy/{CREDITS,README}
+%doc ext/tidy/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tidy.ini
 %attr(755,root,root) %{php_extensiondir}/tidy.so
 %endif
@@ -3360,7 +3364,8 @@ fi
 
 %files xmlreader
 %defattr(644,root,root,755)
-%doc ext/xmlreader/{CREDITS,README,TODO,examples}
+%doc ext/xmlreader/{CREDITS,README,TODO}
+%doc ext/xmlreader/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlreader.ini
 %attr(755,root,root) %{php_extensiondir}/xmlreader.so
 
@@ -3375,6 +3380,7 @@ fi
 %files xmlwriter
 %defattr(644,root,root,755)
 %doc ext/xmlwriter/{CREDITS,TODO}
+%doc ext/xmlwriter/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlwriter.ini
 %attr(755,root,root) %{php_extensiondir}/xmlwriter.so
 
@@ -3387,6 +3393,7 @@ fi
 %files zip
 %defattr(644,root,root,755)
 %doc ext/zip/{CREDITS,TODO}
+%doc ext/zip/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zip.ini
 %attr(755,root,root) %{php_extensiondir}/zip.so
 

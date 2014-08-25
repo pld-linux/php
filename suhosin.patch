@@ -5616,12 +5616,11 @@ the following modifications have been made:
  					PHP_VERSION, cli_sapi_module.name, __DATE__, __TIME__,
  #if ZEND_DEBUG && defined(HAVE_GCOV)
  					"(DEBUG GCOV)",
---- php-5.5.0alpha1/sapi/litespeed/lsapi_main.c~	2012-11-13 22:00:16.000000000 +0200
-+++ php-5.5.0alpha1/sapi/litespeed/lsapi_main.c	2012-11-17 13:47:51.979828334 +0200
-@@ -546,11 +546,19 @@
- 				break;
- 			case 'v':
- 				if (php_request_startup(TSRMLS_C) != FAILURE) {
+--- php-5.5.15/sapi/litespeed/lsapi_main.c	2014-08-21 11:45:02.000000000 +0300
++++ php-5.5.15/sapi/litespeed/lsapi_main.c	2014-08-25 11:50:36.603155796 +0300
+@@ -734,11 +546,19 @@
+             case 'v':
+                 if (php_request_startup(TSRMLS_C) != FAILURE) {
 +#if SUHOSIN_PATCH
 +#if ZEND_DEBUG
 +					php_printf("PHP %s with Suhosin-Patch (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2014 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
@@ -5630,14 +5629,15 @@ the following modifications have been made:
 +#endif
 +#else
  #if ZEND_DEBUG
- 					php_printf("PHP %s (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2014 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
+                     php_printf("PHP %s (%s) (built: %s %s) (DEBUG)\nCopyright (c) 1997-2014 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
  #else
- 					php_printf("PHP %s (%s) (built: %s %s)\nCopyright (c) 1997-2014 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
+                     php_printf("PHP %s (%s) (built: %s %s)\nCopyright (c) 1997-2014 The PHP Group\n%s", PHP_VERSION, sapi_module.name, __DATE__, __TIME__, get_zend_version());
  #endif
 +#endif
  #ifdef PHP_OUTPUT_NEWAPI
                      php_output_end_all(TSRMLS_C);
  #else
+                     php_end_ob_buffers(1 TSRMLS_CC);
 --- a/sapi/milter/php_milter.c
 +++ b/sapi/milter/php_milter.c
 @@ -1109,7 +1109,11 @@ int main(int argc, char *argv[])

@@ -135,7 +135,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.8
+%define		rel	1
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2960,6 +2960,7 @@ fi
 %files phpdbg
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/phpdbg
+%{_mandir}/man1/phpdbg.1*
 %endif
 
 %if %{with milter}

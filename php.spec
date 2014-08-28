@@ -137,11 +137,10 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.7
+%define		rel	0.8
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
-%define		subver	RC4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -154,9 +153,8 @@ Release:	%{rel}%{?with_type_hints:.th}
 Epoch:		4
 License:	PHP
 Group:		Libraries
-#Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	http://downloads.php.net/tyrael/php-%{version}%{subver}.tar.xz
-# Source0-md5:	4430707c7ee075748071ecf803fe6af6
+Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	642825d75ce2634d9513d5b21dbee521
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini

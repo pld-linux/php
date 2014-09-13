@@ -229,7 +229,7 @@ BuildRequires:	sed >= 4.0
 %if %{with mssql} || %{with sybase_ct}
 BuildRequires:	freetds-devel >= 0.82
 %endif
-BuildRequires:	freetype-devel >= 2.5.1
+BuildRequires:	freetype-devel >= 1:2.5.1
 %if %{with system_gd}
 BuildRequires:	gd-devel >= 2.1
 %endif

@@ -8,7 +8,6 @@
 # - update imap myrights patch (needs api porting)
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
-# NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
 # TODO:
@@ -60,8 +59,7 @@
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
-# don't turn it on by default; see TODO item for mysqlnd in this spec
-%bcond_with	mysqlnd		# with mysqlnd support in mysql related extensions
+%bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	opcache		# without Enable Zend OPcache extension support
@@ -135,7 +133,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	1
+%define		rel	2
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -565,7 +563,7 @@ Provides:	php(ereg)
 Provides:	php(libxml)
 Provides:	php(reflection)
 Provides:	php(standard)
-%{!?with_mysqlnd:Obsoletes:	php-mysqlnd}
+%{!?with_mysqlnd:Obsoletes:	%{name}-mysqlnd}
 %{?with_pcre:%requires_ge_to	pcre pcre-devel}
 Obsoletes:	php-common < 4:5.3.28-7
 Obsoletes:	php-pecl-domxml

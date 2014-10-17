@@ -1,0 +1,24 @@
+link mysqlnd.so with openssl if enabled
+
+--- php-5.6.1/ext/mysqlnd/config9.m4~	2014-10-01 12:17:38.000000000 +0300
++++ php-5.6.1/ext/mysqlnd/config9.m4	2014-10-07 20:19:44.653070295 +0300
+@@ -34,10 +34,17 @@
+   test -z "$PHP_OPENSSL" && PHP_OPENSSL=no
+ 
+   if test "$PHP_OPENSSL" != "no" || test "$PHP_OPENSSL_DIR" != "no"; then
+-    AC_CHECK_LIB(ssl, DSA_get_default_method, AC_DEFINE(HAVE_DSA_DEFAULT_METHOD, 1, [OpenSSL 0.9.7 or later]))
+-    AC_CHECK_LIB(crypto, X509_free, AC_DEFINE(HAVE_DSA_DEFAULT_METHOD, 1, [OpenSSL 0.9.7 or later]))
++    AC_CHECK_LIB(ssl, DSA_get_default_method, [
++      AC_DEFINE(HAVE_DSA_DEFAULT_METHOD, 1, [OpenSSL 0.9.7 or later])
++      PHP_ADD_EXTENSION_DEP(mysqlnd, ssl)
++    ])
++    AC_CHECK_LIB(crypto, X509_free, [
++      AC_DEFINE(HAVE_DSA_DEFAULT_METHOD, 1, [OpenSSL 0.9.7 or later])
++      PHP_ADD_EXTENSION_DEP(mysqlnd, crypto)
++    ])
+ 
+     PHP_SETUP_OPENSSL(MYSQLND_SHARED_LIBADD, [AC_DEFINE(MYSQLND_HAVE_SSL,1,[Enable mysqlnd code that uses OpenSSL directly])])
++
+   fi
+ 
+   mysqlnd_sources="$mysqlnd_base_sources $mysqlnd_ps_sources"

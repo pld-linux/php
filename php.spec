@@ -2433,7 +2433,9 @@ sapis=$(%{__sed} -rne 's/^PHP_INSTALLED_SAPIS = (.+)/\1/p' Makefile.* | tr ' ' '
 cp -af php_config.h.cli main/php_config.h
 cp -af Makefile.cli Makefile
 %{__make} libphp_common.la
-%{__make} build-modules
+# hack: MYSQLND_SHARED_LIBADD not initialized
+%{__make} build-modules \
+	MYSQLND_SHARED_LIBADD="-lssl -lcrypto"
 
 %if %{with apache1}
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1

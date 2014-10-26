@@ -47,6 +47,7 @@
 %bcond_with	system_gd	# with system gd (imageantialias function is missing then)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
 %bcond_with	default_php	# use this PHP as default PHP in distro
+%bcond_with	systemtap	# systemtap/DTrace support
 %bcond_without	curl		# without CURL extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	filter		# without filter extension module
@@ -277,6 +278,7 @@ BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.566
+%{?with_systemtap:BuildRequires:	systemtap-sdt-devel}
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	xz
 %if %{with sqlite3} || %{with pdo_sqlite}
@@ -2324,6 +2326,7 @@ for sapi in $sapis; do
 	--enable-ctype=shared \
 	--enable-dba=shared \
 	--enable-dom=shared \
+	%{?with_systemtap:--enable-dtrace} \
 	--enable-exif=shared \
 	--enable-fileinfo=shared \
 	--enable-ftp=shared \

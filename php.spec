@@ -165,6 +165,7 @@ Patch11:	embed.patch
 %if %{with type_hints}
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
+Patch13:	bug-test-pcntl-55479.patch
 Patch14:	%{orgname}-no_pear_install.patch
 Patch15:	%{orgname}-zlib.patch
 Patch17:	%{orgname}-readline.patch
@@ -1999,6 +2000,7 @@ cp -p php.ini-production php.ini
 %if %{with type_hints}
 %patch12 -p0
 %endif
+%patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch17 -p1

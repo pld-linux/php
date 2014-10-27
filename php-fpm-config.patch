@@ -1,15 +1,6 @@
---- php-5.4.7/sapi/fpm/php-fpm.conf.in	2012-10-05 22:16:44.895998479 +0300
-+++ php-5.3.17/sapi/fpm/php-fpm.conf.in	2012-10-12 12:35:47.601602945 +0300
-@@ -12,7 +12,7 @@
- ; Relative path can also be used. They will be prefixed by:
- ;  - the global prefix if it's been set (-p arguement)
- ;  - @prefix@ otherwise
--;include=etc/fpm.d/*.conf
-+;include=/etc/php/fpm.d/*.conf
- 
- ;;;;;;;;;;;;;;;;;;
- ; Global Options ;
-@@ -22,14 +22,14 @@
+--- php-5.6.2/sapi/fpm/php-fpm.conf.in	2014-10-27 08:20:34.963718145 +0200
++++ php-5.6.2.old/sapi/fpm/php-fpm.conf.in	2014-10-27 08:07:47.762117299 +0200
+@@ -14,14 +14,14 @@
  ; Pid file
  ; Note: the default prefix is @EXPANDED_LOCALSTATEDIR@
  ; Default Value: none
@@ -26,25 +17,39 @@
  
  ; syslog_facility is used to specify what type of program is logging the
  ; message. This lets syslogd specify that messages from different facilities
-@@ -93,7 +93,7 @@
+@@ -115,3 +115,11 @@
+ ; ports and different management options.  The name of the pool will be
+ ; used in logs and stats. There is no limitation on the number of pools which
+ ; FPM can handle. Your system will tell you anyway :)
++
++; Include one or more files. If glob(3) exists, it is used to include a bunch of
++; files from a glob(3) pattern. This directive can be used everywhere in the
++; file.
++; Relative path can also be used. They will be prefixed by:
++;  - the global prefix if it's been set (-p argument)
++;  - @prefix@ otherwise
++include=/etc/php/fpm.d/*.conf
+--- php-5.6.2/sapi/fpm/php-fpm.conf-d.in	2014-10-27 08:15:35.350075839 +0200
++++ php-5.6.2.old/sapi/fpm/php-fpm.conf-d.in	2014-10-27 08:07:47.762117299 +0200
+@@ -30,7 +32,7 @@
  ;                            specific port;
  ;   '/path/to/unix/socket' - to listen on a unix socket.
  ; Note: This value is mandatory.
 -listen = 127.0.0.1:9000
 +listen = /var/run/php/@processname@.sock
  
- ; Set listen(2) backlog. A value of '-1' means unlimited.
- ; Default Value: 128 (-1 on FreeBSD and OpenBSD)
-@@ -105,7 +105,7 @@
+ ; Set listen(2) backlog.
+ ; Default Value: 65535 (-1 on FreeBSD and OpenBSD)
+@@ -51,7 +53,7 @@
  ; must be separated by a comma. If this value is left blank, connections will be
  ; accepted from any ip address.
  ; Default Value: any
 -;listen.allowed_clients = 127.0.0.1
 +listen.allowed_clients = 127.0.0.1
  
- ; Set permissions for unix socket, if one is used. In Linux, read/write
- ; permissions must be set in order to allow connections from a web server. Many
-@@ -277,7 +277,7 @@
+ ; Specify the nice(2) priority to apply to the pool processes (only if set)
+ ; The value can vary from -19 (highest priority) to 20 (lower priority)
+@@ -370,7 +372,7 @@
  ; the current environment.
  ; Default Value: clean env
  ;env[HOSTNAME] = $HOSTNAME
@@ -64,14 +69,16 @@
  
  			ths = document.getElementsByTagName("th");
  			for (var i=0; i<ths.length; i++) {
---- php-5.4.18/sapi/fpm/Makefile.frag~	2013-08-14 08:47:24.000000000 +0300
-+++ php-5.4.18/sapi/fpm/Makefile.frag	2013-08-29 10:20:38.161424172 +0300
-@@ -12,7 +12,7 @@
+--- php-5.6.2/sapi/fpm/Makefile.frag~	2014-10-27 08:18:59.000000000 +0200
++++ php-5.6.2/sapi/fpm/Makefile.frag	2014-10-27 08:19:37.524436179 +0200
+@@ -12,8 +12,8 @@
  
  	@echo "Installing PHP FPM config:        $(INSTALL_ROOT)$(sysconfdir)/" && \
- 	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir) || :
+ 	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/fpm.d || :
 -	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf.default || :
+-	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf-d $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf.default || :
 +	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf || :
++	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf-d $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf || :
  
  	@echo "Installing PHP FPM man page:      $(INSTALL_ROOT)$(mandir)/man8/"
  	@$(mkinstalldirs) $(INSTALL_ROOT)$(mandir)/man8

@@ -1,5 +1,5 @@
---- php-5.5.7/sapi/fpm/php-fpm.conf.in~	2013-12-16 17:57:03.000000000 +0200
-+++ php-5.5.7/sapi/fpm/php-fpm.conf.in	2013-12-16 17:58:37.618025260 +0200
+--- php-5.6.2/sapi/fpm/php-fpm.conf.in~	2014-10-15 15:59:32.000000000 +0300
++++ php-5.6.2/sapi/fpm/php-fpm.conf.in	2014-10-27 08:12:12.930858749 +0200
 @@ -6,14 +6,6 @@
  ; prefix (@prefix@). This prefix can be dynamically changed by using the
  ; '-p' argument from the command line.
@@ -10,15 +10,16 @@
 -; Relative path can also be used. They will be prefixed by:
 -;  - the global prefix if it's been set (-p argument)
 -;  - @prefix@ otherwise
--;include=/etc/php/fpm.d/*.conf
+-;include=etc/fpm.d/*.conf
 -
  ;;;;;;;;;;;;;;;;;;
  ; Global Options ;
  ;;;;;;;;;;;;;;;;;;
-@@ -116,404 +116,10 @@
+@@ -123,405 +115,3 @@
+ ; ports and different management options.  The name of the pool will be
  ; used in logs and stats. There is no limitation on the number of pools which
  ; FPM can handle. Your system will tell you anyway :)
- 
+-
 -; Start a new pool named 'www'.
 -; the variable $pool can we used in any directive and will be replaced by the
 -; pool name ('www' here)
@@ -51,7 +52,7 @@
 -;                            specific port;
 -;   '/path/to/unix/socket' - to listen on a unix socket.
 -; Note: This value is mandatory.
--listen = /var/run/php/@processname@.sock
+-listen = 127.0.0.1:9000
 -
 -; Set listen(2) backlog.
 -; Default Value: 65535 (-1 on FreeBSD and OpenBSD)
@@ -72,7 +73,7 @@
 -; must be separated by a comma. If this value is left blank, connections will be
 -; accepted from any ip address.
 -; Default Value: any
--listen.allowed_clients = 127.0.0.1
+-;listen.allowed_clients = 127.0.0.1
 -
 -; Specify the nice(2) priority to apply to the pool processes (only if set)
 -; The value can vary from -19 (highest priority) to 20 (lower priority)
@@ -391,7 +392,7 @@
 -; the current environment.
 -; Default Value: clean env
 -;env[HOSTNAME] = $HOSTNAME
--env[PATH] = $PATH
+-;env[PATH] = /usr/local/bin:/usr/bin:/bin
 -;env[TMP] = /tmp
 -;env[TMPDIR] = /tmp
 -;env[TEMP] = /tmp
@@ -420,18 +421,9 @@
 -;php_admin_value[error_log] = /var/log/fpm-php.www.log
 -;php_admin_flag[log_errors] = on
 -;php_admin_value[memory_limit] = 32M
-+; Include one or more files. If glob(3) exists, it is used to include a bunch of
-+; files from a glob(3) pattern. This directive can be used everywhere in the
-+; file.
-+; Relative path can also be used. They will be prefixed by:
-+;  - the global prefix if it's been set (-p argument)
-+;  - @prefix@ otherwise
-+include=/etc/php/fpm.d/*.conf
 --- /dev/null	2007-02-13 18:29:53.000000000 +0200
-+++ php-5.6.0beta1/sapi/fpm/php-fpm.conf-d.in	2014-04-21 21:58:46.191751631 +0300
-@@ -0,0 +1,403 @@
-+; vim:ft=dosini
-+;
++++ php-5.6.2/sapi/fpm/php-fpm.conf-d.in	2014-10-27 08:12:03.327088104 +0200
+@@ -0,0 +1,401 @@
 +; Start a new pool named 'www'.
 +; the variable $pool can we used in any directive and will be replaced by the
 +; pool name ('www' here)
@@ -464,7 +456,7 @@
 +;                            specific port;
 +;   '/path/to/unix/socket' - to listen on a unix socket.
 +; Note: This value is mandatory.
-+listen = /var/run/php/@processname@.sock
++listen = 127.0.0.1:9000
 +
 +; Set listen(2) backlog.
 +; Default Value: 65535 (-1 on FreeBSD and OpenBSD)
@@ -485,7 +477,7 @@
 +; must be separated by a comma. If this value is left blank, connections will be
 +; accepted from any ip address.
 +; Default Value: any
-+listen.allowed_clients = 127.0.0.1
++;listen.allowed_clients = 127.0.0.1
 +
 +; Specify the nice(2) priority to apply to the pool processes (only if set)
 +; The value can vary from -19 (highest priority) to 20 (lower priority)
@@ -804,7 +796,7 @@
 +; the current environment.
 +; Default Value: clean env
 +;env[HOSTNAME] = $HOSTNAME
-+env[PATH] = $PATH
++;env[PATH] = /usr/local/bin:/usr/bin:/bin
 +;env[TMP] = /tmp
 +;env[TMPDIR] = /tmp
 +;env[TEMP] = /tmp
@@ -844,16 +836,16 @@
    PHP_ADD_MAKEFILE_FRAGMENT([$abs_srcdir/sapi/fpm/Makefile.frag])
  
    SAPI_FPM_PATH=sapi/fpm/php-fpm
---- php-5.5.7/sapi/fpm/Makefile.frag~	2013-12-16 17:57:03.000000000 +0200
-+++ php-5.5.7/sapi/fpm/Makefile.frag	2013-12-16 18:01:19.511829907 +0200
+--- php-5.6.2/sapi/fpm/Makefile.frag~	2014-10-15 15:59:32.000000000 +0300
++++ php-5.6.2/sapi/fpm/Makefile.frag	2014-10-27 08:12:57.402883790 +0200
 @@ -11,8 +11,9 @@
  	@$(INSTALL) -m 0755 $(SAPI_FPM_PATH) $(INSTALL_ROOT)$(sbindir)/$(program_prefix)php-fpm$(program_suffix)$(EXEEXT)
  
  	@echo "Installing PHP FPM config:        $(INSTALL_ROOT)$(sysconfdir)/" && \
 -	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir) || :
 +	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/fpm.d || :
- 	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf || :
-+	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf-d $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf || :
+ 	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf.default || :
++	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf-d $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf.default || :
  
  	@echo "Installing PHP FPM man page:      $(INSTALL_ROOT)$(mandir)/man8/"
  	@$(mkinstalldirs) $(INSTALL_ROOT)$(mandir)/man8

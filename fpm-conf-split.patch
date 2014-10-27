@@ -1,6 +1,6 @@
---- php-5.3.27/sapi/fpm/php-fpm.conf.in~	2013-12-05 17:20:34.000000000 +0200
-+++ php-5.3.27/sapi/fpm/php-fpm.conf.in	2013-12-05 20:51:02.914438767 +0200
-@@ -7,14 +7,6 @@
+--- php-5.3.29/sapi/fpm/php-fpm.conf.in~	2014-08-13 22:22:50.000000000 +0300
++++ php-5.3.29/sapi/fpm/php-fpm.conf.in	2014-10-27 07:43:44.223007095 +0200
+@@ -6,14 +6,6 @@
  ; prefix (@prefix@). This prefix can be dynamicaly changed by using the
  ; '-p' argument from the command line.
  
@@ -10,16 +10,15 @@
 -; Relative path can also be used. They will be prefixed by:
 -;  - the global prefix if it's been set (-p arguement)
 -;  - @prefix@ otherwise
--;include=/etc/php/fpm.d/*.conf
+-;include=etc/fpm.d/*.conf
 -
  ;;;;;;;;;;;;;;;;;;
  ; Global Options ;
  ;;;;;;;;;;;;;;;;;;
-@@ -116,396 +108,11 @@
- ; ports and different management options.  The name of the pool will be
+@@ -116,395 +108,10 @@
  ; used in logs and stats. There is no limitation on the number of pools which
  ; FPM can handle. Your system will tell you anyway :)
--
+ 
 -; Start a new pool named 'www'.
 -; the variable $pool can we used in any directive and will be replaced by the
 -; pool name ('www' here)
@@ -52,7 +51,7 @@
 -;                            specific port;
 -;   '/path/to/unix/socket' - to listen on a unix socket.
 -; Note: This value is mandatory.
--listen = /var/run/php/@processname@.sock
+-listen = 127.0.0.1:9000
 -
 -; Set listen(2) backlog. A value of '-1' means unlimited.
 -; Default Value: 128 (-1 on FreeBSD and OpenBSD)
@@ -73,7 +72,7 @@
 -; must be separated by a comma. If this value is left blank, connections will be
 -; accepted from any ip address.
 -; Default Value: any
--listen.allowed_clients = 127.0.0.1
+-;listen.allowed_clients = 127.0.0.1
 -
 -; Specify the nice(2) priority to apply to the pool processes (only if set)
 -; The value can vary from -19 (highest priority) to 20 (lower priority)
@@ -128,12 +127,12 @@
 -; The desired minimum number of idle server processes.
 -; Note: Used only when pm is set to 'dynamic'
 -; Note: Mandatory when pm is set to 'dynamic'
--pm.min_spare_servers = 2
+-pm.min_spare_servers = 1
 -
 -; The desired maximum number of idle server processes.
 -; Note: Used only when pm is set to 'dynamic'
 -; Note: Mandatory when pm is set to 'dynamic'
--pm.max_spare_servers = 5
+-pm.max_spare_servers = 3
 -
 -; The number of seconds after which an idle process will be killed.
 -; Note: Used only when pm is set to 'ondemand'
@@ -189,7 +188,7 @@
 -;   http://www.foo.bar/status?json
 -;   http://www.foo.bar/status?html
 -;   http://www.foo.bar/status?xml
- ;
+-;
 -; By default the status page only outputs short status. Passing 'full' in the
 -; query string will also return status for each pool process.
 -; Example: 
@@ -243,7 +242,7 @@
 -;       anything, but it may not be a good idea to use the .php extension or it
 -;       may conflict with a real PHP file.
 -; Default Value: not set 
--;pm.status_path = /fpm-status
+-;pm.status_path = /status
 - 
 -; The ping URI to call the monitoring page of FPM. If this value is not set, no
 -; URI will be recognized as a ping page. This could be used to test from outside
@@ -369,7 +368,7 @@
 -; Note: on highloaded environement, this can cause some delay in the page
 -; process time (several ms).
 -; Default Value: no
--catch_workers_output = yes
+-;catch_workers_output = yes
 -
 -; Limits the extensions of the main script FPM will allow to parse. This can
 -; prevent configuration mistakes on the web server side. You should only limit
@@ -383,7 +382,7 @@
 -; the current environment.
 -; Default Value: clean env
 -;env[HOSTNAME] = $HOSTNAME
--env[PATH] = $PATH
+-;env[PATH] = /usr/local/bin:/usr/bin:/bin
 -;env[TMP] = /tmp
 -;env[TMPDIR] = /tmp
 -;env[TEMP] = /tmp
@@ -420,7 +419,7 @@
 +;  - @prefix@ otherwise
 +include=/etc/php/fpm.d/*.conf
 --- /dev/null	2007-02-13 18:29:53.000000000 +0200
-+++ php-5.3.27/sapi/fpm/php-fpm.conf-d.in	2013-12-05 20:50:54.570727359 +0200
++++ php-5.3.29/sapi/fpm/php-fpm.conf-d.in	2014-10-27 07:42:26.259454585 +0200
 @@ -0,0 +1,392 @@
 +; Start a new pool named 'www'.
 +; the variable $pool can we used in any directive and will be replaced by the
@@ -454,7 +453,7 @@
 +;                            specific port;
 +;   '/path/to/unix/socket' - to listen on a unix socket.
 +; Note: This value is mandatory.
-+listen = /var/run/php/@processname@.sock
++listen = 127.0.0.1:9000
 +
 +; Set listen(2) backlog. A value of '-1' means unlimited.
 +; Default Value: 128 (-1 on FreeBSD and OpenBSD)
@@ -475,7 +474,7 @@
 +; must be separated by a comma. If this value is left blank, connections will be
 +; accepted from any ip address.
 +; Default Value: any
-+listen.allowed_clients = 127.0.0.1
++;listen.allowed_clients = 127.0.0.1
 +
 +; Specify the nice(2) priority to apply to the pool processes (only if set)
 +; The value can vary from -19 (highest priority) to 20 (lower priority)
@@ -530,12 +529,12 @@
 +; The desired minimum number of idle server processes.
 +; Note: Used only when pm is set to 'dynamic'
 +; Note: Mandatory when pm is set to 'dynamic'
-+pm.min_spare_servers = 2
++pm.min_spare_servers = 1
 +
 +; The desired maximum number of idle server processes.
 +; Note: Used only when pm is set to 'dynamic'
 +; Note: Mandatory when pm is set to 'dynamic'
-+pm.max_spare_servers = 5
++pm.max_spare_servers = 3
 +
 +; The number of seconds after which an idle process will be killed.
 +; Note: Used only when pm is set to 'ondemand'
@@ -645,7 +644,7 @@
 +;       anything, but it may not be a good idea to use the .php extension or it
 +;       may conflict with a real PHP file.
 +; Default Value: not set 
-+;pm.status_path = /fpm-status
++;pm.status_path = /status
 + 
 +; The ping URI to call the monitoring page of FPM. If this value is not set, no
 +; URI will be recognized as a ping page. This could be used to test from outside
@@ -771,7 +770,7 @@
 +; Note: on highloaded environement, this can cause some delay in the page
 +; process time (several ms).
 +; Default Value: no
-+catch_workers_output = yes
++;catch_workers_output = yes
 +
 +; Limits the extensions of the main script FPM will allow to parse. This can
 +; prevent configuration mistakes on the web server side. You should only limit
@@ -785,7 +784,7 @@
 +; the current environment.
 +; Default Value: clean env
 +;env[HOSTNAME] = $HOSTNAME
-+env[PATH] = $PATH
++;env[PATH] = /usr/local/bin:/usr/bin:/bin
 +;env[TMP] = /tmp
 +;env[TMPDIR] = /tmp
 +;env[TEMP] = /tmp
@@ -825,8 +824,8 @@
    PHP_ADD_MAKEFILE_FRAGMENT([$abs_srcdir/sapi/fpm/Makefile.frag], [$abs_srcdir/sapi/fpm], [sapi/fpm])
  
    SAPI_FPM_PATH=sapi/fpm/php-fpm
---- php-5.3.27/sapi/fpm/Makefile.frag~	2013-12-05 20:55:36.000000000 +0200
-+++ php-5.3.27/sapi/fpm/Makefile.frag	2013-12-05 20:57:56.416089690 +0200
+--- php-5.3.29/sapi/fpm/Makefile.frag~	2014-08-13 22:22:50.000000000 +0300
++++ php-5.3.29/sapi/fpm/Makefile.frag	2014-10-27 07:39:22.354406805 +0200
 @@ -19,9 +19,10 @@
  	@$(INSTALL) -m 0755 $(SAPI_FPM_PATH) $(INSTALL_ROOT)$(sbindir)/$(program_prefix)php-fpm$(program_suffix)$(EXEEXT)
  
@@ -834,7 +833,7 @@
 -	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir) || :
 +	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/fpm.d || :
  
- 	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf || :
+ 	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf.default || :
 +	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf-d $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf || :
  
  	@echo "Installing PHP FPM man page:      $(INSTALL_ROOT)$(mandir)/man8/"

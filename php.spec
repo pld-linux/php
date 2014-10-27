@@ -2027,6 +2027,7 @@ cp -p php.ini-production php.ini
 %patch38 -p1
 %patch39 -p1
 %if %{with fpm}
+%patch69 -p1
 %patch41 -p1
 %patch42 -p1
 %endif
@@ -2055,7 +2056,6 @@ cp -p php.ini-production php.ini
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
 %patch68 -p1
-%patch69 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

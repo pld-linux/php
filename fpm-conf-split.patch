@@ -1,5 +1,5 @@
---- php-5.6.2/sapi/fpm/php-fpm.conf.in~	2014-10-15 15:59:32.000000000 +0300
-+++ php-5.6.2/sapi/fpm/php-fpm.conf.in	2014-10-27 08:12:12.930858749 +0200
+--- php-5.6.3/sapi/fpm/php-fpm.conf.in~	2014-11-17 20:03:42.000000000 +0200
++++ php-5.6.3/sapi/fpm/php-fpm.conf.in	2014-11-17 20:04:50.287981731 +0200
 @@ -6,14 +6,6 @@
  ; prefix (@prefix@). This prefix can be dynamically changed by using the
  ; '-p' argument from the command line.
@@ -15,7 +15,7 @@
  ;;;;;;;;;;;;;;;;;;
  ; Global Options ;
  ;;;;;;;;;;;;;;;;;;
-@@ -123,405 +115,3 @@
+@@ -115,407 +115,3 @@
  ; ports and different management options.  The name of the pool will be
  ; used in logs and stats. There is no limitation on the number of pools which
  ; FPM can handle. Your system will tell you anyway :)
@@ -47,6 +47,8 @@
 -; The address on which to accept FastCGI requests.
 -; Valid syntaxes are:
 -;   'ip.add.re.ss:port'    - to listen on a TCP socket to a specific address on
+-;                            a specific port;
+-;   '[ip:6:addr:ess]:port' - to listen on a TCP socket to a specific IPv6 address on
 -;                            a specific port;
 -;   'port'                 - to listen on a TCP socket to all addresses on a
 -;                            specific port;
@@ -422,8 +424,8 @@
 -;php_admin_flag[log_errors] = on
 -;php_admin_value[memory_limit] = 32M
 --- /dev/null	2007-02-13 18:29:53.000000000 +0200
-+++ php-5.6.2/sapi/fpm/php-fpm.conf-d.in	2014-10-27 08:12:03.327088104 +0200
-@@ -0,0 +1,401 @@
++++ php-5.6.3/sapi/fpm/php-fpm.conf-d.in	2014-11-17 20:05:20.559494174 +0200
+@@ -0,0 +1,403 @@
 +; Start a new pool named 'www'.
 +; the variable $pool can we used in any directive and will be replaced by the
 +; pool name ('www' here)
@@ -451,6 +453,8 @@
 +; The address on which to accept FastCGI requests.
 +; Valid syntaxes are:
 +;   'ip.add.re.ss:port'    - to listen on a TCP socket to a specific address on
++;                            a specific port;
++;   '[ip:6:addr:ess]:port' - to listen on a TCP socket to a specific IPv6 address on
 +;                            a specific port;
 +;   'port'                 - to listen on a TCP socket to all addresses on a
 +;                            specific port;

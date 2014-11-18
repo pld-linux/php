@@ -1,5 +1,5 @@
---- php-5.5.7/sapi/fpm/php-fpm.conf.in~	2013-12-16 17:57:03.000000000 +0200
-+++ php-5.5.7/sapi/fpm/php-fpm.conf.in	2013-12-16 17:58:37.618025260 +0200
+--- php-5.5.19/sapi/fpm/php-fpm.conf.in~	2014-11-18 21:43:01.000000000 +0200
++++ php-5.5.19/sapi/fpm/php-fpm.conf.in	2014-11-18 21:44:54.727742022 +0200
 @@ -6,14 +6,6 @@
  ; prefix (@prefix@). This prefix can be dynamically changed by using the
  ; '-p' argument from the command line.
@@ -15,7 +15,7 @@
  ;;;;;;;;;;;;;;;;;;
  ; Global Options ;
  ;;;;;;;;;;;;;;;;;;
-@@ -116,404 +116,10 @@
+@@ -116,406 +116,10 @@
  ; used in logs and stats. There is no limitation on the number of pools which
  ; FPM can handle. Your system will tell you anyway :)
  
@@ -46,6 +46,8 @@
 -; The address on which to accept FastCGI requests.
 -; Valid syntaxes are:
 -;   'ip.add.re.ss:port'    - to listen on a TCP socket to a specific address on
+-;                            a specific port;
+-;   '[ip:6:addr:ess]:port' - to listen on a TCP socket to a specific IPv6 address on
 -;                            a specific port;
 -;   'port'                 - to listen on a TCP socket to all addresses on a
 -;                            specific port;
@@ -428,10 +430,8 @@
 +;  - @prefix@ otherwise
 +include=/etc/php/fpm.d/*.conf
 --- /dev/null	2007-02-13 18:29:53.000000000 +0200
-+++ php-5.6.0beta1/sapi/fpm/php-fpm.conf-d.in	2014-04-21 21:58:46.191751631 +0300
++++ php-5.5.19/sapi/fpm/php-fpm.conf-d.in	2014-11-18 21:44:32.469960258 +0200
 @@ -0,0 +1,403 @@
-+; vim:ft=dosini
-+;
 +; Start a new pool named 'www'.
 +; the variable $pool can we used in any directive and will be replaced by the
 +; pool name ('www' here)
@@ -459,6 +459,8 @@
 +; The address on which to accept FastCGI requests.
 +; Valid syntaxes are:
 +;   'ip.add.re.ss:port'    - to listen on a TCP socket to a specific address on
++;                            a specific port;
++;   '[ip:6:addr:ess]:port' - to listen on a TCP socket to a specific IPv6 address on
 +;                            a specific port;
 +;   'port'                 - to listen on a TCP socket to all addresses on a
 +;                            specific port;

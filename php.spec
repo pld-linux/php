@@ -90,12 +90,12 @@
 %undefine	with_mm
 %endif
 
-%ifnarch %{ix86} %{x8664} sparc sparcv9 alpha
+%ifnarch %{ix86} %{x8664} x32 sparc sparcv9 alpha
 # ppc disabled (broken on th-ppc)
 %undefine	with_interbase
 %endif
 
-%ifnarch %{ix86} %{x8664}
+%ifnarch %{ix86} %{x8664} x32
 # unsupported, see sapi/cgi/fpm/fpm_atomic.h
 %undefine	with_fpm
 %endif
@@ -207,8 +207,9 @@ Patch64:	%{orgname}-m4.patch
 Patch65:	system-libzip.patch
 Patch66:	%{orgname}-db.patch
 Patch67:	php-litespeed.patch
-Patch68:	mysql-lib-ver-mismatch.patch
+Patch68:	x32.patch
 Patch69:	fpm-conf-split.patch
+Patch70:	mysql-lib-ver-mismatch.patch
 # Fixes for security bugs
 # https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
 # also from RHEL6/CentOS7
@@ -2072,6 +2073,7 @@ cp -p php.ini-production php.ini
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
 %patch68 -p1
+%patch70 -p1
 
 %patch220 -p1
 %patch238 -p1

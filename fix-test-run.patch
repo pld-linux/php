@@ -12,15 +12,15 @@
  PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
  
  PHP_SUBST(PHP_EXECUTABLE)
---- php-5.3.4/Makefile.global~	2010-12-12 23:08:32.000000000 +0200
-+++ php-5.3.4/Makefile.global	2010-12-12 23:09:31.246644108 +0200
+--- php-5.3.2/Makefile.global	2010-03-16 16:31:36.972576955 +0200
++++ php-5.4.35/Makefile.global	2015-01-21 15:07:46.782561411 +0200
 @@ -77,7 +77,8 @@
  		done; \
  	fi
  
 -PHP_TEST_SETTINGS = -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1'
 +PHP_TEST_SETTINGS = -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' -d 'safe_mode=0'
-+PHP_TEST_SHARED_SYSTEM_EXTENSIONS = pcre
++PHP_TEST_SHARED_SYSTEM_EXTENSIONS =
  PHP_TEST_SHARED_EXTENSIONS =  ` \
  	if test "x$(PHP_MODULES)" != "x"; then \
  		for i in $(PHP_MODULES)""; do \
@@ -37,7 +37,16 @@
  	fi`
  PHP_DEPRECATED_DIRECTIVES_REGEX = '^(define_syslog_variables|register_(globals|long_arrays)?|safe_mode|magic_quotes_(gpc|runtime|sybase)?|(zend_)?extension(_debug)?(_ts)?)[\t\ ]*='
  
-@@ -114,7 +114,10 @@
+@@ -96,7 +103,7 @@
+ PHP_DEPRECATED_DIRECTIVES_REGEX = '^(magic_quotes_(gpc|runtime|sybase)?|(zend_)?extension(_debug)?(_ts)?)[\t\ ]*='
+ 
+ test: all
+-	-@if test ! -z "$(PHP_EXECUTABLE)" && test -x "$(PHP_EXECUTABLE)"; then \
++	@if test ! -z "$(PHP_EXECUTABLE)" && test -x "$(PHP_EXECUTABLE)"; then \
+ 		INI_FILE=`$(PHP_EXECUTABLE) -d 'display_errors=stderr' -r 'echo php_ini_loaded_file();' 2> /dev/null`; \
+ 		if test "$$INI_FILE"; then \
+ 			$(EGREP) -h -v $(PHP_DEPRECATED_DIRECTIVES_REGEX) "$$INI_FILE" > $(top_builddir)/tmp-php.ini; \
+@@ -107,7 +114,10 @@
  		TEST_PHP_EXECUTABLE=$(PHP_EXECUTABLE) \
  		TEST_PHP_SRCDIR=$(top_srcdir) \
  		CC="$(CC)" \
@@ -49,14 +58,3 @@
  		rm $(top_builddir)/tmp-php.ini; \
  	else \
  		echo "ERROR: Cannot run tests without CLI sapi."; \
---- php-5.3.2/Makefile.global	2010-03-16 16:31:36.972576955 +0200
-+++ php-5.3.2/Makefile.global	2010-03-16 16:31:36.972576955 +0200
-@@ -296,7 +296,7 @@
- 	fi
- 
- PHP_TEST_SETTINGS = -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' -d 'safe_mode=0'
--PHP_TEST_SHARED_SYSTEM_EXTENSIONS = pcre
-+PHP_TEST_SHARED_SYSTEM_EXTENSIONS =
- PHP_TEST_SHARED_EXTENSIONS =  ` \
- 	if test "x$(PHP_MODULES)" != "x"; then \
- 		for i in $(PHP_MODULES)""; do \

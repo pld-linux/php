@@ -2394,7 +2394,7 @@ install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cg
 
 cp -pf php_config.h.cli main/php_config.h
 cp -pf Makefile.cli Makefile
-%{__make} install \
+%{__make} install -j1 \
 	phpbuilddir=%{_libdir}/%{name}/build \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 

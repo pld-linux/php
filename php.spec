@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	6
+%define		rel	8
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2734,7 +2734,7 @@ for f in /etc/php/*.ini.rpmsave /etc/php/*.d/*.ini.rpmsave; do
 	' $nf
 done
 
-%triggerpostun common -- %{name}-common < 4:5.3.29-4.1
+%triggerpostun common -- %{name}-common < 4:5.3.29-7, php-common < 4:5.3.29-7
 # switch to browscap package if the ini file has original value
 %{__sed} -i -e 's#%{_sysconfdir}/browscap.ini#/usr/share/browscap/php_browscap.ini#' %{_sysconfdir}/php.ini
 

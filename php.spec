@@ -126,7 +126,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	1
+%define		rel	2
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -148,8 +148,6 @@ Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
 Source5:	%{orgname}-cli.ini
-# Taken from: http://browsers.garykeith.com/downloads.asp
-Source9:	%{orgname}_browscap.ini
 Source10:	%{orgname}-fpm.init
 Source11:	%{orgname}-fpm.logrotate
 Source12:	%{orgname}-branch.sh
@@ -541,6 +539,7 @@ Provides:	php(reflection)
 Provides:	php(standard)
 %{!?with_mysqlnd:Obsoletes:	php-mysqlnd}
 %{?with_pcre:%requires_ge_to	pcre pcre-devel}
+Suggests:	browscap
 Obsoletes:	php-common < 4:5.3.28-7
 Obsoletes:	php-pecl-domxml
 Conflicts:	php4-common < 3:4.4.4-8
@@ -2593,9 +2592,7 @@ echo ".so php%{ver_suffix}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
 ln -sf php%{ver_suffix} $RPM_BUILD_ROOT%{_bindir}/php
 
 cp -p php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
-
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-cp -p %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
@@ -2608,6 +2605,8 @@ cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
+
+%{__sed} -i -e 's#/etc/php/browscap.ini#/usr/share/browscap/php_browscap.ini#' $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 
 # ensure that paths are correct for current php version and arch
 grep -El '/etc/php/|/usr/lib/php/' $RPM_BUILD_ROOT%{_sysconfdir}/*.ini | xargs -r \
@@ -2743,6 +2742,10 @@ for f in /etc/php/*.ini.rpmsave /etc/php/*.d/*.ini.rpmsave; do
 		s#/etc/php#%{_sysconfdir}#
 	' $nf
 done
+
+%triggerpostun common -- %{name}-common < 4:5.5.20-2, php-common < 4:5.5.20-2
+# switch to browscap package if the ini file has original value
+%{__sed} -i -e 's#%{_sysconfdir}/browscap.ini#/usr/share/browscap/php_browscap.ini#' %{_sysconfdir}/php.ini
 
 # common macros called at extension post/postun scriptlet
 %define	extension_scripts() \
@@ -2900,7 +2903,6 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/browscap.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
 

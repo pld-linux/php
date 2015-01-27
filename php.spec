@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel		8
+%define		rel		9
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -136,8 +136,6 @@ Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-cgi.ini
 Source5:	%{orgname}-apache.ini
 Source6:	%{orgname}-cli.ini
-# Taken from: http://browsers.garykeith.com/downloads.asp
-Source8:	%{orgname}_browscap.ini
 # lynx -dump ftp://distfiles.gentoo.org/pub/gentoo/distfiles/|grep -o ftp://.*php-patchset.*tar.bz2
 #Source9:	ftp://distfiles.gentoo.org/pub/gentoo/distfiles/%{orgname}-patchset-%{version}-r1.tar.bz2
 ## Source9-md5:	d67f23f5e69664e06fce89b064d5bbab
@@ -539,6 +537,7 @@ Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 %endif
 %{!?with_mysqlnd:Obsoletes:	php-mysqlnd}
 %{?with_pcre:%requires_ge_to	pcre pcre-devel}
+Suggests:	browscap
 Obsoletes:	php-pecl-domxml
 Conflicts:	php-pecl-memcache < 3.0.4-2
 Conflicts:	php4-common < 3:4.4.4-8
@@ -2370,7 +2369,6 @@ install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 %endif
 install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi.ini
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
-install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/browscap.ini
 
 %if %{with apache1}
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
@@ -2492,6 +2490,10 @@ fi
 # restart webserver at the end of transaction
 [ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
 [ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
+
+%triggerpostun common -- %{name}-common < 4:5.2.17-20130717.9, php-common < 4:5.2.17-20130717.9
+# switch to browscap package if the ini file has original value
+%{__sed} -i -e 's#%{_sysconfdir}/browscap.ini#/usr/share/browscap/php_browscap.ini#' %{_sysconfdir}/php.ini
 
 # common macros called at extension post/postun scriptlet
 %define	extension_scripts() \
@@ -2643,7 +2645,6 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/browscap.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
 

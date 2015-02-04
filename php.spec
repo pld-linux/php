@@ -2032,7 +2032,20 @@ cp -p php.ini-production php.ini
 %patch38 -p1
 %patch39 -p1
 %if %{with fpm}
+%if 0
+# create split php-fpm.conf patch. review (restore other diffs) and commit
+cp sapi/fpm/php-fpm.conf.in{,.orig}
+%{__sed} -n -e '/; Start a new pool named/,$p' sapi/fpm/php-fpm.conf.in > sapi/fpm/php-fpm.conf-d.in
+%{__sed} -i -e '/; Include one or more files/,/include=etc\/fpm\.d/d' sapi/fpm/php-fpm.conf.in
+%{__sed} -i -e '/; Start a new pool named/,$d' sapi/fpm/php-fpm.conf.in
+set +e
+cd ..
+diff -u %{orgname}-%{version}/sapi/fpm/php-fpm.conf.in{.orig,} > %{PATCH69}
+diff -u /dev/null %{orgname}-%{version}/sapi/fpm/php-fpm.conf-d.in >> %{PATCH69}
+exit 1
+%else
 %patch69 -p1
+%endif
 %patch41 -p1
 %patch42 -p1
 %endif

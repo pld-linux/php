@@ -1,5 +1,5 @@
---- php-5.6.4/sapi/fpm/php-fpm.conf.in~	2015-01-01 17:18:30.000000000 +0200
-+++ php-5.6.4/sapi/fpm/php-fpm.conf.in	2015-01-01 17:20:31.203799290 +0200
+--- php-5.6.5/sapi/fpm/php-fpm.conf.in~	2015-02-04 19:22:00.000000000 +0200
++++ php-5.6.5/sapi/fpm/php-fpm.conf.in	2015-02-04 19:23:22.109298245 +0200
 @@ -6,14 +6,6 @@
  ; prefix (@prefix@). This prefix can be dynamically changed by using the
  ; '-p' argument from the command line.
@@ -15,7 +15,7 @@
  ;;;;;;;;;;;;;;;;;;
  ; Global Options ;
  ;;;;;;;;;;;;;;;;;;
-@@ -115,410 +115,3 @@
+@@ -115,415 +115,3 @@
  ; ports and different management options.  The name of the pool will be
  ; used in logs and stats. There is no limitation on the number of pools which
  ; FPM can handle. Your system will tell you anyway :)
@@ -71,6 +71,11 @@
 -;listen.owner = @php_fpm_user@
 -;listen.group = @php_fpm_group@
 -;listen.mode = 0660
+-; When POSIX Access Control Lists are supported you can set them using
+-; these options, value is a comma separated list of user/group names.
+-; When set, listen.owner and listen.group are ignored
+-;listen.acl_users =
+-;listen.acl_groups =
 - 
 -; List of addresses (IPv4/IPv6) of FastCGI clients which are allowed to connect.
 -; Equivalent to the FCGI_WEB_SERVER_ADDRS environment variable in the original
@@ -427,8 +432,8 @@
 -;php_admin_flag[log_errors] = on
 -;php_admin_value[memory_limit] = 32M
 --- /dev/null	2007-02-13 18:29:53.000000000 +0200
-+++ php-5.6.4/sapi/fpm/php-fpm.conf-d.in	2015-01-01 17:19:55.621958470 +0200
-@@ -0,0 +1,406 @@
++++ php-5.6.5/sapi/fpm/php-fpm.conf-d.in	2015-02-04 19:23:20.709225773 +0200
+@@ -0,0 +1,411 @@
 +; Start a new pool named 'www'.
 +; the variable $pool can we used in any directive and will be replaced by the
 +; pool name ('www' here)
@@ -480,6 +485,11 @@
 +;listen.owner = @php_fpm_user@
 +;listen.group = @php_fpm_group@
 +;listen.mode = 0660
++; When POSIX Access Control Lists are supported you can set them using
++; these options, value is a comma separated list of user/group names.
++; When set, listen.owner and listen.group are ignored
++;listen.acl_users =
++;listen.acl_groups =
 + 
 +; List of addresses (IPv4/IPv6) of FastCGI clients which are allowed to connect.
 +; Equivalent to the FCGI_WEB_SERVER_ADDRS environment variable in the original

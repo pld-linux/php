@@ -205,7 +205,7 @@
  [browscap]
  ; http://php.net/browscap
 -;browscap = extra/browscap.ini
-+browscap = /etc/php/browscap.ini
++;browscap = /usr/share/browscap/php_browscap.ini
  
  [Session]
  ; Handler used to store/retrieve data.

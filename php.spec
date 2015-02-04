@@ -2606,8 +2606,6 @@ cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
 %endif
 
-%{__sed} -i -e 's#/etc/php/browscap.ini#/usr/share/browscap/php_browscap.ini#' $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
-
 # ensure that paths are correct for current php version and arch
 grep -El '/etc/php/|/usr/lib/php/' $RPM_BUILD_ROOT%{_sysconfdir}/*.ini | xargs -r \
 %{__sed} -i -e '

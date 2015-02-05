@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	8
+%define		rel	9
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -209,6 +209,20 @@ Patch66:	%{orgname}-db.patch
 Patch67:	php-litespeed.patch
 Patch68:	mysql-lib-ver-mismatch.patch
 Patch69:	fpm-conf-split.patch
+# Fixes for security bugs
+# https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
+Patch247:	php-5.3.3-CVE-2014-2497.patch
+Patch248:	php-5.3.3-CVE-2014-3587.patch
+Patch249:	php-5.3.29-CVE-2014-3597.patch
+Patch250:	php-5.3.3-CVE-2014-4698.patch
+Patch251:	php-5.3.3-CVE-2014-4670.patch
+Patch252:	php-5.3.3-CVE-2014-3668.patch
+Patch253:	php-5.3.3-CVE-2014-3669.patch
+Patch254:	php-5.3.3-CVE-2014-3670.patch
+Patch255:	php-5.3.3-CVE-2014-3710.patch
+Patch256:	php-5.3.29-CVE-2014-8142.patch
+Patch257:	php-5.3.29-CVE-2015-0231.patch
+Patch258:	php-5.3.29-CVE-2015-0232.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2055,6 +2069,19 @@ cp -p php.ini-production php.ini
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
 %patch68 -p1
+
+%patch247 -p1
+%patch248 -p1
+%patch249 -p1
+%patch250 -p1
+%patch251 -p1
+%patch252 -p1
+%patch253 -p1
+%patch254 -p1
+%patch255 -p1
+%patch256 -p1
+%patch257 -p1
+%patch258 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

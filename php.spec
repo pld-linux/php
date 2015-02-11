@@ -211,6 +211,9 @@ Patch68:	mysql-lib-ver-mismatch.patch
 Patch69:	fpm-conf-split.patch
 # Fixes for security bugs
 # https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
+# also from RHEL6/CentOS7
+Patch220:	php-5.3.3-CVE-2011-4153.patch
+Patch238:	php-5.3.3-CVE-2014-2270.patch
 Patch247:	php-5.3.3-CVE-2014-2497.patch
 Patch248:	php-5.3.3-CVE-2014-3587.patch
 Patch249:	php-5.3.29-CVE-2014-3597.patch
@@ -2070,6 +2073,8 @@ gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
 %patch68 -p1
 
+%patch220 -p1
+%patch238 -p1
 %patch247 -p1
 %patch248 -p1
 %patch249 -p1

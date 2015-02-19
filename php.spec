@@ -2602,6 +2602,10 @@ fi
 %triggerpostun common -- %{name}-common < 4:5.4.36-2, php-common < 4:5.4.36-2
 # switch to browscap package if the ini file has original value
 %{__sed} -i -e 's#%{_sysconfdir}/browscap.ini#/usr/share/browscap/php_browscap.ini#' %{_sysconfdir}/php.ini
+# disable browscap, if optional package not present
+if [ ! -e /usr/share/browscap/php_browscap.ini ]; then
+	%{__sed} -i -e 's#^browscap = /usr/share/browscap/php_browscap.ini#;&#' %{_sysconfdir}/php.ini
+fi
 
 # common macros called at extension post/postun scriptlet
 %define	extension_scripts() \

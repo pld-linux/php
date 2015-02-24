@@ -157,7 +157,6 @@ Patch0:		%{orgname}-shared.patch
 Patch1:		%{orgname}-pldlogo.patch
 Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
-Patch4:		%{orgname}-libpq_fs_h_path.patch
 Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
@@ -1972,7 +1971,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1

@@ -1,18 +1,17 @@
-From 514afd67b651bea834bdb84b7685b48e9e56ac21 Mon Sep 17 00:00:00 2001
 From: Gustavo Lopes <glopes@nebm.ist.utl.pt>
-Date: Tue, 30 Apr 2013 19:00:31 +0200
-Subject: [PATCH] Fix bug #64729: compilation failure on x32
+Date: Tue, 30 Apr 2013 17:00:31 +0000 (+0200)
+Subject: Fix bug #64729: compilation failure on x32
+X-Git-Tag: php-5.4.16RC1~30^2~10
+X-Git-Url: http://72.52.91.13:8000/?p=php-src.git;a=commitdiff_plain;h=514afd67b651bea834bdb84b7685b48e9e56ac21;hp=4a92ae34011ad2246500f27469f378b66d832976
 
+Fix bug #64729: compilation failure on x32
 ---
- Zend/zend_alloc.c    | 18 ++++++++++++++----
- Zend/zend_multiply.h |  4 ++--
- 2 files changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/Zend/zend_alloc.c b/Zend/zend_alloc.c
 index 605e396..0bbd59a 100644
---- a/Zend/zend_alloc_canary.c
-+++ b/Zend/zend_alloc_canary.c
-@@ -720,7 +720,7 @@ static inline unsigned int zend_mm_high_bit(size_t _size)
+--- a/Zend/zend_alloc.c
++++ b/Zend/zend_alloc.c
+@@ -672,7 +672,7 @@ static inline unsigned int zend_mm_high_bit(size_t _size)
  #elif defined(__GNUC__) && defined(__x86_64__)
  	unsigned long n;
  
@@ -21,7 +20,7 @@ index 605e396..0bbd59a 100644
          return (unsigned int)n;
  #elif defined(_MSC_VER) && defined(_M_IX86)
  	__asm {
-@@ -746,12 +746,12 @@ static inline unsigned int zend_mm_low_bit(size_t _size)
+@@ -698,12 +698,12 @@ static inline unsigned int zend_mm_low_bit(size_t _size)
  #elif defined(__GNUC__) && defined(__x86_64__)
          unsigned long n;
  
@@ -60,3 +59,18 @@ index 605e396..0bbd59a 100644
          if (UNEXPECTED(overflow)) {
                  zend_error_noreturn(E_ERROR, "Possible integer overflow in memory allocation (%zu * %zu + %zu)", nmemb, size, offset);
                  return 0;
+diff --git a/Zend/zend_multiply.h b/Zend/zend_multiply.h
+index c3c9657..092d3cd 100644
+--- a/Zend/zend_multiply.h
++++ b/Zend/zend_multiply.h
+@@ -35,8 +35,8 @@
+ 
+ #define ZEND_SIGNED_MULTIPLY_LONG(a, b, lval, dval, usedval) do {	\
+ 	long __tmpvar; 													\
+-	__asm__ ("imulq %3,%0\n"										\
+-		"adcq $0,%1" 												\
++	__asm__ ("imul %3,%0\n"											\
++		"adc $0,%1" 												\
+ 			: "=r"(__tmpvar),"=r"(usedval) 							\
+ 			: "0"(a), "r"(b), "1"(0));								\
+ 	if (usedval) (dval) = (double) (a) * (double) (b);				\

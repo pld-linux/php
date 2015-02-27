@@ -2052,6 +2052,7 @@ cp -p php.ini-production php.ini
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1
+%patch68 -p1
 %if %{with suhosin}
 %patch47 -p1
 %endif
@@ -2072,7 +2073,6 @@ cp -p php.ini-production php.ini
 %{__rm} -r sapi/litespeed
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
-%patch68 -p1
 %patch70 -p1
 
 %patch220 -p1

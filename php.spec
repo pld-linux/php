@@ -3089,6 +3089,8 @@ fi
 %attr(755,root,root) %{php_extensiondir}/phar.so
 %attr(755,root,root) %{_bindir}/phar
 %attr(755,root,root) %{_bindir}/phar.phar
+%{_mandir}/man1/phar.1*
+%{_mandir}/man1/phar.phar.1
 %endif
 
 %files posix

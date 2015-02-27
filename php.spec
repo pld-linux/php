@@ -1,4 +1,5 @@
-# TODO 5.5:
+# TODO 5.6:
+# - phpdbg: link with libphp_common
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
 # TODO 5.4:
@@ -7,7 +8,6 @@
 # - update imap myrights patch (needs api porting)
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
-# NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
 # TODO:
@@ -38,6 +38,7 @@
 #+ereg
 # libxml
 # Reflection
+# standard
 #
 # Conditional build:
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
@@ -46,6 +47,7 @@
 %bcond_with	system_gd	# with system gd (imageantialias function is missing then)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
 %bcond_with	default_php	# use this PHP as default PHP in distro
+%bcond_with	systemtap	# systemtap/DTrace support
 %bcond_without	curl		# without CURL extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	filter		# without filter extension module
@@ -58,8 +60,7 @@
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
-# don't turn it on by default; see TODO item for mysqlnd in this spec
-%bcond_with	mysqlnd		# with mysqlnd support in mysql related extensions
+%bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	opcache		# without Enable Zend OPcache extension support
@@ -84,7 +85,9 @@
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_without	embed		# disable Embedded API
-%bcond_without	suhosin		# with suhosin patch
+%bcond_without	phpdbg		# disable phpdbg SAPI
+%bcond_with	milter		# disable Milter SAPI
+%bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_with	type_hints	# experimental support for strict typing/casting
@@ -103,6 +106,11 @@
 # mm is not thread safe
 %if %{with zts}
 %undefine	with_mm
+%endif
+
+# milter requires ZTS
+%if %{with milter} && %{without zts}
+%undefine	with_milter
 %endif
 
 %ifnarch %{ix86} %{x8664} x32 sparc sparcv9 alpha
@@ -128,7 +136,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 
 %define		rel	4
 %define		orgname	php
-%define		ver_suffix 55
+%define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -137,13 +145,13 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.5.21
+Version:	5.6.5
 Release:	%{rel}%{?with_type_hints:.th}
 Epoch:		4
 License:	PHP
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	79664ce44f7c93f355a25a3fe3dcc91b
+# Source0-md5:	541a480e1f8747219074c99f3e9edbcc
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -160,7 +168,8 @@ Patch3:		%{orgname}-link-libs.patch
 Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
-
+Patch8:		milter.patch
+Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 %if %{with type_hints}
@@ -206,6 +215,7 @@ Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	x32.patch
 Patch69:	fpm-conf-split.patch
+Patch70:	mysqlnd-ssl.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -266,6 +276,7 @@ BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.566
+%{?with_systemtap:BuildRequires:	systemtap-sdt-devel}
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	xz
 %if %{with sqlite3} || %{with pdo_sqlite}
@@ -291,9 +302,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20121113
-%define		zend_module_api		20121212
-%define		zend_extension_api	220121212
+%define		php_api_version		20131106
+%define		zend_module_api		20131226
+%define		zend_extension_api	220131226
 %define		php_pdo_api_version	20080721
 
 # Extension versions
@@ -306,7 +317,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		opcachever	7.0.4-dev
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
-%define		zipver		1.11.0
+%define		zipver		1.12.4
+%define		phpdbgver	0.4.0
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -508,6 +520,22 @@ PHP FastCGI Process Manager.
 %description fpm -l pl.UTF-8
 PHP FastCGI Process Manager - zarządca procesów FastCGI.
 
+%package phpdbg
+Summary:	The debugging platform for PHP 5.4+
+Group:		Development/Languages/PHP
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(phpdbg) = %{phpdbgver}
+
+%description phpdbg
+phpdbg - The interactive PHP debugger.
+
+Implemented as a SAPI module, phpdbg can excert complete control over
+the environment without impacting the functionality or performance of
+your code.
+
+phpdbg aims to be a lightweight, powerful, easy to use debugging
+platform for PHP 5.4+
+
 %package common
 Summary:	Common files needed by both Apache modules and CGI/CLI SAPIs
 Summary(pl.UTF-8):	Wspólne pliki dla modułu Apache'a i programu CGI
@@ -536,7 +564,7 @@ Provides:	php(ereg)
 Provides:	php(libxml)
 Provides:	php(reflection)
 Provides:	php(standard)
-%{!?with_mysqlnd:Obsoletes:	php-mysqlnd}
+%{!?with_mysqlnd:Obsoletes:	%{name}-mysqlnd}
 %{?with_pcre:%requires_ge_to	pcre pcre-devel}
 Suggests:	browscap
 Obsoletes:	php-common < 4:5.3.28-7
@@ -1966,7 +1994,8 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{orgname}-%{version}
+%setup -q -n %{orgname}-%{version}%{?subver}
+cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -1974,8 +2003,8 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-
-cp -p php.ini-production php.ini
+%patch8 -p1
+%patch9 -p1
 %patch10 -p1
 %if %{with type_hints}
 %patch12 -p0
@@ -2002,6 +2031,20 @@ cp -p php.ini-production php.ini
 %patch38 -p1
 %patch39 -p1
 %if %{with fpm}
+%if 0
+# create split php-fpm.conf patch. review (restore other diffs) and commit
+cp sapi/fpm/php-fpm.conf.in{,.orig}
+%{__sed} -n -e '/; Start a new pool named/,$p' sapi/fpm/php-fpm.conf.in > sapi/fpm/php-fpm.conf-d.in
+%{__sed} -i -e '/; Include one or more files/,/include=etc\/fpm\.d/d' sapi/fpm/php-fpm.conf.in
+%{__sed} -i -e '/; Start a new pool named/,$d' sapi/fpm/php-fpm.conf.in
+set +e
+cd ..
+diff -u %{orgname}-%{version}/sapi/fpm/php-fpm.conf.in{.orig,} > %{PATCH69}
+diff -u /dev/null %{orgname}-%{version}/sapi/fpm/php-fpm.conf-d.in >> %{PATCH69}
+exit 1
+%else
+%patch69 -p1
+%endif
 %patch41 -p1
 %patch42 -p1
 %endif
@@ -2026,7 +2069,7 @@ cp -p php.ini-production php.ini
 %patch66 -p1
 %patch67 -p1
 %patch68 -p1
-%patch69 -p1
+%patch70 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -2152,7 +2195,7 @@ if test "$ver" != "%{sqlite3ver}"; then
 	: Update the sqlite3ver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_ZIP_VERSION_STRING /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
+ver=$(sed -n '/#define PHP_ZIP_VERSION /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
 if test "$ver" != "%{zipver}"; then
 	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.
 	: Update the zipver macro and rebuild.
@@ -2168,6 +2211,12 @@ ver=$(sed -n '/#define PHP_ZENDOPCACHE_VERSION /{s/.* "//;s/".*$//;p}' ext/opcac
 if test "$ver" != "%{opcachever}"; then
 	: Error: Upstream Zend Opcache version is now ${ver}, expecting %{opcachever}.
 	: Update the opcachever macro and rebuild.
+	exit 1
+fi
+ver=$(sed -n '/#define PHPDBG_VERSION /{s/.* "//;s/".*$//;p}' sapi/phpdbg/phpdbg.h)
+if test "$ver" != "%{phpdbgver}"; then
+	: Error: Upstream phpdbg version is now ${ver}, expecting %{phpdbgver}.
+	: Update the phpdbgver macro and rebuild.
 	exit 1
 fi
 ver=$(sed -rne 's,.*<version>(.+)</version>,\1,p' ext/bz2/package.xml)
@@ -2199,7 +2248,7 @@ export EXTENSION_DIR="%{php_extensiondir}"
 # configure once (for faster debugging purposes)
 if [ ! -f _built-conf ]; then
 	# now remove Makefile copies
-	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs1,apxs2,litespeed}
+	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs1,apxs2,litespeed,phpdbg,milter}
 	%{__libtoolize}
 	%{__aclocal}
 	cp -f /usr/share/automake/config.* .
@@ -2230,6 +2279,12 @@ apxs1
 %if %{with apache2}
 apxs2
 %endif
+%if %{with phpdbg}
+phpdbg
+%endif
+%if %{with milter}
+milter
+%endif
 "
 for sapi in $sapis; do
 	: SAPI $sapi
@@ -2259,7 +2314,13 @@ for sapi in $sapis; do
 		sapi_args="--disable-cli --disable-cgi --with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	litespeed)
-		sapi_args='--disable-cli --disable-cgi --with-litespeed '
+		sapi_args='--disable-cli --disable-cgi --with-litespeed'
+	;;
+	phpdbg)
+		sapi_args='--disable-cli --disable-cgi --enable-phpdbg %{?debug:--enable-phpdbg-debug}'
+	;;
+	milter)
+		sapi_args='--disable-cli --disable-cgi --with-milter'
 	;;
 	esac
 
@@ -2280,6 +2341,7 @@ for sapi in $sapis; do
 	--enable-ctype=shared \
 	--enable-dba=shared \
 	--enable-dom=shared \
+	%{?with_systemtap:--enable-dtrace} \
 	--enable-exif=shared \
 	--enable-fileinfo=shared \
 	--enable-ftp=shared \
@@ -2389,7 +2451,9 @@ sapis=$(%{__sed} -rne 's/^PHP_INSTALLED_SAPIS = (.+)/\1/p' Makefile.* | tr ' ' '
 cp -af php_config.h.cli main/php_config.h
 cp -af Makefile.cli Makefile
 %{__make} libphp_common.la
-%{__make} build-modules
+# hack: MYSQLND_SHARED_LIBADD not initialized
+%{__make} build-modules \
+	MYSQLND_SHARED_LIBADD="-lssl -lcrypto"
 
 %if %{with apache1}
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
@@ -2405,6 +2469,16 @@ cp -af Makefile.cli Makefile
 
 %if %{with embed}
 %{__make} -f Makefile.embed libphp5.la
+%endif
+
+%if %{with phpdbg}
+# PHP_READLINE_LIBS is empty, so force readline here
+%{__make} -f Makefile.phpdbg phpdbg \
+	PHPDBG_EXTRA_LIBS=-lreadline
+%endif
+
+%if %{with milter}
+%{__make} -f Makefile.milter milter
 %endif
 
 # CGI/FCGI
@@ -2490,7 +2564,8 @@ chmod +x run-tests.sh
 cp -pf php_config.h.cli main/php_config.h
 cp -pf Makefile.cli Makefile
 
-./run-tests.sh -w failed.log -s tests.log
+./run-tests.sh -w failed.log -s tests.log || {
+rc=$?
 
 # collect failed tests into cleanup script used in prep.
 sed -ne '/^FAILED TEST SUMMARY/,/^===/p' tests.log | sed -e '1,/^---/d;/^===/,$d' > tests-failed.log
@@ -2501,6 +2576,8 @@ sed -ne '/^via/d;/\[.*\]/{s/\t*\(.*\) \[\(.*\)\]\(.*\)/# \1\3\nmv \2{,.skip}/p}'
 tty -q || cat tests.log
 
 test ! -s failed.log
+exit $rc
+}
 %endif
 
 %install
@@ -2539,6 +2616,16 @@ ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
 # install litespeed sapi
 %if %{with litespeed}
 libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/%{name}.litespeed
+%endif
+
+%if %{with phpdbg}
+%{__make} -f Makefile.phpdbg install-phpdbg \
+	INSTALL_ROOT=$RPM_BUILD_ROOT
+%endif
+
+%if %{with milter}
+%{__make} -f Makefile.milter install-milter \
+	INSTALL_ROOT=$RPM_BUILD_ROOT
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
@@ -2739,7 +2826,7 @@ for f in /etc/php/*.ini.rpmsave /etc/php/*.d/*.ini.rpmsave; do
 	' $nf
 done
 
-%triggerpostun common -- %{name}-common < 4:5.5.20-2, php-common < 4:5.5.20-2
+%triggerpostun common -- %{name}-common < 4:5.6.4-2, php-common < 4:5.6.4-2
 # switch to browscap package if the ini file has original value
 %{__sed} -i -e 's#%{_sysconfdir}/browscap.ini#/usr/share/browscap/php_browscap.ini#' %{_sysconfdir}/php.ini
 # disable browscap, if optional package not present
@@ -2897,9 +2984,22 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/%{name}-fpm
 %endif
 
+%if %{with phpdbg}
+%files phpdbg
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/phpdbg
+%{_mandir}/man1/phpdbg.1*
+%endif
+
+%if %{with milter}
+%files milter
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/php-milter
+%endif
+
 %files common
 %defattr(644,root,root,755)
-%doc CREDITS EXTENSIONS LICENSE NEWS README.{PHP4-TO-PHP5-THIN-CHANGES,namespaces} UPGRADING* Zend/{LICENSE.Zend,ZEND_CHANGES} php.ini-*
+%doc CREDITS EXTENSIONS LICENSE NEWS README.namespaces UPGRADING* Zend/{LICENSE.Zend,ZEND_CHANGES} php.ini-*
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
@@ -2910,7 +3010,7 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%doc CODING_STANDARDS README.{EXTENSIONS,EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
+%doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
@@ -2960,6 +3060,7 @@ fi
 %files dom
 %defattr(644,root,root,755)
 %doc ext/dom/{CREDITS,TODO}
+%doc ext/dom/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
 
@@ -3277,6 +3378,7 @@ fi
 %files simplexml
 %defattr(644,root,root,755)
 %doc ext/simplexml/{CREDITS,README}
+%doc ext/simplexml/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
 
@@ -3302,7 +3404,8 @@ fi
 
 %files spl
 %defattr(644,root,root,755)
-%doc ext/spl/{CREDITS,README,TODO,examples}
+%doc ext/spl/{CREDITS,README,TODO}
+%doc ext/spl/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
 %attr(755,root,root) %{php_extensiondir}/spl.so
 
@@ -3359,6 +3462,7 @@ fi
 %files tidy
 %defattr(644,root,root,755)
 %doc ext/tidy/{CREDITS,README}
+%doc ext/tidy/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tidy.ini
 %attr(755,root,root) %{php_extensiondir}/tidy.so
 %endif
@@ -3385,7 +3489,8 @@ fi
 
 %files xmlreader
 %defattr(644,root,root,755)
-%doc ext/xmlreader/{CREDITS,README,TODO,examples}
+%doc ext/xmlreader/{CREDITS,README,TODO}
+%doc ext/xmlreader/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlreader.ini
 %attr(755,root,root) %{php_extensiondir}/xmlreader.so
 
@@ -3400,6 +3505,7 @@ fi
 %files xmlwriter
 %defattr(644,root,root,755)
 %doc ext/xmlwriter/{CREDITS,TODO}
+%doc ext/xmlwriter/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlwriter.ini
 %attr(755,root,root) %{php_extensiondir}/xmlwriter.so
 
@@ -3412,6 +3518,7 @@ fi
 %files zip
 %defattr(644,root,root,755)
 %doc ext/zip/{CREDITS,TODO}
+%doc ext/zip/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zip.ini
 %attr(755,root,root) %{php_extensiondir}/zip.so
 

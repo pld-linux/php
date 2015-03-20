@@ -2052,10 +2052,10 @@ cp -p php.ini-production php.ini
 %patch44 -p1
 %patch45 -p1
 %patch46 -p1
-%patch68 -p1
 %if %{with suhosin}
 %patch47 -p1
 %endif
+%patch68 -p1
 %patch48 -p1
 %patch49 -p1
 %patch50 -p1

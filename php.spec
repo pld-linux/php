@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	13
+%define		rel	14
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -210,20 +210,27 @@ Patch67:	php-litespeed.patch
 Patch68:	x32.patch
 Patch69:	fpm-conf-split.patch
 Patch70:	mysql-lib-ver-mismatch.patch
+# git clone git://github.com/php/php-src.git && git checkout PHP_5_6
+# git diff php-5.3.29..PHP-5.6 ./ext/fileinfo/libmagic > ~/rpm/packages/php/php-fileinfo.patch
+# git diff php-5.3.29..PHP-5.6 ./ext/fileinfo/config.m4 >> ~/rpm/packages/php/php-fileinfo.patch
+# git diff php-5.3.29..PHP-5.6 ./ext/fileinfo/Makefile.frag >> ~/rpm/packages/php/php-fileinfo.patch
+# git diff php-5.3.29..PHP-5.6 ./ext/fileinfo/data_file.c >> ~/rpm/packages/php/php-fileinfo.patch
+Patch71:	php-fileinfo.patch
+# Patch71-md5:	771e4934132c5f5c968248c954d1ef6e
 # Fixes for security bugs
 # https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
 # also from RHEL6/CentOS7
 Patch220:	php-5.3.3-CVE-2011-4153.patch
-Patch238:	php-5.3.3-CVE-2014-2270.patch
+
 Patch247:	php-5.3.3-CVE-2014-2497.patch
-Patch248:	php-5.3.3-CVE-2014-3587.patch
+
 Patch249:	php-5.3.29-CVE-2014-3597.patch
 Patch250:	php-5.3.3-CVE-2014-4698.patch
 Patch251:	php-5.3.3-CVE-2014-4670.patch
 Patch252:	php-5.3.3-CVE-2014-3668.patch
 Patch253:	php-5.3.3-CVE-2014-3669.patch
 Patch254:	php-5.3.3-CVE-2014-3670.patch
-Patch255:	php-5.3.3-CVE-2014-3710.patch
+
 Patch256:	php-5.3.29-CVE-2014-8142.patch
 Patch257:	php-5.3.29-CVE-2015-0231.patch
 Patch258:	php-5.3.29-CVE-2015-0232.patch
@@ -2074,18 +2081,19 @@ cp -p php.ini-production php.ini
 gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
 %patch70 -p1
+%patch71 -p1
 
 %patch220 -p1
-%patch238 -p1
+
 %patch247 -p1
-%patch248 -p1
+
 %patch249 -p1
 %patch250 -p1
 %patch251 -p1
 %patch252 -p1
 %patch253 -p1
 %patch254 -p1
-%patch255 -p1
+
 %patch256 -p1
 %patch257 -p1
 %patch258 -p1

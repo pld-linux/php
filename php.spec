@@ -148,7 +148,10 @@ Name:		%{orgname}%{php_suffix}
 Version:	5.6.7
 Release:	%{rel}%{?with_type_hints:.th}
 Epoch:		4
-License:	PHP
+# All files licensed under PHP version 3.01, except
+# Zend is licensed under Zend
+# TSRM is licensed under BSD
+License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 # Source0-md5:	4e04eb021de009981ed963f993a171c1

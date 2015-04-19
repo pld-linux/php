@@ -137,7 +137,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.5.23
+Version:	5.5.24
 Release:	%{rel}%{?with_type_hints:.th}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -146,7 +146,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	692f9bc5649806f2053eee1e7323b7ea
+# Source0-md5:	32e5ab1d77186142474cb65c685659bd
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini

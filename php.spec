@@ -249,7 +249,6 @@ BuildRequires:	cyrus-sasl-devel
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
-#BuildRequires:	fcgi-devel
 BuildRequires:	file
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10-3}
@@ -272,13 +271,11 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
-#BuildRequires:	libtiff-devel
 %if "%{pld_release}" != "ac"
 BuildRequires:	libtool >= 2:2.2
 %else
 BuildRequires:	libtool >= 1.4.3
 %endif
-#BuildRequires:	libwrap-devel
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
@@ -316,9 +313,6 @@ BuildRequires:	apache1-devel
 BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
-%endif
-%if %{with fpm}
-#BuildRequires:	judy-devel
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 

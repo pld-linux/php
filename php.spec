@@ -56,7 +56,7 @@
 %bcond_without	litespeed	# build litespeed module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
-%bcond_without	mm		# without mm support for session storage
+%bcond_with	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 # don't turn it on by default; see TODO item for mysqlnd in this spec
 %bcond_with	mysqlnd		# with mysqlnd support in mysql related extensions

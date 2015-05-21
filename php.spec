@@ -84,7 +84,7 @@
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_without	embed		# disable Embedded API
-%bcond_without	suhosin		# with suhosin patch
+%bcond_with	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_with	type_hints	# experimental support for strict typing/casting
@@ -137,7 +137,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.5.24
+Version:	5.5.25
 Release:	%{rel}%{?with_type_hints:.th}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -146,7 +146,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	32e5ab1d77186142474cb65c685659bd
+# Source0-md5:	f58edc4f10d63f03e425c5378f727a7c
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -2015,6 +2015,7 @@ cp -p php.ini-production php.ini
 #%patch46 -p1 # imap myrights. fixme
 %if %{with suhosin}
 %patch47 -p1
+%patch68 -p1
 %endif
 %patch50 -p1
 %patch51 -p1
@@ -2029,7 +2030,6 @@ cp -p php.ini-production php.ini
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
 %patch67 -p1
-%patch68 -p1
 %patch69 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4

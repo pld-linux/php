@@ -168,7 +168,6 @@ Patch11:	embed.patch
 Patch14:	%{orgname}-no_pear_install.patch
 Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
-Patch20:	%{orgname}-uint32_t.patch
 Patch21:	%{orgname}-dba-link.patch
 Patch22:	%{orgname}-both-apxs.patch
 Patch23:	%{orgname}-builddir.patch
@@ -1998,7 +1997,6 @@ cp -p php.ini-production php.ini
 %patch14 -p1
 %patch17 -p1
 %patch18 -p1
-%patch20 -p1
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1

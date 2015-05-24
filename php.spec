@@ -51,6 +51,7 @@
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_with	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
+%bcond_without	mysql		# without ext/mysql support
 %bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	odbc		# without ODBC extension module
@@ -2388,7 +2389,7 @@ for sapi in $sapis; do
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
-	--with-mysql=shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd} \
+	%{__enable_disable mysql mysql shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_oci:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_opcache:--enable-opcache=shared} \
@@ -3168,11 +3169,13 @@ fi
 %attr(755,root,root) %{php_extensiondir}/mssql.so
 %endif
 
+%if %{with mysql}
 %files mysql
 %defattr(644,root,root,755)
 %doc ext/mysql/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysql.ini
 %attr(755,root,root) %{php_extensiondir}/mysql.so
+%endif
 
 %if %{with mysqli}
 %files mysqli

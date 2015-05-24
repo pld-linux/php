@@ -2399,7 +2399,7 @@ for sapi in $sapis; do
 	%{__with_without mysql mysql shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_oci:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
-	%{?with_opcache:--enable-opcache=shared} \
+	%{__enable_disable opcache opcache shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \
 	--with-tcadb=/usr \

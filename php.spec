@@ -90,7 +90,6 @@
 %bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
-%bcond_with	type_hints	# experimental support for strict typing/casting
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -146,7 +145,7 @@ Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	5.6.9
-Release:	%{rel}%{?with_type_hints:.th}
+Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -175,9 +174,6 @@ Patch8:		milter.patch
 Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
-%if %{with type_hints}
-Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
-%endif
 Patch14:	%{orgname}-no_pear_install.patch
 Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
@@ -2009,9 +2005,6 @@ cp -p php.ini-production php.ini
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
-%if %{with type_hints}
-%patch12 -p0
-%endif
 %patch14 -p1
 %patch17 -p1
 %patch18 -p1

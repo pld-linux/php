@@ -2016,7 +2016,7 @@ cp -p php.ini-production php.ini
 %if "%{pld_release}" != "ac"
 %patch34 -p1
 %endif
-%patch35 -p1
+%{?with_sybase_ct:%patch35 -p1}
 %patch36 -p1
 %patch37 -p1
 %patch38 -p1

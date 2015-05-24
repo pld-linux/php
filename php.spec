@@ -60,6 +60,7 @@
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
 %bcond_without	pdo_sqlite	# without PDO SQLite extension module
+%bcond_without	pdo_dblib	# without PDO dblib extension module
 %bcond_without	pgsql		# without PostgreSQL extension module
 %bcond_without	phar		# without phar extension module
 %bcond_without	pspell		# without pspell extension module
@@ -223,7 +224,7 @@ BuildRequires:	elfutils-devel
 %{!?with_mysqlnd:BuildRequires:	mysql-devel}
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
-%if %{with mssql} || %{with sybase_ct}
+%if %{with mssql} || %{with sybase_ct} || %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
 BuildRequires:	freetype-devel >= 1:2.5.1
@@ -2345,7 +2346,7 @@ for sapi in $sapis; do
 	--with-fpm-user=http \
 	--with-fpm-group=http \
 %endif
-%if %{with mssql} || %{with sybase_ct}
+%if %{with pdo_dblib}
 	--with-pdo-dblib=shared \
 %endif
 %if %{with interbase} && %{without interbase_inst}
@@ -3248,7 +3249,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
 %attr(755,root,root) %{php_extensiondir}/pdo.so
 
-%if %{with mssql} || %{with sybase_ct}
+%if %{with pdo_dblib}
 %files pdo-dblib
 %defattr(644,root,root,755)
 %doc ext/pdo_dblib/{CREDITS,README}

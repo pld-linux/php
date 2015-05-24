@@ -199,7 +199,6 @@ Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
 Patch62:	mcrypt-libs.patch
-Patch63:	%{orgname}-mysql-nowarning.patch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
@@ -2051,7 +2050,6 @@ exit 1
 %patch59 -p1
 %patch60 -p1
 %patch62 -p1
-%patch63 -p1
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
 %patch67 -p1

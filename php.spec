@@ -32,13 +32,30 @@
 # standard
 #
 # Conditional build:
-%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
-%bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
+# - General options:
+%bcond_without	embed		# disable building Embedded API
+%bcond_with	default_php	# use this PHP as default PHP in distro
+%bcond_with	gcov		# Enable Code coverage reporting
 %bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
+%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
+%bcond_without	kerberos5	# without Kerberos5 support
+%bcond_with	mm		# without mm support for session storage
+%bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
 %bcond_with	system_gd	# with system gd (imageantialias function is missing then)
 %bcond_with	system_libzip	# with system libzip (reported broken currently)
-%bcond_with	default_php	# use this PHP as default PHP in distro
 %bcond_with	systemtap	# systemtap/DTrace support
+%bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
+%bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
+%bcond_with	zts		# Zend Thread Safety
+# - SAPI
+%bcond_without	apache1		# disable building Apache 1.3.x SAPI
+%bcond_without	apache2		# disable building Apache 2.x SAPI
+%bcond_without	cgi		# disable CGI/FCGI SAPI
+%bcond_without	fpm		# disable FPM SAPI
+%bcond_without	litespeed	# build litespeed SAPI
+%bcond_with	milter		# disable Milter SAPI
+%bcond_without	phpdbg		# disable phpdbg SAPI
+# - Extensions
 %bcond_without	curl		# without CURL extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	ereg		# without ext/ereg support
@@ -46,21 +63,19 @@
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	intl		# without Intl extension module
-%bcond_without	kerberos5	# without Kerberos5 support
-%bcond_without	litespeed	# build litespeed module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
-%bcond_with	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_without	mysql		# without ext/mysql support
-%bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
+%bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
+%bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	opcache		# without Enable Zend OPcache extension support
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
-%bcond_without	pdo_sqlite	# without PDO SQLite extension module
 %bcond_without	pdo_dblib	# without PDO dblib extension module
+%bcond_without	pdo_sqlite	# without PDO SQLite extension module
 %bcond_without	pgsql		# without PostgreSQL extension module
 %bcond_without	phar		# without phar extension module
 %bcond_without	pspell		# without pspell extension module
@@ -70,20 +85,8 @@
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
-%bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-%bcond_without	apache1		# disable building Apache 1.3.x SAPI
-%bcond_without	apache2		# disable building Apache 2.x SAPI
-%bcond_with	zts		# Zend Thread Safety
-%bcond_without	cgi		# disable CGI/FCGI SAPI
-%bcond_without	fpm		# disable FPM
-%bcond_without	embed		# disable Embedded API
-%bcond_without	phpdbg		# disable phpdbg SAPI
-%bcond_with	milter		# disable Milter SAPI
-%bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
-%bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
-%bcond_with	gcov		# Enable Code coverage reporting
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs

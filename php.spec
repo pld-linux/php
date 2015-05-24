@@ -3,7 +3,6 @@
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
 # TODO 5.4:
-# - check php-sapi-ini-file.patch for safe mode removal
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
@@ -26,7 +25,6 @@
 #   filepro [pecl-svn], hwapi [pecl-svn]
 # - make additional headers and checking added by mail patch configurable
 # - modularize standard (output from pure php -m)?
-# - lib64 patch obsolete by $PHP_LIBDIR ?
 # - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
 #   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.
 #   make it runtime dep and add Suggests (or php warning messages)

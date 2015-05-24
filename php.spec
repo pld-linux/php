@@ -1998,7 +1998,7 @@ cp -p php.ini-production php.ini
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-%patch8 -p1
+%{?with_milter:%patch8 -p1}
 %patch9 -p1
 %patch10 -p1
 %patch14 -p1

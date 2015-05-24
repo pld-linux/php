@@ -2,7 +2,7 @@
 # timezone_location_get: Test that timezone_location_get returns a correct array of information
 mv ext/date/tests/timezone_location_get.phpt{,.skip}
 # DBA DB4 magic_quotes_runtime Test (info: DB4 handler used)
-mv ext/dba/tests/dba_db4_010.phpt{,.skip}
+#mv ext/dba/tests/dba_db4_010.phpt{,.skip}
 # DBA TCADB handler test
 mv ext/dba/tests/dba_tcadb.phpt{,.skip}
 # enchant_broker_describe() function
@@ -11,50 +11,6 @@ $x86 && mv ext/enchant/tests/broker_describe.phpt{,.skip}
 $x86 && mv ext/enchant/tests/broker_request_dict.phpt{,.skip}
 # bug #13181, leaving a context frees the broker resources
 $x86 && mv ext/enchant/tests/bug13181.phpt{,.skip}
-# Test ereg() function : basic functionality (with $regs)
-mv ext/ereg/tests/ereg_basic_001.phpt{,.skip}
-# Test ereg() function : basic functionality  (without $regs)
-mv ext/ereg/tests/ereg_basic_002.phpt{,.skip}
-# Test ereg() function : error conditions - test bad regular expressions
-mv ext/ereg/tests/ereg_error_002.phpt{,.skip}
-# Test ereg_replace() function : basic functionality
-mv ext/ereg/tests/ereg_replace_basic_001.phpt{,.skip}
-# Test ereg_replace() function : error conditions - bad regular expressions
-mv ext/ereg/tests/ereg_replace_error_002.phpt{,.skip}
-# Test ereg_replace() function : usage variations - unexpected type arg 1
-mv ext/ereg/tests/ereg_replace_variation_001.phpt{,.skip}
-# Test ereg() function : usage variations  - unexpected type arg 1
-mv ext/ereg/tests/ereg_variation_001.phpt{,.skip}
-# Test eregi() function : basic functionality (with $regs)
-mv ext/ereg/tests/eregi_basic_001.phpt{,.skip}
-# Test eregi() function : basic functionality  (without $regs)
-mv ext/ereg/tests/eregi_basic_002.phpt{,.skip}
-# Test eregi() function : error conditions - test bad regular expressions
-mv ext/ereg/tests/eregi_error_002.phpt{,.skip}
-# Test ereg() function : basic functionality
-mv ext/ereg/tests/eregi_replace_basic_001.phpt{,.skip}
-# Test eregi_replace() function : error conditions - bad regular expressions
-mv ext/ereg/tests/eregi_replace_error_002.phpt{,.skip}
-# Test eregi_replace() function : usage variations - unexpected type arg 1
-mv ext/ereg/tests/eregi_replace_variation_001.phpt{,.skip}
-# Test eregi() function : usage variations  - unexpected type arg 1
-mv ext/ereg/tests/eregi_variation_001.phpt{,.skip}
-# Test split() function : basic functionality - test a number of simple split, specifying a limit
-mv ext/ereg/tests/split_basic_001.phpt{,.skip}
-# Test split() function : basic functionality - test a number of simple split, without specifying a limit
-mv ext/ereg/tests/split_basic_002.phpt{,.skip}
-# Test split() function : error conditions - test bad regular expressions
-mv ext/ereg/tests/split_error_002.phpt{,.skip}
-# Test split() function : usage variations  - unexpected type for arg 1
-mv ext/ereg/tests/split_variation_001.phpt{,.skip}
-# Test spliti() function : basic functionality - test a number of simple spliti, specifying a limit
-mv ext/ereg/tests/spliti_basic_001.phpt{,.skip}
-# Test spliti() function : basic functionality - test a number of simple spliti, without specifying a limit
-mv ext/ereg/tests/spliti_basic_002.phpt{,.skip}
-# Test spliti() function : error conditions - test bad regular expressions
-mv ext/ereg/tests/spliti_error_002.phpt{,.skip}
-# Test spliti() function : usage variations  - unexpected type for arg 1
-mv ext/ereg/tests/spliti_variation_001.phpt{,.skip}
 # Bug #60150 (Integer overflow during the parsing of invalid exif header)
 $ix86 mv ext/exif/tests/bug60150.phpt{,.skip}
 # Bug #52209 (INPUT_ENV returns NULL for set variables (CLI))

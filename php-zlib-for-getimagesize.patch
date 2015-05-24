@@ -2,8 +2,8 @@ make compressed .swf parsing possible,
 link core php with -lz for getimagesize()
 see also http://bugs.php.net/bug.php?id=29611
 
---- php-4.4.1/ext/standard/image.c	2005-07-27 14:22:36.000000000 +0300
-+++ /tmp/image.c	2006-01-06 19:14:00.000000000 +0200
+--- php-7.0/ext/standard/image.c~	2015-05-21 23:10:45.000000000 +0300
++++ php-7.0/ext/standard/image.c	2015-05-21 23:11:22.424948534 +0300
 @@ -31,7 +31,7 @@
  #endif
  #include "php_image.h"
@@ -31,12 +31,12 @@ see also http://bugs.php.net/bug.php?id=29611
  /* {{{ php_handle_swc
   */
  static struct gfxinfo *php_handle_swc(php_stream * stream TSRMLS_DC)
-@@ -1267,7 +1290,7 @@
- 			result = php_handle_swf(stream TSRMLS_CC);
+@@ -1321,7 +1321,7 @@
+ 			result = php_handle_swf(stream);
  			break;
  		case IMAGE_FILETYPE_SWC:
 -#if HAVE_ZLIB && !defined(COMPILE_DL_ZLIB)
 +#if HAVE_ZLIB
- 			result = php_handle_swc(stream TSRMLS_CC);
+ 			result = php_handle_swc(stream);
  #else
- 			php_error_docref(NULL TSRMLS_CC, E_NOTICE, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled.");
+ 			php_error_docref(NULL, E_NOTICE, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled");

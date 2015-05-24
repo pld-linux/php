@@ -130,18 +130,18 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	1
+%define		rel	0.1
 %define		orgname	php
-%define		ver_suffix 56
+%define		ver_suffix 7.0
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
 Summary(pt_BR.UTF-8):	A linguagem de script PHP
-Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
-Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
+Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
+Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.6.9
+Version:	7.0.0
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -149,8 +149,9 @@ Epoch:		4
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	f6b90cd0503310c38e9573bae1eb38c7
+#Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://github.com/php/php-src/archive/master/%{orgname}-%{version}.tar.gz
+# Source0-md5:	a50ad24a755dd225d0f1ee674c3dbe1f
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -185,9 +186,9 @@ Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
 Patch34:	%{orgname}-libtool.patch
 Patch35:	%{orgname}-tds.patch
-Patch36:	%{orgname}-mysql-charsetphpini.patch
-Patch37:	%{orgname}-mysqli-charsetphpini.patch
-Patch38:	%{orgname}-pdo_mysql-charsetphpini.patch
+#Patch36:	%{orgname}-mysql-charsetphpini.patch
+#Patch37:	%{orgname}-mysqli-charsetphpini.patch
+#Patch38:	%{orgname}-pdo_mysql-charsetphpini.patch
 Patch39:	%{orgname}-use-prog_sendmail.patch
 Patch41:	%{orgname}-fpm-config.patch
 Patch42:	%{orgname}-fpm-shared.patch
@@ -209,7 +210,6 @@ Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 Patch69:	fpm-conf-split.patch
 Patch70:	mysqlnd-ssl.patch
-Patch71:	libvpx2.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -296,10 +296,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20131106
-%define		zend_module_api		20131226
-%define		zend_extension_api	220131226
-%define		php_pdo_api_version	20080721
+%define		php_api_version		20131218
+%define		zend_module_api		20141001
+%define		zend_extension_api	320140815
+%define		php_pdo_api_version	20150127
 
 # Extension versions
 %define		bz2ver		1.0
@@ -307,11 +307,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		fileinfover	1.0.5
 %define		hashver		1.0
 %define		intlver		1.1.0
-%define		jsonver		1.2.1
-%define		opcachever	7.0.4-dev
+%define		jsonver		1.4.0
+%define		opcachever	7.0.6-dev
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
-%define		zipver		1.12.5
+%define		zipver		1.13.0dev
 %define		phpdbgver	0.4.0
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
@@ -1989,11 +1989,16 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
+%if 0
 %setup -q -n %{orgname}-%{version}%{?subver}
+%else
+%setup -qc -n %{orgname}-%{version}
+mv php-src-*/* .
+%endif
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
+#%patch2 -p1 NEEDS PORTING
 %patch3 -p1
 %patch5 -p1
 %patch6 -p1
@@ -2017,9 +2022,9 @@ cp -p php.ini-production php.ini
 %patch34 -p1
 %endif
 %{?with_sybase_ct:%patch35 -p1}
-%patch36 -p1
-%patch37 -p1
-%patch38 -p1
+#%patch36 -p1
+#%patch37 -p1
+#%patch38 -p1
 %patch39 -p1
 %if %{with fpm}
 %if 0
@@ -2034,7 +2039,7 @@ diff -u %{orgname}-%{version}/sapi/fpm/php-fpm.conf.in{.orig,} > %{PATCH69}
 diff -u /dev/null %{orgname}-%{version}/sapi/fpm/php-fpm.conf-d.in >> %{PATCH69}
 exit 1
 %else
-%patch69 -p1
+#%patch69 -p1
 %endif
 %patch41 -p1
 %patch42 -p1
@@ -2059,7 +2064,6 @@ exit 1
 %patch66 -p1
 %patch67 -p1
 %patch70 -p1
-%patch71 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -2197,7 +2201,7 @@ if test "$ver" != "%{jsonver}"; then
 	: Update the jsonver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_ZENDOPCACHE_VERSION /{s/.* "//;s/".*$//;p}' ext/opcache/ZendAccelerator.h)
+ver=$(awk '/#define PHP_ZENDOPCACHE_VERSION/ {print $3}' ext/opcache/ZendAccelerator.h | xargs)
 if test "$ver" != "%{opcachever}"; then
 	: Error: Upstream Zend Opcache version is now ${ver}, expecting %{opcachever}.
 	: Update the opcachever macro and rebuild.
@@ -2221,7 +2225,7 @@ if test "$ver" != "%{enchantver}"; then
 	: Update the enchantver macro and rebuild.
 	exit 1
 fi
-ver=$(awk '/#define PHP_HASH_EXTVER/ {print $3}' ext/hash/php_hash.h | xargs)
+ver=$(awk '/#define PHP_HASH_VERSION/ {print $3}' ext/hash/php_hash.h | xargs)
 if test "$ver" != "%{hashver}"; then
 	: Error: Upstream HASH version is now ${ver}, expecting %{hashver}.
 	: Update the hashver macro and rebuild.
@@ -2446,11 +2450,11 @@ cp -af Makefile.cli Makefile
 	MYSQLND_SHARED_LIBADD="-lssl -lcrypto"
 
 %if %{with apache1}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp5.la -f Makefile.apxs1
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp7.la -f Makefile.apxs1
 %endif
 
 %if %{with apache2}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp5.la -f Makefile.apxs2
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp7.la -f Makefile.apxs2
 %endif
 
 %if %{with litespeed}
@@ -2458,7 +2462,7 @@ cp -af Makefile.cli Makefile
 %endif
 
 %if %{with embed}
-%{__make} -f Makefile.embed libphp5.la
+%{__make} -f Makefile.embed libphp7.la
 %endif
 
 %if %{with phpdbg}
@@ -2591,16 +2595,16 @@ v=$(echo %{version} | cut -d. -f1-2)
 
 # install Apache1 DSO module
 %if %{with apache1}
-libtool --mode=install install -p sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
-mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-$v}.so
-ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.so
+libtool --mode=install install -p sapi/apache/libphp7.la $RPM_BUILD_ROOT%{_libdir}/apache1
+mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp7{,-$v}.so
+ln -s libphp7-$v.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp7.so
 %endif
 
 # install Apache2 DSO module
 %if %{with apache2}
-libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
-mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-$v}.so
-ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
+libtool --mode=install install -p sapi/apache2handler/libphp7.la $RPM_BUILD_ROOT%{_libdir}/apache
+mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp7{,-$v}.so
+ln -s libphp7-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp7.so
 %endif
 
 # install litespeed sapi
@@ -2634,7 +2638,7 @@ install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
 libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}/%{name}-fpm
 cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8/%{name}-fpm.8
 cp -p sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
-cp -p sapi/fpm/php-fpm.conf-d $RPM_BUILD_ROOT%{_sysconfdir}/fpm.d/www.conf
+cp -p sapi/fpm/www.conf $RPM_BUILD_ROOT%{_sysconfdir}/fpm.d
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
@@ -2655,7 +2659,7 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 # we could use install-headers from Makefile.embed, but that would reinstall all headers
 # install-sapi installs to wrong dir, so just do it all manually
 install -d $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
-install -p libs/libphp5.so $RPM_BUILD_ROOT%{_libdir}
+install -p libs/libphp7.so $RPM_BUILD_ROOT%{_libdir}
 cp -p sapi/embed/php_embed.h $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
 %endif
 
@@ -2672,13 +2676,13 @@ cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 %if %{with apache1}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
-%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.la
+%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp7.la
 %endif
 
 %if %{with apache2}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
-%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.la
+%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp7.la
 %endif
 
 # ensure that paths are correct for current php version and arch
@@ -2914,8 +2918,8 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
-%attr(755,root,root) %{_libdir}/apache1/libphp5.so
-%attr(755,root,root) %{_libdir}/apache1/libphp5-*.*.so
+%attr(755,root,root) %{_libdir}/apache1/libphp7.so
+%attr(755,root,root) %{_libdir}/apache1/libphp7-*.*.so
 %endif
 
 %if %{with apache2}
@@ -2924,8 +2928,8 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
-%attr(755,root,root) %{_libdir}/apache/libphp5.so
-%attr(755,root,root) %{_libdir}/apache/libphp5-*.*.so
+%attr(755,root,root) %{_libdir}/apache/libphp7.so
+%attr(755,root,root) %{_libdir}/apache/libphp7-*.*.so
 %endif
 
 %if %{with litespeed}
@@ -2946,7 +2950,7 @@ fi
 %if %{with embed}
 %files embedded
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libphp5.so
+%attr(755,root,root) %{_libdir}/libphp7.so
 %endif
 
 %files cli
@@ -2993,7 +2997,7 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
-%attr(755,root,root) %{_libdir}/libphp_common-*.so
+#%attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
 
 %doc ext/session/mod_files.sh
@@ -3003,7 +3007,7 @@ fi
 %doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
-%attr(755,root,root) %{_libdir}/libphp_common.so
+#%attr(755,root,root) %{_libdir}/libphp_common.so
 %{_libdir}/libphp_common.la
 %{_includedir}/php
 %{_libdir}/%{name}/build

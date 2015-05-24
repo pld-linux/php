@@ -1,5 +1,5 @@
---- php-5.6.0beta1/php.ini~	2014-04-21 21:38:01.000000000 +0300
-+++ php-5.6.0beta1/php.ini	2014-04-21 21:51:47.379819417 +0300
+--- php-7.0/php.ini~	2015-05-21 23:06:55.000000000 +0300
++++ php-7.0/php.ini	2015-05-21 23:08:25.125742768 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -111,14 +111,14 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -884,49 +837,8 @@
+@@ -825,48 +825,8 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.
  ;
 -; Windows Extensions
 -; Note that ODBC support is built in, so no dll is needed for it.
--; Note that many DLL files are located in the extensions/ (PHP 4) ext/ (PHP 5)
--; extension folders as well as the separate PECL DLL download (PHP 5).
+-; Note that many DLL files are located in the extensions/ (PHP 4) ext/ (PHP 5+)
+-; extension folders as well as the separate PECL DLL download (PHP 5+).
 -; Be sure to appropriately set the extension_dir directive.
 -;
 -;extension=php_bz2.dll
@@ -154,12 +154,11 @@
 -;extension=php_soap.dll
 -;extension=php_sockets.dll
 -;extension=php_sqlite3.dll
--;extension=php_sybase_ct.dll
 -;extension=php_tidy.dll
 -;extension=php_xmlrpc.dll
 -;extension=php_xsl.dll
-+; Ideally in PLD Linux you should install appropriate php-<extension> or
-+; php-pecl-<extension> package.
++; Ideally in PLD Linux you should install appropriate php7.0-<extension> or
++; php7.0-pecl-<extension> package.
  
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;

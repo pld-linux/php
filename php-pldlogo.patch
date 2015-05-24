@@ -1,9 +1,10 @@
---- php-5.5.0alpha1/ext/standard/info.c~	2012-11-13 22:00:16.000000000 +0200
-+++ php-5.5.0alpha1/ext/standard/info.c	2012-11-18 23:37:48.607735302 +0200
-@@ -794,6 +794,18 @@
- 			zend_html_puts(zend_version, strlen(zend_version) TSRMLS_CC);
+--- php-7.0/ext/standard/info.c~	2015-05-21 17:57:06.000000000 +0300
++++ php-7.0/ext/standard/info.c	2015-05-21 22:56:10.367595637 +0300
+@@ -651,6 +651,20 @@
+ 			php_info_print_table_row(2, "PHP Version", PHP_VERSION);
  		}
  		php_info_print_box_end();
++
 +		/* PLD Linux */
 +		php_info_print_box_start(0);
 +		if (!sapi_module.phpinfo_as_text) {
@@ -16,9 +17,10 @@
 +		else
 +			php_info_print("\nMore information at http://www.pld-linux.org/.\n");
 +		php_info_print_box_end();
- 		efree(php_uname);
- 	}
- 
++
+ 		php_info_print_table_start();
+ 		php_info_print_table_row(2, "System", php_uname->val);
+ 		php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__);
 --- php-5.6.0beta1/ext/standard/info.h~	2014-04-10 08:11:48.000000000 +0300
 +++ php-5.6.0beta1/ext/standard/info.h	2014-04-21 21:37:12.184288611 +0300
 @@ -54,6 +54,7 @@

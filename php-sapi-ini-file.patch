@@ -1,6 +1,6 @@
---- php-5.5.21/main/php_ini.c	2015-01-21 12:23:27.000000000 +0200
-+++ php-5.5.21/main/php_ini.c	2015-02-25 01:40:21.335354971 +0200
-@@ -378,12 +378,19 @@
+--- php-7.0/main/php_ini.c~	2015-05-21 22:56:59.000000000 +0300
++++ php-7.0/main/php_ini.c	2015-05-21 23:01:21.580419532 +0300
+@@ -379,12 +379,19 @@
  }
  /* }}} */
  
@@ -11,7 +11,7 @@
 +
  /* {{{ php_init_config
   */
- int php_init_config(TSRMLS_D)
+ int php_init_config(void)
  {
  	char *php_ini_file_name = NULL;
  	char *php_ini_search_path = NULL;
@@ -51,23 +51,27 @@
  		if (!fh.handle.fp) {
  			const char *fmt = "php-%s.ini";
  			char *ini_fname;
-@@ -572,13 +600,10 @@
+@@ -594,15 +601,12 @@
  			if (fh.handle.fp) {
- 				fh.filename = php_ini_opened_path;
+ 				fh.filename = opened_path->val;
  			}
 -		}
  
 -		/* If still no ini file found, search for php.ini file in search path */
 -		if (!fh.handle.fp) {
--			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &php_ini_opened_path TSRMLS_CC);
+-			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &opened_path);
 -			if (fh.handle.fp) {
--				fh.filename = php_ini_opened_path;
+-				fh.filename = opened_path->val;
+-			}
+-		}
 +			// restore previous value, so php_ini_loaded_file() works as expected
 +			if (php_ini_loaded_file) {
 +				php_ini_opened_path = php_ini_loaded_file;
- 			}
- 		}
++ 			}
++ 		}
  	}
+ 
+ 	if (free_ini_search_path) {
 @@ -597,6 +622,10 @@
  
  		{

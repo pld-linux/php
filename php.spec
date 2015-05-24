@@ -41,6 +41,7 @@
 %bcond_with	systemtap	# systemtap/DTrace support
 %bcond_without	curl		# without CURL extension module
 %bcond_without	enchant		# without Enchant extension module
+%bcond_without	ereg		# without ext/ereg support
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
@@ -544,12 +545,12 @@ Provides:	%{name}(zend_extension_api) = %{zend_extension_api}
 Provides:	%{name}(zend_module_api) = %{zend_module_api}
 Provides:	%{name}-core
 Provides:	%{name}-date
-Provides:	%{name}-ereg
+%{?with_ereg:Provides:	%{name}-ereg}
 Provides:	%{name}-reflection
 Provides:	%{name}-standard
 Provides:	php(core) = %{version}
 Provides:	php(date)
-Provides:	php(ereg)
+%{?with_ereg:Provides:	php(ereg)}
 Provides:	php(libxml)
 Provides:	php(reflection)
 Provides:	php(standard)
@@ -2407,7 +2408,7 @@ for sapi in $sapis; do
 	%{?with_pspell:--with-pspell=shared} \
 	--with-readline=shared \
 	%{?with_recode:--with-recode=shared} \
-	--with-regex=system \
+	%{__with_without ereg regex system} \
 	%{?with_snmp:--with-snmp=shared} \
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	%{!?with_pdo_sqlite:--without-pdo-sqlite} \

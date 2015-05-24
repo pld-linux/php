@@ -16,13 +16,6 @@
 #   -  13K fileinfo.so php-pecl-fileinfo-1.0.4-8.amd64
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
-# - deal with modules removed from php and not moved to PECL, still not obsoleted anywhere
-#   - removed from php 5.0 (currently in php4):
-#   db [pecl-svn], hyperwave [pecl-svn], java [pecl-svn], mcal [pecl-svn], qtdom [pecl-svn]
-#   - removed from php 5.1:
-#   oracle [pecl-svn]
-#   - removed from php 5.2:
-#   filepro [pecl-svn], hwapi [pecl-svn]
 # - make additional headers and checking added by mail patch configurable
 # - modularize standard (output from pure php -m)?
 # - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is

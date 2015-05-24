@@ -2392,7 +2392,7 @@ for sapi in $sapis; do
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
-	%{__enable_disable mysql mysql shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd}} \
+	%{__with_without mysql mysql shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_oci:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_opcache:--enable-opcache=shared} \

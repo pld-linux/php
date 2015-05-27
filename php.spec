@@ -56,14 +56,31 @@
 %bcond_with	milter		# disable Milter SAPI
 %bcond_without	phpdbg		# disable phpdbg SAPI
 # - Extensions
+%bcond_without	bcmath		# without bcmath extension module
+%bcond_without	bz2		# without bz2 extension module
+%bcond_without	calendar	# without calendar extension module
+%bcond_without	ctype		# without ctype extension module
 %bcond_without	curl		# without CURL extension module
+%bcond_without	dba		# without DBA extension module
+%bcond_without	dom		# without DOM extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	ereg		# without ext/ereg support
+%bcond_without	exif		# without EXIF extension module
+%bcond_without	fileinfo	# without fileinfo extension module
 %bcond_without	filter		# without filter extension module
+%bcond_without	ftp		# without FTP extension module
+%bcond_without	gd		# without GD extension module
+%bcond_without	gettext		# without gettext extension module
+%bcond_without	gmp		# without gmp extension module
+%bcond_without	hash		# without hash extension module
+%bcond_without	iconv		# without iconv extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	intl		# without Intl extension module
+%bcond_without	json		# without json extension module
 %bcond_without	ldap		# without LDAP extension module
+%bcond_without	mbstring	# without mbstring extension module
+%bcond_without	mcrypt		# without mbcrypt extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_without	mysql		# without ext/mysql support
@@ -73,13 +90,19 @@
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	opcache		# without Enable Zend OPcache extension support
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
+%bcond_without	pcntl		# without pcntl extension module
 %bcond_without	pcre		# without PCRE extension module
+%bcond_without	pdo		# without PDO extension module
 %bcond_without	pdo_dblib	# without PDO dblib extension module
+%bcond_without	pdo_mysql	# without PDO MySQL extension module
 %bcond_without	pdo_sqlite	# without PDO SQLite extension module
 %bcond_without	pgsql		# without PostgreSQL extension module
-%bcond_without	phar		# without phar extension module
+%bcond_without	phar		# without Phar extension module
+%bcond_without	posix		# without POSIX extension module
 %bcond_without	pspell		# without pspell extension module
+%bcond_without	readline	# without readline extension module
 %bcond_without	recode		# without recode extension module
+%bcond_without	session		# without session extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
@@ -2327,24 +2350,24 @@ for sapi in $sapis; do
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	--enable-inline-optimization \
-	--enable-bcmath=shared \
-	--enable-calendar=shared \
-	--enable-ctype=shared \
-	--enable-dba=shared \
-	--enable-dom=shared \
+	%{__enable_disable bcmath bcmath shared} \
+	%{__enable_disable calendar calendar shared} \
+	%{__enable_disable ctype ctype shared} \
+	%{__enable_disable dba dba shared} \
+	%{__enable_disable dom dom shared} \
 	%{?with_systemtap:--enable-dtrace} \
-	--enable-exif=shared \
-	--enable-fileinfo=shared \
-	--enable-ftp=shared \
+	%{__enable_disable exif exif shared} \
+	%{__enable_disable fileinfo fileinfo shared} \
+	%{__enable_disable ftp ftp shared} \
 	--enable-gd-native-ttf \
 	%{?with_intl:--enable-intl=shared} \
 	--enable-libxml \
-	--enable-mbstring=shared,all \
+	%{__enable_disable mbstring mbstring shared,all} \
 	--enable-mbregex \
-	--enable-pcntl=shared \
-	--enable-pdo=shared \
-	--enable-json=shared \
-	--enable-hash=shared \
+	%{__enable_disable pcntl pcntl shared} \
+	%{__enable_disable pdo pdo shared} \
+	%{__enable_disable json json shared} \
+	%{__enable_disable hash hash shared} \
 	--enable-xmlwriter=shared \
 %if %{with fpm}
 	--with-fpm-user=http \
@@ -2358,16 +2381,16 @@ for sapi in $sapis; do
 %endif
 	%{?with_mhash:--with-mhash=yes} \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
-	--with-pdo-mysql=shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd} \
+	%{__with_without pdo_mysql pdo-mysql shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_oci:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
 	%{?with_webp:--with-vpx-dir=/usr} \
 	--without-libexpat-dir \
-	--enable-posix=shared \
+	%{__enable_disable posix posix shared} \
 	--enable-shared \
-	--enable-session=shared \
+	%{__enable_disable session session shared} \
 	--enable-shmop=shared \
 	--enable-simplexml=shared \
 	--enable-sysvmsg=shared \
@@ -2379,21 +2402,21 @@ for sapi in $sapis; do
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
 	--enable-xmlreader=shared \
-	--with-bz2=shared \
+	%{__with_without bz2 bz2 shared} \
 	%{__with_without curl curl shared} \
 	--with-db4 \
-	--with-iconv=shared \
+	%{__with_without iconv iconv shared} \
 	%{?with_enchant:--with-enchant=shared,/usr} \
 	--with-freetype-dir=shared \
-	--with-gettext=shared \
-	--with-gd=shared%{?with_system_gd:,/usr} \
+	%{__with_without gettext gettext shared} \
+	%{__with_without gd gd shared%{?with_system_gd:,/usr}} \
 	--with-gdbm \
-	--with-gmp=shared \
+	%{__with_without gmp gmp shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
 	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
 	--with-jpeg-dir=/usr \
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
-	--with-mcrypt=shared \
+	%{__with_without mcrypt mcrypt shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
@@ -2411,7 +2434,7 @@ for sapi in $sapis; do
 	%{__enable_disable phar phar shared} \
 	--with-png-dir=/usr \
 	%{?with_pspell:--with-pspell=shared} \
-	--with-readline=shared \
+	%{__with_without readline readline shared} \
 	%{?with_recode:--with-recode=shared} \
 	%{__with_without ereg regex system} \
 	%{?with_snmp:--with-snmp=shared} \
@@ -3018,28 +3041,36 @@ fi
 %{_mandir}/man1/php-config.1*
 %{_mandir}/man1/phpize.1*
 
+%if %{with bcmath}
 %files bcmath
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/bcmath.ini
 %attr(755,root,root) %{php_extensiondir}/bcmath.so
+%endif
 
+%if %{with bz2}
 %files bz2
 %defattr(644,root,root,755)
 %doc ext/bz2/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/bz2.ini
 %attr(755,root,root) %{php_extensiondir}/bz2.so
+%endif
 
+%if %{with calendar}
 %files calendar
 %defattr(644,root,root,755)
 %doc ext/calendar/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/calendar.ini
 %attr(755,root,root) %{php_extensiondir}/calendar.so
+%endif
 
+%if %{with ctype}
 %files ctype
 %defattr(644,root,root,755)
 %doc ext/calendar/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ctype.ini
 %attr(755,root,root) %{php_extensiondir}/ctype.so
+%endif
 
 %if %{with curl}
 %files curl
@@ -3049,18 +3080,22 @@ fi
 %attr(755,root,root) %{php_extensiondir}/curl.so
 %endif
 
+%if %{with dba}
 %files dba
 %defattr(644,root,root,755)
 %doc ext/dba/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dba.ini
 %attr(755,root,root) %{php_extensiondir}/dba.so
+%endif
 
+%if %{with dom}
 %files dom
 %defattr(644,root,root,755)
 %doc ext/dom/{CREDITS,TODO}
 %doc ext/dom/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
+%endif
 
 %if %{with enchant}
 %files enchant
@@ -3070,17 +3105,21 @@ fi
 %attr(755,root,root) %{php_extensiondir}/enchant.so
 %endif
 
+%if %{with exif}
 %files exif
 %defattr(644,root,root,755)
 %doc ext/exif/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
 %attr(755,root,root) %{php_extensiondir}/exif.so
+%endif
 
+%if %{with fileinfo}
 %files fileinfo
 %defattr(644,root,root,755)
 %doc ext/fileinfo/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/fileinfo.ini
 %attr(755,root,root) %{php_extensiondir}/fileinfo.so
+%endif
 
 %if %{with filter}
 %files filter
@@ -3090,41 +3129,53 @@ fi
 %attr(755,root,root) %{php_extensiondir}/filter.so
 %endif
 
+%if %{with ftp}
 %files ftp
 %defattr(644,root,root,755)
 %doc ext/ftp/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ftp.ini
 %attr(755,root,root) %{php_extensiondir}/ftp.so
+%endif
 
+%if %{with gd}
 %files gd
 %defattr(644,root,root,755)
 %doc ext/gd/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gd.ini
 %attr(755,root,root) %{php_extensiondir}/gd.so
+%endif
 
+%if %{with gettext}
 %files gettext
 %defattr(644,root,root,755)
 %doc ext/gettext/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gettext.ini
 %attr(755,root,root) %{php_extensiondir}/gettext.so
+%endif
 
+%if %{with gmp}
 %files gmp
 %defattr(644,root,root,755)
 %doc ext/gmp/{CREDITS,README,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{php_extensiondir}/gmp.so
+%endif
 
+%if %{with hash}
 %files hash
 %defattr(644,root,root,755)
 %doc ext/hash/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/hash.ini
 %attr(755,root,root) %{php_extensiondir}/hash.so
+%endif
 
+%if %{with iconv}
 %files iconv
 %defattr(644,root,root,755)
 %doc ext/iconv/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/iconv.ini
 %attr(755,root,root) %{php_extensiondir}/iconv.so
+%endif
 
 %if %{with imap}
 %files imap
@@ -3150,11 +3201,13 @@ fi
 %attr(755,root,root) %{php_extensiondir}/intl.so
 %endif
 
+%if %{with json}
 %files json
 %defattr(644,root,root,755)
 %doc ext/json/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/json.ini
 %attr(755,root,root) %{php_extensiondir}/json.so
+%endif
 
 %if %{with ldap}
 %files ldap
@@ -3164,17 +3217,21 @@ fi
 %attr(755,root,root) %{php_extensiondir}/ldap.so
 %endif
 
+%if %{with mbstring}
 %files mbstring
 %defattr(644,root,root,755)
 %doc ext/mbstring/{CREDITS,README*}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{php_extensiondir}/mbstring.so
+%endif
 
+%if %{with mcrypt}
 %files mcrypt
 %defattr(644,root,root,755)
 %doc ext/mcrypt/{CREDITS,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mcrypt.ini
 %attr(755,root,root) %{php_extensiondir}/mcrypt.so
+%endif
 
 %if %{with mssql}
 %files mssql
@@ -3240,11 +3297,13 @@ fi
 %attr(755,root,root) %{php_extensiondir}/openssl.so
 %endif
 
+%if %{with pcntl}
 %files pcntl
 %defattr(644,root,root,755)
 %doc ext/pcntl/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
+%endif
 
 %if %{with pcre}
 %files pcre
@@ -3254,11 +3313,13 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pcre.so
 %endif
 
+%if %{with pdo}
 %files pdo
 %defattr(644,root,root,755)
 %doc ext/pdo/{CREDITS,README,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
 %attr(755,root,root) %{php_extensiondir}/pdo.so
+%endif
 
 %if %{with pdo_dblib}
 %files pdo-dblib
@@ -3276,11 +3337,13 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pdo_firebird.so
 %endif
 
+%if %{with pdo_mysql}
 %files pdo-mysql
 %defattr(644,root,root,755)
 %doc ext/pdo_mysql/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_mysql.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_mysql.so
+%endif
 
 %if %{with oci}
 %files pdo-oci
@@ -3334,11 +3397,13 @@ fi
 %{_mandir}/man1/phar.phar.1
 %endif
 
+%if %{with posix}
 %files posix
 %defattr(644,root,root,755)
 %doc ext/posix/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/posix.ini
 %attr(755,root,root) %{php_extensiondir}/posix.so
+%endif
 
 %if %{with pspell}
 %files pspell
@@ -3348,11 +3413,13 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pspell.so
 %endif
 
+%if %{with readline}
 %files readline
 %defattr(644,root,root,755)
 %doc ext/readline/{CREDITS,README*}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/readline.ini
 %attr(755,root,root) %{php_extensiondir}/readline.so
+%endif
 
 %if %{with recode}
 %files recode
@@ -3362,12 +3429,14 @@ fi
 %attr(755,root,root) %{php_extensiondir}/recode.so
 %endif
 
+%if %{with session}
 %files session
 %defattr(644,root,root,755)
 %doc ext/session/CREDITS
 %doc ext/session/mod_files.sh
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/Session.ini
 %attr(755,root,root) %{php_extensiondir}/session.so
+%endif
 
 %files shmop
 %defattr(644,root,root,755)

@@ -503,6 +503,7 @@ Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	rc-scripts
+Provides:	php(fcgi)
 Provides:	php(fpm)
 Provides:	user(http)
 Provides:	webserver(php) = %{version}

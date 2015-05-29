@@ -207,7 +207,16 @@
  
  [Session]
  ; Handler used to store/retrieve data.
-@@ -1822,7 +1738,7 @@
+@@ -1678,7 +1610,7 @@
+ [Assertion]
+ ; Assert(expr); active by default.
+ ; http://php.net/assert.active
+-;assert.active = On
++assert.active = Off
+ 
+ ; Issue a PHP warning for each failed assertion.
+ ; http://php.net/assert.warning
+@@ -1806,7 +1738,7 @@
  
  ; Sets the directory name where SOAP extension will put cache files.
  ; http://php.net/soap.wsdl-cache-dir

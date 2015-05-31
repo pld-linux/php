@@ -119,7 +119,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	15
+%define		rel	16
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}

@@ -2789,7 +2789,7 @@ fi
 %service %{name}-fpm restart
 
 %preun fpm
-if [ "$1" = 0 ]; then
+if [ "$1" = "0" ]; then
 	%service %{name}-fpm stop
 	/sbin/chkconfig --del %{name}-fpm
 fi
@@ -2839,8 +2839,8 @@ for f in /etc/php/*.ini.rpmsave /etc/php/*.d/*.ini.rpmsave; do
 	fn=${fn%.rpmsave}
 	nf=%{_sysconfdir}/$dn/$fn
 	test -f "$nf" || continue
-	cp -vf $nf{,.rpmnew}
-	mv -vf $f $nf
+	cp -vfb $nf{,.rpmnew}
+	cp -vfb $f $nf
 	%{__sed} -i -e '
 		s#%{_libdir}/php#%{_libdir}/%{name}#
 		s#/etc/php#%{_sysconfdir}#

@@ -463,9 +463,6 @@ Provides:	php(fcgi)
 Provides:	webserver(php) = %{version}
 Obsoletes:	php-cgi < 4:5.3.28-7
 Obsoletes:	php-fcgi < 4:5.3.0
-%if "%{pld_release}" != "ac"
-Conflicts:	logrotate < 3.8.0
-%endif
 
 %description cgi
 PHP as CGI or FastCGI program.
@@ -531,6 +528,9 @@ Provides:	php(fpm)
 Provides:	user(http)
 Provides:	webserver(php) = %{version}
 Obsoletes:	php-fpm < 4:5.3.28-7
+%if "%{pld_release}" != "ac"
+Conflicts:	logrotate < 3.8.0
+%endif
 
 %description fpm
 PHP FastCGI Process Manager.

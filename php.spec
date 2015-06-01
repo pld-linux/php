@@ -113,10 +113,6 @@
 %undefine	with_fpm
 %endif
 
-#%%ifarch x32
-#%%undefine	with_phar
-#%%endif
-
 %if 0
 %if %{without apache1} && %{without apache2}
 ERROR: You need to select at least one Apache SAPI to build shared modules.
@@ -128,7 +124,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	3.1
+%define		rel	4
 %define		orgname	php
 %define		ver_suffix 54
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -1947,7 +1943,7 @@ cp -p php.ini-production php.ini
 %patch70 -p1
 
 %ifarch x32
-# copy zend_operators from 5.5
+# asm part of zend_operators.h of php-5.5
 %patch71 -p1
 %endif
 

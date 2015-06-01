@@ -113,9 +113,9 @@
 %undefine	with_fpm
 %endif
 
-%ifarch x32
-%undefine	with_phar
-%endif
+#%%ifarch x32
+#%%undefine	with_phar
+#%%endif
 
 %if 0
 %if %{without apache1} && %{without apache2}
@@ -128,7 +128,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	3
+%define		rel	3.1
 %define		orgname	php
 %define		ver_suffix 54
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -220,6 +220,7 @@ Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	x32.patch
 Patch70:	libvpx2.patch
+Patch71:	zend_operators_from_5.5.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1944,6 +1945,11 @@ cp -p php.ini-production php.ini
 %patch66 -p1
 %patch67 -p1
 %patch70 -p1
+
+%ifarch x32
+# copy zend_operators from 5.5
+%patch71 -p1
+%endif
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

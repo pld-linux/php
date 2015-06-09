@@ -1,4 +1,3 @@
-# NOTE: mysqlnd does not support ssl or compression (see FAQ at http://dev.mysql.com/downloads/connector/php-mysqlnd/)
 # UNPACKAGED EXTENSION NOTES:
 # - com_dotnet is Win32-only
 # TODO:
@@ -44,7 +43,6 @@
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_with	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
-# don't turn it on by default; see TODO item for mysqlnd in this spec
 %bcond_with	mysqlnd		# with mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	odbc		# without ODBC extension module
@@ -2376,7 +2374,7 @@ for sapi in $sapis; do
 	--with-mcrypt=shared \
 	%{?with_mm:--with-mm} \
 	%{?with_mssql:--with-mssql=shared} \
-	%{?with_mysqlnd:--with-mysqlnd=shared} \
+	%{?with_mysqlnd:--enable-mysqlnd=shared} \
 	--with-mysql=shared%{?with_mysqlnd:,mysqlnd} \
 	%{?with_mysqli:--with-mysqli=shared%{?with_mysqlnd:,mysqlnd}} \
 	%{?with_oci:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \

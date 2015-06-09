@@ -217,6 +217,7 @@ Patch70:	mysql-lib-ver-mismatch.patch
 # git diff php-5.3.29..PHP-5.6 ./ext/fileinfo/Makefile.frag >> ~/rpm/packages/php/php-fileinfo.patch
 # git diff php-5.3.29..PHP-5.6 ./ext/fileinfo/data_file.c >> ~/rpm/packages/php/php-fileinfo.patch
 Patch71:	php-fileinfo.patch
+Patch72:	x32-suhosin.patch
 # Patch71-md5:	771e4934132c5f5c968248c954d1ef6e
 # Fixes for security bugs
 # https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
@@ -2058,6 +2059,7 @@ cp -p php.ini-production php.ini
 %patch46 -p1
 %if %{with suhosin}
 %patch47 -p1
+%patch72 -p1
 %endif
 %patch68 -p1
 %patch48 -p1

@@ -48,7 +48,7 @@
 %bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 %bcond_with	zts		# Zend Thread Safety
 # - SAPI
-%bcond_without	apache1		# disable building Apache 1.3.x SAPI
+%bcond_with	apache1		# disable building Apache 1.3.x SAPI (sapi removed)
 %bcond_without	apache2		# disable building Apache 2.x SAPI
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM SAPI
@@ -66,7 +66,7 @@
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mssql		# without MS SQL extension module
-%bcond_without	mysql		# without ext/mysql support
+%bcond_with	mysql		# without ext/mysql support (ext removed)
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
 %bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
@@ -83,7 +83,7 @@
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
-%bcond_without	sybase_ct	# without Sybase-CT extension module
+%bcond_with	sybase_ct	# without Sybase-CT extension module (ext removed in 7.0.0)
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
@@ -130,7 +130,8 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.1
+%define		rel	0.2
+%define		subver	beta1
 %define		orgname	php
 %define		ver_suffix 7.0
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -142,7 +143,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.0.0
-Release:	%{rel}
+Release:	%{rel}.%{subver}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -150,8 +151,8 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://github.com/php/php-src/archive/master/%{orgname}-%{version}.tar.gz
-# Source0-md5:	a50ad24a755dd225d0f1ee674c3dbe1f
+Source0:	https://downloads.php.net/~ab/php-%{version}%{subver}.tar.xz
+# Source0-md5:	e18aaad357f7bb8e416c300d64625fb8
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -1989,7 +1990,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%if 0
+%if 1
 %setup -q -n %{orgname}-%{version}%{?subver}
 %else
 %setup -qc -n %{orgname}-%{version}

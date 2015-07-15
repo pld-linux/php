@@ -1,5 +1,5 @@
---- php-7.0/php.ini~	2015-05-21 23:06:55.000000000 +0300
-+++ php-7.0/php.ini	2015-05-21 23:08:25.125742768 +0300
+--- php-7.0.0beta1/php.ini~	2015-07-13 16:12:28.000000000 +0300
++++ php-7.0.0beta1/php.ini	2015-07-13 16:13:25.566494326 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -111,7 +111,7 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -825,48 +825,8 @@
+@@ -825,47 +825,8 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.
  ;
@@ -133,7 +133,6 @@
 -;extension=php_ldap.dll
 -;extension=php_mbstring.dll
 -;extension=php_exif.dll      ; Must be after mbstring as it depends on it
--;extension=php_mysql.dll
 -;extension=php_mysqli.dll
 -;extension=php_oci8_12c.dll  ; Use with Oracle Database 12c Instant Client
 -;extension=php_openssl.dll
@@ -185,16 +184,6 @@
  
  [intl]
  ;intl.default_locale =
-@@ -1152,6 +1062,9 @@
- ; http://php.net/mysql.connect-timeout
- mysql.connect_timeout = 60
- 
-+; The name of the character set to use as the default character set.
-+;mysql.connect_charset=utf8
-+
- ; Trace mode. When trace_mode is active (=On), warnings for table/index scans and
- ; SQL-Errors will be displayed.
- ; http://php.net/mysql.trace-mode
 @@ -1191,6 +1104,9 @@
  ; http://php.net/mysqli.default-socket
  mysqli.default_socket =

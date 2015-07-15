@@ -29,24 +29,24 @@
  				break; \
  			fi; \
  		done; \
---- php-5.4.0alpha2/sapi/cgi/config9.m4~	2010-11-14 01:13:07.000000000 +0200
-+++ php-5.4.0alpha2/sapi/cgi/config9.m4	2011-08-01 10:28:47.495056372 +0300
+--- php-7.0.0beta1/sapi/cgi/config9.m4~	2015-07-10 15:11:43.000000000 +0300
++++ php-7.0.0beta1/sapi/cgi/config9.m4	2015-07-13 16:03:06.900955209 +0300
 @@ -64,7 +64,7 @@
-         BUILD_CGI="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_BINARY_OBJS:.lo=.o) \$(PHP_CGI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
+         BUILD_CGI="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_BINARY_OBJS:.lo=.o) \$(PHP_FASTCGI_OBJS:.lo=.o) \$(PHP_CGI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
        ;;
        *)
--        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_CGI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
-+        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_BINARY_OBJS) \$(PHP_CGI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
+-        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_FASTCGI_OBJS) \$(PHP_CGI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
++        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_BINARY_OBJS) \$(PHP_FASTCGI_OBJS) \$(PHP_CGI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
        ;;
      esac
  
---- php-5.4.0alpha2/sapi/cgi/Makefile.frag~	2010-11-14 01:13:07.000000000 +0200
-+++ php-5.4.0alpha2/sapi/cgi/Makefile.frag	2011-08-01 12:21:29.155180914 +0300
+--- php-7.0.0beta1/sapi/cgi/Makefile.frag~	2015-07-10 15:11:43.000000000 +0300
++++ php-7.0.0beta1/sapi/cgi/Makefile.frag	2015-07-13 16:03:56.810212555 +0300
 @@ -1,6 +1,6 @@
  cgi: $(SAPI_CGI_PATH)
  
--$(SAPI_CGI_PATH): $(PHP_GLOBAL_OBJS) $(PHP_BINARY_OBJS) $(PHP_CGI_OBJS)
-+$(SAPI_CGI_PATH): libphp_common.la $(PHP_BINARY_OBJS) $(PHP_CGI_OBJS)
+-$(SAPI_CGI_PATH): $(PHP_GLOBAL_OBJS) $(PHP_BINARY_OBJS) $(PHP_FASTCGI_OBJS) $(PHP_CGI_OBJS)
++$(SAPI_CGI_PATH): libphp_common.la $(PHP_BINARY_OBJS) $(PHP_FASTCGI_OBJS) $(PHP_CGI_OBJS)
  	$(BUILD_CGI)
  
  install-cgi: $(SAPI_CGI_PATH)

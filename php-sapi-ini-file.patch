@@ -1,5 +1,5 @@
---- php-7.0/main/php_ini.c~	2015-05-21 22:56:59.000000000 +0300
-+++ php-7.0/main/php_ini.c	2015-05-21 23:01:21.580419532 +0300
+--- php-7.0.0beta1/main/php_ini.c~	2015-07-13 16:04:48.000000000 +0300
++++ php-7.0.0beta1/main/php_ini.c	2015-07-13 16:10:07.496198519 +0300
 @@ -379,12 +379,19 @@
  }
  /* }}} */
@@ -51,9 +51,9 @@
  		if (!fh.handle.fp) {
  			const char *fmt = "php-%s.ini";
  			char *ini_fname;
-@@ -594,15 +601,12 @@
+@@ -597,15 +597,12 @@
  			if (fh.handle.fp) {
- 				fh.filename = opened_path->val;
+ 				fh.filename = ZSTR_VAL(opened_path);
  			}
 -		}
  
@@ -61,7 +61,7 @@
 -		if (!fh.handle.fp) {
 -			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &opened_path);
 -			if (fh.handle.fp) {
--				fh.filename = opened_path->val;
+-				fh.filename = ZSTR_VAL(opened_path);
 -			}
 -		}
 +			// restore previous value, so php_ini_loaded_file() works as expected

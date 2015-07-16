@@ -133,7 +133,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		rel	0.2
 %define		subver	beta1
 %define		orgname	php
-%define		ver_suffix 7.0
+%define		ver_suffix 70
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP

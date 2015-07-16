@@ -153,7 +153,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	4
+%define		rel	1
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -164,7 +164,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.6.9
+Version:	5.6.11
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -173,7 +173,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	f6b90cd0503310c38e9573bae1eb38c7
+# Source0-md5:	e463c557b20a7ad3a3397683b3067ea7
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -232,7 +232,6 @@ Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 Patch69:	fpm-conf-split.patch
 Patch70:	mysqlnd-ssl.patch
-Patch71:	libvpx2.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -331,7 +330,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		hashver		1.0
 %define		intlver		1.1.0
 %define		jsonver		1.2.1
-%define		opcachever	7.0.4-dev
+%define		opcachever	7.0.6-dev
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.12.5
@@ -2083,7 +2082,6 @@ exit 1
 %patch66 -p1
 %patch67 -p1
 %patch70 -p1
-%patch71 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

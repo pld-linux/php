@@ -65,7 +65,7 @@
 %bcond_without	intl		# without Intl extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
-%bcond_without	mssql		# without MS SQL extension module
+%bcond_with	mssql		# without MS SQL extension module (ext removed)
 %bcond_with	mysql		# without ext/mysql support (ext removed)
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions

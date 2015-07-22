@@ -66,7 +66,7 @@
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_without	embed		# disable Embedded API
-%bcond_without	suhosin		# with suhosin patch
+%bcond_with	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_with	type_hints	# experimental support for strict typing/casting
@@ -117,7 +117,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	17
+%define		rel	18
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}

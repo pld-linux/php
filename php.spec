@@ -104,9 +104,9 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %if "%{pld_release}" == "ac"
 %define		magic_mime	/usr/share/file/magic.mime
 %define		_noautoreqdep libphp_common.*
-# if commandline --without was given. respect that
-%if 0%{!?_without_default_php:1}
-%define		with_default_php	1
+# if commandline --with was given. respect that
+%if 0%{!?_with_default_php:1}
+%undefine	with_default_php
 %endif
 %else
 %define		magic_mime	/usr/share/misc/magic.mime

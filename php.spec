@@ -131,7 +131,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 
 %define		rel	0.2
-%define		subver	beta1
+%define		subver	beta2
 %define		orgname	php
 %define		ver_suffix 70
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -152,7 +152,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~ab/php-%{version}%{subver}.tar.xz
-# Source0-md5:	e18aaad357f7bb8e416c300d64625fb8
+# Source0-md5:	e1f311a953413508fd16651e32236fce
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -313,7 +313,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.13.0dev
-%define		phpdbgver	0.4.0
+%define		phpdbgver	0.5.0
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}

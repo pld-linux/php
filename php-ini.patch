@@ -1,5 +1,5 @@
---- php-7.0.0beta1/php.ini~	2015-07-13 16:12:28.000000000 +0300
-+++ php-7.0.0beta1/php.ini	2015-07-13 16:13:25.566494326 +0300
+--- php-7.0.0beta2/php.ini~	2015-07-29 21:59:24.000000000 +0300
++++ php-7.0.0beta2/php.ini	2015-07-29 22:45:17.116355242 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -111,7 +111,7 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -825,47 +825,8 @@
+@@ -825,46 +825,8 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.
  ;
@@ -143,7 +143,6 @@
 -;extension=php_pdo_pgsql.dll
 -;extension=php_pdo_sqlite.dll
 -;extension=php_pgsql.dll
--;extension=php_pspell.dll
 -;extension=php_shmop.dll
 -
 -; The MIBS data available in the PHP distribution must be installed. 

@@ -1247,6 +1247,7 @@ Summary(pl.UTF-8):	Zend Optimizer+ - optymalizator kodu PHP
 Group:		Libraries
 URL:		https://wiki.php.net/rfc/optimizerplus
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(opcache) = %{opcachever}
 
 %description opcache

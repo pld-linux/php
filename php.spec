@@ -24,10 +24,10 @@
 # - some mods should be shared:
 #$ php -m
 # [PHP Modules]
-#+Core
+# Core
 # date
-#+ereg
 # libxml
+# phpdbg_webhelper
 # Reflection
 # standard
 #

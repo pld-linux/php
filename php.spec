@@ -359,6 +359,8 @@ mod_php module enables the Apache web server to understand and process
 the embedded PHP language in web pages. This package contains PHP
 version %{version}.
 
+%{?with_suhosin:This version is built with Suhosin-Patch for PHP.}
+
 %description -l fr.UTF-8
 PHP est un langage de script embarque dans le HTM. PHP essaye de
 rendre simple aux developpeurs d'ecrire des pages web generees

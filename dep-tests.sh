@@ -47,7 +47,7 @@ for ext in ${*:-$ext_dir/*.so}; do
 	# special: opcache is listed as "Zend Opcache"
 	[ "$ext" = "opcache" ] && ext="zend opcache"
 
-	grep -rlE '^(zend_)?extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_CTYPE=C LC_ALL= sort | xargs cat > $tmpini
+	grep -rlE '^(zend_)?extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_ALL=C sort | xargs cat > $tmpini
 	$php -n -d extension_dir=$ext_dir -c $tmpini -r "exit(extension_loaded('${ext}') ? 0 : 1);"
 	rc=$?
 	if [ $rc = 0 ]; then

@@ -27,6 +27,7 @@ dep_xmlreader='dom'
 dep_xmlrpc='xml'
 dep_xsl='dom'
 dep_snmp="$dep_spl spl snmp"
+dep_opcache='pcre'
 
 php=${PHP:-$(php-config --php-binary)}
 ext_dir=${EXTENSION_DIR:-$(php-config --extension-dir)}

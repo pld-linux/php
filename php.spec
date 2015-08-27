@@ -631,6 +631,7 @@ Obsoletes:	php52-devel
 Obsoletes:	php53-devel
 Obsoletes:	php54-devel
 Obsoletes:	php55-devel
+Obsoletes:	php70-devel
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.

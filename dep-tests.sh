@@ -34,7 +34,7 @@ conf_dir=${CONFIG_DIR:-$(php-config --sysconfdir)/conf.d $(php-config --sysconfd
 tmpini=$(mktemp)
 
 # poldek --sn ac-ready -u php-*
-for ext in ${1:-$ext_dir/*.so}; do
+for ext in ${*:-$ext_dir/*.so}; do
 	[ -f $ext ] || continue
 	ext=${ext##*/}; ext=${ext%.so}
 

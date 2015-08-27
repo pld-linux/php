@@ -16,7 +16,6 @@
 #   -  13K fileinfo.so php-pecl-fileinfo-1.0.4-8.amd64
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
-# - make additional headers and checking added by mail patch configurable
 # - modularize standard (output from pure php -m)?
 # - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
 #   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.

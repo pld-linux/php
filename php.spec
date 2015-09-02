@@ -612,6 +612,7 @@ Requires:	libtool
 %{?with_embed:Requires:	%{name}-embedded = %{epoch}:%{version}-%{release}}
 %{?with_pcre:Requires:	pcre-devel >= 8.10}
 Requires:	shtool
+Provides:	php-devel = %{epoch}:%{version}-%{release}
 Obsoletes:	php-devel
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel

@@ -581,6 +581,7 @@ Requires:	libtool
 %endif
 %{?with_pcre:Requires:	pcre-devel >= 8.10}
 Requires:	shtool
+Provides:	php-devel = %{epoch}:%{version}-%{release}
 Obsoletes:	php-devel
 Obsoletes:	php-pear-devel
 Obsoletes:	php4-devel

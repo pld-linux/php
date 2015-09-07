@@ -2609,8 +2609,11 @@ cp -pf Makefile.cli Makefile
 	phpbuilddir=%{_libdir}/%{name}/build \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
+# version the .phar files
+mv $RPM_BUILD_ROOT%{_bindir}/phar{,%{ver_suffix}}.phar
+mv $RPM_BUILD_ROOT%{_mandir}/man1/phar{,%{ver_suffix}}.phar.1
 # make link relative
-ln -sfn phar.phar $RPM_BUILD_ROOT%{_bindir}/phar
+ln -sfn phar%{ver_suffix}.phar $RPM_BUILD_ROOT%{_bindir}/phar
 
 # version suffix
 v=$(echo %{version} | cut -d. -f1-2)
@@ -3394,9 +3397,9 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/phar.ini
 %attr(755,root,root) %{php_extensiondir}/phar.so
 %attr(755,root,root) %{_bindir}/phar
-%attr(755,root,root) %{_bindir}/phar.phar
+%attr(755,root,root) %{_bindir}/phar%{ver_suffix}.phar
 %{_mandir}/man1/phar.1*
-%{_mandir}/man1/phar.phar.1
+%{_mandir}/man1/phar%{ver_suffix}.phar.1
 %endif
 
 %if %{with posix}

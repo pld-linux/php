@@ -244,7 +244,7 @@ BuildRequires:	libpng-devel >= 1.0.8
 %{?with_webp:BuildRequires:	libvpx-devel}
 BuildRequires:	tokyocabinet-devel
 %if "%{pld_release}" != "ac"
-BuildRequires:	libtool >= 2:2.2
+BuildRequires:	libtool >= 2:2.4.6
 %else
 BuildRequires:	libtool >= 1.4.3
 %endif
@@ -573,7 +573,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	autoconf >= 2.13
 Requires:	automake
 %if "%{pld_release}" != "ac"
-Requires:	libtool >= 2:2.2
+Requires:	libtool >= 2:2.4.6
 %else
 Requires:	libtool
 %endif

@@ -20,9 +20,8 @@ r3: fix a crash if /usr/share/zoneinfo doesn't exist (Raphael Geissert)
 r2: add filesystem trawl to set up name alias index
 r1: initial revision
 
-diff -up php-5.6.9RC1/ext/date/lib/parse_tz.c.systzdata php-5.6.9RC1/ext/date/lib/parse_tz.c
---- php-5.6.9RC1/ext/date/lib/parse_tz.c.systzdata	2015-04-30 00:00:18.000000000 +0200
-+++ php-5.6.9RC1/ext/date/lib/parse_tz.c	2015-04-30 06:36:47.019617321 +0200
+--- php-7.0.0RC1/ext/date/lib/parse_tz.c~	2015-08-27 12:06:04.000000000 +0300
++++ php-7.0.0RC1/ext/date/lib/parse_tz.c	2015-08-27 12:08:08.706661229 +0300
 @@ -20,6 +20,16 @@
  
  #include "timelib.h"
@@ -40,11 +39,10 @@ diff -up php-5.6.9RC1/ext/date/lib/parse_tz.c.systzdata php-5.6.9RC1/ext/date/li
  #include <stdio.h>
  
  #ifdef HAVE_LOCALE_H
-@@ -31,7 +41,12 @@
- #else
- #include <strings.h>
+@@ -43,7 +43,11 @@
  #endif
-+
+ 
+ #define TIMELIB_SUPPORTS_V2DATA
 +#ifndef HAVE_SYSTEM_TZDATA
  #include "timezonedb.h"
 +#endif

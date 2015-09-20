@@ -1,3 +1,5 @@
+# TODO 7.0
+# - restore libphp_common.so (lost in f4ee12ea)
 # TODO 5.6:
 # - phpdbg: link with libphp_common
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()

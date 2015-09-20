@@ -1,5 +1,5 @@
---- php-7.0.0beta2/php.ini~	2015-07-29 21:59:24.000000000 +0300
-+++ php-7.0.0beta2/php.ini	2015-07-29 22:45:17.116355242 +0300
+--- php-7.0.0RC3/php.ini~	2015-09-20 21:20:29.000000000 +0300
++++ php-7.0.0RC3/php.ini	2015-09-20 21:25:50.349958427 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -145,8 +145,8 @@
 -;extension=php_pgsql.dll
 -;extension=php_shmop.dll
 -
--; The MIBS data available in the PHP distribution must be installed. 
--; See http://www.php.net/manual/en/snmp.installation.php 
+-; The MIBS data available in the PHP distribution must be installed.
+-; See http://www.php.net/manual/en/snmp.installation.php
 -;extension=php_snmp.dll
 -
 -;extension=php_soap.dll
@@ -155,8 +155,8 @@
 -;extension=php_tidy.dll
 -;extension=php_xmlrpc.dll
 -;extension=php_xsl.dll
-+; Ideally in PLD Linux you should install appropriate php7.0-<extension> or
-+; php7.0-pecl-<extension> package.
++; Ideally in PLD Linux you should install appropriate php70-<extension> or
++; php70-pecl-<extension> package.
  
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;

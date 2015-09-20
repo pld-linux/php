@@ -276,7 +276,6 @@ BuildRequires:	xz
 %if %{with sqlite3} || %{with pdo_sqlite}
 BuildRequires:	sqlite3-devel >= 3.3.9
 %endif
-BuildRequires:	t1lib-devel
 %{?with_tidy:BuildRequires:	tidy-devel}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
 %{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel >= 0.54.1}
@@ -2423,7 +2422,6 @@ for sapi in $sapis; do
 	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	%{!?with_pdo_sqlite:--without-pdo-sqlite} \
 	%{__with_without sqlite3 sqlite3 shared,/usr} \
-	--with-t1lib=shared \
 	%{?with_tidy:--with-tidy=shared} \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
 	%{__with_without xmlrpc xmlrpc shared,/usr} \

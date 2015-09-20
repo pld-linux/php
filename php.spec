@@ -310,7 +310,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		opcachever	7.0.6-dev
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
-%define		zipver		1.13.0dev
+%define		zipver		1.13.0
 %define		phpdbgver	0.5.0
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}

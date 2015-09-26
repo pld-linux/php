@@ -1,5 +1,3 @@
-# TODO 7.0
-# - restore libphp_common.so (lost in f4ee12ea)
 # TODO 5.6:
 # - phpdbg: link with libphp_common
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
@@ -131,7 +129,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.3
+%define		rel	0.4
 %define		subver	RC3
 %define		orgname	php
 %define		ver_suffix 70
@@ -3002,7 +3000,7 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
-#%attr(755,root,root) %{_libdir}/libphp_common-*.so
+%attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
 
 %doc ext/session/mod_files.sh
@@ -3012,7 +3010,7 @@ fi
 %doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
-#%attr(755,root,root) %{_libdir}/libphp_common.so
+%attr(755,root,root) %{_libdir}/libphp_common.so
 %{_libdir}/libphp_common.la
 %{_includedir}/php
 %{_libdir}/%{name}/build

@@ -79,7 +79,6 @@
 %bcond_without	mbstring	# without mbstring extension module
 %bcond_without	mcrypt		# without mbcrypt extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
-%bcond_with	mysql		# without ext/mysql support (ext removed)
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
 %bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
@@ -1099,27 +1098,6 @@ support.
 
 %description mcrypt -l pl.UTF-8
 Moduł PHP dodający możliwość szyfrowania poprzez bibliotekę mcrypt.
-
-%package mysql
-Summary:	MySQL database module for PHP
-Summary(pl.UTF-8):	Moduł bazy danych MySQL dla PHP
-Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam bancos de dados MySQL
-Group:		Libraries
-URL:		http://www.php.net/manual/en/book.mysql.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
-Provides:	php(mysql)
-Obsoletes:	php-mysql < 4:5.3.28-7
-
-%description mysql
-This is a dynamic shared object (DSO) for PHP that will add MySQL
-database support.
-
-%description mysql -l pl.UTF-8
-Moduł PHP umożliwiający dostęp do bazy danych MySQL.
-
-%description mysql -l pt_BR.UTF-8
-Um módulo para aplicações PHP que usam bancos de dados MySQL.
 
 %package mysqli
 Summary:	MySQLi module for PHP
@@ -2482,7 +2460,7 @@ generate_inifiles() {
 		[ "$mod" = "spl" ] && conf="SPL.ini"
 		# session needs to be loaded before php-pecl-http, php-pecl-memcache, php-pecl-session_mysql
 		[ "$mod" = "session" ] && conf="Session.ini"
-		# mysqlnd needs to be loaded before mysql,mysqli,pdo_mysqli
+		# mysqlnd needs to be loaded before mysqli,pdo_mysqli
 		[ "$mod" = "mysqlnd" ] && conf="MySQLND.ini"
 		echo "+ $conf"
 		cat > conf.d/$conf <<-EOF
@@ -2813,7 +2791,6 @@ fi
 %extension_scripts ldap
 %extension_scripts mbstring
 %extension_scripts mcrypt
-%extension_scripts mysql
 %extension_scripts mysqli
 %extension_scripts mysqlnd
 %extension_scripts oci8
@@ -3140,14 +3117,6 @@ fi
 %doc ext/mcrypt/{CREDITS,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mcrypt.ini
 %attr(755,root,root) %{php_extensiondir}/mcrypt.so
-%endif
-
-%if %{with mysql}
-%files mysql
-%defattr(644,root,root,755)
-%doc ext/mysql/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysql.ini
-%attr(755,root,root) %{php_extensiondir}/mysql.so
 %endif
 
 %if %{with mysqli}

@@ -46,7 +46,6 @@
 %bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 %bcond_with	zts		# Zend Thread Safety
 # - SAPI
-%bcond_with	apache1		# disable building Apache 1.3.x SAPI (sapi removed)
 %bcond_without	apache2		# disable building Apache 2.x SAPI
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM SAPI
@@ -114,7 +113,6 @@
 
 # disable all sapis
 %if %{with gcov}
-%undefine	with_apache1
 %undefine	with_apache2
 %undefine	with_cgi
 %undefine	with_litespeed
@@ -138,12 +136,6 @@
 %ifnarch %{ix86} %{x8664} x32
 # unsupported, see sapi/cgi/fpm/fpm_atomic.h
 %undefine	with_fpm
-%endif
-
-%if 0
-%if %{without apache1} && %{without apache2}
-ERROR: You need to select at least one Apache SAPI to build shared modules.
-%endif
 %endif
 
 # filter depends on pcre
@@ -304,9 +296,6 @@ BuildRequires:	sqlite3-devel >= 3.3.9
 %{?with_odbc:BuildRequires:	unixODBC-devel}
 %{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel >= 0.54.1}
 BuildRequires:	zlib-devel >= 1.0.9
-%if %{with apache1}
-BuildRequires:	apache1-devel
-%endif
 %if %{with apache2}
 BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -401,24 +390,6 @@ PHP - це мова написання скриптів, що вбудовуют
 пропонує інтеграцію з багатьма СУБД, тому написання скриптів для
 роботи з базами даних є доволі простим. Найбільш популярне
 використання PHP - заміна для CGI скриптів.
-
-%package -n apache1-mod_%{name}
-Summary:	PHP DSO module for Apache 1.3.x
-Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 1.3.x
-Group:		Development/Languages/PHP
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	apache1(EAPI) >= 1.3.33-2
-Requires:	apache1-mod_mime
-Provides:	webserver(php) = %{version}
-Obsoletes:	apache-mod_php < 1:4.1.1
-Obsoletes:	apache1-mod_php < 4:5.3.28-7
-Obsoletes:	phpfi
-
-%description -n apache1-mod_%{name}
-PHP as DSO module for Apache 1.3.x.
-
-%description -n apache1-mod_%{name} -l pl.UTF-8
-PHP jako moduł DSO (Dynamic Shared Object) dla Apache 1.3.x.
 
 %package -n apache-mod_%{name}
 Summary:	PHP DSO module for Apache 2.x
@@ -2294,9 +2265,6 @@ fpm
 %if %{with embed}
 embed
 %endif
-%if %{with apache1}
-apxs1
-%endif
 %if %{with apache2}
 apxs2
 %endif
@@ -2326,10 +2294,6 @@ for sapi in $sapis; do
 	embed)
 		sapi_args='--disable-cli --disable-cgi --enable-embed'
 		;;
-	apxs1)
-		ver=$(rpm -q --qf '%{V}' apache1-devel)
-		sapi_args="--disable-cli --disable-cgi --with-apxs=%{apxs1} --with-apache-version=$ver"
-	;;
 	apxs2)
 		ver=$(rpm -q --qf '%{V}' apache-devel)
 		sapi_args="--disable-cli --disable-cgi --with-apxs2=%{apxs2} --with-apache-version=$ver"
@@ -2475,10 +2439,6 @@ cp -af Makefile.cli Makefile
 %{__make} build-modules \
 	MYSQLND_SHARED_LIBADD="-lssl -lcrypto"
 
-%if %{with apache1}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache/libphp7.la -f Makefile.apxs1
-%endif
-
 %if %{with apache2}
 %{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp7.la -f Makefile.apxs2
 %endif
@@ -2622,13 +2582,6 @@ ln -sfn phar%{ver_suffix}.phar $RPM_BUILD_ROOT%{_bindir}/phar
 # version suffix
 v=$(echo %{version} | cut -d. -f1-2)
 
-# install Apache1 DSO module
-%if %{with apache1}
-libtool --mode=install install -p sapi/apache/libphp7.la $RPM_BUILD_ROOT%{_libdir}/apache1
-mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp7{,-$v}.so
-ln -s libphp7-$v.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp7.so
-%endif
-
 # install Apache2 DSO module
 %if %{with apache2}
 libtool --mode=install install -p sapi/apache2handler/libphp7.la $RPM_BUILD_ROOT%{_libdir}/apache
@@ -2702,12 +2655,6 @@ ln -sf php%{ver_suffix} $RPM_BUILD_ROOT%{_bindir}/php
 cp -p php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 
-%if %{with apache1}
-cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/apache/conf.d/70_mod_php.conf
-cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache.ini
-%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache1/libphp7.la
-%endif
-
 %if %{with apache2}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
@@ -2762,16 +2709,6 @@ sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_lib
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
-%post -n apache1-mod_%{name}
-if [ "$1" = "1" ]; then
-	%service -q apache restart
-fi
-
-%postun -n apache1-mod_%{name}
-if [ "$1" = "0" ]; then
-	%service -q apache restart
-fi
 
 %post -n apache-mod_%{name}
 if [ "$1" = "1" ]; then
@@ -2940,16 +2877,6 @@ fi
 %extension_scripts xsl
 %extension_scripts zip
 %extension_scripts zlib
-
-%if %{with apache1}
-%files -n apache1-mod_%{name}
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
-%dir %{_sysconfdir}/apache.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
-%attr(755,root,root) %{_libdir}/apache1/libphp7.so
-%attr(755,root,root) %{_libdir}/apache1/libphp7-*.*.so
-%endif
 
 %if %{with apache2}
 %files -n apache-mod_%{name}

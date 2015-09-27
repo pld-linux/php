@@ -1,5 +1,4 @@
 # TODO 5.6:
-# - phpdbg: link with libphp_common
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
 # TODO 5.4:
@@ -129,7 +128,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.4
+%define		rel	0.5
 %define		subver	RC3
 %define		orgname	php
 %define		ver_suffix 70

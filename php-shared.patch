@@ -83,3 +83,63 @@
  	$(BUILD_CLI)
  
  install-cli: $(SAPI_CLI_PATH)
+--- php-7.0.0RC3/sapi/phpdbg/Makefile.frag~	2015-09-16 15:49:38.000000000 +0300
++++ php-7.0.0RC3/sapi/phpdbg/Makefile.frag	2015-09-27 21:24:44.370536565 +0300
+@@ -2,10 +2,10 @@
+ 
+ phpdbg-shared: $(BUILD_SHARED)
+ 
+-$(BUILD_SHARED): $(PHP_GLOBAL_OBJS) $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
++$(BUILD_SHARED): libphp_common.la $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
+ 	$(BUILD_PHPDBG_SHARED)
+ 
+-$(BUILD_BINARY): $(PHP_GLOBAL_OBJS) $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
++$(BUILD_BINARY): libphp_common.la $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
+ 	$(BUILD_PHPDBG)
+ 
+ %.c: %.y
+--- php-7.0.0RC3/sapi/phpdbg/config.m4~	2015-09-16 15:49:38.000000000 +0300
++++ php-7.0.0RC3/sapi/phpdbg/config.m4	2015-09-27 21:25:34.413134698 +0300
+@@ -40,7 +40,7 @@
+   
+   BUILD_PHPDBG="\$(LIBTOOL) --mode=link \
+         \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \
+-                \$(PHP_GLOBAL_OBJS) \
++                libphp_common.la \
+                 \$(PHP_BINARY_OBJS) \
+                 \$(PHP_PHPDBG_OBJS) \
+                 \$(EXTRA_LIBS) \
+@@ -50,7 +50,7 @@
+ 
+   BUILD_PHPDBG_SHARED="\$(LIBTOOL) --mode=link \
+         \$(CC) -shared -Wl,-soname,libphpdbg.so -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \
+-                \$(PHP_GLOBAL_OBJS) \
++                libphp_common.la \
+                 \$(PHP_BINARY_OBJS) \
+                 \$(PHP_PHPDBG_OBJS) \
+                 \$(EXTRA_LIBS) \
+--- php-7.0.0RC3/sapi/litespeed/Makefile.frag~	2015-09-16 15:49:38.000000000 +0300
++++ php-7.0.0RC3/sapi/litespeed/Makefile.frag	2015-09-27 21:26:36.783039512 +0300
+@@ -1,6 +1,6 @@
+ litespeed: $(SAPI_LITESPEED_PATH)
+ 
+-$(SAPI_LITESPEED_PATH): $(PHP_GLOBAL_OBJS) $(PHP_BINARY_OBJS) $(PHP_LITESPEED_OBJS)
++$(SAPI_LITESPEED_PATH): libphp_common.la $(PHP_BINARY_OBJS) $(PHP_LITESPEED_OBJS)
+ 	$(BUILD_LITESPEED)
+ 
+ install-litespeed: $(SAPI_LITESPEED_PATH)
+--- php-7.0.0RC3/sapi/litespeed/config.m4~	2015-09-16 15:49:38.000000000 +0300
++++ php-7.0.0RC3/sapi/litespeed/config.m4	2015-09-27 21:27:36.182790123 +0300
+@@ -17,10 +17,10 @@
+     ;;
+   *cygwin*)
+     SAPI_LITESPEED_PATH=sapi/litespeed/php.exe
+-    BUILD_LITESPEED="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_LITESPEED_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_LITESPEED_PATH)"
++    BUILD_LITESPEED="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_BINARY_OBJS) \$(PHP_LITESPEED_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_LITESPEED_PATH)"
+     ;;
+   *)
+-    BUILD_LITESPEED="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_LITESPEED_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_LITESPEED_PATH)"
++    BUILD_LITESPEED="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_BINARY_OBJS) \$(PHP_LITESPEED_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_LITESPEED_PATH)"
+     ;;
+   esac
+ 

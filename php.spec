@@ -79,7 +79,6 @@
 %bcond_without	mbstring	# without mbstring extension module
 %bcond_without	mcrypt		# without mbcrypt extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
-%bcond_with	mssql		# without MS SQL extension module (ext removed)
 %bcond_with	mysql		# without ext/mysql support (ext removed)
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
 %bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
@@ -243,7 +242,7 @@ BuildRequires:	elfutils-devel
 %{!?with_mysqlnd:BuildRequires:	mysql-devel}
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
-%if %{with mssql} || %{with sybase_ct} || %{with pdo_dblib}
+%if %{with sybase_ct} || %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
 BuildRequires:	freetype-devel >= 1:2.5.1
@@ -1100,23 +1099,6 @@ support.
 
 %description mcrypt -l pl.UTF-8
 Moduł PHP dodający możliwość szyfrowania poprzez bibliotekę mcrypt.
-
-%package mssql
-Summary:	MS SQL extension module for PHP
-Summary(pl.UTF-8):	Moduł MS SQL dla PHP
-Group:		Libraries
-URL:		http://www.php.net/manual/en/book.mssql.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(mssql)
-Obsoletes:	php-mssql < 4:5.3.28-7
-
-%description mssql
-This is a dynamic shared object (DSO) for PHP that will add MS SQL
-databases support through FreeTDS library.
-
-%description mssql -l pl.UTF-8
-Moduł PHP dodający obsługę baz danych MS SQL poprzez bibliotekę
-FreeTDS.
 
 %package mysql
 Summary:	MySQL database module for PHP
@@ -2389,7 +2371,6 @@ for sapi in $sapis; do
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	%{__with_without mcrypt mcrypt shared} \
 	%{?with_mm:--with-mm} \
-	%{?with_mssql:--with-mssql=shared} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
 	%{__with_without mysql mysql shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd}} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
@@ -2832,7 +2813,6 @@ fi
 %extension_scripts ldap
 %extension_scripts mbstring
 %extension_scripts mcrypt
-%extension_scripts mssql
 %extension_scripts mysql
 %extension_scripts mysqli
 %extension_scripts mysqlnd
@@ -3160,14 +3140,6 @@ fi
 %doc ext/mcrypt/{CREDITS,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mcrypt.ini
 %attr(755,root,root) %{php_extensiondir}/mcrypt.so
-%endif
-
-%if %{with mssql}
-%files mssql
-%defattr(644,root,root,755)
-%doc ext/mssql/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mssql.ini
-%attr(755,root,root) %{php_extensiondir}/mssql.so
 %endif
 
 %if %{with mysql}

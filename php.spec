@@ -2760,13 +2760,6 @@ sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_c
 # better solution?
 sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/acinclude.m4
 
-# somewhy there are installed static versions we don't use
-%if %{with apache1} || %{with apache2}
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/apache*/libphp*.a
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libphp*.a
-%{__rm} $RPM_BUILD_ROOT%{php_extensiondir}/*.a
-%endif
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 

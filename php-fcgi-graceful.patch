@@ -18,8 +18,8 @@ while ($i < 35) {
 echo "end!<br>\n";
 ?>
 
---- php-5.4.0alpha2/sapi/cgi/cgi_main.c~	2011-08-05 13:26:14.000000000 +0300
-+++ php-5.4.0alpha2/sapi/cgi/cgi_main.c	2011-08-05 13:57:17.564708456 +0300
+--- php-7.0.0beta1/sapi/cgi/cgi_main.c~	2015-07-13 16:14:53.000000000 +0300
++++ php-7.0.0beta1/sapi/cgi/cgi_main.c	2015-07-15 13:51:32.072326529 +0300
 @@ -101,6 +101,9 @@
   */
  static int parent = 1;
@@ -60,18 +60,19 @@ echo "end!<br>\n";
  	fcgi_request *request = NULL;
  	int repeats = 1;
  	int benchmark = 0;
-@@ -1579,9 +1596,13 @@
- 					parent = 0;
+@@ -2050,10 +2050,13 @@
+ 						 */
+ 						parent = 0;
  
- 					/* don't catch our signals */
--					sigaction(SIGTERM, &old_term, 0);
- 					sigaction(SIGQUIT, &old_quit, 0);
- 					sigaction(SIGINT,  &old_int,  0);
+-						/* don't catch our signals */
+-						sigaction(SIGTERM, &old_term, 0);
+ 						sigaction(SIGQUIT, &old_quit, 0);
+ 						sigaction(SIGINT,  &old_int,  0);
 +
-+					/* call graceful shutdown handler for SIGTERM */
-+					act.sa_flags = 0;
-+					act.sa_handler = fastcgi_graceful_shutdown;
-+					sigaction(SIGTERM, &act, &old_term);
- 					break;
- 				case -1:
- 					perror("php (pre-forking)");
++						/* call graceful shutdown handler for SIGTERM */
++						act.sa_flags = 0;
++						act.sa_handler = fastcgi_graceful_shutdown;
++						sigaction(SIGTERM, &act, &old_term);
+ 						break;
+ 					case -1:
+ 						perror("php (pre-forking)");

@@ -27,6 +27,7 @@ dep_xmlreader='dom'
 dep_xmlrpc='xml'
 dep_xsl='dom'
 dep_snmp="$dep_spl spl snmp"
+dep_opcache='pcre'
 
 php=${PHP:-$(php-config --php-binary)}
 ext_dir=${EXTENSION_DIR:-$(php-config --extension-dir)}
@@ -34,7 +35,7 @@ conf_dir=${CONFIG_DIR:-$(php-config --sysconfdir)/conf.d $(php-config --sysconfd
 tmpini=$(mktemp)
 
 # poldek --sn ac-ready -u php-*
-for ext in ${1:-$ext_dir/*.so}; do
+for ext in ${*:-$ext_dir/*.so}; do
 	[ -f $ext ] || continue
 	ext=${ext##*/}; ext=${ext%.so}
 
@@ -47,7 +48,7 @@ for ext in ${1:-$ext_dir/*.so}; do
 	# special: opcache is listed as "Zend Opcache"
 	[ "$ext" = "opcache" ] && ext="zend opcache"
 
-	grep -rlE '^(zend_)?extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_CTYPE=C LC_ALL= sort | xargs cat > $tmpini
+	grep -rlE '^(zend_)?extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_ALL=C sort | xargs cat > $tmpini
 	$php -n -d extension_dir=$ext_dir -c $tmpini -r "exit(extension_loaded('${ext}') ? 0 : 1);"
 	rc=$?
 	if [ $rc = 0 ]; then

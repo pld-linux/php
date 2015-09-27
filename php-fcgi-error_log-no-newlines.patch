@@ -1,14 +1,14 @@
---- php-5.6.6/sapi/cgi/cgi_main.c~	2015-02-27 18:09:34.000000000 +0200
-+++ php-5.6.6/sapi/cgi/cgi_main.c	2015-02-27 18:11:26.296171361 +0200
-@@ -737,12 +737,8 @@
+--- php-7.0/sapi/cgi/cgi_main.c~	2015-05-21 23:12:23.000000000 +0300
++++ php-7.0/sapi/cgi/cgi_main.c	2015-05-21 23:13:24.947976867 +0300
+@@ -701,12 +701,8 @@
  		request = (fcgi_request*) SG(server_context);
  		if (request) {
- 			int ret, len = strlen(message);
+ 			int ret, len = (int)strlen(message);
 -			char *buf = malloc(len+2);
  
 -			memcpy(buf, message, len);
 -			memcpy(buf + len, "\n", sizeof("\n"));
--			ret = fcgi_write(request, FCGI_STDERR, buf, len + 1);
+-			ret = fcgi_write(request, FCGI_STDERR, buf, (int)(len + 1));
 -			free(buf);
 +			ret = fcgi_write(request, FCGI_STDERR, message, len);
  			if (ret < 0) {

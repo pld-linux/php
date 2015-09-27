@@ -1,5 +1,5 @@
---- php-5.5.0alpha6/ext/pcre/config0.m4~	2013-03-19 18:08:15.000000000 +0200
-+++ php-5.5.0alpha6/ext/pcre/config0.m4	2013-03-19 18:09:26.732804962 +0200
+--- php-7.0/ext/pcre/config0.m4~	2015-05-24 14:39:04.000000000 +0300
++++ php-7.0/ext/pcre/config0.m4	2015-05-24 14:53:49.980250297 +0300
 @@ -11,7 +11,7 @@
  
    if test "$PHP_PCRE_REGEX" != "yes" && test "$PHP_PCRE_REGEX" != "no"; then
@@ -27,35 +27,35 @@
      
      AC_DEFINE(HAVE_PCRE, 1, [ ])
      PHP_ADD_INCLUDE($PCRE_INCDIR)
--    PHP_NEW_EXTENSION(pcre, php_pcre.c, no)
-+    PHP_NEW_EXTENSION(pcre, php_pcre.c, $ext_shared)
+-    PHP_NEW_EXTENSION(pcre, php_pcre.c, no,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
++    PHP_NEW_EXTENSION(pcre, php_pcre.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
      PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h])
 +    EXTRA_LIBS="$EXTRA_LIBS -lpcre"
    else
      AC_MSG_CHECKING([for PCRE library to use])
      AC_MSG_RESULT([bundled])
-@@ -61,7 +61,7 @@
-     				 pcrelib/pcre_tables.c pcrelib/pcre_valid_utf8.c \
-     				 pcrelib/pcre_version.c pcrelib/pcre_xclass.c"
-     PHP_PCRE_CFLAGS="-DHAVE_CONFIG_H -I@ext_srcdir@/pcrelib"
+@@ -61,7 +62,7 @@
+     				 pcrelib/pcre_version.c pcrelib/pcre_xclass.c \
+     				 pcrelib/pcre_jit_compile.c"
+     PHP_PCRE_CFLAGS="-DHAVE_CONFIG_H -I@ext_srcdir@/pcrelib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
 -    PHP_NEW_EXTENSION(pcre, $pcrelib_sources php_pcre.c, no,,$PHP_PCRE_CFLAGS)
 +    PHP_NEW_EXTENSION(pcre, $pcrelib_sources php_pcre.c, $ext_shared,,$PHP_PCRE_CFLAGS)
      PHP_ADD_BUILD_DIR($ext_builddir/pcrelib)
      PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h pcrelib/])
      AC_DEFINE(HAVE_BUNDLED_PCRE, 1, [ ])
---- php-5.3.1/ext/pcre/php_pcre.h	2009-11-30 20:59:04.046581246 +0200
-+++ php-5.3.1.pcre/ext/pcre/php_pcre.h	2009-11-30 21:38:06.435493243 +0000
+--- php-7.0/ext/pcre/php_pcre.h~	2015-05-21 17:57:06.000000000 +0300
++++ php-7.0/ext/pcre/php_pcre.h	2015-05-24 14:56:27.528425546 +0300
 @@ -34,7 +34,12 @@
  #endif
  
- PHPAPI char *php_pcre_replace(char *regex, int regex_len, char *subject, int subject_len, zval *replace_val, int is_callable_replace, int *result_len, int limit, int *replace_count TSRMLS_DC);
+ PHPAPI zend_string *php_pcre_replace(zend_string *regex, zend_string *subject_str, char *subject, int subject_len, zval *replace_val, int is_callable_replace, int limit, int *replace_count);
 +#if COMPILE_DL_PCRE
 +#define pcre_get_compiled_regex pcre_get_compiled_regex_p
-+extern PHPAPI pcre* (*pcre_get_compiled_regex)(char *regex, pcre_extra **extra, int *options TSRMLS_DC);
++extern PHPAPI pcre* (*pcre_get_compiled_regex)(zend_string *regex, pcre_extra **extra, int *options);
 +#else
- PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *options TSRMLS_DC);
+ PHPAPI pcre* pcre_get_compiled_regex(zend_string *regex, pcre_extra **extra, int *options);
 +#endif
- PHPAPI pcre* pcre_get_compiled_regex_ex(char *regex, pcre_extra **extra, int *preg_options, int *coptions TSRMLS_DC);
+ PHPAPI pcre* pcre_get_compiled_regex_ex(zend_string *regex, pcre_extra **extra, int *preg_options, int *coptions);
  
  extern zend_module_entry pcre_module_entry;
 --- php-5.3.1/ext/pcre/php_pcre.c	2009-11-30 21:10:01.370473754 +0200
@@ -66,7 +66,7 @@
  
 +#if COMPILE_DL_PCRE
 +#undef pcre_get_compiled_regex
-+PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *preg_options TSRMLS_DC);
++PHPAPI pcre* pcre_get_compiled_regex(zend_string *regex, pcre_extra **extra, int *options);
 +#endif
 +
  #include "ext/standard/php_string.h"
@@ -99,7 +99,7 @@
  
 +#if COMPILE_DL_PCRE
 +// will be visible in here
-+PHPAPI pcre* (*pcre_get_compiled_regex_p)(char *regex, pcre_extra **extra, int *options TSRMLS_DC);
++PHPAPI pcre* (*pcre_get_compiled_regex_p)(zend_string *regex, pcre_extra **extra, int *options);
 +#endif
 +
  #define DEFAULT_SECTION_NAME "Default Browser Capability Settings"
@@ -116,3 +116,15 @@
  
  [Zend Modules]
  %aDone
+--- php-7.0.0beta3/main/php_ini.c~	2015-08-26 18:50:15.000000000 +0300
++++ php-7.0.0beta3/main/php_ini.c	2015-08-26 22:33:59.126957396 +0300
+@@ -765,8 +765,8 @@
+  */
+ void php_ini_register_extensions(void)
+ {
+-	zend_llist_apply(&extension_lists.engine, php_load_zend_extension_cb);
+ 	zend_llist_apply(&extension_lists.functions, php_load_php_extension_cb);
++	zend_llist_apply(&extension_lists.engine, php_load_zend_extension_cb);
+ 
+ 	zend_llist_destroy(&extension_lists.engine);
+ 	zend_llist_destroy(&extension_lists.functions);

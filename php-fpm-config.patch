@@ -17,20 +17,8 @@
  
  ; syslog_facility is used to specify what type of program is logging the
  ; message. This lets syslogd specify that messages from different facilities
-@@ -115,3 +115,11 @@
- ; ports and different management options.  The name of the pool will be
- ; used in logs and stats. There is no limitation on the number of pools which
- ; FPM can handle. Your system will tell you anyway :)
-+
-+; Include one or more files. If glob(3) exists, it is used to include a bunch of
-+; files from a glob(3) pattern. This directive can be used everywhere in the
-+; file.
-+; Relative path can also be used. They will be prefixed by:
-+;  - the global prefix if it's been set (-p argument)
-+;  - @prefix@ otherwise
-+include=/etc/php/fpm.d/*.conf
---- php-5.6.5/sapi/fpm/php-fpm.conf-d.in~	2015-02-04 19:26:16.000000000 +0200
-+++ php-5.6.5/sapi/fpm/php-fpm.conf-d.in	2015-02-04 19:27:25.275218535 +0200
+--- php-5.6.5/sapi/fpm/www.conf.in~	2015-02-04 19:26:16.000000000 +0200
++++ php-5.6.5/sapi/fpm/www.conf.in	2015-02-04 19:27:25.275218535 +0200
 @@ -32,7 +32,7 @@
  ;                            specific port;
  ;   '/path/to/unix/socket' - to listen on a unix socket.
@@ -82,16 +70,18 @@
  
  			ths = document.getElementsByTagName("th");
  			for (var i=0; i<ths.length; i++) {
---- php-5.6.2/sapi/fpm/Makefile.frag~	2014-10-27 08:18:59.000000000 +0200
-+++ php-5.6.2/sapi/fpm/Makefile.frag	2014-10-27 08:19:37.524436179 +0200
-@@ -12,8 +12,8 @@
+--- php7.0-7.0/sapi/fpm/Makefile.frag~	2015-05-21 17:57:06.000000000 +0300
++++ php7.0-7.0/sapi/fpm/Makefile.frag	2015-05-23 11:01:51.383332821 +0300
+@@ -11,9 +11,9 @@
+ 	@$(INSTALL) -m 0755 $(SAPI_FPM_PATH) $(INSTALL_ROOT)$(sbindir)/$(program_prefix)php-fpm$(program_suffix)$(EXEEXT)
  
  	@echo "Installing PHP FPM config:        $(INSTALL_ROOT)$(sysconfdir)/" && \
- 	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/fpm.d || :
+-	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d || :
 -	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf.default || :
--	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf-d $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf.default || :
+-	@$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d/www.conf.default || :
++	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/fpm.d || :
 +	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf || :
-+	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf-d $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf || :
++	@$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf || :
  
  	@echo "Installing PHP FPM man page:      $(INSTALL_ROOT)$(mandir)/man8/"
  	@$(mkinstalldirs) $(INSTALL_ROOT)$(mandir)/man8

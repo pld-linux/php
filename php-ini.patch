@@ -1,9 +1,8 @@
-diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
---- php-5.6.12.orig/php.ini	2015-08-06 09:55:57.000000000 +0200
-+++ php-5.6.12/php.ini	2015-08-08 09:21:30.507130679 +0200
+--- php-7.0.0RC3/php.ini~	2015-09-20 21:20:29.000000000 +0300
++++ php-7.0.0RC3/php.ini	2015-09-20 21:25:50.349958427 +0300
 @@ -82,6 +82,20 @@
- ; much more verbose when it comes to errors. We recommend using the
- ; development version only in development environments, as errors shown to
+ ; much more verbose when it comes to errors. We recommending using the
+ ; development version only in development environments as errors shown to
  ; application users can inadvertently leak otherwise secure information.
 +;
 +; This is the default settings file for new PHP installations from
@@ -20,9 +19,9 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
 +; few options)
 +
  
- ; This is php.ini-production INI file.
- 
-@@ -175,7 +189,7 @@
+ ;;;;;;;;;;;;;;;;;;;
+ ; Quick Reference ;
+@@ -198,7 +212,7 @@
  ;user_ini.filename = ".user.ini"
  
  ; To disable this feature set this option to empty value
@@ -31,7 +30,7 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
  
  ; TTL for user-defined php.ini files (time-to-live) in seconds. Default is 300 seconds (5 minutes)
  ;user_ini.cache_ttl = 300
-@@ -199,7 +213,7 @@
+@@ -223,7 +237,7 @@
  ; Development Value: Off
  ; Production Value: Off
  ; http://php.net/short-open-tag
@@ -40,7 +39,7 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
  
  ; Allow ASP-style <% %> tags.
  ; http://php.net/asp-tags
-@@ -360,7 +374,7 @@
+@@ -372,7 +372,7 @@
  ; threat in any way, but it makes it possible to determine whether you use PHP
  ; on your server or not.
  ; http://php.net/expose-php
@@ -49,7 +48,7 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
  
  ;;;;;;;;;;;;;;;;;;;
  ; Resource Limits ;
-@@ -731,7 +745,7 @@
+@@ -725,7 +725,7 @@
  
  ; Directory in which the loadable extensions (modules) reside.
  ; http://php.net/extension-dir
@@ -58,7 +57,7 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
  ; On windows:
  ; extension_dir = "ext"
  
-@@ -745,53 +759,6 @@
+@@ -760,53 +760,6 @@
  ; http://php.net/enable-dl
  enable_dl = Off
  
@@ -112,14 +111,14 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -869,48 +836,8 @@
+@@ -825,46 +825,8 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.
  ;
 -; Windows Extensions
 -; Note that ODBC support is built in, so no dll is needed for it.
--; Note that many DLL files are located in the extensions/ (PHP 4) ext/ (PHP 5)
--; extension folders as well as the separate PECL DLL download (PHP 5).
+-; Note that many DLL files are located in the extensions/ (PHP 4) ext/ (PHP 5+)
+-; extension folders as well as the separate PECL DLL download (PHP 5+).
 -; Be sure to appropriately set the extension_dir directive.
 -;
 -;extension=php_bz2.dll
@@ -134,7 +133,6 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
 -;extension=php_ldap.dll
 -;extension=php_mbstring.dll
 -;extension=php_exif.dll      ; Must be after mbstring as it depends on it
--;extension=php_mysql.dll
 -;extension=php_mysqli.dll
 -;extension=php_oci8_12c.dll  ; Use with Oracle Database 12c Instant Client
 -;extension=php_openssl.dll
@@ -147,23 +145,22 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
 -;extension=php_pgsql.dll
 -;extension=php_shmop.dll
 -
--; The MIBS data available in the PHP distribution must be installed. 
--; See http://www.php.net/manual/en/snmp.installation.php 
+-; The MIBS data available in the PHP distribution must be installed.
+-; See http://www.php.net/manual/en/snmp.installation.php
 -;extension=php_snmp.dll
 -
 -;extension=php_soap.dll
 -;extension=php_sockets.dll
 -;extension=php_sqlite3.dll
--;extension=php_sybase_ct.dll
 -;extension=php_tidy.dll
 -;extension=php_xmlrpc.dll
 -;extension=php_xsl.dll
-+; Ideally in PLD Linux you should install appropriate php-<extension> or
-+; php-pecl-<extension> package.
++; Ideally in PLD Linux you should install appropriate php70-<extension> or
++; php70-pecl-<extension> package.
  
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;
-@@ -948,19 +875,19 @@
+@@ -964,19 +876,19 @@
  ; Use of this INI entry is deprecated, use global input_encoding instead.
  ; If empty, default_charset or input_encoding or iconv.input_encoding is used.
  ; The precedence is: default_charset < intput_encoding < iconv.input_encoding
@@ -186,17 +183,7 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
  
  [intl]
  ;intl.default_locale =
-@@ -1174,6 +1101,9 @@
- ; http://php.net/mysql.connect-timeout
- mysql.connect_timeout = 60
- 
-+; The name of the character set to use as the default character set.
-+;mysql.connect_charset=utf8
-+
- ; Trace mode. When trace_mode is active (=On), warnings for table/index scans and
- ; SQL-Errors will be displayed.
- ; http://php.net/mysql.trace-mode
-@@ -1213,6 +1143,9 @@
+@@ -1191,6 +1104,9 @@
  ; http://php.net/mysqli.default-socket
  mysqli.default_socket =
  
@@ -206,7 +193,7 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
  ; Default host for mysql_connect() (doesn't apply in safe mode).
  ; http://php.net/mysqli.default-host
  mysqli.default_host =
-@@ -1379,7 +1312,7 @@
+@@ -1357,7 +1273,7 @@
  
  [browscap]
  ; http://php.net/browscap
@@ -215,16 +202,7 @@ diff -ruN php-5.6.12.orig/php.ini php-5.6.12/php.ini
  
  [Session]
  ; Handler used to store/retrieve data.
-@@ -1677,7 +1610,7 @@
- [Assertion]
- ; Assert(expr); active by default.
- ; http://php.net/assert.active
--;assert.active = On
-+assert.active = Off
- 
- ; Issue a PHP warning for each failed assertion.
- ; http://php.net/assert.warning
-@@ -1839,7 +1772,7 @@
+@@ -1822,7 +1738,7 @@
  
  ; Sets the directory name where SOAP extension will put cache files.
  ; http://php.net/soap.wsdl-cache-dir

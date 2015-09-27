@@ -1,5 +1,4 @@
 # TODO 5.6:
-# - phpdbg: link with libphp_common
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
 # TODO 5.4:

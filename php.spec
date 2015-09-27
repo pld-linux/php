@@ -101,7 +101,6 @@
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
-%bcond_with	sybase_ct	# without Sybase-CT extension module (ext removed in 7.0.0)
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
@@ -197,7 +196,6 @@ Patch27:	%{orgname}-config-dir.patch
 Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
 Patch34:	%{orgname}-libtool.patch
-Patch35:	%{orgname}-tds.patch
 #Patch36:	%{orgname}-mysql-charsetphpini.patch
 #Patch37:	%{orgname}-mysqli-charsetphpini.patch
 #Patch38:	%{orgname}-pdo_mysql-charsetphpini.patch
@@ -241,7 +239,7 @@ BuildRequires:	elfutils-devel
 %{!?with_mysqlnd:BuildRequires:	mysql-devel}
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
-%if %{with sybase_ct} || %{with pdo_dblib}
+%if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
 BuildRequires:	freetype-devel >= 1:2.5.1
@@ -1681,24 +1679,6 @@ baz danych. SQLite sam jest serwerem. Biblioteka SQLite czyta i
 zapisuje dane bezpośrednio z/do plików baz danych znajdujących się na
 dysku.
 
-%package sybase-ct
-Summary:	Sybase-CT extension module for PHP
-Summary(pl.UTF-8):	Moduł Sybase-CT dla PHP
-Group:		Libraries
-URL:		http://www.php.net/manual/en/book.sybase.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(sybase-ct)
-Obsoletes:	php-sybase
-Obsoletes:	php-sybase-ct < 4:5.3.28-7
-
-%description sybase-ct
-This is a dynamic shared object (DSO) for PHP that will add Sybase and
-MS SQL databases support through CT-lib.
-
-%description sybase-ct -l pl.UTF-8
-Moduł PHP dodający obsługę baz danych Sybase oraz MS SQL poprzez
-CT-lib.
-
 %package sysvmsg
 Summary:	SysV msg extension module for PHP
 Summary(pl.UTF-8):	Moduł SysV msg dla PHP
@@ -1978,7 +1958,6 @@ cp -p php.ini-production php.ini
 %if "%{pld_release}" != "ac"
 %patch34 -p1
 %endif
-%{?with_sybase_ct:%patch35 -p1}
 #%patch36 -p1
 #%patch37 -p1
 #%patch38 -p1
@@ -2368,7 +2347,6 @@ for sapi in $sapis; do
 	%{?with_recode:--with-recode=shared} \
 	%{__with_without ereg regex system} \
 	%{?with_snmp:--with-snmp=shared} \
-	%{?with_sybase_ct:--with-sybase-ct=shared,/usr} \
 	%{!?with_pdo_sqlite:--without-pdo-sqlite} \
 	%{__with_without sqlite3 sqlite3 shared,/usr} \
 	%{?with_tidy:--with-tidy=shared} \
@@ -2820,7 +2798,6 @@ fi
 %extension_scripts sockets
 %extension_scripts spl
 %extension_scripts sqlite3
-%extension_scripts sybase-ct
 %extension_scripts sysvmsg
 %extension_scripts sysvsem
 %extension_scripts sysvshm
@@ -3354,14 +3331,6 @@ fi
 %doc ext/sqlite3/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sqlite3.ini
 %attr(755,root,root) %{php_extensiondir}/sqlite3.so
-%endif
-
-%if %{with sybase_ct}
-%files sybase-ct
-%defattr(644,root,root,755)
-%doc ext/sybase_ct/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sybase_ct.ini
-%attr(755,root,root) %{php_extensiondir}/sybase_ct.so
 %endif
 
 %files sysvmsg

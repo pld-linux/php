@@ -151,7 +151,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	0.5
+%define		rel	1
 %define		subver	RC3
 %define		orgname	php
 %define		ver_suffix 70

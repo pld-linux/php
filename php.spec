@@ -166,7 +166,7 @@ Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування 
 Name:		%{orgname}%{php_suffix}
 Version:	5.6.14
 Release:	%{rel}
-Epoch:		1
+Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD

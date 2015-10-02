@@ -117,7 +117,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %endif
 %endif
 
-%define		rel	21
+%define		rel	22
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -217,8 +217,9 @@ Patch70:	mysql-lib-ver-mismatch.patch
 # git diff php-5.3.29..PHP-5.6 ./ext/fileinfo/Makefile.frag >> ~/rpm/packages/php/php-fileinfo.patch
 # git diff php-5.3.29..PHP-5.6 ./ext/fileinfo/data_file.c >> ~/rpm/packages/php/php-fileinfo.patch
 Patch71:	php-fileinfo.patch
+# Patch71-md5:  771e4934132c5f5c968248c954d1ef6e
 Patch72:	x32-suhosin.patch
-# Patch71-md5:	771e4934132c5f5c968248c954d1ef6e
+Patch73:	php-bug-68486.patch
 # Fixes for security bugs
 # https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
 # also from RHEL6/CentOS7
@@ -2085,6 +2086,7 @@ gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch67 -p1
 %patch70 -p1
 %patch71 -p1
+%patch73 -p1
 
 %patch220 -p1
 

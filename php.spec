@@ -141,7 +141,7 @@
 %endif
 
 %define		rel	1
-%define		subver	RC3
+%define		subver	RC4
 %define		orgname	php
 %define		ver_suffix 70
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -162,7 +162,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~ab/php-%{version}%{subver}.tar.xz
-# Source0-md5:	8ee634c37dabd88562e2d3ff978cfbe1
+# Source0-md5:	4a0af8c5f4f2133eb2eb6cf79d14cf64
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -266,7 +266,7 @@ BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
-BuildRequires:	openssl-devel >= 0.9.7d
+BuildRequires:	openssl-devel >= 0.9.8
 %endif
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}

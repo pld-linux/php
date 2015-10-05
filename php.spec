@@ -140,7 +140,7 @@
 %undefine	with_filter
 %endif
 
-%define		rel	1
+%define		rel	2
 %define		subver	RC4
 %define		orgname	php
 %define		ver_suffix 70
@@ -2523,7 +2523,7 @@ v=$(echo %{version} | cut -d. -f1-2)
 %if %{with apache2}
 libtool --mode=install install -p sapi/apache2handler/libphp7.la $RPM_BUILD_ROOT%{_libdir}/apache
 mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp7{,-$v}.so
-ln -s libphp7-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp7.so
+ln -s libphp7-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/mod_php.so
 %endif
 
 # install litespeed sapi
@@ -2731,6 +2731,9 @@ if [ ! -e /usr/share/browscap/php_browscap.ini ]; then
 	%{__sed} -i -e 's#^browscap = /usr/share/browscap/php_browscap.ini#;&#' %{_sysconfdir}/php.ini
 fi
 
+%triggerpostun -n apache-mod_%{name} -- apache-mod_%{name} < 4:7.0.0-2.RC4
+sed -i -e 's#modules/libphp[57].so#modules/mod_php.so#g' /etc/httpd/conf.d/*_mod_php.conf
+
 # common macros called at extension post/postun scriptlet
 %define	extension_scripts() \
 %post %1 \
@@ -2818,7 +2821,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
-%attr(755,root,root) %{_libdir}/apache/libphp7.so
+%attr(755,root,root) %{_libdir}/apache/mod_php.so
 %attr(755,root,root) %{_libdir}/apache/libphp7-*.*.so
 %endif
 

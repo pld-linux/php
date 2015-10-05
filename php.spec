@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	13
+%define		rel	14
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2324,14 +2324,14 @@ v=$(echo %{version} | cut -d. -f1-2)
 %if %{with apache1}
 libtool --mode=install install -p sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
 mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-$v}.so
-ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5.so
+ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache1/mod_php.so
 %endif
 
 # install Apache2 DSO module
 %if %{with apache2}
 libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
 mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-$v}.so
-ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/libphp5.so
+ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/mod_php.so
 %endif
 
 # install CGI
@@ -2511,6 +2511,12 @@ if [ ! -e /usr/share/browscap/php_browscap.ini ]; then
 	%{__sed} -i -e 's#^browscap = /usr/share/browscap/php_browscap.ini#;&#' %{_sysconfdir}/php.ini
 fi
 
+%triggerpostun -n apache1-mod_%{name} -- apache1-mod_%{name} < 4:5.2.17-14
+sed -i -e 's#modules/libphp5.so#modules/mod_php.so#g' /etc/apache/conf.d/*_mod_php.conf
+
+%triggerpostun -n apache-mod_%{name} -- apache-mod_%{name} < 4:5.2.17-14
+sed -i -e 's#modules/libphp[57].so#modules/mod_php.so#g' /etc/httpd/conf.d/*_mod_php.conf
+
 # common macros called at extension post/postun scriptlet
 %define	extension_scripts() \
 %post %1 \
@@ -2601,7 +2607,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/apache/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache.ini
-%attr(755,root,root) %{_libdir}/apache1/libphp5.so
+%attr(755,root,root) %{_libdir}/apache1/mod_php.so
 %attr(755,root,root) %{_libdir}/apache1/libphp5-*.*.so
 %endif
 
@@ -2611,7 +2617,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
-%attr(755,root,root) %{_libdir}/apache/libphp5.so
+%attr(755,root,root) %{_libdir}/apache/mod_php.so
 %attr(755,root,root) %{_libdir}/apache/libphp5-*.*.so
 %endif
 

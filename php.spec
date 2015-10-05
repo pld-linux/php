@@ -276,7 +276,6 @@ BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 8.10}
 BuildRequires:	pkgconfig
-%{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}

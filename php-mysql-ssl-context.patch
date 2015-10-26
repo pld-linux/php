@@ -1,36 +1,146 @@
-; obey default context options
-; https://bugs.php.net/bug.php?id=68344
-diff -urbB php-5.6.12/ext/mysqlnd/mysqlnd_net.c php-5.6.12/ext/mysqlnd/mysqlnd_net.c
---- php-5.6.12/ext/mysqlnd/mysqlnd_net.c	2015-08-06 09:55:57.000000000 +0200
-+++ php-5.6.12/ext/mysqlnd/mysqlnd_net.c	2015-08-10 13:25:30.187912101 +0200
-@@ -29,6 +29,7 @@
- #include "mysqlnd_ext_plugin.h"
- #include "php_network.h"
- #include "zend_ini.h"
-+#include "ext/standard/file.h"
- #ifdef MYSQLND_COMPRESSION_ENABLED
- #include <zlib.h>
- #endif
-@@ -868,6 +868,21 @@ MYSQLND_METHOD(mysqlnd_net, enable_ssl)(
- 		DBG_RETURN(FAIL);
+commit 8292260515a904b4d515484145c78f33a06ae1ae
+Author: Andrey Hristov <andrey@php.net>
+Date:   Wed Oct 21 15:10:24 2015 +0200
+
+    Fix for Bug #68344 	MySQLi does not provide way to disable peer certificate validation
+
+diff --git a/ext/mysqli/tests/bug51647.phpt b/ext/mysqli/tests/bug51647.phpt
+index 78540f1..349d6db 100644
+--- a/ext/mysqli/tests/bug51647.phpt
++++ b/ext/mysqli/tests/bug51647.phpt
+@@ -65,9 +65,43 @@ $link->close();
+ 	} else {
+ 		if (!$row = $res->fetch_assoc())
+ 			printf("[006] [%d] %s\n", $link->errno, $link->error);
++		if (!strlen($row["Value"]))
++			printf("[007] Empty cipher. No encrytion!");
  	}
  
-+	if (FG(default_context)) {
-+		zval **tmpzval = NULL;
-+		int i = 0;
-+		/* copy values from default stream settings */
-+		char *opts[] = { "allow_self_signed", "cafile", "capath", "ciphers", "CN_match",
-+			"disable_compression", "local_cert", "local_pk", "no_ticket", "passphrase",
-+			"peer_fingerprint", "peer_name", "SNI_enabled", "SNI_server_certs", "SNI_server_name",
-+			"verify_depth", "verify_peer", "verify_peer_name", NULL };
-+		while (opts[i]) {
-+			if (php_stream_context_get_option(FG(default_context), "ssl", opts[i], &tmpzval) == SUCCESS)
-+				php_stream_context_set_option(context, "ssl", opts[i], *tmpzval);
-+			i++;
-+		}
+ 	var_dump($row);
++	$link->close();
++
++	if (!is_object($link = mysqli_init()))
++		printf("[008] Cannot create link\n");
++
++	if (!my_mysqli_real_connect($link, $host, $user, $passwd, $db, $port, $socket, MYSQLI_CLIENT_SSL)) {
++		printf("[009] Connect failed, [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error());
 +	}
 +
- 	if (net->data->options.ssl_key) {
- 		zval key_zval;
- 		ZVAL_STRING(&key_zval, net->data->options.ssl_key, 0);
++	if (!$res = $link->query('SHOW STATUS like "Ssl_cipher"')) {
++		if (1064 == $link->errno) {
++			/* ERROR 1064 (42000): You have an error in your SQL syntax;  = sql strict mode */
++			if ($res = $link->query("SHOW STATUS")) {
++				while ($row = $res->fetch_assoc())
++					if ($row['Variable_name'] == 'Ssl_cipher')
++						break;
++			} else {
++				printf("[010] [%d] %s\n", $link->errno, $link->error);
++			}
++		} else {
++			printf("[011] [%d] %s\n", $link->errno, $link->error);
++		}
++	} else {
++		if (!$row = $res->fetch_assoc())
++			printf("[012] [%d] %s\n", $link->errno, $link->error);
++		if (!strlen($row["Value"]))
++			printf("[013] Empty cipher. No encrytion!");
++	}
++
++	var_dump($row);
++
++	$link->close();
+ 
+ 	print "done!";
+ ?>
+@@ -78,4 +112,10 @@ array(2) {
+   ["Value"]=>
+   string(%d) "%S"
+ }
++array(2) {
++  ["Variable_name"]=>
++  string(10) "Ssl_cipher"
++  ["Value"]=>
++  string(%d) "%S"
++}
+ done!
+diff --git a/ext/mysqlnd/mysqlnd_net.c b/ext/mysqlnd/mysqlnd_net.c
+index 69f4b7a..4cbe9de 100644
+--- a/ext/mysqlnd/mysqlnd_net.c
++++ b/ext/mysqlnd/mysqlnd_net.c
+@@ -901,6 +901,12 @@ MYSQLND_METHOD(mysqlnd_net, enable_ssl)(MYSQLND_NET * const net TSRMLS_DC)
+ 		zval verify_peer_zval;
+ 		ZVAL_TRUE(&verify_peer_zval);
+ 		php_stream_context_set_option(context, "ssl", "verify_peer", &verify_peer_zval);
++		php_stream_context_set_option(context, "ssl", "verify_peer_name", &verify_peer_zval);
++	} else {
++		zval verify_peer_zval;
++		ZVAL_FALSE(&verify_peer_zval);
++		php_stream_context_set_option(context, "ssl", "verify_peer", &verify_peer_zval);
++		php_stream_context_set_option(context, "ssl", "verify_peer_name", &verify_peer_zval);
+ 	}
+ 	if (net->data->options.ssl_cert) {
+ 		zval cert_zval;
+@@ -918,7 +924,7 @@ MYSQLND_METHOD(mysqlnd_net, enable_ssl)(MYSQLND_NET * const net TSRMLS_DC)
+ 	if (net->data->options.ssl_capath) {
+ 		zval capath_zval;
+ 		ZVAL_STRING(&capath_zval, net->data->options.ssl_capath, 0);
+-		php_stream_context_set_option(context, "ssl", "cafile", &capath_zval);
++		php_stream_context_set_option(context, "ssl", "capath", &capath_zval);
+ 	}
+ 	if (net->data->options.ssl_passphrase) {
+ 		zval passphrase_zval;
+commit afd31489d0d9999f701467e99ef2b40794eed196
+Author: Andrey Hristov <andrey@php.net>
+Date:   Thu Oct 22 11:48:53 2015 +0200
 
+    Improve fix for Bug #68344 MySQLi does not provide way to disable peer certificate validation
+
+diff --git a/ext/mysqli/mysqli.c b/ext/mysqli/mysqli.c
+index e028d60..198ed83 100644
+--- a/ext/mysqli/mysqli.c
++++ b/ext/mysqli/mysqli.c
+@@ -715,6 +715,9 @@ PHP_MINIT_FUNCTION(mysqli)
+ 	REGISTER_LONG_CONSTANT("MYSQLI_CLIENT_IGNORE_SPACE", CLIENT_IGNORE_SPACE, CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_LONG_CONSTANT("MYSQLI_CLIENT_NO_SCHEMA", CLIENT_NO_SCHEMA, CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_LONG_CONSTANT("MYSQLI_CLIENT_FOUND_ROWS", CLIENT_FOUND_ROWS, CONST_CS | CONST_PERSISTENT);
++#ifdef CLIENT_SSL_VERIFY_SERVER_CERT
++	REGISTER_LONG_CONSTANT("MYSQLI_CLIENT_SSL_VERIFY_SERVER_CERT", CLIENT_SSL_VERIFY_SERVER_CERT, CONST_CS | CONST_PERSISTENT);
++#endif
+ #if (MYSQL_VERSION_ID >= 50611 && defined(CLIENT_CAN_HANDLE_EXPIRED_PASSWORDS)) || defined(MYSQLI_USE_MYSQLND)
+ 	REGISTER_LONG_CONSTANT("MYSQLI_CLIENT_CAN_HANDLE_EXPIRED_PASSWORDS", CLIENT_CAN_HANDLE_EXPIRED_PASSWORDS, CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_LONG_CONSTANT("MYSQLI_OPT_CAN_HANDLE_EXPIRED_PASSWORDS", MYSQL_OPT_CAN_HANDLE_EXPIRED_PASSWORDS, CONST_CS | CONST_PERSISTENT);
+diff --git a/ext/mysqli/tests/mysqli_constants.phpt b/ext/mysqli/tests/mysqli_constants.phpt
+index dd0f769..1cb31cc 100644
+--- a/ext/mysqli/tests/mysqli_constants.phpt
++++ b/ext/mysqli/tests/mysqli_constants.phpt
+@@ -136,6 +136,9 @@ require_once('skipifconnectfailure.inc');
+ 		$expected_constants['MYSQLI_SERVER_QUERY_WAS_SLOW'] = true;
+ 	}
+ 
++	if ($version >= 50033 || $IS_MYSQLND) {
++		$expected_constants['MYSQLI_CLIENT_SSL_VERIFY_SERVER_CERT'] = true;
++	}
+ 
+ 	/* First introduced in MySQL 6.0, backported to MySQL 5.5 */
+ 	if ($version >= 50606 || $IS_MYSQLND) {
+diff --git a/ext/mysqlnd/mysqlnd_net.c b/ext/mysqlnd/mysqlnd_net.c
+index 4cbe9de..7b164ac 100644
+--- a/ext/mysqlnd/mysqlnd_net.c
++++ b/ext/mysqlnd/mysqlnd_net.c
+@@ -897,14 +897,9 @@ MYSQLND_METHOD(mysqlnd_net, enable_ssl)(MYSQLND_NET * const net TSRMLS_DC)
+ 		ZVAL_STRING(&key_zval, net->data->options.ssl_key, 0);
+ 		php_stream_context_set_option(context, "ssl", "local_pk", &key_zval);
+ 	}
+-	if (net->data->options.ssl_verify_peer) {
+-		zval verify_peer_zval;
+-		ZVAL_TRUE(&verify_peer_zval);
+-		php_stream_context_set_option(context, "ssl", "verify_peer", &verify_peer_zval);
+-		php_stream_context_set_option(context, "ssl", "verify_peer_name", &verify_peer_zval);
+-	} else {
++	{
+ 		zval verify_peer_zval;
+-		ZVAL_FALSE(&verify_peer_zval);
++		ZVAL_BOOL(&verify_peer_zval, net->data->options.ssl_verify_peer);
+ 		php_stream_context_set_option(context, "ssl", "verify_peer", &verify_peer_zval);
+ 		php_stream_context_set_option(context, "ssl", "verify_peer_name", &verify_peer_zval);
+ 	}

@@ -74,7 +74,7 @@
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_without	mysql		# without ext/mysql support
-%bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
+%bcond_without	mysqli		# without mysqli support (Requires mysql >= 4.1)
 %bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
 %bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	odbc		# without ODBC extension module

@@ -25,7 +25,6 @@
 # Core
 # date
 # libxml
-# phpdbg_webhelper
 # Reflection
 # standard
 #

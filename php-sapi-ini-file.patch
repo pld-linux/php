@@ -1,6 +1,6 @@
---- php-5.5.21/main/php_ini.c	2015-01-21 12:23:27.000000000 +0200
-+++ php-5.5.21/main/php_ini.c	2015-02-25 01:40:21.335354971 +0200
-@@ -378,12 +378,19 @@
+--- php-5.4.0RC3/main/php_ini.c~	2011-12-10 03:35:27.000000000 +0200
++++ php-5.4.0RC3/main/php_ini.c	2011-12-10 03:36:08.930154336 +0200
+@@ -358,6 +358,11 @@
  }
  /* }}} */
  
@@ -12,15 +12,7 @@
  /* {{{ php_init_config
   */
  int php_init_config(TSRMLS_D)
- {
- 	char *php_ini_file_name = NULL;
- 	char *php_ini_search_path = NULL;
-+	// value for php_ini_loaded_file() to be stored into php_ini_opened_path
-+	char *php_ini_loaded_file = NULL;
- 	int php_ini_scanned_path_len;
- 	char *open_basedir;
- 	int free_ini_search_path = 0;
-@@ -561,8 +568,29 @@
+@@ -480,6 +485,24 @@
  				}
  			}
  		}
@@ -29,57 +21,38 @@
 +			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &php_ini_opened_path TSRMLS_CC);
 +			if (fh.handle.fp) {
 +				fh.filename = php_ini_opened_path;
-+
-+				// parse the ini file now
++				//PG(safe_mode) = safe_mode_state;
 +				PG(open_basedir) = open_basedir;
 +				fh.type = ZEND_HANDLE_FP;
 +				zend_parse_ini_file(&fh, 1, ZEND_INI_SCANNER_NORMAL, (zend_ini_parser_cb_t) php_ini_parser_cb, &configuration_hash TSRMLS_CC);
++				//safe_mode_state = PG(safe_mode);
 +				open_basedir = PG(open_basedir);
++				//PG(safe_mode) = 0;
 +				PG(open_basedir) = NULL;
 +				fh.handle.fp = NULL;
- 
--		/* Otherwise search for php-%sapi-module-name%.ini file in search path */
-+				// save this for later
-+				php_ini_loaded_file = estrdup(php_ini_opened_path);
-+
 +				efree(php_ini_opened_path);
 +				fh.filename = php_ini_opened_path = NULL;
 +			}
 +		}
-+
-+		/* Also search for php-%sapi-module-name%.ini file in search path */
+ 
+ 		/* Otherwise search for php-%sapi-module-name%.ini file in search path */
  		if (!fh.handle.fp) {
- 			const char *fmt = "php-%s.ini";
- 			char *ini_fname;
-@@ -572,13 +600,10 @@
- 			if (fh.handle.fp) {
+@@ -492,14 +515,6 @@
  				fh.filename = php_ini_opened_path;
  			}
--		}
- 
+ 		}
+-
 -		/* If still no ini file found, search for php.ini file in search path */
 -		if (!fh.handle.fp) {
 -			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &php_ini_opened_path TSRMLS_CC);
 -			if (fh.handle.fp) {
 -				fh.filename = php_ini_opened_path;
-+			// restore previous value, so php_ini_loaded_file() works as expected
-+			if (php_ini_loaded_file) {
-+				php_ini_opened_path = php_ini_loaded_file;
- 			}
- 		}
+-			}
+-		}
  	}
-@@ -597,6 +622,10 @@
  
- 		{
- 			zval tmp;
-+			// use main php.ini if loaded
-+			if (php_ini_loaded_file) {
-+				fh.filename = php_ini_loaded_file;
-+			}
- 
- 			Z_STRLEN(tmp) = strlen(fh.filename);
- 			Z_STRVAL(tmp) = zend_strndup(fh.filename, Z_STRLEN(tmp));
-@@ -630,13 +659,15 @@
+ 	if (free_ini_search_path) {
+@@ -645,13 +645,15 @@ int php_init_config(TSRMLS_D)
  		zend_llist scanned_ini_list;
  		zend_llist_element *element;
  		int l, total_l = 0;
@@ -96,7 +69,7 @@
  		for (debpath = bufpath ; debpath ; debpath=endpath) {
  			endpath = strchr(debpath, DEFAULT_DIR_SEPARATOR);
  			if (endpath) {
-@@ -649,7 +680,7 @@
+@@ -664,7 +666,7 @@ int php_init_config(TSRMLS_D)
  			}
  			lenpath = strlen(debpath);
  
@@ -105,3 +78,4 @@
  
  				for (i = 0; i < ndir; i++) {
  
+

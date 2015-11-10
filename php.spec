@@ -2567,7 +2567,7 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 
 %{__sed} -i -e '
 	s#/usr/lib/php#%{php_extensiondir}#
-	s#/etc/php#%{_sysconfdir}#
+	s#/etc/php/#%{_sysconfdir}/#
 	s#@processname@#%{name}-fpm#g
 ' $RPM_BUILD_ROOT{/etc/{rc.d/init.d/%{name}-fpm,logrotate.d/%{name}-fpm},%{_sysconfdir}/php-fpm.conf,%{_sysconfdir}/fpm.d/www.conf}
 %endif

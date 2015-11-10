@@ -2552,11 +2552,11 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
 
 # install FCGI PM
 %if %{with fpm}
-install -d $RPM_BUILD_ROOT{%{_sysconfdir}/fpm.d,%{_sbindir}}
+install -d $RPM_BUILD_ROOT{%{_sysconfdir}/php-fpm.d,%{_sbindir}}
 libtool --mode=install install -p sapi/fpm/php-fpm $RPM_BUILD_ROOT%{_sbindir}/%{name}-fpm
 cp -p sapi/fpm/php-fpm.8 $RPM_BUILD_ROOT%{_mandir}/man8/%{name}-fpm.8
 cp -p sapi/fpm/php-fpm.conf $RPM_BUILD_ROOT%{_sysconfdir}
-cp -p sapi/fpm/www.conf $RPM_BUILD_ROOT%{_sysconfdir}/fpm.d
+cp -p sapi/fpm/www.conf $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.d
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -p %{SOURCE10} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}-fpm
 install -d $RPM_BUILD_ROOT/etc/logrotate.d
@@ -2569,7 +2569,7 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 	s#/usr/lib/php#%{php_extensiondir}#
 	s#/etc/php/#%{_sysconfdir}/#
 	s#@processname@#%{name}-fpm#g
-' $RPM_BUILD_ROOT{/etc/{rc.d/init.d/%{name}-fpm,logrotate.d/%{name}-fpm},%{_sysconfdir}/php-fpm.conf,%{_sysconfdir}/fpm.d/www.conf}
+' $RPM_BUILD_ROOT{/etc/{rc.d/init.d/%{name}-fpm,logrotate.d/%{name}-fpm},%{_sysconfdir}/php-fpm.conf,%{_sysconfdir}/php-fpm.d/www.conf}
 %endif
 
 # install Embedded API
@@ -2861,9 +2861,9 @@ fi
 %files fpm
 %defattr(644,root,root,755)
 %doc sapi/fpm/{CREDITS,LICENSE}
-%dir %{_sysconfdir}/fpm.d
+%dir %{_sysconfdir}/php-fpm.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fpm.d/www.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.d/www.conf
 %attr(755,root,root) %{_sbindir}/%{name}-fpm
 %{_mandir}/man8/%{name}-fpm.8*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/%{name}-fpm

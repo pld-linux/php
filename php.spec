@@ -139,7 +139,7 @@
 %undefine	with_filter
 %endif
 
-%define		rel	1
+%define		rel	2
 %define		subver	RC6
 %define		orgname	php
 %define		ver_suffix 70

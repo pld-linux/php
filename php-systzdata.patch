@@ -1,6 +1,10 @@
 Add support for use of the system timezone database, rather
 than embedding a copy.  Discussed upstream but was not desired.
 
+(Few) upstream reports:
+https://bugs.php.net/bug.php?id=53320
+https://bugs.php.net/bug.php?id=54250
+
 History:
 r13: adapt for upstream changes to use PHP allocator
 r12: adapt for upstream changes for new zic

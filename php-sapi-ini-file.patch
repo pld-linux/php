@@ -1,6 +1,11 @@
---- php-7.0.0beta1/main/php_ini.c~	2015-07-13 16:04:48.000000000 +0300
-+++ php-7.0.0beta1/main/php_ini.c	2015-07-13 16:10:07.496198519 +0300
-@@ -379,12 +379,19 @@
+to test which is main php.ini:
+$ php -r 'var_dump(array(get_cfg_var("cfg_file_path"),php_ini_loaded_file()));'
+
+https://github.com/pld-linux/php/commit/762ec2e
+
+--- php-7.0.0RC6.orig/main/php_ini.c	2015-11-10 23:58:52.227101032 +0200
++++ php-7.0.0RC6/main/php_ini.c	2015-11-11 00:01:43.502674750 +0200
+@@ -375,12 +375,19 @@
  }
  /* }}} */
  
@@ -20,15 +25,15 @@
  	int php_ini_scanned_path_len;
  	char *open_basedir;
  	int free_ini_search_path = 0;
-@@ -561,8 +568,29 @@
+@@ -557,8 +564,26 @@
  				}
  			}
  		}
 +		/* Search (global) php.ini file in search path */
 +		if (!fh.handle.fp) {
-+			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &php_ini_opened_path TSRMLS_CC);
++			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &opened_path);
 +			if (fh.handle.fp) {
-+				fh.filename = php_ini_opened_path;
++				fh.filename = ZSTR_VAL(opened_path);
 +
 +				// parse the ini file now
 +				PG(open_basedir) = open_basedir;
@@ -37,21 +42,18 @@
 +				open_basedir = PG(open_basedir);
 +				PG(open_basedir) = NULL;
 +				fh.handle.fp = NULL;
- 
--		/* Otherwise search for php-%sapi-module-name%.ini file in search path */
-+				// save this for later
-+				php_ini_loaded_file = estrdup(php_ini_opened_path);
 +
-+				efree(php_ini_opened_path);
-+				fh.filename = php_ini_opened_path = NULL;
++				php_ini_loaded_file = estrdup(fh.filename);
++				fh.filename = NULL;
 +			}
 +		}
-+
+ 
+-		/* Otherwise search for php-%sapi-module-name%.ini file in search path */
 +		/* Also search for php-%sapi-module-name%.ini file in search path */
  		if (!fh.handle.fp) {
  			const char *fmt = "php-%s.ini";
  			char *ini_fname;
-@@ -597,15 +597,12 @@
+@@ -568,15 +593,8 @@
  			if (fh.handle.fp) {
  				fh.filename = ZSTR_VAL(opened_path);
  			}
@@ -64,26 +66,41 @@
 -				fh.filename = ZSTR_VAL(opened_path);
 -			}
 -		}
-+			// restore previous value, so php_ini_loaded_file() works as expected
-+			if (php_ini_loaded_file) {
-+				php_ini_opened_path = php_ini_loaded_file;
-+ 			}
 + 		}
  	}
  
  	if (free_ini_search_path) {
-@@ -597,6 +622,10 @@
+@@ -593,14 +611,28 @@
  
  		{
  			zval tmp;
 +			// use main php.ini if loaded
++			// see https://github.com/pld-linux/php/commit/762ec2e
++			// test with:
++			// php -r 'var_dump(array(get_cfg_var("cfg_file_path"),php_ini_loaded_file()));'
 +			if (php_ini_loaded_file) {
++				if (fh.filename) {
++					efree((char *)fh.filename);
++				}
 +				fh.filename = php_ini_loaded_file;
 +			}
  
- 			Z_STRLEN(tmp) = strlen(fh.filename);
- 			Z_STRVAL(tmp) = zend_strndup(fh.filename, Z_STRLEN(tmp));
-@@ -630,13 +659,15 @@
+ 			ZVAL_NEW_STR(&tmp, zend_string_init(fh.filename, strlen(fh.filename), 1));
+ 			zend_hash_str_update(&configuration_hash, "cfg_file_path", sizeof("cfg_file_path")-1, &tmp);
+ 			if (opened_path) {
+ 				zend_string_release(opened_path);
+-			} else {
++			}
++
++			if (fh.filename) {
+ 				efree((char *)fh.filename);
++				fh.filename = NULL;
+ 			}
++
+ 			php_ini_opened_path = zend_strndup(Z_STRVAL(tmp), Z_STRLEN(tmp));
+ 		}
+ 	}
+@@ -624,13 +656,15 @@
  		zend_llist scanned_ini_list;
  		zend_llist_element *element;
  		int l, total_l = 0;
@@ -100,9 +117,9 @@
  		for (debpath = bufpath ; debpath ; debpath=endpath) {
  			endpath = strchr(debpath, DEFAULT_DIR_SEPARATOR);
  			if (endpath) {
-@@ -649,7 +680,7 @@
+@@ -643,7 +677,7 @@
  			}
- 			lenpath = strlen(debpath);
+ 			lenpath = (int)strlen(debpath);
  
 -			if (lenpath > 0 && (ndir = php_scandir(debpath, &namelist, 0, php_alphasort)) > 0) {
 +			if (lenpath > 0 && (ndir = php_scandir(debpath, &namelist, 0, php_csort)) > 0) {

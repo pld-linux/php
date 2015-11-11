@@ -221,6 +221,7 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-mysql-ssl-context.patch
 Patch69:	fpm-conf-split.patch
 Patch70:	mysqlnd-ssl.patch
+Patch71:	libdb-info.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2000,6 +2001,7 @@ exit 1
 %patch67 -p1
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch70 -p1
+%patch71 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

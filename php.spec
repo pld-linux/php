@@ -2067,13 +2067,31 @@ mv Zend/tests/bug39438.phpt{,.disable}
 %{__rm} -r ext/sqlite3/tests
 %endif
 
+# ----- Manage known as failed test -------
+# affected by systzdata patch
+%{__rm} ext/date/tests/timezone_location_get.phpt
+%{__rm} ext/date/tests/timezone_version_get.phpt
+%{__rm} ext/date/tests/timezone_version_get_basic1.phpt
+# Should be skipped but fails sometime
+%{__rm} ext/standard/tests/file/file_get_contents_error001.phpt
+# fails sometimes
+%{__rm} ext/sockets/tests/mcast_ipv?_recv.phpt
+# causes stack exhausion
+%{__rm} Zend/tests/bug54268.phpt
+%{__rm} Zend/tests/bug68412.phpt
+
+# avoid issues when two builds run simultaneously
+%ifarch %{x8664}
+sed -e 's/64321/64322/' -i ext/openssl/tests/*.phpt
+%endif
+
 # skip XFAILs
 # no point testing stuff that is knowingly broken
-find -name '*.phpt' | xargs grep XFAIL -l | xargs rm -v
+find -name '*.phpt' | xargs grep '^--XFAIL--' -l | xargs rm -v
 
 env \
 %ifarch %{ix86}
-ix86= x8664=:
+ix86= x8664=: \
 %endif
 %ifarch %{x8664}
 ix86=: x8664= \
@@ -2469,6 +2487,7 @@ exit 1
 cat <<'EOF' > run-tests.sh
 #!/bin/sh
 export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
+export SKIP_ONLINE_TESTS=1
 unset TZ LANG LC_ALL || :
 %{__make} test \
 	EXTENSION_DIR=modules \

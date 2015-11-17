@@ -1,6 +1,4 @@
 #!/bin/sh
-# timezone_location_get: Test that timezone_location_get returns a correct array of information
-mv ext/date/tests/timezone_location_get.phpt{,.skip}
 # DBA DB4 magic_quotes_runtime Test (info: DB4 handler used)
 #mv ext/dba/tests/dba_db4_010.phpt{,.skip}
 # DBA TCADB handler test
@@ -75,10 +73,6 @@ mv ext/snmp/tests/snmpset.phpt{,.skip}
 mv ext/snmp/tests/snmpwalk.phpt{,.skip}
 # SOAP Server 9: setclass and setpersistence(SOAP_PERSISTENCE_SESSION)
 mv ext/soap/tests/server009.phpt{,.skip}
-# Multicast support: IPv4 receive options
-mv ext/sockets/tests/mcast_ipv4_recv.phpt{,.skip}
-# Multicast support: IPv6 receive options
-mv ext/sockets/tests/mcast_ipv6_recv.phpt{,.skip}
 # socket_import_stream: Test with multicasting
 mv ext/sockets/tests/socket_import_stream-3.phpt{,.skip}
 # Test function getservbyname()

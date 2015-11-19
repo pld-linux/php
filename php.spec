@@ -16,9 +16,6 @@
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
 # - wddx: restore session support (not compiled in due DL extension check)
 # - modularize standard (output from pure php -m)?
-# - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
-#   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.
-#   make it runtime dep and add Suggests (or php warning messages)
 # - some mods should be shared:
 #$ php -m
 # [PHP Modules]
@@ -139,7 +136,7 @@
 %undefine	with_filter
 %endif
 
-%define		rel	2
+%define		rel	3
 %define		subver	RC7
 %define		orgname	php
 %define		ver_suffix 70
@@ -222,6 +219,7 @@ Patch68:	php-mysql-ssl-context.patch
 Patch69:	fpm-conf-split.patch
 Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
+Patch72:	phar-hash-shared.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1448,6 +1446,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Requires:	%{name}-hash = %{epoch}:%{version}-%{release}
 Suggests:	%{name}-cli
 # zlib is required by phar program, but as phar cli is optional should the dep be too
 Suggests:	%{name}-zlib
@@ -2002,6 +2001,7 @@ exit 1
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch70 -p1
 %patch71 -p1
+%patch72 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

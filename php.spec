@@ -139,7 +139,7 @@
 %undefine	with_filter
 %endif
 
-%define		rel	1
+%define		rel	2
 %define		subver	RC7
 %define		orgname	php
 %define		ver_suffix 70
@@ -152,7 +152,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.0.0
-Release:	2.%{subver}.%{rel}
+Release:	%{rel}.%{subver}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend

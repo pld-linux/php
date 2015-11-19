@@ -18,9 +18,6 @@
 # - wddx: restore session support (not compiled in due DL extension check)
 # - make additional headers and checking added by mail patch configurable
 # - modularize standard (output from pure php -m)?
-# - WARNING: Phar: sha256/sha512 signature support disabled if ext/hash is
-#   built shared, also PHAR_HAVE_OPENSSL is false if openssl is built shared.
-#   make it runtime dep and add Suggests (or php warning messages)
 # - some mods should be shared:
 #$ php -m
 # [PHP Modules]
@@ -234,6 +231,7 @@ Patch67:	mysql-lib-ver-mismatch.patch
 
 Patch69:	fpm-conf-split.patch
 Patch70:	mysqlnd-ssl.patch
+Patch72:	phar-hash-shared.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1519,6 +1517,7 @@ Summary(pl.UTF-8):	Moduł phar dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	%{name}-hash = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Requires:	alternatives
 Suggests:	%{name}-cli
@@ -2089,6 +2088,7 @@ exit 1
 %patch67 -p1
 
 %patch70 -p1
+%patch72 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

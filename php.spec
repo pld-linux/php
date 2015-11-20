@@ -6,8 +6,6 @@
 # - update imap myrights patch (needs api porting)
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
-# UNPACKAGED EXTENSION NOTES:
-# - com_dotnet is Win32-only
 # TODO:
 # - fileinfo extension bundles magic db in library: data_file.c (dump of magic.mgc) is 14M
 #   - 2.3M fileinfo.so php54-fileinfo-5.4.6-0.15.x86_64
@@ -2007,6 +2005,9 @@ sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
+
+# com_dotnet is Win32-only
+%{__rm} -r ext/com_dotnet
 
 # conflict seems to be resolved by recode patches
 %{__rm} ext/recode/config9.m4

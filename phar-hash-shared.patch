@@ -20,3 +20,14 @@
    if test "$PHP_OPENSSL_SHARED" = "yes"; then
      AC_MSG_RESULT([no (shared openssl)])
    else
+--- php-7.0.0RC7/ext/phar/Makefile.frag~	2015-11-23 11:06:31.000000000 +0200
++++ php-7.0.0RC7/ext/phar/Makefile.frag	2015-11-23 11:15:36.452443959 +0200
+@@ -9,7 +9,7 @@
+ 		$(top_srcdir)/build/shtool echo -n -- "$(top_builddir)/$(SAPI_CLI_PATH) -n"; \
+ 		if test "x$(PHP_MODULES)" != "x"; then \
+ 		$(top_srcdir)/build/shtool echo -n -- " -d extension_dir=$(top_builddir)/modules"; \
+-		for i in pcre spl bz2 zlib phar; do \
++		for i in pcre spl bz2 zlib hash phar; do \
+ 			if test -f "$(top_builddir)/modules/$$i.la"; then \
+ 				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
+ 			fi; \

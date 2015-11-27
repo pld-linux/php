@@ -153,7 +153,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	2
+%define		rel	1
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -164,7 +164,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.6.15
+Version:	5.6.16
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -173,7 +173,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	c726a86238017c2d9db0171b14d300e7
+# Source0-md5:	3f1d999ed1f9cb5713c9a0161c557f2f
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -230,8 +230,7 @@ Patch62:	mcrypt-libs.patch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
-# https://bugs.php.net/bug.php?id=68344
-Patch68:	php-mysql-ssl-context.patch
+
 Patch69:	fpm-conf-split.patch
 Patch70:	mysqlnd-ssl.patch
 URL:		http://www.php.net/
@@ -2084,7 +2083,7 @@ exit 1
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
 %patch67 -p1
-%patch68 -p1
+
 %patch70 -p1
 
 sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4

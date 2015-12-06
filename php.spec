@@ -134,8 +134,6 @@
 %undefine	with_filter
 %endif
 
-%define		rel	4
-%define		subver	RC7
 %define		orgname	php
 %define		ver_suffix 70
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -147,16 +145,15 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.0.0
-Release:	%{rel}.%{subver}
+Release:	5
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-#Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://downloads.php.net/~ab/php-%{version}%{subver}.tar.xz
-# Source0-md5:	5bb4e6b8bf969d2bd5ab222c60c52dad
+Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	394e4d6c517078ca3e23acf633c5ed27
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -1923,12 +1920,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%if 1
-%setup -q -n %{orgname}-%{version}%{?subver}
-%else
-%setup -qc -n %{orgname}-%{version}
-mv php-src-*/* .
-%endif
+%setup -q -n %{orgname}-%{version}
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1

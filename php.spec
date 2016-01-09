@@ -241,6 +241,7 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
+%{?with_intl:BuildRequires:	libstdc++-devel}
 %{?with_webp:BuildRequires:	libvpx-devel}
 BuildRequires:	tokyocabinet-devel
 %if "%{pld_release}" != "ac"

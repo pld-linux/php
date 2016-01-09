@@ -248,6 +248,7 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libmcrypt-devel >= 2.4.4
 BuildRequires:	libpng-devel >= 1.0.8
+%{?with_intl:BuildRequires:	libstdc++-devel}
 %{?with_webp:BuildRequires:	libwebp-devel}
 BuildRequires:	tokyocabinet-devel
 %if "%{pld_release}" != "ac"
@@ -1440,8 +1441,8 @@ Summary(pl.UTF-8):	Moduł phar dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Requires:	%{name}-hash = %{epoch}:%{version}-%{release}
+Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Suggests:	%{name}-cli
 # zlib is required by phar program, but as phar cli is optional should the dep be too
 Suggests:	%{name}-zlib

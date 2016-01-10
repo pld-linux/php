@@ -1,5 +1,5 @@
---- php-5.3.16/ext/dba/config.m4.orig	2012-09-06 11:15:09.743002303 +0200
-+++ php-5.3.16/ext/dba/config.m4	2012-09-06 11:28:12.192974701 +0200
+--- php-7.0.2/ext/dba/config.m4~	2016-01-11 00:42:48.000000000 +0200
++++ php-7.0.2/ext/dba/config.m4	2016-01-11 00:43:39.055351157 +0200
 @@ -287,6 +287,14 @@
        THIS_PREFIX=$i
        THIS_INCLUDE=$i/db4/db.h
@@ -15,12 +15,13 @@
      elif test -f "$i/include/db5.1/db.h"; then
        THIS_PREFIX=$i
        THIS_INCLUDE=$i/include/db5.1/db.h
-@@ -329,7 +337,7 @@
+@@ -376,7 +376,7 @@
        break
      fi
    done
--  PHP_DBA_DB_CHECK(4, db-5.1 db-5.0 db-4.8 db-4.7 db-4.6 db-4.5 db-4.4 db-4.3 db-4.2 db-4.1 db-4.0 db-4 db4 db, [(void)db_create((DB**)0, (DB_ENV*)0, 0)])
+-  PHP_DBA_DB_CHECK(4, db-5.3 db-5.1 db-5.0 db-4.8 db-4.7 db-4.6 db-4.5 db-4.4 db-4.3 db-4.2 db-4.1 db-4.0 db-4 db4 db, [(void)db_create((DB**)0, (DB_ENV*)0, 0)])
 +  PHP_DBA_DB_CHECK(4, db-5.3 db-5.2 db-5.1 db-5.0 db-4.8 db-4.7 db-4.6 db-4.5 db-4.4 db-4.3 db-4.2 db-4.1 db-4.0 db-4 db4 db, [(void)db_create((DB**)0, (DB_ENV*)0, 0)])
  fi
  PHP_DBA_STD_RESULT(db4,Berkeley DB4)
  
+

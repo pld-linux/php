@@ -1513,7 +1513,7 @@ Moduł PHP umożliwiający dostęp do bazy danych PostgreSQL.
 Um módulo para aplicações PHP que usam bancos de dados postgresql.
 
 %package phar
-Summary:	phar database module for PHP
+Summary:	Phar archive module for PHP
 Summary(pl.UTF-8):	Moduł phar dla PHP
 Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php

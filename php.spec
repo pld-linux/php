@@ -1443,6 +1443,7 @@ URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-hash = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Requires:	alternatives
 Suggests:	%{name}-cli
 # zlib is required by phar program, but as phar cli is optional should the dep be too
 Suggests:	%{name}-zlib
@@ -2527,9 +2528,10 @@ cp -pf Makefile.cli Makefile
 # version the .phar files
 mv $RPM_BUILD_ROOT%{_bindir}/phar{,%{ver_suffix}}.phar
 mv $RPM_BUILD_ROOT%{_mandir}/man1/phar{,%{ver_suffix}}.1
-# make link relative
-ln -sfn phar%{ver_suffix}.phar $RPM_BUILD_ROOT%{_bindir}/phar
-ln -sfn phar%{ver_suffix}.1 $RPM_BUILD_ROOT%{_mandir}/man1/phar.1
+# touch for ghost
+%{__rm} $RPM_BUILD_ROOT%{_bindir}/phar
+touch $RPM_BUILD_ROOT%{_bindir}/phar
+touch $RPM_BUILD_ROOT%{_mandir}/man1/phar.1
 
 # version suffix
 v=$(echo %{version} | cut -d. -f1-2)
@@ -2750,16 +2752,24 @@ fi
 sed -i -e 's#modules/libphp[57].so#modules/mod_php.so#g' /etc/httpd/conf.d/*_mod_php.conf
 
 # common macros called at extension post/postun scriptlet
-%define	extension_scripts() \
-%post %1 \
+%define ext_post \
 if [ "$1" = "1" ]; then \
 	%php_webserver_restart \
 fi \
-\
-%postun %1 \
+%{nil}
+
+%define ext_postun \
 if [ "$1" = "0" ]; then \
 	%php_webserver_restart \
-fi
+fi \
+%{nil}
+
+%define extension_scripts() \
+%post %1 \
+%ext_post \
+\
+%postun %1 \
+%ext_postun
 %{nil}
 
 # extension scripts defines
@@ -2803,7 +2813,6 @@ fi
 %extension_scripts pdo-pgsql
 %extension_scripts pdo-sqlite
 %extension_scripts pgsql
-%extension_scripts phar
 %extension_scripts pcntl
 %extension_scripts posix
 %extension_scripts pspell
@@ -2829,6 +2838,18 @@ fi
 %extension_scripts xsl
 %extension_scripts zip
 %extension_scripts zlib
+
+%post phar
+%ext_post
+update-alternatives \
+	--install %{_bindir}/phar phar %{_bindir}/phar%{ver_suffix}.phar %{ver_suffix} \
+	--slave %{_mandir}/man1/phar.1 phar.1 %{_mandir}/man1/phar%{ver_suffix}.1* || :
+
+%postun phar
+%ext_postun
+if [ $1 -eq 0 ]; then
+	update-alternatives --remove phar %{_bindir}/phar || :
+fi
 
 %if %{with apache2}
 %files -n apache-mod_%{name}
@@ -3256,11 +3277,11 @@ fi
 %doc ext/phar/{CREDITS,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/phar.ini
 %attr(755,root,root) %{php_extensiondir}/phar.so
-%attr(755,root,root) %{_bindir}/phar
 %attr(755,root,root) %{_bindir}/phar%{ver_suffix}.phar
-%{_mandir}/man1/phar.1
 %{_mandir}/man1/phar.phar.1
 %{_mandir}/man1/phar%{ver_suffix}.1*
+%ghost %{_bindir}/phar
+%ghost %{_mandir}/man1/phar.1
 %endif
 
 %if %{with posix}

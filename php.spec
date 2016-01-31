@@ -2526,9 +2526,10 @@ cp -pf Makefile.cli Makefile
 
 # version the .phar files
 mv $RPM_BUILD_ROOT%{_bindir}/phar{,%{ver_suffix}}.phar
-mv $RPM_BUILD_ROOT%{_mandir}/man1/phar{,%{ver_suffix}}.phar.1
+mv $RPM_BUILD_ROOT%{_mandir}/man1/phar{,%{ver_suffix}}.1
 # make link relative
 ln -sfn phar%{ver_suffix}.phar $RPM_BUILD_ROOT%{_bindir}/phar
+ln -sfn phar%{ver_suffix}.1 $RPM_BUILD_ROOT%{_mandir}/man1/phar.1
 
 # version suffix
 v=$(echo %{version} | cut -d. -f1-2)
@@ -3257,8 +3258,9 @@ fi
 %attr(755,root,root) %{php_extensiondir}/phar.so
 %attr(755,root,root) %{_bindir}/phar
 %attr(755,root,root) %{_bindir}/phar%{ver_suffix}.phar
-%{_mandir}/man1/phar.1*
-%{_mandir}/man1/phar%{ver_suffix}.phar.1
+%{_mandir}/man1/phar.1
+%{_mandir}/man1/phar.phar.1
+%{_mandir}/man1/phar%{ver_suffix}.1*
 %endif
 
 %if %{with posix}

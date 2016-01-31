@@ -2769,7 +2769,7 @@ fi \
 %ext_post \
 \
 %postun %1 \
-%ext_postun
+%ext_postun \
 %{nil}
 
 # extension scripts defines

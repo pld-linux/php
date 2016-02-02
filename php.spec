@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	15
+%define		rel	16
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -209,6 +209,7 @@ Patch57:	php-php_dl.patch
 Patch58:	php-svn-281516.patch
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	bug-60986.patch
+Patch61:	php-bug-71475.patch
 # http://spot.fedorapeople.org/php-5.3.6-libzip.patch
 Patch65:	system-libzip.patch
 Patch66:	bug-47930.patch
@@ -1936,6 +1937,7 @@ done
 %patch58 -p4
 %patch59 -p1
 %patch60 -p4
+%patch61 -p1
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p2
 %patch67 -p1

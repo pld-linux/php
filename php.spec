@@ -124,7 +124,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	3
+%define		rel	4
 %define		orgname	php
 %define		ver_suffix 54
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -163,6 +163,7 @@ Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		%{orgname}-config-file-scan-dir.patch
+Patch9:		php-bug-71475.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 %if %{with type_hints}
@@ -1888,6 +1889,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %patch5 -p1
 %patch6 -p1
 %patch8 -p1
+%patch9 -p1
 %patch7 -p1
 cp -p php.ini-production php.ini
 %patch10 -p1

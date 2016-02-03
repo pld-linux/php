@@ -67,6 +67,7 @@
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM
 %bcond_without	embed		# disable Embedded API
+%bcond_without	alternatives		# disable alternatives support
 %bcond_with	suhosin		# with suhosin patch
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	gcov		# Enable Code coverage reporting
@@ -121,6 +122,10 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %if 0%{!?_without_default_php:1}
 %define		with_default_php	1
 %endif
+%endif
+
+%if %{with default_php}
+%undefine	with_alternatives
 %endif
 
 %define		rel	26
@@ -1491,7 +1496,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
-Requires:	alternatives
+%{?with_alternatives:Requires:	alternatives}
 Suggests:	%{name}-cli
 # zlib is required by phar program, but as phar cli is optional should the dep be too
 Suggests:	%{name}-zlib
@@ -2561,9 +2566,14 @@ cp -pf Makefile.cli Makefile
 
 # version the .phar files
 mv $RPM_BUILD_ROOT%{_bindir}/phar{,%{ver_suffix}}.phar
+%if %{with alternatives}
 # touch for ghost
 %{__rm} $RPM_BUILD_ROOT%{_bindir}/phar
 touch $RPM_BUILD_ROOT%{_bindir}/phar
+%else
+# make link relative
+ln -sfn phar%{ver_suffix}.phar $RPM_BUILD_ROOT%{_bindir}/phar
+%endif
 
 # version suffix
 v=$(echo %{version} | cut -d. -f1-2)
@@ -2901,13 +2911,17 @@ fi \
 
 %post phar
 %ext_post
+%if %{with alternatives}
 update-alternatives --install %{_bindir}/phar phar %{_bindir}/phar%{ver_suffix}.phar %{ver_suffix} || :
+%endif
 
 %postun phar
 %ext_postun
+%if %{with alternatives}
 if [ $1 -eq 0 ]; then
 	update-alternatives --remove phar %{_bindir}/phar || :
 fi
+%endif
 
 %if %{with apache1}
 %files -n apache1-mod_%{name}
@@ -3308,7 +3322,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/phar.ini
 %attr(755,root,root) %{php_extensiondir}/phar.so
 %attr(755,root,root) %{_bindir}/phar%{ver_suffix}.phar
-%ghost %{_bindir}/phar
+%{?with_alternatives:%ghost} %{_bindir}/phar
 %endif
 
 %files posix

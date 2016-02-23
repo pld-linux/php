@@ -144,8 +144,8 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.0.2
-Release:	2
+Version:	7.0.3
+Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -153,7 +153,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	ce5964672e4ec0b66ff088a6bafde8c7
+# Source0-md5:	3c5d2b5b392b78fa92c48822e25ccb56
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -167,7 +167,7 @@ Patch0:		%{orgname}-shared.patch
 Patch1:		%{orgname}-pldlogo.patch
 Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
-Patch4:		php-bug-71475.patch
+
 Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
@@ -1929,7 +1929,7 @@ cp -p php.ini-production php.ini
 %patch1 -p1
 #%patch2 -p1 NEEDS PORTING
 %patch3 -p1
-%patch4 -p1
+
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1

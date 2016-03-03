@@ -1,0 +1,46 @@
+--- php-5.2.17/ext/openssl/xp_ssl.c	2010-04-23 16:32:03.000000000 +0300
++++ php-5.3.29/ext/openssl/xp_ssl.c	2014-08-13 22:22:50.000000000 +0300
+@@ -333,9 +329,14 @@
+ 			method = SSLv23_client_method();
+ 			break;
+ 		case STREAM_CRYPTO_METHOD_SSLv2_CLIENT:
++#ifdef OPENSSL_NO_SSL2
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv2 support is not compiled into the OpenSSL library PHP is linked against");
++			return -1;
++#else
+ 			sslsock->is_client = 1;
+ 			method = SSLv2_client_method();
+ 			break;
++#endif
+ 		case STREAM_CRYPTO_METHOD_SSLv3_CLIENT:
+ 			sslsock->is_client = 1;
+ 			method = SSLv3_client_method();
+@@ -353,9 +354,14 @@
+ 			method = SSLv3_server_method();
+ 			break;
+ 		case STREAM_CRYPTO_METHOD_SSLv2_SERVER:
++#ifdef OPENSSL_NO_SSL2
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv2 support is not compiled into the OpenSSL library PHP is linked against");
++			return -1;
++#else
+ 			sslsock->is_client = 0;
+ 			method = SSLv2_server_method();
+ 			break;
++#endif
+ 		case STREAM_CRYPTO_METHOD_TLS_SERVER:
+ 			sslsock->is_client = 0;
+ 			method = TLSv1_server_method();
+@@ -813,8 +922,13 @@
+ 		sslsock->enable_on_connect = 1;
+ 		sslsock->method = STREAM_CRYPTO_METHOD_SSLv23_CLIENT;
+ 	} else if (strncmp(proto, "sslv2", protolen) == 0) {
++#ifdef OPENSSL_NO_SSL2
++		php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv2 support is not compiled into the OpenSSL library PHP is linked against");
++		return NULL;
++#else
+ 		sslsock->enable_on_connect = 1;
+ 		sslsock->method = STREAM_CRYPTO_METHOD_SSLv2_CLIENT;
++#endif
+ 	} else if (strncmp(proto, "sslv3", protolen) == 0) {
+ 		sslsock->enable_on_connect = 1;
+ 		sslsock->method = STREAM_CRYPTO_METHOD_SSLv3_CLIENT;

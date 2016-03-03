@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	17
+%define		rel	18
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -197,6 +197,7 @@ Patch44:	%{orgname}-include_path.patch
 Patch45:	%{orgname}-imap-annotations.patch
 Patch46:	%{orgname}-imap-myrights.patch
 Patch47:	suhosin.patch
+Patch48:	no-sslv2.patch
 Patch49:	%{orgname}-m4-divert.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
@@ -1925,6 +1926,7 @@ done
 %if %{with suhosin}
 %patch47 -p1
 %endif
+%patch48 -p1
 %patch49 -p1
 %patch50 -p1
 %patch51 -p1

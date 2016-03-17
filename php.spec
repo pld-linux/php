@@ -604,7 +604,14 @@ Provides:	php(standard)
 %{?with_pcre:%requires_ge_to	pcre pcre-devel}
 Suggests:	browscap
 Obsoletes:	php-common < 4:5.3.28-7
+# withdrawn modules
+Obsoletes:	php-filepro < 4:5.2.0
+Obsoletes:	php-hwapi < 4:5.2.0
+Obsoletes:	php-hyperwave < 3:5.0.0
+Obsoletes:	php-java < 3:5.0.0
+Obsoletes:	php-mcal < 3:5.0.0
 Obsoletes:	php-pecl-domxml
+Obsoletes:	php-qtdom < 3:5.0.0
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	php55-common < 4:5.5.10-4
 Conflicts:	rpm < 4.4.2-0.2
@@ -779,6 +786,8 @@ URL:		http://php.net/manual/en/book.dba.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dba)
 Obsoletes:	php-dba < 4:5.3.28-7
+# withdrawn module of similar functionality but different API
+Obsoletes:	php-db < 3:5.0.0
 
 %description dba
 This is a dynamic shared object (DSO) for PHP that will add flat-file
@@ -1258,6 +1267,8 @@ URL:		http://php.net/manual/en/book.oci8.php
 %{?requires_php_extension}
 Provides:	php(oci8)
 Obsoletes:	php-oci8 < 4:5.3.28-7
+# withdrawn module of similar functionality but different API
+Obsoletes:	php-oracle < 4:5.1.0
 
 %description oci8
 This is a dynamic shared object (DSO) for PHP that will add Oracle 7,

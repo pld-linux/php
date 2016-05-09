@@ -1,6 +1,7 @@
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
+# - ext/intl poison libs in php-common: https://github.com/pld-linux/php/commit/5b279587c5f1dec19027944644902d6e993d5446
 # TODO 5.4:
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)

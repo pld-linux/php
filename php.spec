@@ -1963,6 +1963,9 @@ done
 # causes regression -> magic_quotes_gpc setting cannot be changed
 #%%patch402 -p1 -b .bug-323016
 
+# cleanup backups after patching
+find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
+
 # conflict seems to be resolved by recode patches
 rm -f ext/recode/config9.m4
 
@@ -2074,6 +2077,7 @@ for sapi in $sapis; do
 
 	%configure \
 	FORCE_APACHE_VERSION="${apache_ver}" \
+	EXTRA_LDFLAGS="%{rpmldflags}" \
 	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"
 	--cache-file=config.cache \

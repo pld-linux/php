@@ -2090,7 +2090,7 @@ exit 1
 %patch70 -p1
 %patch72 -p1
 
-sed -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
+%{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
@@ -2344,6 +2344,7 @@ for sapi in $sapis; do
 	esac
 
 	%configure \
+	EXTRA_LDFLAGS="%{rpmldflags}" \
 	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"
 	--cache-file=config.cache \

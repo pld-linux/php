@@ -1,7 +1,6 @@
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
-# - ext/intl poison libs in php-common: https://github.com/pld-linux/php/commit/5b279587c5f1dec19027944644902d6e993d5446
 # TODO 5.4:
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
@@ -145,7 +144,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.0.6
-Release:	2
+Release:	3
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -167,7 +166,7 @@ Patch0:		%{orgname}-shared.patch
 Patch1:		%{orgname}-pldlogo.patch
 Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
-
+Patch4:		intl-stdc++.patch
 Patch5:		%{orgname}-filter-shared.patch
 Patch6:		%{orgname}-build_modules.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
@@ -1942,7 +1941,7 @@ cp -p php.ini-production php.ini
 %patch1 -p1
 #%patch2 -p1 NEEDS PORTING
 %patch3 -p1
-
+%patch4 -p1
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1

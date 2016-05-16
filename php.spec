@@ -56,7 +56,6 @@
 %bcond_without	dba		# without DBA extension module
 %bcond_without	dom		# without DOM extension module
 %bcond_without	enchant		# without Enchant extension module
-%bcond_without	ereg		# without ext/ereg support
 %bcond_without	exif		# without EXIF extension module
 %bcond_without	fileinfo	# without fileinfo extension module
 %bcond_without	filter		# without filter extension module
@@ -536,12 +535,10 @@ Provides:	%{name}(zend_extension_api) = %{zend_extension_api}
 Provides:	%{name}(zend_module_api) = %{zend_module_api}
 Provides:	%{name}-core
 Provides:	%{name}-date
-%{?with_ereg:Provides:	%{name}-ereg}
 Provides:	%{name}-reflection
 Provides:	%{name}-standard
 Provides:	php(core) = %{version}
 Provides:	php(date)
-%{?with_ereg:Provides:	php(ereg)}
 Provides:	php(libxml)
 Provides:	php(reflection)
 Provides:	php(standard)
@@ -2378,7 +2375,6 @@ for sapi in $sapis; do
 	%{?with_pspell:--with-pspell=shared} \
 	%{__with_without readline readline shared} \
 	%{?with_recode:--with-recode=shared} \
-	%{__with_without ereg regex system} \
 	%{?with_snmp:--with-snmp=shared} \
 	%{!?with_pdo_sqlite:--without-pdo-sqlite} \
 	%{__with_without sqlite3 sqlite3 shared,/usr} \

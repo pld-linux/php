@@ -2326,7 +2326,7 @@ for sapi in $sapis; do
 	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
-	%{?with_webp:--with-vpx-dir=/usr} \
+	%{?with_webp:--with-webp-dir=/usr} \
 	--without-libexpat-dir \
 	%{__enable_disable posix posix shared} \
 	--enable-shared \

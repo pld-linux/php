@@ -133,8 +133,10 @@
 %undefine	with_filter
 %endif
 
+%define		rel		0.1
+%define		subver	alpha1
 %define		orgname	php
-%define		ver_suffix 70
+%define		ver_suffix 71
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -143,16 +145,17 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.0.7
-Release:	1
+Version:	7.1.0
+Release:	0.%{subver}.%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	75f8d1693a470cefe2a50abd283eb291
+#Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://downloads.php.net/~krakjoe/php-%{version}%{subver}.tar.xz
+# Source0-md5:	bba5158cf155a63bc6a1daf51b7b34a7
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -299,8 +302,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
 %define		php_api_version		20151012
-%define		zend_module_api		20151012
-%define		zend_extension_api	320151012
+%define		zend_module_api		20160303
+%define		zend_extension_api	320160303
 %define		php_pdo_api_version	20150127
 
 # Extension versions
@@ -310,7 +313,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		hashver		1.0
 %define		intlver		1.1.0
 %define		jsonver		1.4.0
-%define		opcachever	7.0.6-dev
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.13.2
@@ -1208,7 +1210,7 @@ Group:		Libraries
 URL:		https://wiki.php.net/rfc/optimizerplus
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Provides:	php(opcache) = %{opcachever}
+Provides:	php(opcache) = %{version}
 
 %description opcache
 The Zend OPcache provides faster PHP execution through opcode caching
@@ -1935,7 +1937,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{orgname}-%{version}
+%setup -q -n %{orgname}-%{version}%{?subver}
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1
@@ -2164,12 +2166,6 @@ ver=$(sed -n '/#define PHP_JSON_VERSION /{s/.* "//;s/".*$//;p}' ext/json/php_jso
 if test "$ver" != "%{jsonver}"; then
 	: Error: Upstream JSON version is now ${ver}, expecting %{jsonver}.
 	: Update the jsonver macro and rebuild.
-	exit 1
-fi
-ver=$(awk '/#define PHP_ZENDOPCACHE_VERSION/ {print $3}' ext/opcache/ZendAccelerator.h | xargs)
-if test "$ver" != "%{opcachever}"; then
-	: Error: Upstream Zend Opcache version is now ${ver}, expecting %{opcachever}.
-	: Update the opcachever macro and rebuild.
 	exit 1
 fi
 ver=$(sed -n '/#define PHPDBG_VERSION /{s/.* "//;s/".*$//;p}' sapi/phpdbg/phpdbg.h)

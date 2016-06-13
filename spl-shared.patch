@@ -62,17 +62,18 @@
  
  /* {{{ defines */
  #define EXTR_OVERWRITE			0
---- php-5.3.1/ext/pdo/pdo.c~	2009-07-19 22:46:03.000000000 +0000
-+++ php-5.3.1/ext/pdo/pdo.c	2009-11-27 16:37:51.332409104 +0000
-@@ -132,7 +132,7 @@
+--- php-7.1.0alpha1/ext/pdo/pdo.c~	2016-06-07 23:56:47.000000000 +0300
++++ php-7.1.0alpha1/ext/pdo/pdo.c	2016-06-13 23:24:51.238259131 +0300
+@@ -117,7 +117,9 @@
+ 
  /* {{{ pdo_functions[] */
- #if ZEND_MODULE_API_NO >= 20050922
  static const zend_module_dep pdo_deps[] = {
--#ifdef HAVE_SPL
 +#ifdef HAVE_SPL && !COMPILE_DL_SPL
  	ZEND_MOD_REQUIRED("spl")
- #endif
- 	{NULL, NULL, NULL}
++#endif
+ 	ZEND_MOD_END
+ };
+ /* }}} */
 --- php-5.3.1/ext/phar/Makefile.frag~	2009-07-23 15:48:04.000000000 +0000
 +++ php-5.3.1/ext/phar/Makefile.frag	2009-11-30 16:10:29.687175948 +0000
 @@ -10,7 +10,7 @@

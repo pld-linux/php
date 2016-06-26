@@ -310,7 +310,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		hashver		1.0
 %define		intlver		1.1.0
 %define		jsonver		1.4.0
-%define		opcachever	7.0.6-dev
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.13.3
@@ -1208,7 +1207,7 @@ Group:		Libraries
 URL:		https://wiki.php.net/rfc/optimizerplus
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Provides:	php(opcache) = %{opcachever}
+Provides:	php(opcache) = %{version}
 
 %description opcache
 The Zend OPcache provides faster PHP execution through opcode caching
@@ -2164,12 +2163,6 @@ ver=$(sed -n '/#define PHP_JSON_VERSION /{s/.* "//;s/".*$//;p}' ext/json/php_jso
 if test "$ver" != "%{jsonver}"; then
 	: Error: Upstream JSON version is now ${ver}, expecting %{jsonver}.
 	: Update the jsonver macro and rebuild.
-	exit 1
-fi
-ver=$(awk '/#define PHP_ZENDOPCACHE_VERSION/ {print $3}' ext/opcache/ZendAccelerator.h | xargs)
-if test "$ver" != "%{opcachever}"; then
-	: Error: Upstream Zend Opcache version is now ${ver}, expecting %{opcachever}.
-	: Update the opcachever macro and rebuild.
 	exit 1
 fi
 ver=$(sed -n '/#define PHPDBG_VERSION /{s/.* "//;s/".*$//;p}' sapi/phpdbg/phpdbg.h)

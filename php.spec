@@ -133,7 +133,7 @@
 %undefine	with_filter
 %endif
 
-%define		rel		0.4
+%define		rel		0.5
 %define		subver	alpha2
 %define		orgname	php
 %define		ver_suffix 71
@@ -2562,6 +2562,7 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 
 %if %{with phpdbg}
 %{__make} -f Makefile.phpdbg install-phpdbg \
+	INSTALL="libtool --mode=install install -p" \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 %endif
 

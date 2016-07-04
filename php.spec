@@ -2246,34 +2246,37 @@ for sapi in $sapis; do
 	sapi_args=''
 	case $sapi in
 	cgi-fcgi)
-		sapi_args='--disable-cli'
+		sapi_args='--enable-cgi'
 	;;
 	cli)
-		sapi_args='--disable-cgi %{?with_gcov:--enable-gcov}'
+		sapi_args='--enable-cli %{?with_gcov:--enable-gcov}'
 	;;
 	fpm)
-		sapi_args='--disable-cli --disable-cgi --enable-fpm'
+		sapi_args='--enable-fpm'
 		;;
 	embed)
-		sapi_args='--disable-cli --disable-cgi --enable-embed'
+		sapi_args='--enable-embed'
 		;;
 	apxs2)
 		ver=$(rpm -q --qf '%{V}' apache-devel)
-		sapi_args="--disable-cli --disable-cgi --with-apxs2=%{apxs2} --with-apache-version=$ver"
+		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	litespeed)
-		sapi_args='--disable-cli --disable-cgi --with-litespeed'
+		sapi_args='--with-litespeed'
 	;;
 	phpdbg)
-		sapi_args='--disable-cli --disable-cgi --enable-phpdbg %{?debug:--enable-phpdbg-debug}'
+		sapi_args='--enable-phpdbg %{?debug:--enable-phpdbg-debug}'
 	;;
 	milter)
-		sapi_args='--disable-cli --disable-cgi --with-milter'
+		sapi_args='--with-milter'
 	;;
 	esac
 
 	%configure \
 	EXTRA_LDFLAGS="%{rpmldflags}" \
+	--disable-cgi \
+	--disable-cli \
+	--disable-phpdbg \
 	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"
 	--cache-file=config.cache \

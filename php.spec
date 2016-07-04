@@ -134,7 +134,7 @@
 %endif
 
 %define		rel		0.1
-%define		subver	alpha1
+%define		subver	alpha2
 %define		orgname	php
 %define		ver_suffix 71
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -155,7 +155,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~krakjoe/php-%{version}%{subver}.tar.xz
-# Source0-md5:	bba5158cf155a63bc6a1daf51b7b34a7
+# Source0-md5:	71e2e66a62ba839868dac762ca54dbee
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -315,7 +315,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		1.4.0
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
-%define		zipver		1.13.2
+%define		zipver		1.13.3
 %define		phpdbgver	0.5.0
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}

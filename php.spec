@@ -2647,7 +2647,7 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 	INSTALL="libtool --mode=install install -p" \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
-# version the .phar files
+# version the phpdbg files
 mv $RPM_BUILD_ROOT%{_bindir}/phpdbg{,%{ver_suffix}}
 mv $RPM_BUILD_ROOT%{_mandir}/man1/phpdbg{,%{ver_suffix}}.1
 %endif

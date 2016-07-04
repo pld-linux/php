@@ -2644,6 +2644,7 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 
 %if %{with phpdbg}
 %{__make} -f Makefile.phpdbg install-phpdbg \
+	INSTALL="libtool --mode=install install -p" \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 %endif
 

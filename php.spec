@@ -2646,6 +2646,10 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 %{__make} -f Makefile.phpdbg install-phpdbg \
 	INSTALL="libtool --mode=install install -p" \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
+
+# version the .phar files
+mv $RPM_BUILD_ROOT%{_bindir}/phpdbg{,%{ver_suffix}}
+mv $RPM_BUILD_ROOT%{_mandir}/man1/phpdbg{,%{ver_suffix}}.1
 %endif
 
 %if %{with milter}
@@ -3044,8 +3048,8 @@ fi
 %if %{with phpdbg}
 %files phpdbg
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/phpdbg
-%{_mandir}/man1/phpdbg.1*
+%attr(755,root,root) %{_bindir}/phpdbg%{ver_suffix}
+%{_mandir}/man1/phpdbg%{ver_suffix}.1*
 %endif
 
 %if %{with milter}

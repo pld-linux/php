@@ -133,7 +133,7 @@
 %undefine	with_filter
 %endif
 
-%define		rel		0.1
+%define		rel		0.4
 %define		subver	alpha2
 %define		orgname	php
 %define		ver_suffix 71

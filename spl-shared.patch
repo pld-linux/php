@@ -50,18 +50,19 @@
  extern PHPAPI zend_class_entry *spl_ce_CallbackFilterIterator;
  extern PHPAPI zend_class_entry *spl_ce_RecursiveCallbackFilterIterator;
  
---- php-5.3.1/ext/standard/array.c~	2009-08-14 06:20:21.000000000 +0000
-+++ php-5.3.1/ext/standard/array.c	2009-11-27 16:37:15.029078323 +0000
-@@ -49,6 +49,9 @@
- #ifdef HAVE_SPL
+--- php-7.1.0alpha2/ext/standard/array.c~	2016-07-04 17:52:16.000000000 +0300
++++ php-7.1.0alpha2/ext/standard/array.c	2016-07-04 18:54:43.937173429 +0300
+@@ -48,6 +48,10 @@
+ #include "zend_smart_str.h"
  #include "ext/spl/spl_array.h"
- #endif
+ 
 +#if COMPILE_DL_SPL
 +PHPAPI zend_class_entry *spl_ce_Countable_p = NULL; // external one
 +#endif
- 
++
  /* {{{ defines */
  #define EXTR_OVERWRITE			0
+ #define EXTR_SKIP				1
 --- php-7.1.0alpha1/ext/pdo/pdo.c~	2016-06-07 23:56:47.000000000 +0300
 +++ php-7.1.0alpha1/ext/pdo/pdo.c	2016-06-13 23:24:51.238259131 +0300
 @@ -117,7 +117,9 @@

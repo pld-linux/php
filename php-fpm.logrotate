@@ -4,6 +4,7 @@
 	notifempty
 	missingok
 	create 600 root root
+	olddir /var/log/archive/php
 	sharedscripts
 	postrotate
 		/sbin/service @processname@ flush-logs > /dev/null

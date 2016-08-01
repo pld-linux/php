@@ -482,6 +482,7 @@ Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	php-dirs >= 1.4-2
 Requires:	rc-scripts
 Provides:	php(fcgi)
 Provides:	php(fpm)

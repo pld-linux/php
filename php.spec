@@ -1767,6 +1767,9 @@ Summary(pl.UTF-8):	Zawiera pliki testów jednostkowych dla PHP i rozszerzeń
 Group:		Libraries
 URL:		http://qa.php.net/
 Requires:	%{name}-cli
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description tests
 This package contains unit tests for PHP and its extensions.

@@ -134,7 +134,7 @@
 %endif
 
 %define		rel		0.5
-%define		subver	beta3
+%define		subver	RC1
 %define		orgname	php
 %define		ver_suffix 71
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -146,7 +146,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.1.0
-Release:	0.%{subver}.%{rel}
+Release:	1.%{subver}.%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -155,7 +155,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~davey/php-%{version}%{subver}.tar.xz
-# Source0-md5:	a8dac6900b017f2036c8b5a2770c3091
+# Source0-md5:	d9e84872f2ab73d00d3eb250ae8941d1
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -312,7 +312,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		fileinfover	1.0.5
 %define		hashver		1.0
 %define		intlver		1.1.0
-%define		jsonver		1.4.0
+%define		jsonver		1.5.0
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.13.4

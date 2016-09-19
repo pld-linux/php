@@ -1,5 +1,5 @@
---- php-7.0.0RC3/php.ini~	2015-09-20 21:20:29.000000000 +0300
-+++ php-7.0.0RC3/php.ini	2015-09-20 21:25:50.349958427 +0300
+--- php-7.0.10/php.ini~	2016-09-19 23:26:55.000000000 +0300
++++ php-7.0.10/php.ini	2016-09-19 23:27:28.521756951 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -111,7 +111,7 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -825,46 +825,8 @@
+@@ -823,47 +823,8 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.
  ;
@@ -124,6 +124,7 @@
 -;extension=php_bz2.dll
 -;extension=php_curl.dll
 -;extension=php_fileinfo.dll
+-;extension=php_ftp.dll
 -;extension=php_gd2.dll
 -;extension=php_gettext.dll
 -;extension=php_gmp.dll

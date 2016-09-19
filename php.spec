@@ -134,7 +134,7 @@
 %endif
 
 %define		rel		0.5
-%define		subver	RC1
+%define		subver	RC2
 %define		orgname	php
 %define		ver_suffix 71
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -155,7 +155,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~davey/php-%{version}%{subver}.tar.xz
-# Source0-md5:	d9e84872f2ab73d00d3eb250ae8941d1
+# Source0-md5:	efa2652fdb58b5bee56750238b5df45f
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -301,7 +301,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20151012
+%define		php_api_version		20160303
 %define		zend_module_api		20160303
 %define		zend_extension_api	320160303
 %define		php_pdo_api_version	20150127

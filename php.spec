@@ -126,7 +126,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	2
+%define		rel	3
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -1421,7 +1421,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-pgsql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-pgsql)
-Provides:	php-pecl-PDO_PGSQL
+Provides:	php-pecl-PDO_PGSQL = 4:5.3.28-7
 Obsoletes:	php-pdo-pgsql < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_PGSQL < 4:5.2.1-2
 

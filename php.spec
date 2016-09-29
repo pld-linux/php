@@ -3065,7 +3065,9 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
+%if %{with apache1} || %{with apache2}
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
+%endif
 %dir %{php_extensiondir}
 
 %doc ext/session/mod_files.sh
@@ -3075,7 +3077,11 @@ fi
 %doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
+%if %{with apache1} || %{with apache2}
 %attr(755,root,root) %{_libdir}/libphp_common.so
+%else
+%attr(755,root,root) %{_libdir}/libphp_common.a
+%endif
 %{_libdir}/libphp_common.la
 %{_includedir}/php
 %{_libdir}/%{name}/build

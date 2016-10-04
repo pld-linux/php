@@ -124,7 +124,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	9
+%define		rel	10
 %define		orgname	php
 %define		ver_suffix 54
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2606,7 +2606,7 @@ fi
 %post	embedded -p /sbin/ldconfig
 %postun	embedded -p /sbin/ldconfig
 
-%post common
+%posttrans common
 # PHP 5.3 requires timezone being setup, try setup it from tzdata
 if ! grep -q '^date.timezone[[:space:]]*=' %{_sysconfdir}/php.ini && [ -f /etc/sysconfig/timezone ]; then
 	TIMEZONE=
@@ -2616,7 +2616,6 @@ if ! grep -q '^date.timezone[[:space:]]*=' %{_sysconfdir}/php.ini && [ -f /etc/s
 	fi
 fi
 
-%posttrans common
 # minimizing apache restarts logics. we restart webserver:
 #
 # 1. at the end of transaction. (posttrans, feature from rpm 4.4.2)

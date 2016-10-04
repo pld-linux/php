@@ -2761,7 +2761,7 @@ fi
 %post	embedded -p /sbin/ldconfig
 %postun	embedded -p /sbin/ldconfig
 
-%post common
+%posttrans common
 # PHP 5.3 requires timezone being setup, try setup it from tzdata
 if ! grep -q '^date.timezone[[:space:]]*=' %{_sysconfdir}/php.ini && [ -f /etc/sysconfig/timezone ]; then
 	TIMEZONE=
@@ -2771,7 +2771,6 @@ if ! grep -q '^date.timezone[[:space:]]*=' %{_sysconfdir}/php.ini && [ -f /etc/s
 	fi
 fi
 
-%posttrans common
 # minimizing apache restarts logics. we restart webserver:
 #
 # 1. at the end of transaction. (posttrans, feature from rpm 4.4.2)

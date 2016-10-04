@@ -144,7 +144,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.0.11
-Release:	1
+Release:	2
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -2707,7 +2707,7 @@ fi
 %post	embedded -p /sbin/ldconfig
 %postun	embedded -p /sbin/ldconfig
 
-%post common
+%posttrans common
 # PHP 5.3 requires timezone being setup, try setup it from tzdata
 if ! grep -q '^date.timezone[[:space:]]*=' %{_sysconfdir}/php.ini && [ -f /etc/sysconfig/timezone ]; then
 	TIMEZONE=
@@ -2717,7 +2717,6 @@ if ! grep -q '^date.timezone[[:space:]]*=' %{_sysconfdir}/php.ini && [ -f /etc/s
 	fi
 fi
 
-%posttrans common
 # minimizing apache restarts logics. we restart webserver:
 #
 # 1. at the end of transaction. (posttrans, feature from rpm 4.4.2)

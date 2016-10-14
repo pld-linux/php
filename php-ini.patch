@@ -1,5 +1,5 @@
---- php-7.0.10/php.ini~	2016-09-19 23:26:55.000000000 +0300
-+++ php-7.0.10/php.ini	2016-09-19 23:27:28.521756951 +0300
+--- php-7.0.12/php.ini~	2016-10-14 17:03:05.000000000 +0300
++++ php-7.0.12/php.ini	2016-10-14 17:04:24.894309139 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -57,7 +57,7 @@
  ; On windows:
  ; extension_dir = "ext"
  
-@@ -760,53 +760,6 @@
+@@ -746,65 +746,6 @@
  ; http://php.net/enable-dl
  enable_dl = Off
  
@@ -88,6 +88,11 @@
 -; http://php.net/cgi.fix-pathinfo
 -;cgi.fix_pathinfo=1
 -
+-; if cgi.discard_path is enabled, the PHP CGI binary can safely be placed outside
+-; of the web tree and people will not be able to circumvent .htaccess security.
+-; http://php.net/cgi.dicard-path
+-;cgi.discard_path=1
+-
 -; FastCGI under IIS (on WINNT based OS) supports the ability to impersonate
 -; security tokens of the calling client.  This allows IIS to define the
 -; security context that the request runs under.  mod_fastcgi under Apache
@@ -107,6 +112,13 @@
 -; Default is zero.
 -; http://php.net/cgi.rfc2616-headers
 -;cgi.rfc2616_headers = 0
+-
+-; cgi.check_shebang_line controls whether CGI PHP checks for line starting with #!
+-; (shebang) at the top of the running script. This line might be needed if the
+-; script support running both as stand-alone script and via PHP CGI<. PHP in CGI
+-; mode skips this line and ignores its content if this directive is turned on.
+-; http://php.net/cgi.check-shebang-line
+-;cgi.check_shebang_line=1
 -
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;

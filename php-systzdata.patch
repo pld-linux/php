@@ -644,13 +644,12 @@ diff -up php-7.0.0RC1/ext/date/lib/parse_tz.c.systzdata php-7.0.0RC1/ext/date/li
  	} else {
  		tmp = NULL;
  	}
-diff -up php-7.0.0RC1/ext/date/lib/timelib.m4.systzdata php-7.0.0RC1/ext/date/lib/timelib.m4
---- php-7.0.0RC1/ext/date/lib/timelib.m4.systzdata	2015-08-18 23:39:24.000000000 +0200
-+++ php-7.0.0RC1/ext/date/lib/timelib.m4	2015-08-22 07:47:34.854055364 +0200
-@@ -78,3 +78,17 @@ stdlib.h
+--- php-7.1.0RC4/ext/date/lib/timelib.m4~	2016-10-17 14:35:11.000000000 +0300
++++ php-7.1.0RC4/ext/date/lib/timelib.m4	2016-10-25 14:11:32.224877793 +0300
+@@ -78,3 +78,16 @@
  
  dnl Check for strtoll, atoll
- AC_CHECK_FUNCS(strtoll atoll strftime)
+ AC_CHECK_FUNCS(strtoll atoll strftime gettimeofday)
 +
 +PHP_ARG_WITH(system-tzdata, for use of system timezone data,
 +[  --with-system-tzdata[=DIR]      to specify use of system timezone data],
@@ -664,4 +663,3 @@ diff -up php-7.0.0RC1/ext/date/lib/timelib.m4.systzdata php-7.0.0RC1/ext/date/li
 +                         [Define for location of system timezone data])
 +   fi
 +fi
-+

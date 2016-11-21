@@ -482,6 +482,7 @@ Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	alternatives
 Requires:	php-dirs >= 1.4-2
 Requires:	rc-scripts
 Provides:	php(fcgi)
@@ -2595,6 +2596,9 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 %{__sed} -i -e '/su/d' $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 %endif
 
+# touch for ghost for alternatives
+touch $RPM_BUILD_ROOT%{_sbindir}/php-fpm
+
 %{__sed} -i -e '
 	s#/usr/lib/php#%{php_extensiondir}#
 	s#/etc/php/#%{_sysconfdir}/#
@@ -2692,11 +2696,13 @@ fi
 %post fpm
 /sbin/chkconfig --add %{name}-fpm
 %service %{name}-fpm restart
+update-alternatives --install %{_sbindir}/php-fpm php-fpm %{_sbindir}/php%{ver_suffix}-fpm %{ver_suffix} || :
 
 %preun fpm
 if [ "$1" = "0" ]; then
 	%service %{name}-fpm stop
 	/sbin/chkconfig --del %{name}-fpm
+	update-alternatives --remove php-fpm %{_sbindir}/php-fpm || :
 fi
 
 %postun fpm
@@ -2913,6 +2919,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.d/www.conf
 %attr(755,root,root) %{_sbindir}/%{name}-fpm
+%ghost %{_sbindir}/php-fpm
 %{_mandir}/man8/%{name}-fpm.8*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/%{name}-fpm
 %attr(754,root,root) /etc/rc.d/init.d/%{name}-fpm

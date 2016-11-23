@@ -12,9 +12,9 @@
  PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
  
  PHP_SUBST(PHP_EXECUTABLE)
---- php-5.3.2/Makefile.global	2010-03-16 16:31:36.972576955 +0200
-+++ php-5.4.35/Makefile.global	2015-01-21 15:07:46.782561411 +0200
-@@ -77,7 +77,8 @@
+--- php-5.4.35/Makefile.global	2015-01-21 15:07:46.782561411 +0200
++++ php-5.5.38/Makefile.global	2016-11-23 04:52:33.981224263 +0200
+@@ -81,8 +81,15 @@
  		done; \
  	fi
  
@@ -22,21 +22,15 @@
 +PHP_TEST_SETTINGS = -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' -d 'safe_mode=0'
 +PHP_TEST_SHARED_SYSTEM_EXTENSIONS =
  PHP_TEST_SHARED_EXTENSIONS =  ` \
- 	if test "x$(PHP_MODULES)" != "x"; then \
- 		for i in $(PHP_MODULES)""; do \
-@@ -88,6 +89,12 @@
- 		for i in $(PHP_ZEND_EX)""; do \
- 			. $$i; $(top_srcdir)/build/shtool echo -n -- " -d $(ZEND_EXT_TYPE)=$(top_builddir)/modules/$$dlname"; \
- 		done; \
-+	fi; \
 +	if test "x$(PHP_TEST_SHARED_SYSTEM_EXTENSIONS)" != "x"; then \
 +		for i in $(PHP_TEST_SHARED_SYSTEM_EXTENSIONS)""; do \
 +			dlname=$$i.$(SHLIB_DL_SUFFIX_NAME); \
 +			$(top_srcdir)/build/shtool echo -n -- " -d extension=$(EXTENSION_DIR)/$$dlname"; \
 +		done; \
- 	fi`
- PHP_DEPRECATED_DIRECTIVES_REGEX = '^(define_syslog_variables|register_(globals|long_arrays)?|safe_mode|magic_quotes_(gpc|runtime|sybase)?|(zend_)?extension(_debug)?(_ts)?)[\t\ ]*='
- 
++	fi; \
+ 	if test "x$(PHP_MODULES)" != "x"; then \
+ 		for i in $(PHP_MODULES)""; do \
+ 			. $$i; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
 @@ -96,7 +103,7 @@
  PHP_DEPRECATED_DIRECTIVES_REGEX = '^(magic_quotes_(gpc|runtime|sybase)?|(zend_)?extension(_debug)?(_ts)?)[\t\ ]*='
  

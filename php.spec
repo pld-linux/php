@@ -24,20 +24,16 @@
 # standard
 #
 # Conditional build:
+# - packaging options
+%bcond_without	alternatives	# use alternatives system to select default phar and php-fpm
+%bcond_with	default_php	# build this PHP as default PHP in system (disables alternatives)
 # - General options:
 %bcond_without	embed		# disable building Embedded API
-%bcond_with	default_php	# use this PHP as default PHP in distro
 %bcond_with	gcov		# Enable Code coverage reporting
-%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
-%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_without	kerberos5	# without Kerberos5 support
-%bcond_with	mm		# without mm support for session storage
 %bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
-%bcond_with	system_gd	# with system gd (imageantialias function is missing then)
-%bcond_with	system_libzip	# with system libzip (reported broken currently)
 %bcond_with	systemtap	# systemtap/DTrace support
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
-%bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 %bcond_with	zts		# Zend Thread Safety
 # - SAPI
 %bcond_without	apache2		# disable building Apache 2.x SAPI
@@ -97,6 +93,13 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
+# extensions options
+%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
+%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
+%bcond_with	mm		# without mm support for session storage
+%bcond_with	system_gd	# with system gd (imageantialias function is missing then)
+%bcond_with	system_libzip	# with system libzip (reported broken currently)
+%bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -106,6 +109,10 @@
 %undefine	with_apache2
 %undefine	with_cgi
 %undefine	with_litespeed
+%endif
+
+%if %{with default_php}
+%undefine	with_alternatives
 %endif
 
 # mm is not thread safe
@@ -482,7 +489,7 @@ Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	alternatives
+%{?with_alternatives:Requires:	alternatives}
 Requires:	php-dirs >= 1.4-2
 Requires:	rc-scripts
 Provides:	php(fcgi)
@@ -502,6 +509,7 @@ PHP FastCGI Process Manager - zarządca procesów FastCGI.
 
 %package phpdbg
 Summary:	The debugging platform for PHP 5.4+
+Summary(pl.UTF-8):	Platforma diagnostyczna dla PHP 5.4+
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(phpdbg) = %{phpdbgver}
@@ -515,6 +523,15 @@ your code.
 
 phpdbg aims to be a lightweight, powerful, easy to use debugging
 platform for PHP 5.4+
+
+%description phpdbg -l pl.UTF-8
+phpdbg - interaktywny debugger dla PHP.
+
+Jest zaimplementowany jako moduł SAPI, potrafi przejąć pełną kontrolę
+nad środowiskiem bez wpływu na zachowanie lub wydajność kodu.
+
+Narzędzie powstało jako lekka, mająca duże możliwości, łatwa w użyciu
+platforma diagnostyczna dla PHP 5.4+.
 
 %package common
 Summary:	Common files needed by both Apache modules and CGI/CLI SAPIs
@@ -1457,7 +1474,7 @@ URL:		http://php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-hash = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
-Requires:	alternatives
+%{?with_alternatives:Requires:	alternatives}
 Suggests:	%{name}-cli
 # zlib is required by phar program, but as phar cli is optional should the dep be too
 Suggests:	%{name}-zlib
@@ -2046,22 +2063,22 @@ sed -i -e 's#-fvisibility=hidden##g' configure*
 
 # disable broken tests
 # says just "Terminated" twice and fails
-mv sapi/cli/tests/022.phpt{,.broken}
+%{__mv} sapi/cli/tests/022.phpt{,.broken}
 
 # really dumb test, executable binary name is .libs/ something when building
 # https://bugs.php.net/bug.php?id=54514
-mv tests/basic/bug54514.phpt{,.disable}
+%{__mv} tests/basic/bug54514.phpt{,.disable}
 
 # breaks whole testsuite unexpectedly:
 # Fatal error: Call to undefined function gzencode() in run-tests.php on line 1714
 # probably broken as zlib is built as shared
-mv ext/soap/tests/server019.phpt{,disable}
+%{__mv} ext/soap/tests/server019.phpt{,disable}
 # Fatal error: Call to undefined function gzcompress() in run-tests.php on line 1728
-mv ext/soap/tests/server020.phpt{,disable}
+%{__mv} ext/soap/tests/server020.phpt{,disable}
 
 # runs out of memory and kills carme vserver
 # PASS Bug #39438 (Fatal error: Out of memory) [Zend/tests/bug39438.phpt]
-mv Zend/tests/bug39438.phpt{,.disable}
+%{__mv} Zend/tests/bug39438.phpt{,.disable}
 
 # php-5.3.3/ext/standard/tests/file/statpage.phpt
 %{__rm} ext/standard/tests/file/statpage.phpt
@@ -2533,13 +2550,17 @@ cp -pf Makefile.cli Makefile
 	phpbuilddir=%{_libdir}/%{name}/build \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
+%if %{without default_php}
 # version the .phar files
-mv $RPM_BUILD_ROOT%{_bindir}/phar{,%{ver_suffix}}.phar
-mv $RPM_BUILD_ROOT%{_mandir}/man1/phar{,%{ver_suffix}}.1
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/phar{,%{php_suffix}}.phar
+%{__mv} $RPM_BUILD_ROOT%{_mandir}/man1/phar{,%{php_suffix}}.1
+%endif
+%if %{with alternatives}
 # touch for ghost
 %{__rm} $RPM_BUILD_ROOT%{_bindir}/phar
 touch $RPM_BUILD_ROOT%{_bindir}/phar
 touch $RPM_BUILD_ROOT%{_mandir}/man1/phar.1
+%endif
 
 # version suffix
 v=$(echo %{version} | cut -d. -f1-2)
@@ -2547,7 +2568,7 @@ v=$(echo %{version} | cut -d. -f1-2)
 # install Apache2 DSO module
 %if %{with apache2}
 libtool --mode=install install -p sapi/apache2handler/libphp7.la $RPM_BUILD_ROOT%{_libdir}/apache
-mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp7{,-$v}.so
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/apache/libphp7{,-$v}.so
 ln -s libphp7-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/mod_php.so
 %endif
 
@@ -2561,9 +2582,11 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 	INSTALL="libtool --mode=install install -p" \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
+%if %{without default_php}
 # version the phpdbg files
-mv $RPM_BUILD_ROOT%{_bindir}/phpdbg{,%{ver_suffix}}
-mv $RPM_BUILD_ROOT%{_mandir}/man1/phpdbg{,%{ver_suffix}}.1
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/phpdbg{,%{ver_suffix}}
+%{__mv} $RPM_BUILD_ROOT%{_mandir}/man1/phpdbg{,%{ver_suffix}}.1
+%endif
 %endif
 
 %if %{with milter}
@@ -2596,8 +2619,10 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 %{__sed} -i -e '/su/d' $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 %endif
 
+%if %{with alternatives}
 # touch for ghost for alternatives
 touch $RPM_BUILD_ROOT%{_sbindir}/php-fpm
+%endif
 
 %{__sed} -i -e '
 	s#/usr/lib/php#%{php_extensiondir}#
@@ -2645,7 +2670,7 @@ cp -p conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
 
 # for CLI SAPI only
-mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
+%{__mv} $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/%{name}/build
@@ -2696,13 +2721,17 @@ fi
 %post fpm
 /sbin/chkconfig --add %{name}-fpm
 %service %{name}-fpm restart
+%if %{with alternatives}
 update-alternatives --install %{_sbindir}/php-fpm php-fpm %{_sbindir}/php%{ver_suffix}-fpm %{ver_suffix} || :
+%endif
 
 %preun fpm
 if [ "$1" = "0" ]; then
 	%service %{name}-fpm stop
 	/sbin/chkconfig --del %{name}-fpm
+%if %{with alternatives}
 	update-alternatives --remove php-fpm %{_sbindir}/php-fpm || :
+%endif
 fi
 
 %postun fpm
@@ -2858,15 +2887,19 @@ fi \
 
 %post phar
 %ext_post
+%if %{with alternatives}
 update-alternatives \
 	--install %{_bindir}/phar phar %{_bindir}/phar%{ver_suffix}.phar %{ver_suffix} \
 	--slave %{_mandir}/man1/phar.1 phar.1 %{_mandir}/man1/phar%{ver_suffix}.1* || :
+%endif
 
 %postun phar
 %ext_postun
+%if %{with alternatives}
 if [ $1 -eq 0 ]; then
 	update-alternatives --remove phar %{_bindir}/phar || :
 fi
+%endif
 
 %if %{with apache2}
 %files -n apache-mod_%{name}
@@ -2919,7 +2952,9 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-fpm.d/www.conf
 %attr(755,root,root) %{_sbindir}/%{name}-fpm
+%if %{with alternatives}
 %ghost %{_sbindir}/php-fpm
+%endif
 %{_mandir}/man8/%{name}-fpm.8*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/%{name}-fpm
 %attr(754,root,root) /etc/rc.d/init.d/%{name}-fpm
@@ -2928,8 +2963,8 @@ fi
 %if %{with phpdbg}
 %files phpdbg
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/phpdbg%{ver_suffix}
-%{_mandir}/man1/phpdbg%{ver_suffix}.1*
+%attr(755,root,root) %{_bindir}/phpdbg%{php_suffix}
+%{_mandir}/man1/phpdbg%{php_suffix}.1*
 %endif
 
 %if %{with milter}
@@ -3295,11 +3330,15 @@ fi
 %doc ext/phar/{CREDITS,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/phar.ini
 %attr(755,root,root) %{php_extensiondir}/phar.so
-%attr(755,root,root) %{_bindir}/phar%{ver_suffix}.phar
-%{_mandir}/man1/phar.phar.1
-%{_mandir}/man1/phar%{ver_suffix}.1*
+%attr(755,root,root) %{_bindir}/phar%{php_suffix}.phar
+%{_mandir}/man1/phar%{php_suffix}.1*
+%{_mandir}/man1/phar.phar.1*
+%if %{with alternatives}
 %ghost %{_bindir}/phar
 %ghost %{_mandir}/man1/phar.1
+%else
+%attr(755,root,root) %{_bindir}/phar
+%endif
 %endif
 
 %if %{with posix}

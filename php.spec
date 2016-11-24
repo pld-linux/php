@@ -39,27 +39,41 @@
 # Reflection
 #
 # Conditional build:
-%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
-%bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
-%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
-%bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
-%bcond_with	system_libzip	# with system libzip (reported broken currently)
-%bcond_with	default_php	# use this PHP as default PHP in distro
+# - packaging options
+%bcond_without	alternatives	# use alternatives system to select default phar and php-fpm
+%bcond_with	default_php	# build this PHP as default PHP in system (disables alternatives)
+# - General options:
+%bcond_without	embed		# disable building Embedded API
+%bcond_with	gcov		# Enable Code coverage reporting
+%bcond_without	kerberos5	# without Kerberos5 support
+%bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
+%bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
+%bcond_with	type_hints	# experimental support for strict typing/casting
+%bcond_with	zts		# Zend Thread Safety
+# - SAPI
+%bcond_without	apache1		# disable building Apache 1.3.x SAPI
+%bcond_without	apache2		# disable building Apache 2.x SAPI
+%bcond_without	cgi		# disable CGI/FCGI SAPI
+%bcond_without	fpm		# disable FPM SAPI
+%bcond_without	litespeed	# build litespeed SAPI
+# - Extensions
+%bcond_without	bcmath		# without bcmath extension module
+%bcond_without	bz2		# without bz2 extension module
+%bcond_without	calendar	# without calendar extension module
+%bcond_without	ctype		# without ctype extension module
 %bcond_without	curl		# without CURL extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
 %bcond_without	intl		# without Intl extension module
-%bcond_without	kerberos5	# without Kerberos5 support
-%bcond_without	litespeed	# build litespeed module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
-%bcond_without	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 # don't turn it on by default; see TODO item for mysqlnd in this spec
 %bcond_with	mysqlnd		# with mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
+%bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
@@ -73,19 +87,15 @@
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
-%bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-%bcond_without	apache1		# disable building Apache 1.3.x SAPI
-%bcond_without	apache2		# disable building Apache 2.x SAPI
-%bcond_with	zts		# Zend Thread Safety
-%bcond_without	cgi		# disable CGI/FCGI SAPI
-%bcond_without	fpm		# disable FPM
-%bcond_with	embed		# disable Embedded API
-%bcond_with	suhosin		# with suhosin patch
-%bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
-%bcond_with	gcov		# Enable Code coverage reporting
-%bcond_with	type_hints	# experimental support for strict typing/casting
+# extensions options
+%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
+%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
+%bcond_with	mm		# without mm support for session storage
+%bcond_with	system_gd	# with system gd (imageantialias function is missing then)
+%bcond_with	system_libzip	# with system libzip (reported broken currently)
+%bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -96,6 +106,10 @@
 %undefine	with_apache2
 %undefine	with_cgi
 %undefine	with_litespeed
+%endif
+
+%if %{with default_php}
+%undefine	with_alternatives
 %endif
 
 # mm is not thread safe
@@ -1412,7 +1426,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
-Requires:	alternatives
+%{?with_alternatives:Requires:	alternatives}
 Suggests:	%{name}-cli
 # zlib is required by phar program, but as phar cli is optional should the dep be too
 Suggests:	%{name}-zlib
@@ -1986,22 +2000,22 @@ sed -i -e 's#-fvisibility=hidden##g' configure*
 
 # disable broken tests
 # says just "Terminated" twice and fails
-mv sapi/cli/tests/022.phpt{,.broken}
+%{__mv} sapi/cli/tests/022.phpt{,.broken}
 
 # really dumb test, executable binary name is .libs/ something when building
 # https://bugs.php.net/bug.php?id=54514
-mv tests/basic/bug54514.phpt{,.disable}
+%{__mv} tests/basic/bug54514.phpt{,.disable}
 
 # breaks whole testsuite unexpectedly:
 # Fatal error: Call to undefined function gzencode() in run-tests.php on line 1714
 # probably broken as zlib is built as shared
-mv ext/soap/tests/server019.phpt{,disable}
+%{__mv} ext/soap/tests/server019.phpt{,disable}
 # Fatal error: Call to undefined function gzcompress() in run-tests.php on line 1728
-mv ext/soap/tests/server020.phpt{,disable}
+%{__mv} ext/soap/tests/server020.phpt{,disable}
 
 # runs out of memory and kills carme vserver
 # PASS Bug #39438 (Fatal error: Out of memory) [Zend/tests/bug39438.phpt]
-mv Zend/tests/bug39438.phpt{,.disable}
+%{__mv} Zend/tests/bug39438.phpt{,.disable}
 
 # php-5.3.3/ext/standard/tests/file/statpage.phpt
 %{__rm} ext/standard/tests/file/statpage.phpt
@@ -2422,13 +2436,17 @@ cp -pf Makefile.cli Makefile
 	phpbuilddir=%{_libdir}/%{name}/build \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
+%if %{without default_php}
 # version the .phar files
-mv $RPM_BUILD_ROOT%{_bindir}/phar{,%{ver_suffix}}.phar
-mv $RPM_BUILD_ROOT%{_mandir}/man1/phar{,%{ver_suffix}}.1
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/phar{,%{php_suffix}}.phar
+%{__mv} $RPM_BUILD_ROOT%{_mandir}/man1/phar{,%{php_suffix}}.1
+%endif
+%if %{with alternatives}
 # touch for ghost
 %{__rm} $RPM_BUILD_ROOT%{_bindir}/phar
 touch $RPM_BUILD_ROOT%{_bindir}/phar
 touch $RPM_BUILD_ROOT%{_mandir}/man1/phar.1
+%endif
 
 # version suffix
 v=$(echo %{version} | cut -d. -f1-2)
@@ -2436,14 +2454,14 @@ v=$(echo %{version} | cut -d. -f1-2)
 # install Apache1 DSO module
 %if %{with apache1}
 libtool --mode=install install -p sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
-mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-$v}.so
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-$v}.so
 ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache1/mod_php.so
 %endif
 
 # install Apache2 DSO module
 %if %{with apache2}
 libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
-mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-$v}.so
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-$v}.so
 ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/mod_php.so
 %endif
 
@@ -2477,7 +2495,7 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 %endif
 
 %if %{with alternatives}
-# touch for ghost
+# touch for ghost for alternatives
 touch $RPM_BUILD_ROOT%{_sbindir}/php-fpm
 %endif
 
@@ -2532,7 +2550,7 @@ cp -p conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
 
 # for CLI SAPI only
-mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
+%{__mv} $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/%{name}/build
@@ -2747,15 +2765,19 @@ fi \
 
 %post phar
 %ext_post
+%if %{with alternatives}
 update-alternatives \
 	--install %{_bindir}/phar phar %{_bindir}/phar%{ver_suffix}.phar %{ver_suffix} \
 	--slave %{_mandir}/man1/phar.1 phar.1 %{_mandir}/man1/phar%{ver_suffix}.1* || :
+%endif
 
 %postun phar
 %ext_postun
+%if %{with alternatives}
 if [ $1 -eq 0 ]; then
 	update-alternatives --remove phar %{_bindir}/phar || :
 fi
+%endif
 
 %if %{with apache1}
 %files -n apache1-mod_%{name}
@@ -3152,11 +3174,15 @@ fi
 %doc ext/phar/{CREDITS,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/phar.ini
 %attr(755,root,root) %{php_extensiondir}/phar.so
-%attr(755,root,root) %{_bindir}/phar%{ver_suffix}.phar
-%{_mandir}/man1/phar.phar.1
-%{_mandir}/man1/phar%{ver_suffix}.1*
+%attr(755,root,root) %{_bindir}/phar%{php_suffix}.phar
+%{_mandir}/man1/phar%{php_suffix}.1*
+%{_mandir}/man1/phar.phar.1*
+%if %{with alternatives}
 %ghost %{_bindir}/phar
 %ghost %{_mandir}/man1/phar.1
+%else
+%attr(755,root,root) %{_bindir}/phar
+%endif
 %endif
 
 %files posix

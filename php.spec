@@ -26,25 +26,41 @@
 # Reflection
 #
 # Conditional build:
-%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
-%bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
-%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
-%bcond_with	system_gd	# with system gd (we prefer internal since it enables few more features)
-%bcond_with	system_libzip	# with system libzip (reported broken currently)
-%bcond_with	default_php	# use this PHP as default PHP in distro
+# - packaging options
+%bcond_without	alternatives	# use alternatives system to select default phar and php-fpm
+%bcond_with	default_php	# build this PHP as default PHP in system (disables alternatives)
+# - General options:
+%bcond_without	embed		# disable building Embedded API
+%bcond_with	gcov		# Enable Code coverage reporting
+%bcond_without	kerberos5	# without Kerberos5 support
+%bcond_with	lfs		# Build with FILE_OFFSET_BITS=64
+%bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
+%bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
+%bcond_with	type_hints	# experimental support for strict typing/casting
+%bcond_with	zts		# Zend Thread Safety
+# - SAPI
+%bcond_without	apache1		# disable building Apache 1.3.x SAPI
+%bcond_without	apache2		# disable building Apache 2.x SAPI
+%bcond_without	cgi		# disable CGI/FCGI SAPI
+%bcond_without	fpm		# disable FPM SAPI
+%bcond_without	litespeed	# build litespeed SAPI
+# - Extensions
+%bcond_without	bcmath		# without bcmath extension module
+%bcond_without	bz2		# without bz2 extension module
+%bcond_without	calendar	# without calendar extension module
+%bcond_without	ctype		# without ctype extension module
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	interbase	# without InterBase extension module
-%bcond_without	kerberos5	# without Kerberos5 support
-%bcond_without	litespeed	# build litespeed module
+%bcond_without	intl		# without Intl extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
-%bcond_with	mm		# without mm support for session storage
 %bcond_without	mssql		# without MS SQL extension module
 %bcond_with	mysqlnd		# with mysqlnd support in mysql related extensions
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
+%bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
 %bcond_without	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
@@ -60,18 +76,12 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-%bcond_without	apache1		# disable building Apache 1.3.x SAPI
-%bcond_without	apache2		# disable building Apache 2.x SAPI
-%bcond_with	zts		# Zend Thread Safety
-%bcond_with	lfs		# Build with FILE_OFFSET_BITS=64
-%bcond_without	cgi		# disable CGI/FCGI SAPI
-%bcond_without	fpm		# disable FPM
-%bcond_without	embed		# disable Embedded API
-%bcond_without	alternatives		# disable alternatives support
-%bcond_with	suhosin		# with suhosin patch
-%bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
-%bcond_with	gcov		# Enable Code coverage reporting
-%bcond_with	type_hints	# experimental support for strict typing/casting
+# extensions options
+%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
+%bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
+%bcond_with	mm		# without mm support for session storage
+%bcond_with	system_gd	# with system gd (imageantialias function is missing then)
+%bcond_with	system_libzip	# with system libzip (reported broken currently)
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
@@ -88,6 +98,10 @@
 %ifnarch %{ix86} x32
 # has no effect on 64bit systems
 %undefine	with_lfs
+%endif
+
+%if %{with default_php}
+%undefine	with_alternatives
 %endif
 
 # mm is not thread safe
@@ -2153,7 +2167,7 @@ sed -i -e 's#-fvisibility=hidden##g' configure*
 
 # disable broken tests
 # says just "Terminated" twice and fails
-mv sapi/cli/tests/022.phpt{,.broken}
+%{__mv} sapi/cli/tests/022.phpt{,.broken}
 
 # php-5.3.3/ext/standard/tests/file/statpage.phpt
 %{__rm} ext/standard/tests/file/statpage.phpt
@@ -2567,15 +2581,16 @@ cp -pf Makefile.cli Makefile
 	phpbuilddir=%{_libdir}/%{name}/build \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
+%if %{without default_php}
 # version the .phar files
-mv $RPM_BUILD_ROOT%{_bindir}/phar{,%{ver_suffix}}.phar
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/phar{,%{php_suffix}}.phar
 %if %{with alternatives}
 # touch for ghost
 %{__rm} $RPM_BUILD_ROOT%{_bindir}/phar
 touch $RPM_BUILD_ROOT%{_bindir}/phar
 %else
 # make link relative
-ln -sfn phar%{ver_suffix}.phar $RPM_BUILD_ROOT%{_bindir}/phar
+ln -sfn phar%{php_suffix}.phar $RPM_BUILD_ROOT%{_bindir}/phar
 %endif
 
 # version suffix
@@ -2584,14 +2599,14 @@ v=$(echo %{version} | cut -d. -f1-2)
 # install Apache1 DSO module
 %if %{with apache1}
 libtool --mode=install install -p sapi/apache/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache1
-mv $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-$v}.so
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/apache1/libphp5{,-$v}.so
 ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache1/mod_php.so
 %endif
 
 # install Apache2 DSO module
 %if %{with apache2}
 libtool --mode=install install -p sapi/apache2handler/libphp5.la $RPM_BUILD_ROOT%{_libdir}/apache
-mv $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-$v}.so
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/apache/libphp5{,-$v}.so
 ln -s libphp5-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/mod_php.so
 %endif
 
@@ -2627,7 +2642,7 @@ cp -p %{SOURCE11} $RPM_BUILD_ROOT/etc/logrotate.d/%{name}-fpm
 %endif
 
 %if %{with alternatives}
-# touch for ghost
+# touch for ghost for alternatives
 touch $RPM_BUILD_ROOT%{_sbindir}/php-fpm
 %endif
 
@@ -2687,7 +2702,7 @@ cp -p conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
 
 # for CLI SAPI only
-mv $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
+%{__mv} $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
 
 # use system automake and {lib,sh}tool
 ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/%{name}/build
@@ -3337,8 +3352,12 @@ fi
 %doc ext/phar/{CREDITS,TODO}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/phar.ini
 %attr(755,root,root) %{php_extensiondir}/phar.so
-%attr(755,root,root) %{_bindir}/phar%{ver_suffix}.phar
-%{?with_alternatives:%ghost} %{_bindir}/phar
+%attr(755,root,root) %{_bindir}/phar%{php_suffix}.phar
+%if %{with alternatives}
+%ghost %{_bindir}/phar
+%else
+%attr(755,root,root) %{_bindir}/phar
+%endif
 %endif
 
 %files posix

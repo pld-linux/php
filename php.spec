@@ -134,7 +134,6 @@
 %endif
 
 %define		rel		0.5
-%define		subver	RC6
 %define		orgname	php
 %define		ver_suffix 71
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -146,16 +145,15 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.1.0
-Release:	1.%{subver}.%{rel}
+Release:	1.1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-#Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://downloads.php.net/~krakjoe/%{orgname}-%{version}%{subver}.tar.xz
-# Source0-md5:	26bb2d5dc690b3463a0fea3d71fcf935
+Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	cf36039303c47f493100afea522a8f53
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini

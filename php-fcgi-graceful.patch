@@ -18,8 +18,8 @@ while ($i < 35) {
 echo "end!<br>\n";
 ?>
 
---- php-7.0.0beta1/sapi/cgi/cgi_main.c~	2015-07-13 16:14:53.000000000 +0300
-+++ php-7.0.0beta1/sapi/cgi/cgi_main.c	2015-07-15 13:51:32.072326529 +0300
+--- php-7.1.0alpha2/sapi/cgi/cgi_main.c~	2016-07-04 14:56:49.000000000 +0300
++++ php-7.1.0alpha2/sapi/cgi/cgi_main.c	2016-07-04 14:58:17.522958766 +0300
 @@ -101,6 +101,9 @@
   */
  static int parent = 1;
@@ -60,11 +60,10 @@ echo "end!<br>\n";
  	fcgi_request *request = NULL;
  	int repeats = 1;
  	int benchmark = 0;
-@@ -2050,10 +2050,13 @@
- 						 */
+@@ -2080,9 +2080,14 @@
  						parent = 0;
  
--						/* don't catch our signals */
+ 						/* don't catch our signals */
 -						sigaction(SIGTERM, &old_term, 0);
  						sigaction(SIGQUIT, &old_quit, 0);
  						sigaction(SIGINT,  &old_int,  0);
@@ -73,6 +72,7 @@ echo "end!<br>\n";
 +						act.sa_flags = 0;
 +						act.sa_handler = fastcgi_graceful_shutdown;
 +						sigaction(SIGTERM, &act, &old_term);
++
+ 						zend_signal_init();
  						break;
  					case -1:
- 						perror("php (pre-forking)");

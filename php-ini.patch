@@ -1,5 +1,5 @@
---- php-7.0.12/php.ini~	2016-10-14 17:03:05.000000000 +0300
-+++ php-7.0.12/php.ini	2016-10-14 17:04:24.894309139 +0300
+--- php-7.1.0RC3/php.ini~	2016-10-04 18:47:57.000000000 +0300
++++ php-7.1.0RC3/php.ini	2016-10-04 18:50:05.861335161 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -57,7 +57,7 @@
  ; On windows:
  ; extension_dir = "ext"
  
-@@ -746,65 +746,6 @@
+@@ -761,65 +761,6 @@
  ; http://php.net/enable-dl
  enable_dl = Off
  
@@ -123,7 +123,7 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -823,47 +823,8 @@
+@@ -824,47 +824,8 @@
  ; If you only provide the name of the extension, PHP will look for it in its
  ; default extension directory.
  ;
@@ -168,8 +168,8 @@
 -;extension=php_tidy.dll
 -;extension=php_xmlrpc.dll
 -;extension=php_xsl.dll
-+; Ideally in PLD Linux you should install appropriate php70-<extension> or
-+; php70-pecl-<extension> package.
++; Ideally in PLD Linux you should install appropriate php71-<extension> or
++; php71-pecl-<extension> package.
  
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;

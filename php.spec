@@ -141,7 +141,7 @@
 %endif
 
 %define		orgname	php
-%define		ver_suffix 70
+%define		ver_suffix 71
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -150,8 +150,8 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.0.13
-Release:	1
+Version:	7.1.0
+Release:	2
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -159,7 +159,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	eb117bf1d1efc99c522f132b265a3402
+# Source0-md5:	cf36039303c47f493100afea522a8f53
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -268,7 +268,7 @@ BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
-BuildRequires:	openssl-devel >= 0.9.8
+BuildRequires:	openssl-devel >= 1.0.1
 %endif
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
@@ -305,9 +305,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20151012
-%define		zend_module_api		20151012
-%define		zend_extension_api	320151012
+%define		php_api_version		20160303
+%define		zend_module_api		20160303
+%define		zend_extension_api	320160303
 %define		php_pdo_api_version	20150127
 
 # Extension versions
@@ -316,7 +316,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		fileinfover	1.0.5
 %define		hashver		1.0
 %define		intlver		1.1.0
-%define		jsonver		1.4.0
+%define		jsonver		1.5.0
 %define		pharver		2.0.2
 %define		sqlite3ver	0.7-dev
 %define		zipver		1.13.5
@@ -1760,6 +1760,9 @@ Summary(pl.UTF-8):	Zawiera pliki testów jednostkowych dla PHP i rozszerzeń
 Group:		Libraries
 URL:		http://qa.php.net/
 Requires:	%{name}-cli
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description tests
 This package contains unit tests for PHP and its extensions.
@@ -1953,7 +1956,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{orgname}-%{version}
+%setup -q -n %{orgname}-%{version}%{?subver}
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1
@@ -2262,34 +2265,37 @@ for sapi in $sapis; do
 	sapi_args=''
 	case $sapi in
 	cgi-fcgi)
-		sapi_args='--disable-cli'
+		sapi_args='--enable-cgi'
 	;;
 	cli)
-		sapi_args='--disable-cgi %{?with_gcov:--enable-gcov}'
+		sapi_args='--enable-cli %{?with_gcov:--enable-gcov}'
 	;;
 	fpm)
-		sapi_args='--disable-cli --disable-cgi --enable-fpm'
+		sapi_args='--enable-fpm'
 		;;
 	embed)
-		sapi_args='--disable-cli --disable-cgi --enable-embed'
+		sapi_args='--enable-embed'
 		;;
 	apxs2)
 		ver=$(rpm -q --qf '%{V}' apache-devel)
-		sapi_args="--disable-cli --disable-cgi --with-apxs2=%{apxs2} --with-apache-version=$ver"
+		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	litespeed)
-		sapi_args='--disable-cli --disable-cgi --with-litespeed'
+		sapi_args='--with-litespeed'
 	;;
 	phpdbg)
-		sapi_args='--disable-cli --disable-cgi --enable-phpdbg %{?debug:--enable-phpdbg-debug}'
+		sapi_args='--enable-phpdbg %{?debug:--enable-phpdbg-debug}'
 	;;
 	milter)
-		sapi_args='--disable-cli --disable-cgi --with-milter'
+		sapi_args='--with-milter'
 	;;
 	esac
 
 	%configure \
 	EXTRA_LDFLAGS="%{rpmldflags}" \
+	--disable-cgi \
+	--disable-cli \
+	--disable-phpdbg \
 	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"
 	--cache-file=config.cache \

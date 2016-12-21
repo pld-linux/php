@@ -2757,8 +2757,8 @@ touch $RPM_BUILD_ROOT%{_sbindir}/php-fpm
 %endif
 
 %{__sed} -i -e '
-	s#/usr/lib/php#%{php_extensiondir}#
-	s#/etc/php/#%{_sysconfdir}/#
+	s#/usr/lib/php#%{php_extensiondir}#g
+	s#/etc/php/#%{_sysconfdir}/#g
 	s#@processname@#%{name}-fpm#g
 ' $RPM_BUILD_ROOT{/etc/{rc.d/init.d/%{name}-fpm,logrotate.d/%{name}-fpm},%{_sysconfdir}/php-fpm.conf,%{_sysconfdir}/fpm.d/www.conf}
 %endif
@@ -2797,8 +2797,8 @@ cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
 # ensure that paths are correct for current php version and arch
 grep -El '/etc/php/|/usr/lib/php/' $RPM_BUILD_ROOT%{_sysconfdir}/*.ini | xargs -r \
 %{__sed} -i -e '
-	s#/usr/lib/php#%{php_extensiondir}#
-	s#/etc/php#%{_sysconfdir}#
+	s#/usr/lib/php#%{php_extensiondir}#g
+	s#/etc/php/#%{_sysconfdir}/#g
 '
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d

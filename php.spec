@@ -1359,7 +1359,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/ref.pdo-dblib.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
-Provides:	php(dblib)
+Provides:	php(pdo_dblib)
 Obsoletes:	php-pdo-dblib < 4:5.3.28-7
 
 %description pdo-dblib

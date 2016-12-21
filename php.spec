@@ -2209,7 +2209,6 @@ sed -i -e 's#-fvisibility=hidden##g' configure*
 %{__rm} ext/sockets/tests/mcast_ipv?_recv.phpt
 # causes stack exhausion
 %{__rm} Zend/tests/bug54268.phpt
-%{__rm} Zend/tests/bug68412.phpt
 
 # avoid issues when two builds run simultaneously
 %ifarch %{x8664}

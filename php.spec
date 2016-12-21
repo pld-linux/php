@@ -2584,6 +2584,7 @@ cp -pf Makefile.cli Makefile
 %if %{without default_php}
 # version the .phar files
 %{__mv} $RPM_BUILD_ROOT%{_bindir}/phar{,%{php_suffix}}.phar
+%endif
 %if %{with alternatives}
 # touch for ghost
 %{__rm} $RPM_BUILD_ROOT%{_bindir}/phar

@@ -1281,7 +1281,7 @@ Group:		Libraries
 URL:		http://www.php.net/manual/en/ref.pdo-dblib.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
-Provides:	php(dblib)
+Provides:	php(pdo_dblib)
 
 %description pdo-dblib
 This is a dynamic shared object (DSO) for PHP that will add PDO

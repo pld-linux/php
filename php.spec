@@ -1359,6 +1359,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-firebird.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-firebird)
+Provides:	php(pdo_firebird)
 Obsoletes:	php-pdo-firebird < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_FIREBIRD
 
@@ -1379,6 +1380,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-mysql)
+Provides:	php(pdo_mysql)
 Obsoletes:	php-pdo-mysql < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_MYSQL
 
@@ -1398,6 +1400,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-oci.php
 %{?requires_php_extension}
 %{?requires_php_pdo_module}
 Provides:	php(pdo-oci)
+Provides:	php(pdo_oci)
 Obsoletes:	php-pdo-oci < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_OCI
 
@@ -1417,6 +1420,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-odbc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-odbc)
+Provides:	php(pdo_odbc)
 Obsoletes:	php-pdo-odbc < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_ODBC
 
@@ -1436,6 +1440,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-pgsql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-pgsql)
+Provides:	php(pdo_pgsql)
 Provides:	php-pecl-PDO_PGSQL = 4:5.3.28-7
 Obsoletes:	php-pdo-pgsql < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_PGSQL < 4:5.2.1-2
@@ -1456,6 +1461,7 @@ URL:		http://www.php.net/manual/en/ref.pdo-sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-sqlite)
+Provides:	php(pdo_sqlite)
 Obsoletes:	php-pdo-sqlite < 4:5.3.28-7
 Obsoletes:	php-pecl-PDO_SQLITE
 

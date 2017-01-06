@@ -1377,7 +1377,6 @@ URL:		http://www.php.net/manual/en/ref.pdo-pgsql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-pgsql)
-Provides:	php-pecl-PDO_PGSQL
 Provides:	php(pdo_pgsql)
 Obsoletes:	php-pecl-PDO_PGSQL < 4:5.2.1-2
 

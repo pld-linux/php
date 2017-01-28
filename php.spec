@@ -235,11 +235,6 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
-%{?with_fpm:BuildRequires:	libapparmor-devel}
-%{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
-%{!?with_mysqlnd:BuildRequires:	mysql-devel}
-BuildRequires:	pkgconfig
-BuildRequires:	sed >= 4.0
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
@@ -250,6 +245,8 @@ BuildRequires:	gd-devel >= 2.1
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel >= 4.2
 %{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
+%{?with_gcov:BuildRequires:	lcov}
+%{?with_fpm:BuildRequires:	libapparmor-devel}
 %{?with_intl:BuildRequires:	libicu-devel >= 4.4}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
@@ -257,7 +254,6 @@ BuildRequires:	libmcrypt-devel >= 2.5.6
 BuildRequires:	libpng-devel >= 1.0.8
 %{?with_intl:BuildRequires:	libstdc++-devel}
 %{?with_webp:BuildRequires:	libwebp-devel}
-BuildRequires:	tokyocabinet-devel
 %if "%{pld_release}" != "ac"
 BuildRequires:	libtool >= 2:2.4.6
 %else
@@ -265,14 +261,16 @@ BuildRequires:	libtool >= 1.4.3
 %endif
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 BuildRequires:	libxslt-devel >= 1.1.0
+%{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
+%{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
+%{!?with_pdo_mysql:BuildRequires:	mysql-devel}
+%{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
+%{?with_snmp:BuildRequires:	net-snmp-devel >= 5.3}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 1.0.1
 %endif
-%{?with_gcov:BuildRequires:	lcov}
-%{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
-%{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
 %{?with_oci:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
 %{?with_pcre:BuildRequires:	pcre-devel >= 8.10}
@@ -283,16 +281,18 @@ BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.566
-%{?with_systemtap:BuildRequires:	systemtap-sdt-devel}
-BuildRequires:	tar >= 1:1.22
-BuildRequires:	xz
+BuildRequires:	sed >= 4.0
 %if %{with sqlite3} || %{with pdo_sqlite}
 BuildRequires:	sqlite3-devel >= 3.3.9
 %endif
+%{?with_systemtap:BuildRequires:	systemtap-sdt-devel}
+BuildRequires:	tar >= 1:1.22
 %{?with_tidy:BuildRequires:	tidy-devel}
+BuildRequires:	tokyocabinet-devel
 %{?with_odbc:BuildRequires:	unixODBC-devel}
 %{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel >= 0.54.1}
-BuildRequires:	zlib-devel >= 1.0.9
+BuildRequires:	xz
+BuildRequires:	zlib-devel >= 1.2.0.4
 %if %{with apache2}
 BuildRequires:	apache-devel >= 2.0.52-2
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -545,6 +545,7 @@ Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs >= 1.4
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
+Requires:	zlib >= 1.2.0.4
 Provides:	%{name}(debug) = %{php_debug}
 Provides:	%{name}(modules_api) = %{php_api_version}
 Provides:	%{name}(thread-safety) = %{_zend_zts}
@@ -1129,6 +1130,7 @@ URL:		http://php.net/manual/en/book.mysqli.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Requires:	mysql-libs >= 4.1.13
 Provides:	php(mysqli)
 Obsoletes:	php-mysqli < 4:5.3.28-7
 
@@ -1914,7 +1916,7 @@ Group:		Libraries
 URL:		http://php.net/manual/en/book.xsl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
-Requires:	libxslt >= 1.0.18
+Requires:	libxslt >= 1.1.0
 Provides:	php(xsl)
 Obsoletes:	php-xsl < 4:5.3.28-7
 # actually not true, functionality is similar, but API differs

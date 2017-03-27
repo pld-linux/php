@@ -1,5 +1,5 @@
---- php-5.4.6/scripts/phpize.in~	2012-08-23 03:02:42.000000000 +0300
-+++ php-5.4.6/scripts/phpize.in	2012-08-23 10:16:37.011306948 +0300
+--- php-7.1.3/scripts/phpize.in~	2017-03-27 23:35:05.000000000 +0300
++++ php-7.1.3/scripts/phpize.in	2017-03-27 23:37:32.336520891 +0300
 @@ -6,10 +6,16 @@
  exec_prefix="`eval echo @exec_prefix@`"
  phpdir="`eval echo @libdir@`/php/build"
@@ -8,15 +8,15 @@
  builddir="`pwd`"
  SED="@SED@"
  
--FILES_BUILD="mkdep.awk scan_makefile_in.awk shtool libtool.m4"
-+FILES_BUILD="mkdep.awk scan_makefile_in.awk shtool"
+-FILES_BUILD="mkdep.awk scan_makefile_in.awk shtool libtool.m4 ax_check_compile_flag.m4"
++FILES_BUILD="mkdep.awk scan_makefile_in.awk shtool ax_check_compile_flag.m4"
 +if [ -f "$aclocaldir/ltsugar.m4" ]; then
 +    LIBTOOL_FILES="libtool.m4 ltoptions.m4 ltsugar.m4 ltversion.m4 lt~obsolete.m4"
 +else
 +    LIBTOOL_FILES="libtool.m4"
 +fi
  FILES="acinclude.m4 Makefile.global config.sub config.guess ltmain.sh run-tests*.php"
- CLEAN_FILES="$FILES *.o *.lo *.la .deps .libs/ build/ include/ modules/ install-sh \
+ CLEAN_FILES="$FILES *.o *.lo *.la .deps .libs/ build/ modules/ install-sh \
  	mkinstalldirs missing config.nice config.sub config.guess configure configure.in \
 @@ -145,8 +151,9 @@ phpize_copy_files()
    test -d build || mkdir build

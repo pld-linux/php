@@ -43,7 +43,7 @@
 %bcond_without	alternatives	# use alternatives system to select default phar and php-fpm
 %bcond_with	default_php	# build this PHP as default PHP in system (disables alternatives)
 # - General options:
-%bcond_without	embed		# disable building Embedded API
+%bcond_with	embed		# disable building Embedded API
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_without	kerberos5	# without Kerberos5 support
 %bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
@@ -138,7 +138,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	13
+%define		rel	15
 %define		orgname	php
 %define		ver_suffix 54
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}

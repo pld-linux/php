@@ -70,18 +70,18 @@
  
  			ths = document.getElementsByTagName("th");
  			for (var i=0; i<ths.length; i++) {
---- php7.0-7.0/sapi/fpm/Makefile.frag~	2015-05-21 17:57:06.000000000 +0300
-+++ php7.0-7.0/sapi/fpm/Makefile.frag	2015-05-23 11:01:51.383332821 +0300
-@@ -11,9 +11,9 @@
- 	@$(INSTALL) -m 0755 $(SAPI_FPM_PATH) $(INSTALL_ROOT)$(sbindir)/$(program_prefix)php-fpm$(program_suffix)$(EXEEXT)
- 
- 	@echo "Installing PHP FPM config:        $(INSTALL_ROOT)$(sysconfdir)/" && \
--	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d || :
--	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf.default || :
--	@$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d/www.conf.default || :
-+	$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/fpm.d || :
-+	@$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf || :
-+	@$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf || :
- 
+--- php-7.1.3/sapi/fpm/Makefile.frag~	2017-03-14 15:17:50.000000000 +0200
++++ php-7.1.3/sapi/fpm/Makefile.frag	2017-03-28 09:44:28.799989897 +0300
+@@ -14,9 +14,9 @@
+ 		echo "Installing PHP FPM defconfig:     skipping"; \
+ 	else \
+ 		echo "Installing PHP FPM defconfig:     $(INSTALL_ROOT)$(sysconfdir)/" && \
+-		$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d; \
+-		$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf.default; \
+-		$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d/www.conf.default; \
++		$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/fpm.d; \
++		$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf; \
++		$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf; \
+ 	fi
+ 	
  	@echo "Installing PHP FPM man page:      $(INSTALL_ROOT)$(mandir)/man8/"
- 	@$(mkinstalldirs) $(INSTALL_ROOT)$(mandir)/man8

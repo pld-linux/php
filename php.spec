@@ -151,7 +151,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.1.3
-Release:	2
+Release:	3
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -389,20 +389,33 @@ PHP - це мова написання скриптів, що вбудовуют
 використання PHP - заміна для CGI скриптів.
 
 %package -n apache-mod_%{name}
+Summary:	PHP support for Apache 2.x
+Summary(pl.UTF-8):	Wsparcie PHP dla Apache 2.x
+Group:		Development/Languages/PHP
+Requires:	apache-mod_%{name}-core = %{epoch}:%{version}-%{release}
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	webserver(php) = %{version}
+Obsoletes:	apache-mod_php < 4:5.3.28-7
+Obsoletes:	phpfi
+
+%description -n apache-mod_%{name}
+PHP support for Apache 2.x.
+
+%description -n apache-mod_%{name} -l pl.UTF-8
+Wsparcie PHP dla Apache 2.x.
+
+%package -n apache-mod_%{name}-core
 Summary:	PHP DSO module for Apache 2.x
 Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 2.x
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache(modules-api) = %{apache_modules_api}
 Requires:	apache-mod_mime
-Provides:	webserver(php) = %{version}
-Obsoletes:	apache-mod_php < 4:5.3.28-7
-Obsoletes:	phpfi
 
-%description -n apache-mod_%{name}
+%description -n apache-mod_%{name}-core
 PHP as DSO module for Apache 2.x.
 
-%description -n apache-mod_%{name} -l pl.UTF-8
+%description -n apache-mod_%{name}-core -l pl.UTF-8
 PHP jako moduł DSO (Dynamic Shared Object) dla Apache 2.x.
 
 %package litespeed
@@ -2921,9 +2934,12 @@ fi
 %files -n apache-mod_%{name}
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/httpd/conf.d/*_mod_php.conf
+%attr(755,root,root) %{_libdir}/apache/mod_php.so
+
+%files -n apache-mod_%{name}-core
+%defattr(644,root,root,755)
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
-%attr(755,root,root) %{_libdir}/apache/mod_php.so
 %attr(755,root,root) %{_libdir}/apache/libphp7-*.*.so
 %endif
 

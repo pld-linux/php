@@ -1,0 +1,10 @@
+--- php-5.2.17/sapi/cgi/fpm/fpm_events.c~	2017-04-03 20:18:01.000000000 +0200
++++ php-5.2.17/sapi/cgi/fpm/fpm_events.c	2017-04-05 09:28:49.495634577 +0200
+@@ -130,6 +130,6 @@
+ 
+ void fpm_event_fire(struct event *ev)
+ {
+-	(*ev->ev_callback)( (int) ev->ev_fd, (short) ev->ev_res, ev->ev_arg);	
++	(*ev->ev_evcallback.evcb_cb_union.evcb_callback)( (int) ev->ev_fd, (short) ev->ev_res, ev->ev_evcallback.evcb_arg);
+ }
+ 

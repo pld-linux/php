@@ -150,16 +150,16 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.1.3
-Release:	3
+Version:	7.1.4
+Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	d604d688be17f4a05b99dbb7fb9581f4
+Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	a74c13f8779349872b365e6732e8c98e
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -222,7 +222,6 @@ Patch69:	fpm-conf-split.patch
 Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
 Patch72:	phar-hash-shared.patch
-Patch73:	php-pdo-ssl.patch
 URL:		http://php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2051,7 +2050,6 @@ exit 1
 %patch70 -p1
 %patch71 -p1
 %patch72 -p1
-%patch73 -p1
 
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

@@ -150,16 +150,16 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.0.17
-Release:	2
+Version:	7.0.18
+Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	http://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	549df69a7a3c79d49fcafe2097579d9e
+Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	a578c55644d233635d2caa96c3a6f9c7
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini

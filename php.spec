@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	24
+%define		rel	25
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -664,7 +664,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	%{name}-bzip2 = %{epoch}:%{version}-%{release}
 Provides:	php(bz2)
 Provides:	php(bzip2)
-Obsoletes:	php-bzip2
+Obsoletes:	php-bzip2 < 4:5.2.14-3
 
 %description bz2
 This is a dynamic shared object (DSO) for PHP that will add bzip2

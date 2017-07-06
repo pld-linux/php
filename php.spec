@@ -264,8 +264,8 @@ BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
-%{!?with_pdo_mysql:BuildRequires:	mysql-devel}
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
+%{!?with_pdo_mysql:BuildRequires:	mysql-devel}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.3}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
@@ -391,8 +391,8 @@ PHP - це мова написання скриптів, що вбудовуют
 Summary:	PHP support for Apache 2.x
 Summary(pl.UTF-8):	Wsparcie PHP dla Apache 2.x
 Group:		Development/Languages/PHP
-Requires:	apache-mod_%{name}-core = %{epoch}:%{version}-%{release}
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	apache-mod_%{name}-core = %{epoch}:%{version}-%{release}
 Provides:	webserver(php) = %{version}
 Obsoletes:	apache-mod_php < 4:5.3.28-7
 Obsoletes:	phpfi

@@ -1,3 +1,5 @@
+# TODO 7.2:
+# - package ext/sodium https://github.com/php/php-src/pull/2560
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
@@ -139,8 +141,9 @@
 %undefine	with_filter
 %endif
 
+%define		subver alpha3
 %define		orgname	php
-%define		ver_suffix 71
+%define		ver_suffix 72
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -149,16 +152,17 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.1.6
-Release:	1
+Version:	7.2.0
+Release:	0.1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	eafc7a79cc8cc62c9292c96f9c9ccf90
+#Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://downloads.php.net/~remi/php-%{version}%{subver}.tar.xz
+# Source0-md5:	de555e594f4211d0152c6a762762ae01
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -299,10 +303,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20160303
-%define		zend_module_api		20160303
-%define		zend_extension_api	320160303
-%define		php_pdo_api_version	20150127
+%define		php_api_version		20160731
+%define		zend_module_api		20160731
+%define		zend_extension_api	320160731
+%define		php_pdo_api_version	20170320
 
 # Extension versions
 %define		bz2ver		1.0
@@ -312,8 +316,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		intlver		1.1.0
 %define		jsonver		1.5.0
 %define		pharver		2.0.2
-%define		sqlite3ver	0.7-dev
-%define		zipver		1.13.5
+%define		sqlite3ver	%{version}
+%define		zipver		1.14.0
 %define		phpdbgver	0.5.0
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
@@ -2162,8 +2166,8 @@ if test "$ver" != "%{pharver}"; then
 	: Update the pharver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_SQLITE3_VERSION/{s/.* "//;s/".*$//;p}' ext/sqlite3/php_sqlite3.h)
-if test "$ver" != "%{sqlite3ver}"; then
+ver=$(awk '/#define PHP_SQLITE3_VERSION/ {print $3}' ext/sqlite3/php_sqlite3.h | xargs)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream Sqlite3 version is now ${ver}, expecting %{sqlite3ver}.
 	: Update the sqlite3ver macro and rebuild.
 	exit 1

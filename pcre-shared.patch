@@ -43,12 +43,12 @@
      PHP_ADD_BUILD_DIR($ext_builddir/pcrelib)
      PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h pcrelib/])
      AC_DEFINE(HAVE_BUNDLED_PCRE, 1, [ ])
---- php-7.0/ext/pcre/php_pcre.h~	2015-05-21 17:57:06.000000000 +0300
-+++ php-7.0/ext/pcre/php_pcre.h	2015-05-24 14:56:27.528425546 +0300
+--- php-7.2.0alpha3/ext/pcre/php_pcre.h~	2017-07-04 12:26:40.000000000 +0300
++++ php-7.2.0alpha3/ext/pcre/php_pcre.h	2017-07-07 01:45:58.017098044 +0300
 @@ -34,7 +34,12 @@
  #endif
  
- PHPAPI zend_string *php_pcre_replace(zend_string *regex, zend_string *subject_str, char *subject, int subject_len, zval *replace_val, int is_callable_replace, int limit, int *replace_count);
+ PHPAPI zend_string *php_pcre_replace(zend_string *regex, zend_string *subject_str, char *subject, int subject_len, zend_string *replace_str, int limit, int *replace_count);
 +#if COMPILE_DL_PCRE
 +#define pcre_get_compiled_regex pcre_get_compiled_regex_p
 +extern PHPAPI pcre* (*pcre_get_compiled_regex)(zend_string *regex, pcre_extra **extra, int *options);

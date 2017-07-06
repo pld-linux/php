@@ -1,5 +1,5 @@
---- php-4.3.0/configure.in.orig	Fri Dec 27 05:07:18 2002
-+++ php-4.3.0/configure.in	Thu Jan  2 20:34:43 2003
+--- php-4.3.0/configure.ac.orig	Fri Dec 27 05:07:18 2002
++++ php-4.3.0/configure.ac	Thu Jan  2 20:34:43 2003
 @@ -288,7 +288,6 @@
  PHP_CHECK_FUNC(htonl, socket)
  PHP_CHECK_FUNC(gethostname, nsl)

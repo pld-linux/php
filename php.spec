@@ -31,7 +31,6 @@
 %bcond_without	embed		# disable building Embedded API
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_without	kerberos5	# without Kerberos5 support
-%bcond_with	suhosin		# with suhosin patch, has little point in PHP>=5.3, see https://github.com/stefanesser/suhosin/issues/42#issuecomment-41728178
 %bcond_with	systemtap	# systemtap/DTrace support
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	zts		# Zend Thread Safety
@@ -201,7 +200,6 @@ Patch43:	%{orgname}-silent-session-cleanup.patch
 Patch44:	%{orgname}-include_path.patch
 Patch45:	%{orgname}-imap-annotations.patch
 Patch46:	%{orgname}-imap-myrights.patch
-Patch47:	suhosin.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
@@ -2008,9 +2006,6 @@ cp -p php.ini-production php.ini
 %patch44 -p1
 #%patch45 -p1 # imap annotations. fixme
 #%patch46 -p1 # imap myrights. fixme
-%if %{with suhosin}
-%patch47 -p1
-%endif
 %patch50 -p1
 %patch51 -p1
 %patch52 -p1

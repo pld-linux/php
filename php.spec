@@ -218,7 +218,6 @@ Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 # https://bugs.php.net/bug.php?id=68344
 Patch68:	php-mysql-ssl-context.patch
-Patch69:	fpm-conf-split.patch
 Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
 Patch72:	phar-hash-shared.patch
@@ -1994,24 +1993,8 @@ cp -p php.ini-production php.ini
 #%patch37 -p1
 #%patch38 -p1
 %patch39 -p1
-%if %{with fpm}
-%if 0
-# create split php-fpm.conf patch. review (restore other diffs) and commit
-cp sapi/fpm/php-fpm.conf.in{,.orig}
-%{__sed} -n -e '/; Start a new pool named/,$p' sapi/fpm/php-fpm.conf.in > sapi/fpm/php-fpm.conf-d.in
-%{__sed} -i -e '/; Include one or more files/,/include=etc\/fpm\.d/d' sapi/fpm/php-fpm.conf.in
-%{__sed} -i -e '/; Start a new pool named/,$d' sapi/fpm/php-fpm.conf.in
-set +e
-cd ..
-diff -u %{orgname}-%{version}/sapi/fpm/php-fpm.conf.in{.orig,} > %{PATCH69}
-diff -u /dev/null %{orgname}-%{version}/sapi/fpm/php-fpm.conf-d.in >> %{PATCH69}
-exit 1
-%else
-#%patch69 -p1
-%endif
 %patch41 -p1
 %patch42 -p1
-%endif
 %patch43 -p1
 %patch44 -p1
 #%patch45 -p1 # imap annotations. fixme

@@ -67,7 +67,6 @@
 %bcond_without	json		# without json extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mbstring	# without mbstring extension module
-%bcond_without	mcrypt		# without mbcrypt extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mysqli		# without mysqli support (Requires mysql >= 4.1)
 %bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
@@ -211,7 +210,6 @@ Patch53:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
-Patch62:	mcrypt-libs.patch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
@@ -248,7 +246,6 @@ BuildRequires:	gmp-devel >= 4.2
 %{?with_intl:BuildRequires:	libicu-devel >= 4.4}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
-BuildRequires:	libmcrypt-devel >= 2.5.6
 BuildRequires:	libpng-devel >= 1.0.8
 %{?with_intl:BuildRequires:	libstdc++-devel}
 %{?with_webp:BuildRequires:	libwebp-devel}
@@ -1115,23 +1112,6 @@ string support.
 
 %description mbstring -l pl.UTF-8
 Moduł PHP dodający obsługę ciągów znaków wielobajtowych.
-
-%package mcrypt
-Summary:	mcrypt extension module for PHP
-Summary(pl.UTF-8):	Moduł mcrypt dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.mcrypt.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	libmcrypt >= 2.5.6
-Provides:	php(mcrypt)
-Obsoletes:	php-mcrypt < 4:5.3.28-7
-
-%description mcrypt
-This is a dynamic shared object (DSO) for PHP that will add mcrypt
-support.
-
-%description mcrypt -l pl.UTF-8
-Moduł PHP dodający możliwość szyfrowania poprzez bibliotekę mcrypt.
 
 %package mysqli
 Summary:	MySQLi module for PHP
@@ -2018,7 +1998,6 @@ cp -p php.ini-production php.ini
 %patch55 -p1
 %patch59 -p1
 %patch60 -p1
-%patch62 -p1
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
 %patch67 -p1
@@ -2374,7 +2353,6 @@ for sapi in $sapis; do
 	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
 	--with-jpeg-dir=/usr \
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
-	%{__with_without mcrypt mcrypt shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
@@ -2849,7 +2827,6 @@ fi \
 %extension_scripts json
 %extension_scripts ldap
 %extension_scripts mbstring
-%extension_scripts mcrypt
 %extension_scripts mysqli
 %extension_scripts mysqlnd
 %extension_scripts oci8
@@ -3188,14 +3165,6 @@ fi
 %doc ext/mbstring/{CREDITS,README*}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{php_extensiondir}/mbstring.so
-%endif
-
-%if %{with mcrypt}
-%files mcrypt
-%defattr(644,root,root,755)
-%doc ext/mcrypt/{CREDITS,TODO}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mcrypt.ini
-%attr(755,root,root) %{php_extensiondir}/mcrypt.so
 %endif
 
 %if %{with mysqli}

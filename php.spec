@@ -194,9 +194,6 @@ Patch27:	%{orgname}-config-dir.patch
 Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
 Patch34:	%{orgname}-libtool.patch
-#Patch36:	%{orgname}-mysql-charsetphpini.patch
-#Patch37:	%{orgname}-mysqli-charsetphpini.patch
-#Patch38:	%{orgname}-pdo_mysql-charsetphpini.patch
 Patch39:	%{orgname}-use-prog_sendmail.patch
 Patch41:	%{orgname}-fpm-config.patch
 Patch42:	%{orgname}-fpm-shared.patch
@@ -2004,9 +2001,6 @@ cp -p php.ini-production php.ini
 %if "%{pld_release}" != "ac"
 %patch34 -p1
 %endif
-#%patch36 -p1
-#%patch37 -p1
-#%patch38 -p1
 %patch39 -p1
 %patch41 -p1
 %patch42 -p1

@@ -128,3 +128,14 @@
  
  	zend_llist_destroy(&extension_lists.engine);
  	zend_llist_destroy(&extension_lists.functions);
+--- php-5.3.1/ext/phar/Makefile.frag~	2009-07-23 15:48:04.000000000 +0000
++++ php-5.3.1/ext/phar/Makefile.frag	2009-11-30 16:10:29.687175948 +0000
+@@ -10,7 +10,7 @@
+ 		$(top_srcdir)/build/shtool echo -n -- "$(top_builddir)/$(SAPI_CLI_PATH) -n"; \
+ 		if test "x$(PHP_MODULES)" != "x"; then \
+ 		$(top_srcdir)/build/shtool echo -n -- " -d extension_dir=$(top_builddir)/modules"; \
+-		for i in spl bz2 zlib phar; do \
++		for i in pcre spl bz2 zlib phar; do \
+ 			if test -f "$(top_builddir)/modules/$$i.la"; then \
+ 				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
+ 			fi; \

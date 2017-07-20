@@ -3,6 +3,7 @@
 # - package ext/sodium https://github.com/php/php-src/pull/2560
 # - --with-password-argon2 https://wiki.php.net/rfc/argon2_password_hash
 # - zip: read/write encrypted archive, relying on libzip 1.2.0,
+# - Use of bundled libzip is deprecated, --with-libzip option is recommended.
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
@@ -155,7 +156,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.0
-Release:	0.1
+Release:	0.3
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend

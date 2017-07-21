@@ -144,7 +144,7 @@
 %undefine	with_filter
 %endif
 
-%define		subver alpha3
+%define		subver beta1
 %define		orgname	php
 %define		ver_suffix 72
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -164,8 +164,8 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://downloads.php.net/~remi/php-%{version}%{subver}.tar.xz
-# Source0-md5:	de555e594f4211d0152c6a762762ae01
+Source0:	https://downloads.php.net/~pollita/php-%{version}%{subver}.tar.xz
+# Source0-md5:	60cba499e8fe1f044c53ea4bc225d1f0
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -304,9 +304,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20160731
-%define		zend_module_api		20160731
-%define		zend_extension_api	320160731
+%define		php_api_version		20170718
+%define		zend_module_api		20170718
+%define		zend_extension_api	320170718
 %define		php_pdo_api_version	20170320
 
 # Extension versions
@@ -315,10 +315,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		fileinfover	1.0.5
 %define		hashver		1.0
 %define		intlver		1.1.0
-%define		jsonver		1.5.0
+%define		jsonver		1.6.0
 %define		pharver		2.0.2
 %define		sqlite3ver	%{version}
-%define		zipver		1.14.0
+%define		zipver		1.15.1
 %define		phpdbgver	0.5.0
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}

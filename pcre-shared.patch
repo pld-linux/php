@@ -106,23 +106,7 @@
  #include "php_pcre.h"
  #include "ext/standard/info.h"
  #include "ext/standard/basic_functions.h"
-@@ -28,6 +31,15 @@
- 
- #if HAVE_PCRE || HAVE_BUNDLED_PCRE
- 
-+#if COMPILE_DL_PCRE
-+//extern void *pcre_get_compiled_regex_p;
-+//extern void *pcre_get_compiled_regex_cache_p;
-+//extern void *php_pcre_replace_impl_p;
-+//extern void *php_pcre_match_impl_p;
-+//extern void *php_pcre_split_impl_p;
-+#endif
-+
-+
- #include "ext/standard/php_string.h"
- 
- #define PREG_PATTERN_ORDER			1
-@@ -208,6 +220,14 @@
+@@ -208,6 +211,14 @@
  	REGISTER_LONG_CONSTANT("PREG_JIT_STACKLIMIT_ERROR", PHP_PCRE_JIT_STACKLIMIT_ERROR, CONST_CS | CONST_PERSISTENT);
  	REGISTER_STRING_CONSTANT("PCRE_VERSION", (char *)pcre_version(), CONST_CS | CONST_PERSISTENT);
  

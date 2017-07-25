@@ -1996,7 +1996,7 @@ cp -p php.ini-production php.ini
 #%patch46 -p1 # imap myrights. fixme
 %patch50 -p1
 %patch51 -p1
-%patch52 -p1
+%patch52 -p1 -b .pcre-shared
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1

@@ -149,7 +149,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.1.6
+Version:	7.1.8
 Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -158,7 +158,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	eafc7a79cc8cc62c9292c96f9c9ccf90
+# Source0-md5:	937dba5d7f12bca3c6864db52ea499e1
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -312,7 +312,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		intlver		1.1.0
 %define		jsonver		1.5.0
 %define		pharver		2.0.2
-%define		sqlite3ver	0.7-dev
+%define		sqlite3ver	%{version}
 %define		zipver		1.13.5
 %define		phpdbgver	0.5.0
 
@@ -2162,12 +2162,12 @@ if test "$ver" != "%{pharver}"; then
 	: Update the pharver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_SQLITE3_VERSION/{s/.* "//;s/".*$//;p}' ext/sqlite3/php_sqlite3.h)
-if test "$ver" != "%{sqlite3ver}"; then
-	: Error: Upstream Sqlite3 version is now ${ver}, expecting %{sqlite3ver}.
-	: Update the sqlite3ver macro and rebuild.
-	exit 1
-fi
+#ver=$(sed -n '/#define PHP_SQLITE3_VERSION/{s/.* "//;s/".*$//;p}' ext/sqlite3/php_sqlite3.h)
+#if test "$ver" != "%{sqlite3ver}"; then
+#	: Error: Upstream Sqlite3 version is now ${ver}, expecting %{sqlite3ver}.
+#	: Update the sqlite3ver macro and rebuild.
+#	exit 1
+#fi
 ver=$(sed -n '/#define PHP_ZIP_VERSION /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
 if test "$ver" != "%{zipver}"; then
 	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.

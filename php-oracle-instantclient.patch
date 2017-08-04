@@ -25,18 +25,15 @@
        OCI8INCDIR=$OCISDKRPMINC
 --- php-5.4.0alpha2/ext/pdo_oci/config.m4~	2011-08-07 12:46:31.000000000 +0300
 +++ php-5.4.0alpha2/ext/pdo_oci/config.m4	2011-08-07 12:48:24.712839499 +0300
-@@ -6,8 +6,10 @@
+@@ -17,7 +17,7 @@ fi
+ 
  AC_DEFUN([AC_PDO_OCI_VERSION],[
    AC_MSG_CHECKING([Oracle version])
-   for OCI_VER in $SUPPORTED_LIB_VERS; do
--    if test -f $PDO_OCI_DIR/lib/libclntsh.$SHLIB_SUFFIX_NAME.$OCI_VER; then
-+    if test -f $1/lib/libclntsh.$SHLIB_SUFFIX_NAME.$OCI_VER; then
-       PDO_OCI_VERSION="$OCI_VER"
-+    elif test -f $1/libclntsh.$SHLIB_SUFFIX_NAME.$OCI_VER; then
-+      PDO_OCI_VERSION="$OCI_VER"
-     fi
-   done
-   if test -z "$PDO_OCI_VERSION"; then
+-  PDO_OCI_LCS_BASE=$PDO_OCI_LIB_DIR/libclntsh.$SHLIB_SUFFIX_NAME
++  PDO_OCI_LCS_BASE=$1/libclntsh.$SHLIB_SUFFIX_NAME
+   PDO_OCI_LCS=`ls $PDO_OCI_LCS_BASE.*.1 2> /dev/null | $PHP_PDO_OCI_TAIL1`  # Oracle 10g, 11g, 12c etc
+   if test -f "$PDO_OCI_LCS"; then
+     dnl Oracle 10g, 11g 12c etc.  The x.2 version libraries are named x.1 for drop in compatibility
 @@ -103,6 +103,9 @@
      elif test -f $PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include/oci.h ; then
        PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include)

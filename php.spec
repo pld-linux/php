@@ -1,9 +1,9 @@
 # TODO 7.2:
 # - https://github.com/php/php-src/blob/php-7.2.0alpha3/UPGRADING
-# - package ext/sodium https://github.com/php/php-src/pull/2560
 # - --with-password-argon2 https://wiki.php.net/rfc/argon2_password_hash
 # - zip: read/write encrypted archive, relying on libzip 1.2.0,
 # - Use of bundled libzip is deprecated, --with-libzip option is recommended.
+# - configure: WARNING: unrecognized options: --enable-gd-native-ttf
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
@@ -92,6 +92,7 @@
 %bcond_without	recode		# without recode extension module
 %bcond_without	session		# without session extension module
 %bcond_without	snmp		# without SNMP extension module
+%bcond_without	sodium		# without sodium extension module
 %bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	tidy		# without Tidy extension module
@@ -157,7 +158,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.0
-Release:	0.6
+Release:	0.12
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -236,6 +237,7 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
+%{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
@@ -321,6 +323,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		sqlite3ver	%{version}
 %define		zipver		1.15.1
 %define		phpdbgver	0.5.0
+%define		sodiumver	%{version}
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -1663,6 +1666,16 @@ support.
 %description sockets -l pl.UTF-8
 Moduł PHP dodający obsługę gniazdek.
 
+%package sodium
+Summary:	Wrapper for the Sodium cryptographic library
+Group:		Libraries
+URL:		https://paragonie.com/book/pecl-libsodium
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(sodium) = %{sodiumver}
+
+%description sodium
+A simple, low-level PHP extension for libsodium.
+
 %package spl
 Summary:	Standard PHP Library module for PHP
 Summary(pl.UTF-8):	Moduł biblioteki standardowej (Standard PHP Library) dla PHP
@@ -2156,6 +2169,10 @@ if test "$ver" != "PHP_VERSION"; then
 	: Update the sqlite3ver macro and rebuild.
 	exit 1
 fi
+ver=$(awk '/#define PHP_SODIUM_VERSION/ {print $3}' ext/sodium/php_libsodium.h | xargs)
+if test "$ver" != "PHP_VERSION"; then
+	exit 1
+fi
 ver=$(sed -n '/#define PHP_ZIP_VERSION /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
 if test "$ver" != "%{zipver}"; then
 	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.
@@ -2340,6 +2357,7 @@ for sapi in $sapis; do
 	--enable-sysvshm=shared \
 	--enable-soap=shared \
 	--enable-sockets=shared \
+	%{__with_without sodium sodium shared} \
 	--enable-tokenizer=shared \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
@@ -2858,6 +2876,7 @@ fi \
 %extension_scripts snmp
 %extension_scripts soap
 %extension_scripts sockets
+%extension_scripts sodium
 %extension_scripts spl
 %extension_scripts sqlite3
 %extension_scripts sysvmsg
@@ -3398,6 +3417,14 @@ fi
 %doc ext/sockets/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sockets.ini
 %attr(755,root,root) %{php_extensiondir}/sockets.so
+
+%if %{with sodium}
+%files sodium
+%defattr(644,root,root,755)
+%doc ext/sodium/{README.md,CREDITS}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sodium.ini
+%attr(755,root,root) %{php_extensiondir}/sodium.so
+%endif
 
 %files spl
 %defattr(644,root,root,755)

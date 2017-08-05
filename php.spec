@@ -97,6 +97,7 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
+%bcond_without	xsl		# without xsl extension module
 # extensions options
 %bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
@@ -259,7 +260,7 @@ BuildRequires:	libtool >= 2:2.4.6
 BuildRequires:	libtool >= 1.4.3
 %endif
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
-BuildRequires:	libxslt-devel >= 1.1.0
+%{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
@@ -2380,7 +2381,7 @@ for sapi in $sapis; do
 	%{?with_tidy:--with-tidy=shared} \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
 	%{__with_without xmlrpc xmlrpc shared,/usr} \
-	--with-xsl=shared \
+	%{?with_xsl:--with-xsl=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
 	%{?with_system_libzip:--with-libzip} \
@@ -3497,11 +3498,13 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlwriter.ini
 %attr(755,root,root) %{php_extensiondir}/xmlwriter.so
 
+%if %{with xsl}
 %files xsl
 %defattr(644,root,root,755)
 %doc ext/xsl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xsl.ini
 %attr(755,root,root) %{php_extensiondir}/xsl.so
+%endif
 
 %files zip
 %defattr(644,root,root,755)

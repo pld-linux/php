@@ -1,7 +1,6 @@
 # TODO 7.2:
 # - https://github.com/php/php-src/blob/php-7.2.0alpha3/UPGRADING
 # - --with-password-argon2 https://wiki.php.net/rfc/argon2_password_hash
-# - configure: WARNING: unrecognized options: --enable-gd-native-ttf
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # - build with system libgd 2.1, see 73c5128
@@ -2314,7 +2313,6 @@ for sapi in $sapis; do
 	%{__enable_disable exif exif shared} \
 	%{__enable_disable fileinfo fileinfo shared} \
 	%{__enable_disable ftp ftp shared} \
-	--enable-gd-native-ttf \
 	%{?with_intl:--enable-intl=shared} \
 	--enable-libxml \
 	%{__enable_disable mbstring mbstring shared,all} \

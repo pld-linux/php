@@ -3,7 +3,6 @@
 # - --with-password-argon2 https://wiki.php.net/rfc/argon2_password_hash
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
-# - build with system libgd 2.1, see 73c5128
 # TODO 5.4:
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
@@ -100,7 +99,7 @@
 %bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	mm		# without mm support for session storage
-%bcond_with	system_gd	# with system gd (imageantialias function is missing then)
+%bcond_without	system_gd	# system gd
 %bcond_without	system_libzip	# system libzip
 %bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 
@@ -155,7 +154,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.0
-Release:	0.13
+Release:	0.15
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend

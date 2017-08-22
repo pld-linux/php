@@ -1,8 +1,6 @@
 # TODO 7.2:
 # - https://github.com/php/php-src/blob/php-7.2.0alpha3/UPGRADING
 # - --with-password-argon2 https://wiki.php.net/rfc/argon2_password_hash
-# - zip: read/write encrypted archive, relying on libzip 1.2.0,
-# - Use of bundled libzip is deprecated, --with-libzip option is recommended.
 # - configure: WARNING: unrecognized options: --enable-gd-native-ttf
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
@@ -104,7 +102,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	mm		# without mm support for session storage
 %bcond_with	system_gd	# with system gd (imageantialias function is missing then)
-%bcond_with	system_libzip	# with system libzip (reported broken currently)
+%bcond_without	system_libzip	# system libzip
 %bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 
 %define apxs1		/usr/sbin/apxs1
@@ -158,7 +156,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.0
-Release:	0.12
+Release:	0.13
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -216,7 +214,6 @@ Patch53:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
-Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 # https://bugs.php.net/bug.php?id=68344
@@ -263,7 +260,7 @@ BuildRequires:	libtool >= 1.4.3
 %endif
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
-%{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
+%{?with_system_libzip:BuildRequires:	libzip-devel >= 1.2.0}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
@@ -1944,7 +1941,7 @@ Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
 URL:		http://php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%{?with_system_libzip:Requires:	libzip >= 0.10.1-2}
+%{?with_system_libzip:Requires:	libzip >= 1.2.0}
 Provides:	php(zip) = %{zipver}
 Obsoletes:	php-pecl-zip < %{zipver}
 Obsoletes:	php-zip < 4:5.3.28-7
@@ -2016,7 +2013,6 @@ cp -p php.ini-production php.ini
 %patch55 -p1
 %patch59 -p1
 %patch60 -p1
-%{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
 %patch67 -p1
 #%patch68 -p1 DROP or update to 7.0 APIs

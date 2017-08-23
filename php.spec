@@ -1,6 +1,5 @@
 # TODO 7.2:
 # - https://github.com/php/php-src/blob/php-7.2.0alpha3/UPGRADING
-# - --with-password-argon2 https://wiki.php.net/rfc/argon2_password_hash
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # TODO 5.4:
@@ -96,6 +95,7 @@
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	xsl		# without xsl extension module
 # extensions options
+%bcond_without	argon2		# argon2 password hashing
 %bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	mm		# without mm support for session storage
@@ -154,7 +154,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.0
-Release:	0.15
+Release:	0.16
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -232,6 +232,7 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
+%{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
 %{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
@@ -2300,6 +2301,7 @@ for sapi in $sapis; do
 	--with-config-file-path=%{_sysconfdir} \
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-system-tzdata \
+	%{?with_argon2:--with-password-argon2} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	--enable-inline-optimization \

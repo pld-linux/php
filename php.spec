@@ -142,7 +142,7 @@
 %undefine	with_filter
 %endif
 
-%define		subver RC3
+%define		subver RC4
 %define		orgname	php
 %define		ver_suffix 72
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -154,7 +154,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.0
-Release:	0.20
+Release:	0.21
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -163,7 +163,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~remi/php-%{version}%{subver}.tar.xz
-# Source0-md5:	050e86d624e2c32194383bc92ac4e3b1
+# Source0-md5:	d919196c9780513e9577af32c756e536
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -2005,19 +2005,21 @@ cp -p php.ini-production php.ini
 #%patch45 -p1 # imap annotations. fixme
 #%patch46 -p1 # imap myrights. fixme
 %patch50 -p1
-%patch51 -p1
+%patch51 -p1 -b .spl-shared
 %patch52 -p1 -b .pcre-shared
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1
-%patch59 -p1
-%patch60 -p1
+%patch59 -p1 -b .systzdata
+%if %{with instantclient}
+%patch60 -p1 -b .instantclient
+%endif
 %patch66 -p1
 %patch67 -p1
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch70 -p1
 %patch71 -p1
-%patch72 -p1
+%patch72 -p1 -b .phar-shared
 
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

@@ -1,5 +1,5 @@
---- php-7.0/ext/pcre/config0.m4~	2015-05-24 14:39:04.000000000 +0300
-+++ php-7.0/ext/pcre/config0.m4	2015-05-24 14:53:49.980250297 +0300
+--- php-7.2.0RC4/ext/pcre/config0.m4~	2017-10-15 16:17:20.000000000 +0300
++++ php-7.2.0RC4/ext/pcre/config0.m4	2017-10-15 18:34:27.673725678 +0300
 @@ -11,7 +11,7 @@
  
    if test "$PHP_PCRE_REGEX" != "yes" && test "$PHP_PCRE_REGEX" != "no"; then
@@ -18,10 +18,10 @@
        test -f $j/libpcre.a || test -f $j/libpcre.$SHLIB_SUFFIX_NAME && PCRE_LIBDIR=$j
      done
      
-@@ -43,12 +43,13 @@
-       AC_MSG_ERROR([The PCRE extension requires PCRE library version >= 6.6])
-     fi
- 
+@@ -52,12 +52,13 @@
+     ],[
+       -L$PCRE_LIBDIR
+     ])
 -    PHP_ADD_LIBRARY_WITH_PATH(pcre, $PCRE_LIBDIR)
 +    PHP_ADD_LIBRARY_WITH_PATH(pcre, $PCRE_LIBDIR, PCRE_SHARED_LIBADD)
      

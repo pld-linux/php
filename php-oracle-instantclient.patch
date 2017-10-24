@@ -1,3 +1,5 @@
+checking Oracle Instant Client SDK header directory... configure: error: Oracle Instant Client SDK header files not found
+
 --- php-5.3.3/ext/oci8/config.m4.orig	2010-06-25 23:18:09.000000000 +0200
 +++ php-5.3.3/ext/oci8/config.m4	2010-09-10 19:37:23.484315002 +0200
 @@ -304,6 +304,9 @@
@@ -23,41 +25,15 @@
        AC_MSG_RESULT($OCISDKRPMINC)
        PHP_ADD_INCLUDE($OCISDKRPMINC)
        OCI8INCDIR=$OCISDKRPMINC
---- php-5.4.0alpha2/ext/pdo_oci/config.m4~	2011-08-07 12:46:31.000000000 +0300
-+++ php-5.4.0alpha2/ext/pdo_oci/config.m4	2011-08-07 12:48:24.712839499 +0300
-@@ -6,8 +6,10 @@
- AC_DEFUN([AC_PDO_OCI_VERSION],[
-   AC_MSG_CHECKING([Oracle version])
-   for OCI_VER in $SUPPORTED_LIB_VERS; do
--    if test -f $PDO_OCI_DIR/lib/libclntsh.$SHLIB_SUFFIX_NAME.$OCI_VER; then
-+    if test -f $1/lib/libclntsh.$SHLIB_SUFFIX_NAME.$OCI_VER; then
-       PDO_OCI_VERSION="$OCI_VER"
-+    elif test -f $1/libclntsh.$SHLIB_SUFFIX_NAME.$OCI_VER; then
-+      PDO_OCI_VERSION="$OCI_VER"
-     fi
-   done
-   if test -z "$PDO_OCI_VERSION"; then
-@@ -103,6 +103,9 @@
-     elif test -f $PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include/oci.h ; then
-       PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include)
-       AC_MSG_RESULT($PDO_OCI_IC_PREFIX/$PDO_OCI_CLIENT_DIR/include)
-+    elif test -f $PDO_OCI_IC_PREFIX/../include/oracle/client/oci.h ; then
-+      PHP_ADD_INCLUDE($PDO_OCI_IC_PREFIX/../include/oracle/client)
-+      AC_MSG_RESULT($PDO_OCI_IC_PREFIX/../include/oracle/client)
+--- php-7.2.0RC1/ext/pdo_oci/config.m4~	2017-09-11 14:32:13.000000000 +0300
++++ php-7.2.0RC1/ext/pdo_oci/config.m4	2017-09-11 14:45:25.019346828 +0300
+@@ -113,6 +113,9 @@
+     elif test -f "$OCISDKZIPINC/oci.h" ; then
+       PHP_ADD_INCLUDE($OCISDKZIPINC)
+       AC_MSG_RESULT($OCISDKZIPINC)
++    elif test -f $PDO_OCI_LIB_DIR/../include/oracle/client/oci.h ; then
++      PHP_ADD_INCLUDE($PDO_OCI_LIB_DIR/../include/oracle/client)
++      AC_MSG_RESULT($PDO_OCI_LIB_DIR/../include/oracle/client)
      else
        AC_MSG_ERROR([I'm too dumb to figure out where the include dir is in your Instant Client install])
      fi
-@@ -103,7 +103,12 @@
-     else
-       AC_MSG_ERROR([I'm too dumb to figure out where the libraries are in your Instant Client install])
-     fi
--    PDO_OCI_VERSION="`echo $PDO_OCI_IC_VERS | cut -d. -f1-2`"
-+    __PDO_OCI_VERSION="`echo $PDO_OCI_IC_VERS | cut -d. -f1-2`"
-+    if test -n "$__PDO_OCI_VERSION" ; then
-+      PDO_OCI_VERSION=$__PDO_OCI_VERSION
-+    else
-+      AC_PDO_OCI_VERSION($PDO_OCI_IC_PREFIX)
-+    fi
-   else
-     AC_PDO_OCI_CHECK_LIB_DIR($PDO_OCI_DIR)
- 

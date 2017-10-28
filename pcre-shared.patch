@@ -1,5 +1,5 @@
---- php-7.0/ext/pcre/config0.m4~	2015-05-24 14:39:04.000000000 +0300
-+++ php-7.0/ext/pcre/config0.m4	2015-05-24 14:53:49.980250297 +0300
+--- php-7.2.0RC4/ext/pcre/config0.m4~	2017-10-15 16:17:20.000000000 +0300
++++ php-7.2.0RC4/ext/pcre/config0.m4	2017-10-15 18:34:27.673725678 +0300
 @@ -11,7 +11,7 @@
  
    if test "$PHP_PCRE_REGEX" != "yes" && test "$PHP_PCRE_REGEX" != "no"; then
@@ -18,10 +18,10 @@
        test -f $j/libpcre.a || test -f $j/libpcre.$SHLIB_SUFFIX_NAME && PCRE_LIBDIR=$j
      done
      
-@@ -43,12 +43,13 @@
-       AC_MSG_ERROR([The PCRE extension requires PCRE library version >= 6.6])
-     fi
- 
+@@ -52,12 +52,13 @@
+     ],[
+       -L$PCRE_LIBDIR
+     ])
 -    PHP_ADD_LIBRARY_WITH_PATH(pcre, $PCRE_LIBDIR)
 +    PHP_ADD_LIBRARY_WITH_PATH(pcre, $PCRE_LIBDIR, PCRE_SHARED_LIBADD)
      
@@ -43,68 +43,102 @@
      PHP_ADD_BUILD_DIR($ext_builddir/pcrelib)
      PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h pcrelib/])
      AC_DEFINE(HAVE_BUNDLED_PCRE, 1, [ ])
---- php-7.0/ext/pcre/php_pcre.h~	2015-05-21 17:57:06.000000000 +0300
-+++ php-7.0/ext/pcre/php_pcre.h	2015-05-24 14:56:27.528425546 +0300
-@@ -34,7 +34,12 @@
+--- php-7.2.0beta1/ext/pcre/php_pcre.h	2017-07-22 12:35:11.071146616 +0300
++++ php-7.2.0beta1/ext/pcre/php_pcre.h	2017-07-22 12:41:01.858859537 +0300
+@@ -33,7 +33,29 @@
+ #include <locale.h>
  #endif
  
- PHPAPI zend_string *php_pcre_replace(zend_string *regex, zend_string *subject_str, char *subject, int subject_len, zval *replace_val, int is_callable_replace, int limit, int *replace_count);
-+#if COMPILE_DL_PCRE
-+#define pcre_get_compiled_regex pcre_get_compiled_regex_p
-+extern PHPAPI pcre* (*pcre_get_compiled_regex)(zend_string *regex, pcre_extra **extra, int *options);
++#if !defined(COMPILE_DL_PCRE_NOREDIRECT)
++#define pcre_get_compiled_regex (*pcre_get_compiled_regex_p)
++#define pcre_get_compiled_regex_cache (*pcre_get_compiled_regex_cache_p)
++#define php_pcre_replace_impl (*php_pcre_replace_impl_p)
++#define php_pcre_match_impl (*php_pcre_match_impl_p)
++#define php_pcre_split_impl (*php_pcre_split_impl_p)
++#if !defined(COMPILE_DL_PCRE_NOEXTERN)
++#	define PCRE_EXTERN extern
 +#else
- PHPAPI pcre* pcre_get_compiled_regex(zend_string *regex, pcre_extra **extra, int *options);
++#	define PCRE_EXTERN
 +#endif
- PHPAPI pcre* pcre_get_compiled_regex_ex(zend_string *regex, pcre_extra **extra, int *preg_options, int *coptions);
- 
- extern zend_module_entry pcre_module_entry;
---- php-5.3.1/ext/pcre/php_pcre.c	2009-11-30 21:10:01.370473754 +0200
-+++ php-5.3.1.pcre/ext/pcre/php_pcre.c	2009-11-30 21:38:01.759684456 +0000
-@@ -27,6 +27,11 @@
- 
- #if HAVE_PCRE || HAVE_BUNDLED_PCRE
- 
-+#if COMPILE_DL_PCRE
-+#undef pcre_get_compiled_regex
-+PHPAPI pcre* pcre_get_compiled_regex(zend_string *regex, pcre_extra **extra, int *options);
++#else
++// for pcre.c
++#define PCRE_EXTERN
++extern void *pcre_get_compiled_regex_p;
++extern void *pcre_get_compiled_regex_cache_p;
++extern void *php_pcre_replace_impl_p;
++extern void *php_pcre_match_impl_p;
++extern void *php_pcre_split_impl_p;
 +#endif
 +
- #include "ext/standard/php_string.h"
+ PHPAPI zend_string *php_pcre_replace(zend_string *regex, zend_string *subject_str, char *subject, int subject_len, zend_string *replace_str, int limit, int *replace_count);
++PCRE_EXTERN
+ PHPAPI pcre* pcre_get_compiled_regex(zend_string *regex, pcre_extra **extra, int *options);
+ PHPAPI pcre* pcre_get_compiled_regex_ex(zend_string *regex, pcre_extra **extra, int *preg_options, int *coptions);
  
- #define PREG_PATTERN_ORDER			1
-@@ -153,6 +158,10 @@
- 	REGISTER_LONG_CONSTANT("PREG_BAD_UTF8_OFFSET_ERROR", PHP_PCRE_BAD_UTF8_OFFSET_ERROR, CONST_CS | CONST_PERSISTENT);
+@@ -56,14 +78,18 @@
+ 	int refcount;
+ } pcre_cache_entry;
+ 
++PCRE_EXTERN
+ PHPAPI pcre_cache_entry* pcre_get_compiled_regex_cache(zend_string *regex);
+ 
++PCRE_EXTERN
+ PHPAPI void  php_pcre_match_impl(  pcre_cache_entry *pce, char *subject, int subject_len, zval *return_value,
+ 	zval *subpats, int global, int use_flags, zend_long flags, zend_long start_offset);
+ 
++PCRE_EXTERN
+ PHPAPI zend_string *php_pcre_replace_impl(pcre_cache_entry *pce, zend_string *subject_str, char *subject, int subject_len, zend_string *replace_str,
+ 	int limit, int *replace_count);
+ 
++PCRE_EXTERN
+ PHPAPI void  php_pcre_split_impl(  pcre_cache_entry *pce, zend_string *subject_str, zval *return_value,
+ 	zend_long limit_val, zend_long flags);
+ 
+--- php-5.3.1.pcre/ext/pcre/php_pcre.c	2009-11-30 21:38:01.759684456 +0000
++++ php-7.2.0beta1/ext/pcre/php_pcre.c	2017-07-22 12:42:57.878062137 +0300
+@@ -21,6 +21,9 @@
+ #include "php.h"
+ #include "php_ini.h"
+ #include "php_globals.h"
++#if COMPILE_DL_PCRE
++#define COMPILE_DL_PCRE_NOREDIRECT
++#endif
+ #include "php_pcre.h"
+ #include "ext/standard/info.h"
+ #include "ext/standard/basic_functions.h"
+@@ -208,6 +211,14 @@
+ 	REGISTER_LONG_CONSTANT("PREG_JIT_STACKLIMIT_ERROR", PHP_PCRE_JIT_STACKLIMIT_ERROR, CONST_CS | CONST_PERSISTENT);
  	REGISTER_STRING_CONSTANT("PCRE_VERSION", (char *)pcre_version(), CONST_CS | CONST_PERSISTENT);
  
 +#if COMPILE_DL_PCRE
 +	pcre_get_compiled_regex_p = pcre_get_compiled_regex;
++	pcre_get_compiled_regex_cache_p = pcre_get_compiled_regex_cache;
++	php_pcre_replace_impl_p = php_pcre_replace_impl;
++	php_pcre_match_impl_p = php_pcre_match_impl;
++	php_pcre_split_impl_p = php_pcre_split_impl;
 +#endif
 +
  	return SUCCESS;
  }
  /* }}} */
-@@ -429,6 +438,7 @@
- }
- /* }}} */
- 
-+
- /* {{{ pcre_get_compiled_regex
-  */
- PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *preg_options TSRMLS_DC)
---- php-5.3.1/ext/standard/browscap.c	2009-06-06 02:40:49.000000000 +0000
-+++ php-5.3.1.pcre/ext/standard/browscap.c	2009-11-30 21:33:00.775241138 +0000
-@@ -31,6 +31,11 @@
- static zval *current_section;
- static char *current_section_name;
+--- php-7.2.0RC5/ext/standard/basic_functions.c	2017-10-28 21:08:47.383549141 +0300
++++ php-7.2.0RC5/ext/standard/basic_functions.c	2017-10-28 21:10:20.625051932 +0300
+@@ -113,6 +113,15 @@
+ PHPAPI php_basic_globals basic_globals;
+ #endif
  
 +#if COMPILE_DL_PCRE
-+// will be visible in here
-+PHPAPI pcre* (*pcre_get_compiled_regex_p)(zend_string *regex, pcre_extra **extra, int *options);
++// for pcre shared patch symbol
++void *pcre_get_compiled_regex_p;
++void *pcre_get_compiled_regex_cache_p;
++void *php_pcre_replace_impl_p;
++void *php_pcre_match_impl_p;
++void *php_pcre_split_impl_p;
 +#endif
 +
- #define DEFAULT_SECTION_NAME "Default Browser Capability Settings"
+ #include "php_fopen_wrappers.h"
+ #include "streamsfuncs.h"
  
- /* OBJECTS_FIXME: This whole extension needs going through. The use of objects looks pretty broken here */
 --- php-5.3.2/sapi/cli/tests/018.phpt~	2008-03-17 16:05:39.000000000 +0200
 +++ php-5.3.2/sapi/cli/tests/018.phpt	2010-03-16 20:41:11.341251246 +0200
 @@ -20,8 +20,6 @@
@@ -128,3 +162,14 @@
  
  	zend_llist_destroy(&extension_lists.engine);
  	zend_llist_destroy(&extension_lists.functions);
+--- php-5.3.1/ext/phar/Makefile.frag~	2009-07-23 15:48:04.000000000 +0000
++++ php-5.3.1/ext/phar/Makefile.frag	2009-11-30 16:10:29.687175948 +0000
+@@ -10,7 +10,7 @@
+ 		$(top_srcdir)/build/shtool echo -n -- "$(top_builddir)/$(SAPI_CLI_PATH) -n"; \
+ 		if test "x$(PHP_MODULES)" != "x"; then \
+ 		$(top_srcdir)/build/shtool echo -n -- " -d extension_dir=$(top_builddir)/modules"; \
+-		for i in spl bz2 zlib phar; do \
++		for i in pcre spl bz2 zlib phar; do \
+ 			if test -f "$(top_builddir)/modules/$$i.la"; then \
+ 				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
+ 			fi; \

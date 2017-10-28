@@ -1,6 +1,7 @@
+# TODO 7.2:
+# - https://github.com/php/php-src/blob/php-7.2.0alpha3/UPGRADING
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
-# - build with system libgd 2.1, see 73c5128
 # TODO 5.4:
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
@@ -65,7 +66,6 @@
 %bcond_without	json		# without json extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mbstring	# without mbstring extension module
-%bcond_without	mcrypt		# without mbcrypt extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
 %bcond_without	mysqli		# without mysqli support (Requires mysql >= 4.1)
 %bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
@@ -87,17 +87,20 @@
 %bcond_without	recode		# without recode extension module
 %bcond_without	session		# without session extension module
 %bcond_without	snmp		# without SNMP extension module
+%bcond_without	sodium		# without sodium extension module
 %bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
+%bcond_without	xsl		# without xsl extension module
 # extensions options
+%bcond_without	argon2		# argon2 password hashing
 %bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	mm		# without mm support for session storage
-%bcond_with	system_gd	# with system gd (imageantialias function is missing then)
-%bcond_with	system_libzip	# with system libzip (reported broken currently)
+%bcond_without	system_gd	# system gd
+%bcond_without	system_libzip	# system libzip
 %bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 
 %define apxs1		/usr/sbin/apxs1
@@ -139,8 +142,9 @@
 %undefine	with_filter
 %endif
 
+%define		subver RC5
 %define		orgname	php
-%define		ver_suffix 71
+%define		ver_suffix 72
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -149,7 +153,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.1.11
+Version:	7.2.0
 Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -157,8 +161,10 @@ Epoch:		4
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	bbf4dfe4f501143a1763eb86b6a0a454
+#Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+#Source0:	https://downloads.php.net/~remi/php-%{version}%{subver}.tar.xz
+Source0:	https://downloads.php.net/~pollita/php-%{version}%{subver}.tar.xz
+# Source0-md5:	6f6167edc4b7c9d91c7c1cf702705fc0
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -207,8 +213,6 @@ Patch53:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
-Patch62:	mcrypt-libs.patch
-Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 # https://bugs.php.net/bug.php?id=68344
@@ -229,6 +233,8 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
+%{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
+%{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
@@ -244,7 +250,6 @@ BuildRequires:	gmp-devel >= 4.2
 %{?with_intl:BuildRequires:	libicu-devel >= 4.4}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
-BuildRequires:	libmcrypt-devel >= 2.5.6
 BuildRequires:	libpng-devel >= 1.0.8
 %{?with_intl:BuildRequires:	libstdc++-devel}
 %{?with_webp:BuildRequires:	libwebp-devel}
@@ -254,8 +259,8 @@ BuildRequires:	libtool >= 2:2.4.6
 BuildRequires:	libtool >= 1.4.3
 %endif
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
-BuildRequires:	libxslt-devel >= 1.1.0
-%{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
+%{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
+%{?with_system_libzip:BuildRequires:	libzip-devel >= 1.2.0}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
@@ -299,22 +304,23 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20160303
-%define		zend_module_api		20160303
-%define		zend_extension_api	320160303
-%define		php_pdo_api_version	20150127
+%define		php_api_version		20170718
+%define		zend_module_api		20170718
+%define		zend_extension_api	320170718
+%define		php_pdo_api_version	20170320
 
 # Extension versions
 %define		bz2ver		1.0
-%define		enchantver	1.1.0
+%define		enchantver	%{version}
 %define		fileinfover	1.0.5
 %define		hashver		1.0
 %define		intlver		1.1.0
-%define		jsonver		1.5.0
+%define		jsonver		1.6.0
 %define		pharver		2.0.2
 %define		sqlite3ver	%{version}
-%define		zipver		1.13.5
+%define		zipver		1.15.1
 %define		phpdbgver	0.5.0
+%define		sodiumver	%{version}
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?debug:0}%{?debug:1}
@@ -624,7 +630,7 @@ Obsoletes:	php54-devel
 Obsoletes:	php55-devel
 Obsoletes:	php56-devel
 Obsoletes:	php70-devel
-Obsoletes:	php72-devel
+Obsoletes:	php71-devel
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.
@@ -1112,23 +1118,6 @@ string support.
 
 %description mbstring -l pl.UTF-8
 Moduł PHP dodający obsługę ciągów znaków wielobajtowych.
-
-%package mcrypt
-Summary:	mcrypt extension module for PHP
-Summary(pl.UTF-8):	Moduł mcrypt dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.mcrypt.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	libmcrypt >= 2.5.6
-Provides:	php(mcrypt)
-Obsoletes:	php-mcrypt < 4:5.3.28-7
-
-%description mcrypt
-This is a dynamic shared object (DSO) for PHP that will add mcrypt
-support.
-
-%description mcrypt -l pl.UTF-8
-Moduł PHP dodający możliwość szyfrowania poprzez bibliotekę mcrypt.
 
 %package mysqli
 Summary:	MySQLi module for PHP
@@ -1675,6 +1664,16 @@ support.
 %description sockets -l pl.UTF-8
 Moduł PHP dodający obsługę gniazdek.
 
+%package sodium
+Summary:	Wrapper for the Sodium cryptographic library
+Group:		Libraries
+URL:		https://paragonie.com/book/pecl-libsodium
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(sodium) = %{sodiumver}
+
+%description sodium
+A simple, low-level PHP extension for libsodium.
+
 %package spl
 Summary:	Standard PHP Library module for PHP
 Summary(pl.UTF-8):	Moduł biblioteki standardowej (Standard PHP Library) dla PHP
@@ -1943,7 +1942,7 @@ Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
 URL:		http://php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%{?with_system_libzip:Requires:	libzip >= 0.10.1-2}
+%{?with_system_libzip:Requires:	libzip >= 1.2.0}
 Provides:	php(zip) = %{zipver}
 Obsoletes:	php-pecl-zip < %{zipver}
 Obsoletes:	php-zip < 4:5.3.28-7
@@ -2008,21 +2007,21 @@ cp -p php.ini-production php.ini
 #%patch45 -p1 # imap annotations. fixme
 #%patch46 -p1 # imap myrights. fixme
 %patch50 -p1
-%patch51 -p1
-%patch52 -p1
+%patch51 -p1 -b .spl-shared
+%patch52 -p1 -b .pcre-shared
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1
-%patch59 -p1
-%patch60 -p1
-%patch62 -p1
-%{?with_system_libzip:%patch65 -p1}
+%patch59 -p1 -b .systzdata
+%if %{with instantclient}
+%patch60 -p1 -b .instantclient
+%endif
 %patch66 -p1
 %patch67 -p1
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch70 -p1
 %patch71 -p1
-%patch72 -p1
+%patch72 -p1 -b .phar-shared
 
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -2169,6 +2168,10 @@ if test "$ver" != "PHP_VERSION"; then
 	: Update the sqlite3ver macro and rebuild.
 	exit 1
 fi
+ver=$(awk '/#define PHP_SODIUM_VERSION/ {print $3}' ext/sodium/php_libsodium.h | xargs)
+if test "$ver" != "PHP_VERSION"; then
+	exit 1
+fi
 ver=$(sed -n '/#define PHP_ZIP_VERSION /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
 if test "$ver" != "%{zipver}"; then
 	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.
@@ -2193,10 +2196,8 @@ if test "$ver" != "%{bz2ver}"; then
 	: Update the bz2ver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_ENCHANT_VERSION /{s/.* "//;s/".*$//;p}' ext/enchant/php_enchant.h)
-if test "$ver" != "%{enchantver}"; then
-	: Error: Upstream Enchant version is now ${ver}, expecting %{enchantver}.
-	: Update the enchantver macro and rebuild.
+ver=$(awk '/#define PHP_ENCHANT_VERSION/ {print $3}' ext/enchant/php_enchant.h | xargs)
+if test "$ver" != "PHP_VERSION"; then
 	exit 1
 fi
 ver=$(awk '/#define PHP_HASH_VERSION/ {print $3}' ext/hash/php_hash.h | xargs)
@@ -2302,6 +2303,7 @@ for sapi in $sapis; do
 	--with-config-file-path=%{_sysconfdir} \
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-system-tzdata \
+	%{?with_argon2:--with-password-argon2} \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	--enable-inline-optimization \
@@ -2314,7 +2316,6 @@ for sapi in $sapis; do
 	%{__enable_disable exif exif shared} \
 	%{__enable_disable fileinfo fileinfo shared} \
 	%{__enable_disable ftp ftp shared} \
-	--enable-gd-native-ttf \
 	%{?with_intl:--enable-intl=shared} \
 	--enable-libxml \
 	%{__enable_disable mbstring mbstring shared,all} \
@@ -2353,6 +2354,7 @@ for sapi in $sapis; do
 	--enable-sysvshm=shared \
 	--enable-soap=shared \
 	--enable-sockets=shared \
+	%{__with_without sodium sodium shared} \
 	--enable-tokenizer=shared \
 	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
@@ -2371,7 +2373,6 @@ for sapi in $sapis; do
 	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
 	--with-jpeg-dir=/usr \
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
-	%{__with_without mcrypt mcrypt shared} \
 	%{?with_mm:--with-mm} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
@@ -2395,7 +2396,7 @@ for sapi in $sapis; do
 	%{?with_tidy:--with-tidy=shared} \
 	%{?with_odbc:--with-unixODBC=shared,/usr} \
 	%{__with_without xmlrpc xmlrpc shared,/usr} \
-	--with-xsl=shared \
+	%{?with_xsl:--with-xsl=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
 	%{?with_system_libzip:--with-libzip} \
@@ -2846,7 +2847,6 @@ fi \
 %extension_scripts json
 %extension_scripts ldap
 %extension_scripts mbstring
-%extension_scripts mcrypt
 %extension_scripts mysqli
 %extension_scripts mysqlnd
 %extension_scripts oci8
@@ -2873,6 +2873,7 @@ fi \
 %extension_scripts snmp
 %extension_scripts soap
 %extension_scripts sockets
+%extension_scripts sodium
 %extension_scripts spl
 %extension_scripts sqlite3
 %extension_scripts sysvmsg
@@ -2982,7 +2983,7 @@ fi
 
 %files common
 %defattr(644,root,root,755)
-%doc CREDITS EXTENSIONS LICENSE NEWS README.namespaces UPGRADING* Zend/{LICENSE.Zend,ZEND_CHANGES} php.ini-*
+%doc CREDITS EXTENSIONS LICENSE NEWS UPGRADING* Zend/{LICENSE.Zend,README*} php.ini-*
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
@@ -3185,14 +3186,6 @@ fi
 %doc ext/mbstring/{CREDITS,README*}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{php_extensiondir}/mbstring.so
-%endif
-
-%if %{with mcrypt}
-%files mcrypt
-%defattr(644,root,root,755)
-%doc ext/mcrypt/{CREDITS,TODO}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mcrypt.ini
-%attr(755,root,root) %{php_extensiondir}/mcrypt.so
 %endif
 
 %if %{with mysqli}
@@ -3422,6 +3415,14 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sockets.ini
 %attr(755,root,root) %{php_extensiondir}/sockets.so
 
+%if %{with sodium}
+%files sodium
+%defattr(644,root,root,755)
+%doc ext/sodium/{README.md,CREDITS}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sodium.ini
+%attr(755,root,root) %{php_extensiondir}/sodium.so
+%endif
+
 %files spl
 %defattr(644,root,root,755)
 %doc ext/spl/{CREDITS,README,TODO}
@@ -3521,11 +3522,13 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlwriter.ini
 %attr(755,root,root) %{php_extensiondir}/xmlwriter.so
 
+%if %{with xsl}
 %files xsl
 %defattr(644,root,root,755)
 %doc ext/xsl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xsl.ini
 %attr(755,root,root) %{php_extensiondir}/xsl.so
+%endif
 
 %files zip
 %defattr(644,root,root,755)

@@ -2163,12 +2163,12 @@ if test "$ver" != "%{pharver}"; then
 	: Update the pharver macro and rebuild.
 	exit 1
 fi
-#ver=$(sed -n '/#define PHP_SQLITE3_VERSION/{s/.* "//;s/".*$//;p}' ext/sqlite3/php_sqlite3.h)
-#if test "$ver" != "%{sqlite3ver}"; then
-#	: Error: Upstream Sqlite3 version is now ${ver}, expecting %{sqlite3ver}.
-#	: Update the sqlite3ver macro and rebuild.
-#	exit 1
-#fi
+ver=$(awk '/#define PHP_SQLITE3_VERSION/ {print $3}' ext/sqlite3/php_sqlite3.h | xargs)
+if test "$ver" != "PHP_VERSION"; then
+	: Error: Upstream Sqlite3 version is now ${ver}, expecting %{sqlite3ver}.
+	: Update the sqlite3ver macro and rebuild.
+	exit 1
+fi
 ver=$(sed -n '/#define PHP_ZIP_VERSION /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
 if test "$ver" != "%{zipver}"; then
 	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.

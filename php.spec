@@ -306,7 +306,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # Extension versions
 %define		bz2ver		1.0
-%define		enchantver	1.1.0
+%define		enchantver	%{version}
 %define		fileinfover	1.0.5
 %define		hashver		1.0
 %define		intlver		1.1.0
@@ -2193,10 +2193,8 @@ if test "$ver" != "%{bz2ver}"; then
 	: Update the bz2ver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_ENCHANT_VERSION /{s/.* "//;s/".*$//;p}' ext/enchant/php_enchant.h)
-if test "$ver" != "%{enchantver}"; then
-	: Error: Upstream Enchant version is now ${ver}, expecting %{enchantver}.
-	: Update the enchantver macro and rebuild.
+ver=$(awk '/#define PHP_ENCHANT_VERSION/ {print $3}' ext/enchant/php_enchant.h | xargs)
+if test "$ver" != "PHP_VERSION"; then
 	exit 1
 fi
 ver=$(awk '/#define PHP_HASH_VERSION/ {print $3}' ext/hash/php_hash.h | xargs)

@@ -140,7 +140,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	8
+%define		rel	9
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -620,6 +620,7 @@ Obsoletes:	php54-devel
 Obsoletes:	php56-devel
 Obsoletes:	php70-devel
 Obsoletes:	php71-devel
+Obsoletes:	php72-devel
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.

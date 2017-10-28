@@ -121,20 +121,24 @@
  	return SUCCESS;
  }
  /* }}} */
---- php-5.3.1/ext/standard/browscap.c	2009-06-06 02:40:49.000000000 +0000
-+++ php-5.3.1.pcre/ext/standard/browscap.c	2009-11-30 21:33:00.775241138 +0000
-@@ -31,6 +31,11 @@
- static zval *current_section;
- static char *current_section_name;
+--- php-7.2.0RC5/ext/standard/basic_functions.c	2017-10-28 21:08:47.383549141 +0300
++++ php-7.2.0RC5/ext/standard/basic_functions.c	2017-10-28 21:10:20.625051932 +0300
+@@ -113,6 +113,15 @@
+ PHPAPI php_basic_globals basic_globals;
+ #endif
  
 +#if COMPILE_DL_PCRE
-+// will be visible in here
-+PHPAPI pcre* (*pcre_get_compiled_regex_p)(zend_string *regex, pcre_extra **extra, int *options);
++// for pcre shared patch symbol
++void *pcre_get_compiled_regex_p;
++void *pcre_get_compiled_regex_cache_p;
++void *php_pcre_replace_impl_p;
++void *php_pcre_match_impl_p;
++void *php_pcre_split_impl_p;
 +#endif
 +
- #define DEFAULT_SECTION_NAME "Default Browser Capability Settings"
+ #include "php_fopen_wrappers.h"
+ #include "streamsfuncs.h"
  
- /* OBJECTS_FIXME: This whole extension needs going through. The use of objects looks pretty broken here */
 --- php-5.3.2/sapi/cli/tests/018.phpt~	2008-03-17 16:05:39.000000000 +0200
 +++ php-5.3.2/sapi/cli/tests/018.phpt	2010-03-16 20:41:11.341251246 +0200
 @@ -20,8 +20,6 @@
@@ -169,21 +173,3 @@
  			if test -f "$(top_builddir)/modules/$$i.la"; then \
  				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
  			fi; \
---- php-7.2.0beta1/ext/spl/spl_iterators.h	2017-07-18 18:58:54.000000000 +0300
-+++ php-7.2.0beta1-pcre-shared/ext/spl/spl_iterators.h	2017-07-24 22:55:20.641679202 +0300
-@@ -24,9 +24,15 @@
- #include "php.h"
- #include "php_spl.h"
- #if HAVE_PCRE || HAVE_BUNDLED_PCRE
-+
-+#if COMPILE_DL_PCRE
-+// make pcre symbols will be declared here
-+#define COMPILE_DL_PCRE_NOEXTERN
- #include "ext/pcre/php_pcre.h"
- #endif
- 
-+#endif
-+
- #define spl_ce_Traversable   zend_ce_traversable
- #define spl_ce_Iterator      zend_ce_iterator
- #define spl_ce_Aggregate     zend_ce_aggregate

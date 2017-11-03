@@ -1,3 +1,5 @@
+# NOTES
+# - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
 # TODO 7.2:
 # - https://github.com/php/php-src/blob/php-7.2.0alpha3/UPGRADING
 # TODO 5.6:

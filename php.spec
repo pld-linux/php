@@ -8,7 +8,6 @@
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
 # --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
-# --with-onig=DIR         MBSTRING: Use external oniguruma. DIR is the oniguruma install prefix.
 # TODO:
 # - fileinfo extension bundles magic db in library: data_file.c (dump of magic.mgc) is 14M
 #   - 2.3M fileinfo.so php54-fileinfo-5.4.6-0.15.x86_64
@@ -268,6 +267,7 @@ BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
 %{!?with_pdo_mysql:BuildRequires:	mysql-devel}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.3}
+BuildRequires: oniguruma-devel
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 1.0.1
@@ -2046,7 +2046,7 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/dba/libinifile
 #%{__rm} -r ext/gd/libgd
 #%{__rm} -r ext/mbstring/libmbfl
-#%{__rm} -r ext/mbstring/oniguruma
+%{__rm} -r ext/mbstring/oniguruma
 %{__rm} -r ext/pcre/pcrelib
 #%{__rm} -r ext/soap/interop
 %{__rm} -r ext/xmlrpc/libxmlrpc
@@ -2321,6 +2321,7 @@ for sapi in $sapis; do
 	%{?with_intl:--enable-intl=shared} \
 	--enable-libxml \
 	%{__enable_disable mbstring mbstring shared,all} \
+	--with-onig=/usr \
 	--enable-mbregex \
 	%{__enable_disable pcntl pcntl shared} \
 	%{__enable_disable pdo pdo shared} \

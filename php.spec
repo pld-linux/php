@@ -166,6 +166,7 @@ Group:		Libraries
 #Source0:	https://downloads.php.net/~remi/php-%{version}%{subver}.tar.xz
 Source0:	https://downloads.php.net/~pollita/php-%{version}%{subver}.tar.xz
 # Source0-md5:	43244f99613c6dc51a532b802cea17a8
+Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -2495,6 +2496,7 @@ generate_inifiles() {
 	done
 }
 generate_inifiles
+cp -p %{_sourcedir}/opcache.ini conf.d
 
 # Check that the module inner-dependencies are intact
 PHP=./sapi/cli/php EXTENSION_DIR=modules CONFIG_DIR=conf.d ./dep-tests.sh > dep-tests.log

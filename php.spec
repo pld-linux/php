@@ -312,7 +312,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		intlver		1.1.0
 %define		jsonver		1.4.0
 %define		pharver		2.0.2
-%define		sqlite3ver	0.7-dev
+%define		sqlite3ver	%{version}
 %define		zipver		1.13.5
 %define		phpdbgver	0.5.0
 
@@ -2148,8 +2148,8 @@ if test "$ver" != "%{pharver}"; then
 	: Update the pharver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_SQLITE3_VERSION/{s/.* "//;s/".*$//;p}' ext/sqlite3/php_sqlite3.h)
-if test "$ver" != "%{sqlite3ver}"; then
+ver=$(awk '/#define PHP_SQLITE3_VERSION/ {print $3}' ext/sqlite3/php_sqlite3.h | xargs)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream Sqlite3 version is now ${ver}, expecting %{sqlite3ver}.
 	: Update the sqlite3ver macro and rebuild.
 	exit 1

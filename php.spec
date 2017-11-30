@@ -1,7 +1,7 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
 # TODO 7.2:
-# - https://github.com/php/php-src/blob/php-7.2.0alpha3/UPGRADING
+# - https://github.com/php/php-src/blob/php-7.2.0/UPGRADING
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # TODO 5.4:
@@ -143,7 +143,6 @@
 %undefine	with_filter
 %endif
 
-%define		subver RC6
 %define		orgname	php
 %define		ver_suffix 72
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -155,17 +154,15 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.0
-Release:	2
+Release:	3
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-#Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-#Source0:	https://downloads.php.net/~remi/php-%{version}%{subver}.tar.xz
-Source0:	https://downloads.php.net/~pollita/php-%{version}%{subver}.tar.xz
-# Source0-md5:	43244f99613c6dc51a532b802cea17a8
+Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	ef8d4764f16d5f066e9893fe91887a31
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

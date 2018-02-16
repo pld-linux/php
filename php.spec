@@ -153,7 +153,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.2.1
+Version:	7.2.2
 Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -162,7 +162,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	f8682afff613f7e4661c77f122e4dbfd
+# Source0-md5:	d6358fd1e5f9d458878a6ece23c56f99
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -259,7 +259,7 @@ BuildRequires:	libtool >= 1.4.3
 %endif
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
-%{?with_system_libzip:BuildRequires:	libzip-devel >= 1.2.0}
+%{?with_system_libzip:BuildRequires:	libzip-devel >= 1.3.1}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
@@ -318,7 +318,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		1.6.0
 %define		pharver		2.0.2
 %define		sqlite3ver	%{version}
-%define		zipver		1.15.1
+%define		zipver		1.15.2
 %define		phpdbgver	0.5.0
 %define		sodiumver	%{version}
 
@@ -1942,7 +1942,7 @@ Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
 URL:		http://php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%{?with_system_libzip:Requires:	libzip >= 1.2.0}
+%{?with_system_libzip:Requires:	libzip >= 1.3.1}
 Provides:	php(zip) = %{zipver}
 Obsoletes:	php-pecl-zip < %{zipver}
 Obsoletes:	php-zip < 4:5.3.28-7

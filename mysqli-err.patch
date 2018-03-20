@@ -1,0 +1,29 @@
+--- php-5.4.45/ext/mysqli/mysqli.c.orig	2018-03-20 20:56:38.000000000 +0100
++++ php-5.4.45/ext/mysqli/mysqli.c	2018-03-20 21:15:42.030265770 +0100
+@@ -1376,7 +1376,7 @@
+ 	}
+ 
+ 	if (!(mysql = (MY_MYSQL *)userdata)) {
+-		LOCAL_INFILE_ERROR_MSG(data->error_msg, ER(CR_UNKNOWN_ERROR));
++		LOCAL_INFILE_ERROR_MSG(data->error_msg, "Unknown MySQL error");
+ 		return 1;
+ 	}
+ 
+@@ -1423,7 +1423,7 @@
+ 		int count = (int)php_stream_read(mysql->li_stream, buf, buf_len);
+ 
+ 		if (count < 0) {
+-			LOCAL_INFILE_ERROR_MSG(data->error_msg, ER(2));
++			LOCAL_INFILE_ERROR_MSG(data->error_msg, "Can't connect to local MySQL server");
+ 		}
+ 
+ 		return count;
+@@ -1499,7 +1499,7 @@
+ 		strlcpy(error_msg, data->error_msg, error_msg_len);
+ 		return 2000;
+ 	} 
+-	strlcpy(error_msg, ER(CR_OUT_OF_MEMORY), error_msg_len);
++	strlcpy(error_msg, "MySQL client ran out of memory", error_msg_len);
+ 	return CR_OUT_OF_MEMORY;
+ }
+ /* }}} */

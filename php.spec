@@ -138,7 +138,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	18
+%define		rel	19
 %define		orgname	php
 %define		ver_suffix 54
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -232,6 +232,7 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	x32.patch
 Patch70:	libvpx2.patch
 Patch71:	zend_operators_from_5.5.patch
+Patch72:	mysqli-err.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1974,6 +1975,7 @@ cp -p php.ini-production php.ini
 # asm part of zend_operators.h of php-5.5
 %patch71 -p1
 %endif
+%patch72 -p1
 
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

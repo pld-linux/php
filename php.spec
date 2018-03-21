@@ -38,6 +38,7 @@
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	type_hints	# experimental support for strict typing/casting
 %bcond_with	zts		# Zend Thread Safety
+%bcond_with	debug		# Zend Debug Build
 # - SAPI
 %bcond_without	apache1		# disable building Apache 1.3.x SAPI
 %bcond_without	apache2		# disable building Apache 2.x SAPI
@@ -366,7 +367,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		zipver		1.11.0
 
 %define		zend_zts		%{!?with_zts:0}%{?with_zts:1}
-%define		php_debug		%{!?debug:0}%{?debug:1}
+%define		php_debug		%{!?with_debug:0}%{?with_debug:1}
 
 %if %{with gcov}
 %undefine	with_ccache
@@ -2365,7 +2366,7 @@ for sapi in $sapis; do
 	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
 	--with-exec-dir=%{_bindir} \
 	--with-system-tzdata \
-	--%{!?debug:dis}%{?debug:en}able-debug \
+	--%{!?with_debug:dis}%{?with_debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
 	--enable-inline-optimization \
 	--enable-bcmath=shared \

@@ -149,7 +149,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.1.15
+Version:	7.1.16
 Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -158,7 +158,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	9bf2b48c9f928cbb99d59338da28e5b4
+# Source0-md5:	537bf278c8f4d3afa163bab90af868a4
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini

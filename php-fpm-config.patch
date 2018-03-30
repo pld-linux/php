@@ -17,11 +17,11 @@
  
  ; syslog_facility is used to specify what type of program is logging the
  ; message. This lets syslogd specify that messages from different facilities
-@@ -115,3 +115,11 @@
+@@ -115,4 +115,11 @@
  ; ports and different management options.  The name of the pool will be
  ; used in logs and stats. There is no limitation on the number of pools which
  ; FPM can handle. Your system will tell you anyway :)
-+
+ 
 +; Include one or more files. If glob(3) exists, it is used to include a bunch of
 +; files from a glob(3) pattern. This directive can be used everywhere in the
 +; file.

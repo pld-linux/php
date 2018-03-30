@@ -15,11 +15,10 @@
  ;;;;;;;;;;;;;;;;;;
  ; Global Options ;
  ;;;;;;;;;;;;;;;;;;
-@@ -115,415 +115,3 @@
- ; ports and different management options.  The name of the pool will be
+@@ -116,420 +116,3 @@
  ; used in logs and stats. There is no limitation on the number of pools which
  ; FPM can handle. Your system will tell you anyway :)
--
+ 
 -; Start a new pool named 'www'.
 -; the variable $pool can we used in any directive and will be replaced by the
 -; pool name ('www' here)
@@ -92,6 +91,12 @@
 -;         unless it specified otherwise
 -; Default Value: no set
 -; process.priority = -19
+-
+-; Set the process dumpable flag (PR_SET_DUMPABLE prctl) even if the process user
+-; or group is differrent than the master process user. It allows to create process
+-; core dump and ptrace the process for the pool user.
+-; Default Value: no
+-; process.dumpable = yes
 -
 -; Choose how the process manager will control the number of child processes.
 -; Possible Values:
@@ -433,7 +438,7 @@
 -;php_admin_value[memory_limit] = 32M
 --- /dev/null	2007-02-13 18:29:53.000000000 +0200
 +++ php-5.6.5/sapi/fpm/php-fpm.conf-d.in	2015-02-04 19:23:20.709225773 +0200
-@@ -0,0 +1,411 @@
+@@ -0,0 +1,417 @@
 +; Start a new pool named 'www'.
 +; the variable $pool can we used in any directive and will be replaced by the
 +; pool name ('www' here)
@@ -506,6 +511,12 @@
 +;         unless it specified otherwise
 +; Default Value: no set
 +; process.priority = -19
++
++; Set the process dumpable flag (PR_SET_DUMPABLE prctl) even if the process user
++; or group is differrent than the master process user. It allows to create process
++; core dump and ptrace the process for the pool user.
++; Default Value: no
++; process.dumpable = yes
 +
 +; Choose how the process manager will control the number of child processes.
 +; Possible Values:

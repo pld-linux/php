@@ -1,5 +1,5 @@
---- php-7.2.0alpha3/php.ini~	2017-07-06 18:09:13.000000000 +0300
-+++ php-7.2.0/php.ini	2018-01-03 22:50:15.769999341 +0200
+--- php-7.2.5/php.ini~	2018-04-27 23:35:26.000000000 +0300
++++ php-7.2.5/php.ini	2018-04-27 23:40:07.930515960 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -129,7 +129,6 @@
  ;
 -; Notes for Windows environments :
 -;
--; - ODBC support is built in, so no dll is needed for it.
 -; - Many DLL files are located in the extensions/ (PHP 4) or ext/ (PHP 5+)
 -;   extension folders as well as the separate PECL DLL download (PHP 5+).
 -;   Be sure to appropriately set the extension_dir directive.
@@ -148,6 +147,7 @@
 -;extension=exif      ; Must be after mbstring as it depends on it
 -;extension=mysqli
 -;extension=oci8_12c  ; Use with Oracle Database 12c Instant Client
+-;extension=odbc
 -;extension=openssl
 -;extension=pdo_firebird
 -;extension=pdo_mysql

@@ -155,7 +155,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.6
-Release:	1
+Release:	2
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend

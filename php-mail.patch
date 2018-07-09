@@ -1,16 +1,17 @@
---- php-5.2.0/ext/standard/mail.c	2006-12-01 14:20:27.881416250 +0100
-+++ php-5.2.4/ext/standard/mail.c	2007-08-31 19:25:50.777713042 +0300
-@@ -35,6 +37,8 @@
+diff -ur php-7.1.18.org/ext/standard/mail.c php-7.1.18.new/ext/standard/mail.c
+--- php-7.1.18.org/ext/standard/mail.c	2018-05-23 20:14:41.000000000 +0200
++++ php-7.1.18.new/ext/standard/mail.c	2018-07-09 10:06:56.968650606 +0200
+@@ -46,6 +46,8 @@
  #include "php_ini.h"
- #include "safe_mode.h"
+ #include "php_string.h"
  #include "exec.h"
 +#include "zend_operators.h"
 +#include "zend_globals.h"
  
  #ifdef PHP_WIN32
  #include "win32/sendmail.h"
-@@ -107,6 +111,18 @@
- 		return;
+@@ -125,6 +127,18 @@
+ 		MAIL_ASCIIZ_CHECK(ZSTR_VAL(extra_cmd), ZSTR_LEN(extra_cmd));
  	}
  
 +    /* search for To: and Subject: headers which should be specified in proper mail() parameters, not in additional headers */
@@ -28,8 +29,8 @@
  	if (to_len > 0) {
  		to_r = estrndup(to, to_len);
  		for (; to_len; to_len--) {
-@@ -231,8 +247,42 @@
- 			return 0;
+@@ -397,8 +411,41 @@
+ 			MAIL_RET(0);
  		}
  #endif
 -		fprintf(sendmail, "To: %s\n", to);
@@ -42,32 +43,31 @@
 +		if ((subject != NULL) && (strlen(subject)!=0)) {
 +			fprintf(sendmail, "Subject: %s\n", subject);
 +		}
-+		zend_is_auto_global(ZEND_STRL("_SERVER") TSRMLS_CC);
-+		if (PG(http_globals)[TRACK_VARS_SERVER]) {
-+			zval **remote_addr, **server_name, **server_port,
-+				**script_name, **http_user_agent;
++		if (Z_TYPE(PG(http_globals)[TRACK_VARS_SERVER]) == IS_ARRAY
++				|| zend_is_auto_global_str(ZEND_STRL("_SERVER"))) {
++					zval *remote_addr, *server_name, *server_port, *script_name, *http_user_agent;
++					remote_addr = zend_hash_str_find(Z_ARRVAL_P(&PG(http_globals)[TRACK_VARS_SERVER]),
++							"REMOTE_ADDR", sizeof("REMOTE_ADDR")-1);
++					server_name = zend_hash_str_find(Z_ARRVAL_P(&PG(http_globals)[TRACK_VARS_SERVER]),
++							"SERVER_NAME", sizeof("SERVER_NAME")-1);
++					server_port = zend_hash_str_find(Z_ARRVAL_P(&PG(http_globals)[TRACK_VARS_SERVER]),
++							"SERVER_PORT", sizeof("SERVER_PORT")-1);
++					script_name = zend_hash_str_find(Z_ARRVAL_P(&PG(http_globals)[TRACK_VARS_SERVER]),
++							"SCRIPT_NAME", sizeof("SCRIPT_NAME")-1);
++					http_user_agent = zend_hash_str_find(Z_ARRVAL_P(&PG(http_globals)[TRACK_VARS_SERVER]),
++							"HTTP_USER_AGENT", sizeof("HTTP_USER_AGENT")-1);
 +
-+			if (zend_hash_find(PG(http_globals)[TRACK_VARS_SERVER]->value.ht, "REMOTE_ADDR", sizeof("REMOTE_ADDR"), (void **) &remote_addr)==SUCCESS) {
-+				convert_to_string_ex(remote_addr);
-+				fprintf(sendmail, "HTTP-Posting-Client: %s\n", Z_STRVAL_PP(remote_addr));
-+			}
-+			if (zend_hash_find(PG(http_globals)[TRACK_VARS_SERVER]->value.ht, "SERVER_NAME", sizeof("SERVER_NAME"), (void **) &server_name)==SUCCESS) {
-+				convert_to_string_ex(server_name);
-+				fprintf(sendmail, "HTTP-Posting-URI: %s", Z_STRVAL_PP(server_name));
-+				if (zend_hash_find(PG(http_globals)[TRACK_VARS_SERVER]->value.ht, "SERVER_PORT", sizeof("SERVER_PORT"), (void **) &server_port)==SUCCESS) {
-+					convert_to_string_ex(server_port);
-+					fprintf(sendmail, ":%s", Z_STRVAL_PP(server_port));
-+				}
-+				if (zend_hash_find(PG(http_globals)[TRACK_VARS_SERVER]->value.ht, "SCRIPT_NAME", sizeof("SCRIPT_NAME"), (void **) &script_name)==SUCCESS) {
-+					convert_to_string_ex(script_name);
-+					fprintf(sendmail, "%s", Z_STRVAL_PP(script_name));
-+				}
-+				fprintf(sendmail, "\n");
-+			}
-+			if (zend_hash_find(PG(http_globals)[TRACK_VARS_SERVER]->value.ht, "HTTP_USER_AGENT", sizeof("HTTP_USER_AGENT"), (void **) &http_user_agent)==SUCCESS) {
-+				convert_to_string_ex(http_user_agent);
-+					fprintf(sendmail, "HTTP-Posting-User-Agent: %s\n", Z_STRVAL_PP(http_user_agent));
-+			}
++					if (remote_addr && Z_TYPE_P(remote_addr) == IS_STRING)
++						fprintf(sendmail, "HTTP-Posting-Client: %s\n", Z_STRVAL_P(remote_addr));
++					if (server_name && Z_TYPE_P(server_name) == IS_STRING)
++						fprintf(sendmail, "HTTP-Posting-URI: %s", Z_STRVAL_P(server_name));
++					if (server_port && Z_TYPE_P(server_port) == IS_STRING)
++						fprintf(sendmail, ":%s", Z_STRVAL_P(server_port));
++					if (script_name && Z_TYPE_P(script_name) == IS_STRING)
++						fprintf(sendmail, "%s", Z_STRVAL_P(script_name));
++					fprintf(sendmail, "\n");
++					if (http_user_agent && Z_TYPE_P(http_user_agent) == IS_STRING)
++						fprintf(sendmail, "HTTP-Posting-User-Agent: %s\n", Z_STRVAL_P(http_user_agent));
 +		}
 +
  		if (hdr != NULL) {

@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.0.30
-Release:	2
+Release:	3
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -1961,7 +1961,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1
-#%patch2 -p1 NEEDS PORTING
+%patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1

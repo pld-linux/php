@@ -88,7 +88,7 @@ https://github.com/pld-linux/php/commit/762ec2e
  			ZVAL_NEW_STR(&tmp, zend_string_init(fh.filename, strlen(fh.filename), 1));
  			zend_hash_str_update(&configuration_hash, "cfg_file_path", sizeof("cfg_file_path")-1, &tmp);
  			if (opened_path) {
- 				zend_string_release(opened_path);
+ 				zend_string_release_ex(opened_path, 0);
 -			} else {
 +			}
 +

@@ -144,8 +144,9 @@
 %undefine	with_filter
 %endif
 
+%define		subver alpha3
 %define		orgname	php
-%define		ver_suffix 72
+%define		ver_suffix 73
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -154,16 +155,17 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.2.7
-Release:	1
+Version:	7.3.0
+Release:	0.%{subver}.1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	3714de04f777c1925abb0f7d6646e99d
+#Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://downloads.php.net/~cmb/php-%{version}alpha3.tar.xz
+# Source0-md5:	7abe998a27daf8507b79086b542317f0
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -180,7 +182,7 @@ Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
 Patch5:		%{orgname}-filter-shared.patch
-Patch6:		%{orgname}-build_modules.patch
+
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		milter.patch
 Patch9:		libtool-tag.patch
@@ -1980,7 +1982,7 @@ cp -p php.ini-production php.ini
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
+
 %patch7 -p1
 %{?with_milter:%patch8 -p1}
 %patch9 -p1

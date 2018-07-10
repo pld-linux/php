@@ -307,21 +307,21 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20170718
-%define		zend_module_api		20170718
-%define		zend_extension_api	320170718
+%define		php_api_version		20180606
+%define		zend_module_api		20180606
+%define		zend_extension_api	320180606
 %define		php_pdo_api_version	20170320
 
 # Extension versions
-%define		bz2ver		1.0
+%define		bz2ver		%{version}
 %define		enchantver	%{version}
-%define		fileinfover	1.0.5
-%define		hashver		1.0
-%define		intlver		1.1.0
-%define		jsonver		1.6.0
-%define		pharver		2.0.2
+%define		fileinfover	%{version}
+%define		hashver		%{version}
+%define		intlver		%{version}
+%define		jsonver		1.7.0
+%define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.15.2
+%define		zipver		1.15.3
 %define		phpdbgver	0.5.0
 %define		sodiumver	%{version}
 
@@ -2128,6 +2128,11 @@ ix86=: x8664=: \
 	sh -xe %{_sourcedir}/skip-tests.sh
 
 %build
+get_version() {
+	local define="$1" filename="$2"
+	awk -vdefine="$define" '/#define/ && $2 == define {print $3}' "$filename" | xargs
+}
+
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
 if [ $API != %{php_api_version} ]; then
 	echo "Set %%define php_api_version to $API and re-run."
@@ -2153,14 +2158,14 @@ if [ $API != %{php_pdo_api_version} ]; then
 fi
 
 # Check for some extension version
-ver=$(sed -n '/#define PHP_FILEINFO_VERSION /{s/.* "//;s/".*$//;p}' ext/fileinfo/php_fileinfo.h)
-if test "$ver" != "%{fileinfover}"; then
+ver=$(awk '/#define PHP_FILEINFO_VERSION/ {print $3}' ext/fileinfo/php_fileinfo.h | xargs)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream FILEINFO version is now ${ver}, expecting %{fileinfover}.
 	: Update the fileinfover macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_PHAR_VERSION /{s/.* "//;s/".*$//;p}' ext/phar/php_phar.h)
-if test "$ver" != "%{pharver}"; then
+ver=$(get_version PHP_PHAR_VERSION ext/phar/php_phar.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream PHAR version is now ${ver}, expecting %{pharver}.
 	: Update the pharver macro and rebuild.
 	exit 1
@@ -2193,8 +2198,8 @@ if test "$ver" != "%{phpdbgver}"; then
 	: Update the phpdbgver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -rne 's,.*<version>(.+)</version>,\1,p' ext/bz2/package.xml)
-if test "$ver" != "%{bz2ver}"; then
+ver=$(get_version PHP_BZ2_VERSION ext/bz2/php_bz2.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream BZIP2 version is now ${ver}, expecting %{bz2ver}.
 	: Update the bz2ver macro and rebuild.
 	exit 1
@@ -2203,14 +2208,14 @@ ver=$(awk '/#define PHP_ENCHANT_VERSION/ {print $3}' ext/enchant/php_enchant.h |
 if test "$ver" != "PHP_VERSION"; then
 	exit 1
 fi
-ver=$(awk '/#define PHP_HASH_VERSION/ {print $3}' ext/hash/php_hash.h | xargs)
-if test "$ver" != "%{hashver}"; then
+ver=$(get_version PHP_HASH_VERSION ext/hash/php_hash.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream HASH version is now ${ver}, expecting %{hashver}.
 	: Update the hashver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_INTL_VERSION /{s/.* "//;s/".*$//;p}' ext/intl/php_intl.h)
-if test "$ver" != "%{intlver}"; then
+ver=$(get_version PHP_INTL_VERSION ext/intl/php_intl.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream Intl version is now ${ver}, expecting %{intlver}.
 	: Update the intlver macro and rebuild.
 	exit 1

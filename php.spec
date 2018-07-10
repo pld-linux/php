@@ -275,7 +275,7 @@ BuildRequires:	openssl-devel >= 1.0.1
 %endif
 %{?with_oci:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
-%{?with_pcre:BuildRequires:	pcre-devel >= 8.10}
+%{?with_pcre:BuildRequires:	pcre2-8-devel >= 10.30}
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -577,7 +577,7 @@ Provides:	php(libxml)
 Provides:	php(reflection)
 Provides:	php(standard)
 %{!?with_mysqlnd:Obsoletes:	%{name}-mysqlnd}
-%{?with_pcre:%requires_ge_to	pcre pcre-devel}
+%{?with_pcre:%requires_ge_to	pcre2-8 pcre2-8-devel}
 Suggests:	browscap
 Obsoletes:	php-common < 4:5.3.28-7
 # withdrawn modules
@@ -621,7 +621,7 @@ Requires:	libtool >= 2:2.4.6
 %else
 Requires:	libtool
 %endif
-%{?with_pcre:Requires:	pcre-devel >= 8.10}
+%{?with_pcre:Requires:	pcre2-8-devel >= 10.30}
 Requires:	shtool
 Provides:	php-devel = %{epoch}:%{version}-%{release}
 Obsoletes:	php-devel
@@ -2048,7 +2048,7 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/gd/libgd
 #%{__rm} -r ext/mbstring/libmbfl
 %{__rm} -r ext/mbstring/oniguruma
-%{__rm} -r ext/pcre/pcrelib
+%{__rm} -r ext/pcre/pcre2lib
 #%{__rm} -r ext/soap/interop
 %{__rm} -r ext/xmlrpc/libxmlrpc
 #%{__rm} -r ext/zip/lib

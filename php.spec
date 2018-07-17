@@ -3004,7 +3004,7 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
+%doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,UNIX-BUILD-SYSTEM,input_filter}
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
@@ -3064,8 +3064,7 @@ fi
 %if %{with dom}
 %files dom
 %defattr(644,root,root,755)
-%doc ext/dom/{CREDITS,TODO}
-%doc ext/dom/examples
+%doc ext/dom/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
 %endif
@@ -3073,7 +3072,7 @@ fi
 %if %{with enchant}
 %files enchant
 %defattr(644,root,root,755)
-%doc ext/enchant/{CREDITS,docs/examples}
+%doc ext/enchant/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/enchant.ini
 %attr(755,root,root) %{php_extensiondir}/enchant.so
 %endif
@@ -3097,7 +3096,7 @@ fi
 %if %{with filter}
 %files filter
 %defattr(644,root,root,755)
-%doc ext/filter/{CREDITS,docs/*}
+%doc ext/filter/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
 %attr(755,root,root) %{php_extensiondir}/filter.so
 %endif
@@ -3129,7 +3128,7 @@ fi
 %if %{with gmp}
 %files gmp
 %defattr(644,root,root,755)
-%doc ext/gmp/{CREDITS,README,TODO}
+%doc ext/gmp/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{php_extensiondir}/gmp.so
 %endif
@@ -3169,7 +3168,7 @@ fi
 %if %{with intl}
 %files intl
 %defattr(644,root,root,755)
-%doc ext/intl/{CREDITS,TODO}
+%doc ext/intl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/intl.ini
 %attr(755,root,root) %{php_extensiondir}/intl.so
 %endif
@@ -3193,7 +3192,7 @@ fi
 %if %{with mbstring}
 %files mbstring
 %defattr(644,root,root,755)
-%doc ext/mbstring/{CREDITS,README*}
+%doc ext/mbstring/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{php_extensiondir}/mbstring.so
 %endif
@@ -3201,7 +3200,7 @@ fi
 %if %{with mysqli}
 %files mysqli
 %defattr(644,root,root,755)
-%doc ext/mysqli/{CREDITS,TODO}
+%doc ext/mysqli/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysqli.ini
 %attr(755,root,root) %{php_extensiondir}/mysqli.so
 %endif
@@ -3265,7 +3264,7 @@ fi
 %if %{with pdo}
 %files pdo
 %defattr(644,root,root,755)
-%doc ext/pdo/{CREDITS,README,TODO}
+%doc ext/pdo/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
 %attr(755,root,root) %{php_extensiondir}/pdo.so
 %endif
@@ -3337,7 +3336,7 @@ fi
 %if %{with phar}
 %files phar
 %defattr(644,root,root,755)
-%doc ext/phar/{CREDITS,TODO}
+%doc ext/phar/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/phar.ini
 %attr(755,root,root) %{php_extensiondir}/phar.so
 %attr(755,root,root) %{_bindir}/phar%{php_suffix}.phar
@@ -3401,7 +3400,6 @@ fi
 %files simplexml
 %defattr(644,root,root,755)
 %doc ext/simplexml/{CREDITS,README}
-%doc ext/simplexml/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
 
@@ -3415,7 +3413,7 @@ fi
 
 %files soap
 %defattr(644,root,root,755)
-%doc ext/soap/{CREDITS,TODO*}
+%doc ext/soap/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/soap.ini
 %attr(755,root,root) %{php_extensiondir}/soap.so
 
@@ -3435,7 +3433,7 @@ fi
 
 %files spl
 %defattr(644,root,root,755)
-%doc ext/spl/{CREDITS,README,TODO}
+%doc ext/spl/{CREDITS,README}
 %doc ext/spl/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
 %attr(755,root,root) %{php_extensiondir}/spl.so
@@ -3484,8 +3482,7 @@ fi
 %if %{with tidy}
 %files tidy
 %defattr(644,root,root,755)
-%doc ext/tidy/{CREDITS,README}
-%doc ext/tidy/examples
+%doc ext/tidy/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tidy.ini
 %attr(755,root,root) %{php_extensiondir}/tidy.so
 %endif
@@ -3512,8 +3509,7 @@ fi
 
 %files xmlreader
 %defattr(644,root,root,755)
-%doc ext/xmlreader/{CREDITS,README,TODO}
-%doc ext/xmlreader/examples
+%doc ext/xmlreader/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlreader.ini
 %attr(755,root,root) %{php_extensiondir}/xmlreader.so
 
@@ -3542,7 +3538,7 @@ fi
 
 %files zip
 %defattr(644,root,root,755)
-%doc ext/zip/{CREDITS,TODO}
+%doc ext/zip/CREDITS
 %doc ext/zip/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zip.ini
 %attr(755,root,root) %{php_extensiondir}/zip.so

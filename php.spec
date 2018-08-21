@@ -2480,6 +2480,8 @@ generate_inifiles() {
 		[ "$mod" = "spl" ] && conf="SPL.ini"
 		# session needs to be loaded before php-pecl-http, php-pecl-memcache, php-pecl-session_mysql
 		[ "$mod" = "session" ] && conf="Session.ini"
+		# hash needs to be loaded before mysqlnd
+		[ "$mod" = "hash" ] && conf="Hash.ini"
 		# mysqlnd needs to be loaded before mysqli,pdo_mysqli
 		[ "$mod" = "mysqlnd" ] && conf="MySQLND.ini"
 		echo "+ $conf"
@@ -3126,7 +3128,7 @@ fi
 %files hash
 %defattr(644,root,root,755)
 %doc ext/hash/{CREDITS,README}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/hash.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/Hash.ini
 %attr(755,root,root) %{php_extensiondir}/hash.so
 %endif
 

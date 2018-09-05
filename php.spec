@@ -144,7 +144,7 @@
 %undefine	with_filter
 %endif
 
-%define		subver alpha3
+%define		subver beta3
 %define		orgname	php
 %define		ver_suffix 73
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -164,8 +164,8 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://downloads.php.net/~cmb/php-%{version}alpha3.tar.xz
-# Source0-md5:	7abe998a27daf8507b79086b542317f0
+Source0:	https://downloads.php.net/~cmb/php-%{version}%{subver}.tar.xz
+# Source0-md5:	fe3e3ac34ba995c56b9f71b458abe248
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -307,9 +307,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20180606
-%define		zend_module_api		20180606
-%define		zend_extension_api	320180606
+%define		php_api_version		20180731
+%define		zend_module_api		20180731
+%define		zend_extension_api	320180731
 %define		php_pdo_api_version	20170320
 
 # Extension versions
@@ -3523,8 +3523,7 @@ fi
 
 %files xmlwriter
 %defattr(644,root,root,755)
-%doc ext/xmlwriter/{CREDITS,TODO}
-%doc ext/xmlwriter/examples
+%doc ext/xmlwriter/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlwriter.ini
 %attr(755,root,root) %{php_extensiondir}/xmlwriter.so
 

@@ -1,6 +1,5 @@
-diff -ur php-7.1.18.org/ext/standard/mail.c php-7.1.18.new/ext/standard/mail.c
---- php-7.1.18.org/ext/standard/mail.c	2018-05-23 20:14:41.000000000 +0200
-+++ php-7.1.18.new/ext/standard/mail.c	2018-07-09 10:06:56.968650606 +0200
+--- php-7.1.22.org/ext/standard/mail.c	2018-09-11 16:08:35.000000000 +0200
++++ php-7.1.22/ext/standard/mail.c	2018-09-14 11:40:47.086119608 +0200
 @@ -46,6 +46,8 @@
  #include "php_ini.h"
  #include "php_string.h"
@@ -10,7 +9,7 @@ diff -ur php-7.1.18.org/ext/standard/mail.c php-7.1.18.new/ext/standard/mail.c
  
  #ifdef PHP_WIN32
  #include "win32/sendmail.h"
-@@ -125,6 +127,18 @@
+@@ -125,6 +127,18 @@ PHP_FUNCTION(mail)
  		MAIL_ASCIIZ_CHECK(ZSTR_VAL(extra_cmd), ZSTR_LEN(extra_cmd));
  	}
  
@@ -29,7 +28,7 @@ diff -ur php-7.1.18.org/ext/standard/mail.c php-7.1.18.new/ext/standard/mail.c
  	if (to_len > 0) {
  		to_r = estrndup(to, to_len);
  		for (; to_len; to_len--) {
-@@ -397,8 +411,41 @@
+@@ -397,8 +411,42 @@ PHPAPI int php_mail(char *to, char *subj
  			MAIL_RET(0);
  		}
  #endif
@@ -59,13 +58,14 @@ diff -ur php-7.1.18.org/ext/standard/mail.c php-7.1.18.new/ext/standard/mail.c
 +
 +					if (remote_addr && Z_TYPE_P(remote_addr) == IS_STRING)
 +						fprintf(sendmail, "HTTP-Posting-Client: %s\n", Z_STRVAL_P(remote_addr));
-+					if (server_name && Z_TYPE_P(server_name) == IS_STRING)
++					if (server_name && Z_TYPE_P(server_name) == IS_STRING) {
 +						fprintf(sendmail, "HTTP-Posting-URI: %s", Z_STRVAL_P(server_name));
-+					if (server_port && Z_TYPE_P(server_port) == IS_STRING)
-+						fprintf(sendmail, ":%s", Z_STRVAL_P(server_port));
-+					if (script_name && Z_TYPE_P(script_name) == IS_STRING)
-+						fprintf(sendmail, "%s", Z_STRVAL_P(script_name));
-+					fprintf(sendmail, "\n");
++						if (server_port && Z_TYPE_P(server_port) == IS_STRING)
++							fprintf(sendmail, ":%s", Z_STRVAL_P(server_port));
++						if (script_name && Z_TYPE_P(script_name) == IS_STRING)
++							fprintf(sendmail, "%s", Z_STRVAL_P(script_name));
++						fprintf(sendmail, "\n");
++					}
 +					if (http_user_agent && Z_TYPE_P(http_user_agent) == IS_STRING)
 +						fprintf(sendmail, "HTTP-Posting-User-Agent: %s\n", Z_STRVAL_P(http_user_agent));
 +		}

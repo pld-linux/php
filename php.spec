@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	2
+%define		rel	1
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -166,7 +166,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 5 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 5 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	5.6.37
+Version:	5.6.38
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -175,7 +175,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	6a21894661704641b77ccc40e091eaf9
+# Source0-md5:	8c84a9320f2d18e5c205ea4b0a30af91
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
@@ -197,6 +197,7 @@ Patch8:		milter.patch
 Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
+Patch12:	openssl.patch
 Patch14:	%{orgname}-no_pear_install.patch
 Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
@@ -2085,6 +2086,9 @@ cp -p php.ini-production php.ini
 %{?with_milter:%patch8 -p1}
 %patch9 -p1
 %patch10 -p1
+
+%patch12 -p1
+
 %patch14 -p1
 %patch17 -p1
 %patch18 -p1

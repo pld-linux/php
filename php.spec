@@ -143,7 +143,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_alternatives
 %endif
 
-%define		rel	42
+%define		rel	43
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2300,7 +2300,7 @@ if [ ! -f _built-conf ]; then
 	touch _built-conf
 fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
-export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} -I%{_includedir}/xmlrpc-epi"
+export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP -DOPENSSL_NO_SSL2=1 -DOPENSSL_NO_SSL3=1 %{rpmcppflags} -I%{_includedir}/xmlrpc-epi"
 %if %{with lfs}
 CPPFLAGS="$CPPFLAGS $(getconf LFS_CFLAGS)"
 %endif

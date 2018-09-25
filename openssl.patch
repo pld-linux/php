@@ -943,3 +943,43 @@ diff -urN php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/openssl/openssl.c
        PHP_EVAL_INCLINE($OPENSSL_INCS)
      fi
    fi
+commit 640214701c9cf259c899d283ea769b3045d2553c
+Author: Daniel Lowrey <rdlowrey@php.net>
+Date:   Mon Aug 25 17:28:09 2014 +0200
+
+    Bug #67850: Build when OpenSSL compiled without SSLv3 support
+
+diff --git a/ext/openssl/xp_ssl.c b/ext/openssl/xp_ssl.c
+index b9a30df6cf..5fddf73c4e 100644
+--- a/ext/openssl/xp_ssl.c
++++ b/ext/openssl/xp_ssl.c
+@@ -385,9 +385,14 @@ static inline int php_openssl_setup_crypto(php_stream *stream,
+ 			break;
+ #endif
+ 		case STREAM_CRYPTO_METHOD_SSLv3_CLIENT:
++#ifdef OPENSSL_NO_SSL3
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv3 support is not compiled into the OpenSSL library PHP is linked against");
++			return -1;
++#else
+ 			sslsock->is_client = 1;
+ 			method = SSLv3_client_method();
+ 			break;
++#endif
+ 		case STREAM_CRYPTO_METHOD_TLS_CLIENT:
+ 			sslsock->is_client = 1;
+ 			method = TLSv1_client_method();
+@@ -397,9 +402,14 @@ static inline int php_openssl_setup_crypto(php_stream *stream,
+ 			method = SSLv23_server_method();
+ 			break;
+ 		case STREAM_CRYPTO_METHOD_SSLv3_SERVER:
++#ifdef OPENSSL_NO_SSL3
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv3 support is not compiled into the OpenSSL library PHP is linked against");
++			return -1;
++#else
+ 			sslsock->is_client = 0;
+ 			method = SSLv3_server_method();
+ 			break;
++#endif
+ 		case STREAM_CRYPTO_METHOD_SSLv2_SERVER:
+ #ifdef OPENSSL_NO_SSL2
+ 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv2 support is not compiled into the OpenSSL library PHP is linked against");

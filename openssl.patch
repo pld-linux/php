@@ -1,0 +1,430 @@
+diff -ur php-5.2.17/ext/openssl.org/openssl.c php-5.2.17/ext/openssl/openssl.c
+--- php-5.2.17/ext/openssl.org/openssl.c	2018-09-28 10:44:23.152948019 +0200
++++ php-5.2.17/ext/openssl/openssl.c	2018-09-28 10:55:24.424744224 +0200
+@@ -73,6 +73,13 @@
+ 		ZEND_ARG_PASS_INFO(1)
+ 	ZEND_END_ARG_INFO();
+ 
++
++#if (OPENSSL_VERSION_NUMBER >= 0x10100000L)
++#define PHP_OPENSSL_RAND_ADD_TIME() ((void) 0)
++#else
++#define PHP_OPENSSL_RAND_ADD_TIME() php_openssl_rand_add_timeval()
++#endif
++
+ /* FIXME: Use the openssl constants instead of
+  * enum. It is now impossible to match real values
+  * against php constants. Also sorry to break the
+@@ -608,11 +615,6 @@
+ #endif
+ 	if (file == NULL) {
+ 		file = RAND_file_name(buffer, sizeof(buffer));
+-	} else if (RAND_egd(file) > 0) {
+-		/* if the given filename is an EGD socket, don't
+-		 * write anything back to it */
+-		*egdsocket = 1;
+-		return SUCCESS;
+ 	}
+ 	if (file == NULL || !RAND_load_file(file, -1)) {
+ 		if (RAND_status() == 0) {
+@@ -666,9 +668,11 @@
+ 			mdtype = (EVP_MD *) EVP_md2();
+ 			break;
+ #endif
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
+ 		case OPENSSL_ALGO_DSS1:
+ 			mdtype = (EVP_MD *) EVP_dss1();
+ 			break;
++#endif
+ 		default:
+ 			return NULL;
+ 			break;
+@@ -688,14 +692,17 @@
+ 	le_x509 = zend_register_list_destructors_ex(php_x509_free, NULL, "OpenSSL X.509", module_number);
+ 	le_csr = zend_register_list_destructors_ex(php_csr_free, NULL, "OpenSSL X.509 CSR", module_number);
+ 
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
++	OPENSSL_config(NULL);
+ 	SSL_library_init();
+ 	OpenSSL_add_all_ciphers();
+ 	OpenSSL_add_all_digests();
+ 	OpenSSL_add_all_algorithms();
+ 
+-	ERR_load_ERR_strings();
+-	ERR_load_crypto_strings();
+-	ERR_load_EVP_strings();
++	SSL_load_error_strings();
++#else
++	OPENSSL_init_ssl(OPENSSL_INIT_LOAD_CONFIG, NULL);
++#endif
+ 
+ 	/* register a resource id number with openSSL so that we can map SSL -> stream structures in
+ 	 * openSSL callbacks */
+@@ -1037,6 +1044,7 @@
+ {
+ 	GENERAL_NAMES *names;
+ 	const X509V3_EXT_METHOD *method = NULL;
++	ASN1_OCTET_STRING *extension_data;
+ 	long i, length, num;
+ 	const unsigned char *p;
+ 
+@@ -1045,8 +1053,9 @@
+ 		return -1;
+ 	}
+ 
+-	p = extension->value->data;
+-	length = extension->value->length;
++	extension_data = X509_EXTENSION_get_data(extension);
++	p = extension_data->data;
++	length = extension_data->length;
+ 	if (method->it) {
+ 		names = (GENERAL_NAMES*)(ASN1_item_d2i(NULL, &p, length,
+ 						       ASN1_ITEM_ptr(method->it)));
+@@ -1109,6 +1118,8 @@
+ 	char * tmpstr;
+ 	zval * subitem;
+ 	X509_EXTENSION *extension;
++	X509_NAME *subject_name;
++	char *cert_name;
+ 	char *extname;
+ 	BIO  *bio_out;
+ 	BUF_MEM *bio_buf;
+@@ -1123,12 +1134,12 @@
+ 	}
+ 	array_init(return_value);
+ 
+-	if (cert->name) {
+-		add_assoc_string(return_value, "name", cert->name, 1);
+-	}
+-/*	add_assoc_bool(return_value, "valid", cert->valid); */
++	subject_name = X509_get_subject_name(cert);
++	cert_name = X509_NAME_oneline(subject_name, NULL, 0);
++	add_assoc_string(return_value, "name", cert_name, 1);
++	OPENSSL_free(cert_name);
+ 
+-	add_assoc_name_entry(return_value, "subject", 		X509_get_subject_name(cert), useshortnames TSRMLS_CC);
++	add_assoc_name_entry(return_value, "subject", 		subject_name, useshortnames TSRMLS_CC);
+ 	/* hash as used in CA directories to lookup cert by subject name */
+ 	{
+ 		char buf[32];
+@@ -2592,13 +2603,20 @@
+ {
+ 	assert(pkey != NULL);
+ 
+-	switch (pkey->type) {
++	switch (EVP_PKEY_id(pkey)) {
+ #ifndef NO_RSA
+ 		case EVP_PKEY_RSA:
+ 		case EVP_PKEY_RSA2:
+-			assert(pkey->pkey.rsa != NULL);
+-			if (pkey->pkey.rsa != NULL && (NULL == pkey->pkey.rsa->p || NULL == pkey->pkey.rsa->q)) {
+-				return 0;
++			{
++				RSA *rsa = EVP_PKEY_get0_RSA(pkey);
++				if (rsa != NULL) {
++					const BIGNUM *p, *q;
++
++					RSA_get0_factors(rsa, &p, &q);
++					if (p == NULL || q == NULL) {
++						return 0;
++					}
++				}
+ 			}
+ 			break;
+ #endif
+@@ -2608,19 +2626,41 @@
+ 		case EVP_PKEY_DSA2:
+ 		case EVP_PKEY_DSA3:
+ 		case EVP_PKEY_DSA4:
+-			assert(pkey->pkey.dsa != NULL);
++			{
++				DSA *dsa = EVP_PKEY_get0_DSA(pkey);
++				if (dsa != NULL) {
++					const BIGNUM *p, *q, *g, *pub_key, *priv_key;
++
++					DSA_get0_pqg(dsa, &p, &q, &g);
++					if (p == NULL || q == NULL) {
++						return 0;
++					}
+ 
+-			if (NULL == pkey->pkey.dsa->p || NULL == pkey->pkey.dsa->q || NULL == pkey->pkey.dsa->priv_key){ 
+-				return 0;
++					DSA_get0_key(dsa, &pub_key, &priv_key);
++					if (priv_key == NULL) {
++						return 0;
++					}
++				}
+ 			}
+ 			break;
+ #endif
+ #ifndef NO_DH
+ 		case EVP_PKEY_DH:
+-			assert(pkey->pkey.dh != NULL);
++			{
++				DH *dh = EVP_PKEY_get0_DH(pkey);
++				if (dh != NULL) {
++					const BIGNUM *p, *q, *g, *pub_key, *priv_key;
++
++					DH_get0_pqg(dh, &p, &q, &g);
++					if (p == NULL) {
++						return 0;
++					}
+ 
+-			if (NULL == pkey->pkey.dh->p || NULL == pkey->pkey.dh->priv_key) {
+-				return 0;
++					DH_get0_key(dh, &pub_key, &priv_key);
++					if (priv_key == NULL) {
++						return 0;
++					}
++				}
+ 			}
+ 			break;
+ #endif
+@@ -2861,7 +2901,7 @@
+ 	/*TODO: Use the real values once the openssl constants are used 
+ 	 * See the enum at the top of this file
+ 	 */
+-	switch (EVP_PKEY_type(pkey->type)) {
++	switch (EVP_PKEY_base_id(pkey)) {
+ 		case EVP_PKEY_RSA:
+ 		case EVP_PKEY_RSA2:
+ 			ktype = OPENSSL_KEYTYPE_RSA;
+@@ -3398,13 +3438,13 @@
+ 	cryptedlen = EVP_PKEY_size(pkey);
+ 	cryptedbuf = emalloc(cryptedlen + 1);
+ 
+-	switch (pkey->type) {
++	switch (EVP_PKEY_id(pkey)) {
+ 		case EVP_PKEY_RSA:
+ 		case EVP_PKEY_RSA2:
+ 			successful =  (RSA_private_encrypt(data_len, 
+ 						(unsigned char *)data, 
+ 						cryptedbuf, 
+-						pkey->pkey.rsa, 
++						EVP_PKEY_get0_RSA(pkey), 
+ 						padding) == cryptedlen);
+ 			break;
+ 		default:
+@@ -3456,13 +3496,13 @@
+ 	cryptedlen = EVP_PKEY_size(pkey);
+ 	crypttemp = emalloc(cryptedlen + 1);
+ 
+-	switch (pkey->type) {
++	switch (EVP_PKEY_id(pkey)) {
+ 		case EVP_PKEY_RSA:
+ 		case EVP_PKEY_RSA2:
+ 			cryptedlen = RSA_private_decrypt(data_len, 
+ 					(unsigned char *)data, 
+ 					crypttemp, 
+-					pkey->pkey.rsa, 
++					EVP_PKEY_get0_RSA(pkey), 
+ 					padding);
+ 			if (cryptedlen != -1) {
+ 				cryptedbuf = emalloc(cryptedlen + 1);
+@@ -3521,13 +3561,13 @@
+ 	cryptedlen = EVP_PKEY_size(pkey);
+ 	cryptedbuf = emalloc(cryptedlen + 1);
+ 
+-	switch (pkey->type) {
++	switch (EVP_PKEY_id(pkey)) {
+ 		case EVP_PKEY_RSA:
+ 		case EVP_PKEY_RSA2:
+ 			successful = (RSA_public_encrypt(data_len, 
+ 						(unsigned char *)data, 
+ 						cryptedbuf, 
+-						pkey->pkey.rsa, 
++						EVP_PKEY_get0_RSA(pkey), 
+ 						padding) == cryptedlen);
+ 			break;
+ 		default:
+@@ -3580,13 +3620,13 @@
+ 	cryptedlen = EVP_PKEY_size(pkey);
+ 	crypttemp = emalloc(cryptedlen + 1);
+ 
+-	switch (pkey->type) {
++	switch (EVP_PKEY_id(pkey)) {
+ 		case EVP_PKEY_RSA:
+ 		case EVP_PKEY_RSA2:
+ 			cryptedlen = RSA_public_decrypt(data_len, 
+ 					(unsigned char *)data, 
+ 					crypttemp, 
+-					pkey->pkey.rsa, 
++					EVP_PKEY_get0_RSA(pkey), 
+ 					padding);
+ 			if (cryptedlen != -1) {
+ 				cryptedbuf = emalloc(cryptedlen + 1);
+@@ -3650,7 +3690,7 @@
+ 	long keyresource = -1;
+ 	char * data;
+ 	int data_len;
+-	EVP_MD_CTX md_ctx;
++	EVP_MD_CTX *md_ctx;
+ 	long signature_algo = OPENSSL_ALGO_SHA1;
+ 	EVP_MD *mdtype;
+ 
+@@ -3672,9 +3712,11 @@
+ 	siglen = EVP_PKEY_size(pkey);
+ 	sigbuf = emalloc(siglen + 1);
+ 
+-	EVP_SignInit(&md_ctx, mdtype);
+-	EVP_SignUpdate(&md_ctx, data, data_len);
+-	if (EVP_SignFinal (&md_ctx, sigbuf,(unsigned int *)&siglen, pkey)) {
++	md_ctx = EVP_MD_CTX_create();
++	if (md_ctx != NULL &&
++			EVP_SignInit(md_ctx, mdtype) &&
++			EVP_SignUpdate(md_ctx, data, data_len) &&
++			EVP_SignFinal (md_ctx, sigbuf,(unsigned int *)&siglen, pkey)) {
+ 		zval_dtor(signature);
+ 		sigbuf[siglen] = '\0';
+ 		ZVAL_STRINGL(signature, (char *)sigbuf, siglen, 0);
+@@ -3684,7 +3726,7 @@
+ 		RETVAL_FALSE;
+ 	}
+ #if OPENSSL_VERSION_NUMBER >= 0x0090700fL
+-	EVP_MD_CTX_cleanup(&md_ctx);
++	EVP_MD_CTX_free(md_ctx);
+ #endif
+ 	if (keyresource == -1) {
+ 		EVP_PKEY_free(pkey);
+@@ -3699,7 +3741,7 @@
+ 	zval **key;
+ 	EVP_PKEY *pkey;
+ 	int err;
+-	EVP_MD_CTX     md_ctx;
++	EVP_MD_CTX     *md_ctx;
+ 	EVP_MD *mdtype;
+ 	long keyresource = -1;
+ 	char * data;	int data_len;
+@@ -3722,11 +3764,13 @@
+ 		RETURN_FALSE;
+ 	}
+ 
+-	EVP_VerifyInit   (&md_ctx, mdtype);
+-	EVP_VerifyUpdate (&md_ctx, data, data_len);
+-	err = EVP_VerifyFinal (&md_ctx, (unsigned char *)signature, signature_len, pkey);
++	if (md_ctx != NULL) {
++		EVP_VerifyInit   (md_ctx, mdtype);
++		EVP_VerifyUpdate (md_ctx, data, data_len);
++		err = EVP_VerifyFinal (md_ctx, (unsigned char *)signature, signature_len, pkey);
++	}
+ #if OPENSSL_VERSION_NUMBER >= 0x0090700fL
+-	EVP_MD_CTX_cleanup(&md_ctx);
++	EVP_MD_CTX_destroy(md_ctx);
+ #endif
+ 
+ 	if (keyresource == -1) {
+@@ -3748,7 +3792,7 @@
+ 	int i, len1, len2, *eksl, nkeys;
+ 	unsigned char *buf = NULL, **eks;
+ 	char * data; int data_len;
+-	EVP_CIPHER_CTX ctx;
++	EVP_CIPHER_CTX *ctx;
+ 
+ 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "szza/", &data, &data_len, &sealdata, &ekeys, &pubkeys) == FAILURE) {
+ 		return;
+@@ -3785,7 +3829,9 @@
+ 		i++;
+ 	}
+ 
+-	if (!EVP_EncryptInit(&ctx,EVP_rc4(),NULL,NULL)) {
++	ctx = EVP_CIPHER_CTX_new();
++	if (!EVP_EncryptInit(ctx,EVP_rc4(),NULL,NULL)) {
++		EVP_CIPHER_CTX_free(ctx);
+ 		RETVAL_FALSE;
+ 		goto clean_exit;
+ 	}
+@@ -3796,15 +3842,16 @@
+ 	iv = ivlen ? emalloc(ivlen + 1) : NULL;
+ #endif
+ 	/* allocate one byte extra to make room for \0 */
+-	buf = emalloc(data_len + EVP_CIPHER_CTX_block_size(&ctx));
++	buf = emalloc(data_len + EVP_CIPHER_CTX_block_size(ctx));
+ 
+-	if (!EVP_SealInit(&ctx, EVP_rc4(), eks, eksl, NULL, pkeys, nkeys) || !EVP_SealUpdate(&ctx, buf, &len1, (unsigned char *)data, data_len)) {
++	if (!EVP_SealInit(ctx, EVP_rc4(), eks, eksl, NULL, pkeys, nkeys) || !EVP_SealUpdate(ctx, buf, &len1, (unsigned char *)data, data_len)) {
+ 		RETVAL_FALSE;
+ 		efree(buf);
++		EVP_CIPHER_CTX_free(ctx);
+ 		goto clean_exit;
+ 	}
+ 
+-	EVP_SealFinal(&ctx, buf + len1, &len2);
++	EVP_SealFinal(ctx, buf + len1, &len2);
+ 
+ 	if (len1 + len2 > 0) {
+ 		zval_dtor(sealdata);
+@@ -3833,6 +3880,7 @@
+ 		efree(buf);
+ 	}
+ 	RETVAL_LONG(len1 + len2);
++	EVP_CIPHER_CTX_free(ctx);
+ 
+ clean_exit:
+ 	for (i=0; i<nkeys; i++) {
+@@ -3859,7 +3907,7 @@
+ 	int len1, len2;
+ 	unsigned char *buf;
+ 	long keyresource = -1;
+-	EVP_CIPHER_CTX ctx;
++	EVP_CIPHER_CTX *ctx;
+ 	char * data;	int data_len;
+ 	char * ekey;	int ekey_len;
+ 
+@@ -3874,8 +3922,8 @@
+ 	}
+ 	buf = emalloc(data_len + 1);
+ 
+-	if (EVP_OpenInit(&ctx, EVP_rc4(), (unsigned char *)ekey, ekey_len, NULL, pkey) && EVP_OpenUpdate(&ctx, buf, &len1, (unsigned char *)data, data_len)) {
+-		if (!EVP_OpenFinal(&ctx, buf + len1, &len2) || (len1 + len2 == 0)) {
++	if (EVP_OpenInit(ctx, EVP_rc4(), (unsigned char *)ekey, ekey_len, NULL, pkey) && EVP_OpenUpdate(ctx, buf, &len1, (unsigned char *)data, data_len)) {
++		if (!EVP_OpenFinal(ctx, buf + len1, &len2) || (len1 + len2 == 0)) {
+ 			efree(buf);
+ 			if (keyresource == -1) { 
+ 				EVP_PKEY_free(pkey);
+diff -ur php-5.2.17/ext/openssl.org/xp_ssl.c php-5.2.17/ext/openssl/xp_ssl.c
+--- php-5.2.17/ext/openssl.org/xp_ssl.c	2018-09-28 10:44:23.112946707 +0200
++++ php-5.2.17/ext/openssl/xp_ssl.c	2018-09-28 10:48:26.714263136 +0200
+@@ -342,9 +342,14 @@
+ 			break;
+ #endif
+ 		case STREAM_CRYPTO_METHOD_SSLv3_CLIENT:
++#ifdef OPENSSL_NO_SSL3
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv3 support is not compiled into the OpenSSL library PHP is linked against");
++			return -1;
++#else
+ 			sslsock->is_client = 1;
+ 			method = SSLv3_client_method();
+ 			break;
++#endif
+ 		case STREAM_CRYPTO_METHOD_TLS_CLIENT:
+ 			sslsock->is_client = 1;
+ 			method = TLSv1_client_method();
+@@ -354,9 +359,14 @@
+ 			method = SSLv23_server_method();
+ 			break;
+ 		case STREAM_CRYPTO_METHOD_SSLv3_SERVER:
++#ifdef OPENSSL_NO_SSL3
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv3 support is not compiled into the OpenSSL library PHP is linked against");
++			return -1;
++#else
+ 			sslsock->is_client = 0;
+ 			method = SSLv3_server_method();
+ 			break;
++#endif
+ 		case STREAM_CRYPTO_METHOD_SSLv2_SERVER:
+ #ifdef OPENSSL_NO_SSL2
+ 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv2 support is not compiled into the OpenSSL library PHP is linked against");
+--- php-5.2.17/acinclude.m4~	2018-09-28 11:08:22.000000000 +0200
++++ php-5.2.17/acinclude.m4	2018-09-28 11:17:41.392940657 +0200
+@@ -2325,8 +2325,10 @@ AC_DEFUN([PHP_SETUP_OPENSSL],[
+       AC_MSG_ERROR([OpenSSL version 0.9.6 or greater required.])
+     fi
+ 
+-    if test -n "$OPENSSL_LIBS" && test -n "$OPENSSL_INCS"; then
++    if test -n "$OPENSSL_LIBS"; then
+       PHP_EVAL_LIBLINE($OPENSSL_LIBS, $1)
++    fi
++    if test -n "$OPENSSL_INCS"; then
+       PHP_EVAL_INCLINE($OPENSSL_INCS)
+     fi
+   fi

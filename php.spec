@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	30
+%define		rel	31
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -227,6 +227,7 @@ Patch77:	x32.patch
 Patch78:	php-bug-68486.patch
 Patch79:	libevent-2.1.patch
 Patch80:	mysqli-err.patch
+Patch81:	openssl.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -1972,6 +1973,7 @@ done
 %patch78 -p1
 %patch79 -p1
 %patch80 -p1
+%patch81 -p1
 
 # Bugfix backport from 5.3.6
 %patch311 -p1 -b .bug-47435
@@ -2095,6 +2097,7 @@ for sapi in $sapis; do
 	esac
 
 	%configure \
+	CFLAGS="%{rpmcflags} -DOPENSSL_NO_SSL2=1 -DOPENSSL_NO_SSL3=1" \
 	FORCE_APACHE_VERSION="${apache_ver}" \
 	EXTRA_LDFLAGS="%{rpmldflags}" \
 	$sapi_args \

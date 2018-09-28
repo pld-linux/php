@@ -974,3 +974,33 @@ diff -ur php-5.4.45/ext/openssl.org/openssl.c php-5.4.45/ext/openssl/openssl.c
  
  	if (len >= 0) {
  		data[len] = 0;
+--- php-5.4.45/ext/openssl/xp_ssl.c~	2015-09-01 22:09:37.000000000 +0200
++++ php-5.4.45/ext/openssl/xp_ssl.c	2018-09-28 14:06:51.890385590 +0200
+@@ -339,8 +339,13 @@ static inline int php_openssl_setup_cryp
+ 			break;
+ #endif
+ 		case STREAM_CRYPTO_METHOD_SSLv3_CLIENT:
++#ifdef OPENSSL_NO_SSL3
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv3 support is not compiled into the OpenSSL library PHP is linked against");
++			return -1;
++#else
+ 			sslsock->is_client = 1;
+ 			method = SSLv3_client_method();
++#endif
+ 			break;
+ 		case STREAM_CRYPTO_METHOD_TLS_CLIENT:
+ 			sslsock->is_client = 1;
+@@ -351,8 +356,13 @@ static inline int php_openssl_setup_cryp
+ 			method = SSLv23_server_method();
+ 			break;
+ 		case STREAM_CRYPTO_METHOD_SSLv3_SERVER:
++#ifdef OPENSSL_NO_SSL3
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv3 support is not compiled into the OpenSSL library PHP is linked against");
++			return -1;
++#else
+ 			sslsock->is_client = 0;
+ 			method = SSLv3_server_method();
++#endif
+ 			break;
+ 		case STREAM_CRYPTO_METHOD_SSLv2_SERVER:
+ #ifdef OPENSSL_NO_SSL2

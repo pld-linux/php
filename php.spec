@@ -2240,6 +2240,11 @@ export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
 CXXFLAGS="%{rpmcxxflags} -std=c++11"
 %endif
 
+# This should be detected by configure and set there,
+# but looks like the build system is hosed on 7.3
+export CXXFLAGS="%{rpmcxxflags} -fPIC -DPIC"
+export CFLAGS="%{rpmcflags} -fPIC -DPIC"
+
 sapis="
 cli
 %if %{with cgi}

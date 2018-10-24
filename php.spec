@@ -222,6 +222,7 @@ Patch68:	php-mysql-ssl-context.patch
 Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
 Patch72:	phar-hash-shared.patch
+Patch73:	x32.patch
 URL:		http://php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2025,6 +2026,7 @@ cp -p php.ini-production php.ini
 %patch70 -p1
 %patch71 -p1
 %patch72 -p1 -b .phar-shared
+%patch73 -p1
 
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -2235,15 +2237,16 @@ fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
 export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
 	-I%{_includedir}/xmlrpc-epi"
-%if %{with intl}
-# icu 59+ C++ API requires C++ >= 11
-CXXFLAGS="%{rpmcxxflags} -std=c++11"
-%endif
 
 # This should be detected by configure and set there,
 # but looks like the build system is hosed on 7.3
 export CXXFLAGS="%{rpmcxxflags} -fPIC -DPIC"
 export CFLAGS="%{rpmcflags} -fPIC -DPIC"
+
+%if %{with intl}
+# icu 59+ C++ API requires C++ >= 11
+CXXFLAGS="$CXXFLAGS -std=c++11"
+%endif
 
 sapis="
 cli

@@ -67,29 +67,6 @@
 +int(%i)
  
  *** Done ***
---- php-5.3.3/ext/standard/tests/file/filestat.phpt~	2006-11-15 19:27:03.000000000 +0200
-+++ php-5.3.3/ext/standard/tests/file/filestat.phpt	2010-07-26 19:37:10.367060798 +0300
-@@ -30,17 +30,17 @@
- echo "Done\n";
- ?>
- --EXPECTF--	
-+int(%i)
- int(%d)
- int(%d)
- int(%d)
- int(%d)
-+int(%i)
- int(%d)
- int(%d)
- int(%d)
- int(%d)
--int(%d)
--int(%d)
--int(%d)
-+int(%i)
- int(%d)
- int(%d)
- int(%d)
 --- php-5.3.3/ext/standard/tests/file/lstat_stat_variation18.phpt~	2010-07-26 19:43:12.000000000 +0300
 +++ php-5.3.3/ext/standard/tests/file/lstat_stat_variation18.phpt	2010-07-26 19:43:14.470984630 +0300
 @@ -66,7 +66,7 @@

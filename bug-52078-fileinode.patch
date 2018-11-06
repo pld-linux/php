@@ -72,7 +72,7 @@
 @@ -30,17 +30,17 @@
  echo "Done\n";
  ?>
- --EXPECTF--	
+ --EXPECTF--
 +int(%i)
  int(%d)
  int(%d)

@@ -2984,7 +2984,7 @@ fi
 
 %files common
 %defattr(644,root,root,755)
-%doc CREDITS EXTENSIONS LICENSE NEWS README.namespaces UPGRADING* Zend/{LICENSE.Zend,ZEND_CHANGES} php.ini-*
+%doc CREDITS EXTENSIONS LICENSE NEWS README.namespaces UPGRADING* Zend/{LICENSE.Zend,ZEND_CHANGES} php.ini-* .gdbinit
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini

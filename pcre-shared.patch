@@ -1,9 +1,9 @@
---- php-7.3.0alpha3/ext/pcre/config0.m4~	2018-07-03 15:56:43.000000000 +0300
-+++ php-7.3.0alpha3/ext/pcre/config0.m4	2018-07-10 11:09:21.010882573 +0300
-@@ -61,8 +61,9 @@
-     PHP_EVAL_LIBLINE($PCRE2_LIB)
-     AC_DEFINE(HAVE_PCRE, 1, [ ])
-     AC_DEFINE(PCRE2_CODE_UNIT_WIDTH, 8, [ ])
+--- php-7.3.0RC5/ext/pcre/config0.m4~	2018-11-06 12:22:53.000000000 +0200
++++ php-7.3.0RC5/ext/pcre/config0.m4	2018-11-12 13:30:52.805036671 +0200
+@@ -84,8 +84,9 @@
+       ])
+     fi
+ 
 -    PHP_NEW_EXTENSION(pcre, php_pcre.c, no,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
 +    PHP_NEW_EXTENSION(pcre, php_pcre.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
      PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h])

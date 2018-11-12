@@ -144,7 +144,7 @@
 %undefine	with_filter
 %endif
 
-%define		subver RC4
+%define		subver RC5
 %define		orgname	php
 %define		ver_suffix 73
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -165,7 +165,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~cmb/php-%{version}%{subver}.tar.xz
-# Source0-md5:	c8d4be9ebd25082365b3488fd6a04a41
+# Source0-md5:	9cc3c9f146b86e813f42555528a27cfe
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

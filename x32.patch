@@ -9,17 +9,17 @@
  ZEND_API zend_bool ZEND_FASTCALL zend_string_equal_val(zend_string *s1, zend_string *s2)
  {
  	char *ptr = ZSTR_VAL(s1);
---- php-7.3.0RC3/Zend/zend_string.h~	2018-10-09 11:26:41.000000000 +0200
-+++ php-7.3.0RC3/Zend/zend_string.h	2018-10-24 22:47:14.745614884 +0200
+--- php-7.3.0RC5/Zend/zend_string.h~	2018-11-06 12:22:56.000000000 +0200
++++ php-7.3.0RC5/Zend/zend_string.h	2018-11-12 13:32:37.350520375 +0200
 @@ -294,7 +294,7 @@
  	}
  }
  
 -#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 +#if defined(__GNUC__) && (defined(__i386__) || (defined(__x86_64__) && !defined(__ILP32__)))
+ BEGIN_EXTERN_C()
  ZEND_API zend_bool ZEND_FASTCALL zend_string_equal_val(zend_string *s1, zend_string *s2);
- #else
- static zend_always_inline zend_bool zend_string_equal_val(zend_string *s1, zend_string *s2)
+ END_EXTERN_C()
 --- php-7.3.0RC3/ext/opcache/zend_accelerator_util_funcs.c~	2018-10-09 11:26:32.000000000 +0200
 +++ php-7.3.0RC3/ext/opcache/zend_accelerator_util_funcs.c	2018-10-24 22:15:44.849117508 +0200
 @@ -719,7 +719,7 @@

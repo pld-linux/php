@@ -1,3 +1,5 @@
+https://github.com/php/php-src/pull/3665
+
 --- php-7.3.0RC3/Zend/zend_string.c~	2018-10-09 11:26:41.000000000 +0200
 +++ php-7.3.0RC3/Zend/zend_string.c	2018-10-24 22:05:01.639560148 +0200
 @@ -392,7 +392,7 @@

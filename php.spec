@@ -144,7 +144,7 @@
 %undefine	with_filter
 %endif
 
-%define		subver RC5
+%define		subver RC6
 %define		orgname	php
 %define		ver_suffix 73
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -165,7 +165,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~cmb/php-%{version}%{subver}.tar.xz
-# Source0-md5:	9cc3c9f146b86e813f42555528a27cfe
+# Source0-md5:	2d2e6e1a0faaa9275db519e031b4288c
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -222,7 +222,6 @@ Patch68:	php-mysql-ssl-context.patch
 Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
 Patch72:	phar-hash-shared.patch
-Patch73:	x32.patch
 URL:		http://php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2026,7 +2025,6 @@ cp -p php.ini-production php.ini
 %patch70 -p1
 %patch71 -p1
 %patch72 -p1 -b .phar-shared
-%patch73 -p1
 
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 

@@ -17,7 +17,7 @@
 -  save_old_LDFLAGS=$LDFLAGS
 +  save_old_LIBS=$LIBS
    ac_stuff="$5"
-   
+ 
    save_ext_shared=$ext_shared
    ext_shared=yes
 -  PHP_EVAL_LIBLINE([$]ac_stuff, LDFLAGS)

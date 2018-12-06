@@ -17,18 +17,18 @@
    dnl PEAR dependancies
    dnl
 -  if test "$PHP_XML" = "no"; then
--    pear_error_msg="$pear_error_msg 
+-    pear_error_msg="$pear_error_msg
 -                    PEAR requires XML to be enabled.     Add --enable-xml to the configure line. (or --without-pear)"
 -  fi
 -
 +dnl  if test "$PHP_XML" = "no"; then
-+dnl    pear_error_msg="$pear_error_msg 
++dnl    pear_error_msg="$pear_error_msg
 +dnl                    PEAR requires XML to be enabled.     Add --enable-xml to the configure line. (or --without-pear)"
 +dnl  fi
 +dnl
  dnl
  dnl  if test "$PHP_XMLRPC" = "no"; then
- dnl    pear_error_msg="$pear_error_msg 
+ dnl    pear_error_msg="$pear_error_msg
 --- php-5.2.6/sapi/cli/config.m4~	2008-11-16 18:35:31.000000000 +0200
 +++ php-5.2.6/sapi/cli/config.m4	2008-11-20 19:04:12.585061299 +0200
 @@ -4,7 +4,7 @@

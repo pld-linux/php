@@ -103,7 +103,6 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	mm		# without mm support for session storage
 %bcond_without	system_gd	# system gd
-%bcond_without	system_libzip	# system libzip
 %bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 
 %define apxs1		/usr/sbin/apxs1
@@ -263,7 +262,7 @@ BuildRequires:	libtool >= 1.4.3
 %endif
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
-%{?with_system_libzip:BuildRequires:	libzip-devel >= 1.3.1}
+BuildRequires:	libzip-devel >= 1.3.1
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
@@ -1947,7 +1946,7 @@ Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
 URL:		http://php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%{?with_system_libzip:Requires:	libzip >= 1.3.1}
+Requires:	libzip >= 1.3.1
 Provides:	php(zip) = %{zipver}
 Obsoletes:	php-pecl-zip < %{zipver}
 Obsoletes:	php-zip < 4:5.3.28-7
@@ -2416,7 +2415,7 @@ for sapi in $sapis; do
 	%{?with_xsl:--with-xsl=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
-	%{?with_system_libzip:--with-libzip} \
+	--with-libzip \
 	--enable-zip=shared,/usr \
 
 	# save for debug

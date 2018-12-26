@@ -1,6 +1,6 @@
---- php-7.0/ext/spl/config.m4~	2015-05-21 17:57:06.000000000 +0300
-+++ php-7.0/ext/spl/config.m4	2015-05-23 11:25:19.609715006 +0300
-@@ -2,6 +2,6 @@
+--- php-7.3.0beta3/ext/spl/config.m4~	2018-08-28 13:26:31.000000000 +0300
++++ php-7.3.0beta3/ext/spl/config.m4	2018-09-05 19:06:13.737232662 +0300
+@@ -1,6 +1,6 @@
  dnl config.m4 for extension SPL
  
    AC_DEFINE(HAVE_SPL, 1, [Whether you want SPL (Standard PHP Library) support])

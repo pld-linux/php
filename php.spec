@@ -1,5 +1,7 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
+# TODO 7.3:
+# - branch php-7.2 and merge dev-7.3 into head once official announcement ready
 # TODO 7.2:
 # - https://github.com/php/php-src/blob/php-7.2.0/UPGRADING
 # TODO 5.6:
@@ -144,8 +146,9 @@
 %undefine	with_filter
 %endif
 
+%define		subver %{nil}
 %define		orgname	php
-%define		ver_suffix 72
+%define		ver_suffix 73
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -154,16 +157,17 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.2.13
-Release:	1
+Version:	7.3.0
+Release:	2
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
+#Source0:	https://downloads.php.net/~cmb/php-%{version}%{subver}.tar.xz
 Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	777c170cc2a96a272b11e4c00365e4bc
+# Source0-md5:	6b58a59106b0da4fdcba3bcf12cc3ca5
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -180,7 +184,7 @@ Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
 Patch5:		%{orgname}-filter-shared.patch
-Patch6:		%{orgname}-build_modules.patch
+
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		milter.patch
 Patch9:		libtool-tag.patch
@@ -233,6 +237,8 @@ BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
+%{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
+%{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
@@ -245,12 +251,10 @@ BuildRequires:	gmp-devel >= 4.2
 %{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_fpm:BuildRequires:	libapparmor-devel}
-%{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
 %{?with_intl:BuildRequires:	libicu-devel >= 4.4}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libpng-devel >= 1.0.8
-%{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %{?with_intl:BuildRequires:	libstdc++-devel}
 %{?with_webp:BuildRequires:	libwebp-devel}
 %if "%{pld_release}" != "ac"
@@ -273,7 +277,7 @@ BuildRequires:	openssl-devel >= 1.0.1
 %endif
 %{?with_oci:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
-%{?with_pcre:BuildRequires:	pcre-devel >= 8.10}
+%{?with_pcre:BuildRequires:	pcre2-8-devel >= 10.30}
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -305,19 +309,19 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20170718
-%define		zend_module_api		20170718
-%define		zend_extension_api	320170718
+%define		php_api_version		20180731
+%define		zend_module_api		20180731
+%define		zend_extension_api	320180731
 %define		php_pdo_api_version	20170320
 
 # Extension versions
-%define		bz2ver		1.0
+%define		bz2ver		%{version}
 %define		enchantver	%{version}
-%define		fileinfover	1.0.5
-%define		hashver		1.0
-%define		intlver		1.1.0
-%define		jsonver		1.6.0
-%define		pharver		2.0.2
+%define		fileinfover	%{version}
+%define		hashver		%{version}
+%define		intlver		%{version}
+%define		jsonver		1.7.0
+%define		pharver		%{version}
 %define		sqlite3ver	%{version}
 %define		zipver		1.15.4
 %define		phpdbgver	0.5.0
@@ -575,7 +579,7 @@ Provides:	php(libxml)
 Provides:	php(reflection)
 Provides:	php(standard)
 %{!?with_mysqlnd:Obsoletes:	%{name}-mysqlnd}
-%{?with_pcre:%requires_ge_to	pcre pcre-devel}
+%{?with_pcre:%requires_ge_to	pcre2-8 pcre2-8-devel}
 Suggests:	browscap
 Obsoletes:	php-common < 4:5.3.28-7
 # withdrawn modules
@@ -619,7 +623,7 @@ Requires:	libtool >= 2:2.4.6
 %else
 Requires:	libtool
 %endif
-%{?with_pcre:Requires:	pcre-devel >= 8.10}
+%{?with_pcre:Requires:	pcre2-8-devel >= 10.30}
 Requires:	shtool
 Provides:	php-devel = %{epoch}:%{version}-%{release}
 Obsoletes:	php-devel
@@ -1668,7 +1672,6 @@ Moduł PHP dodający obsługę gniazdek.
 
 %package sodium
 Summary:	Wrapper for the Sodium cryptographic library
-Summary(pl.UTF-8):	Interfejs do biblioteki kryptograficznej Sodium
 Group:		Libraries
 URL:		https://paragonie.com/book/pecl-libsodium
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1676,9 +1679,6 @@ Provides:	php(sodium) = %{sodiumver}
 
 %description sodium
 A simple, low-level PHP extension for libsodium.
-
-%description sodium -l pl.UTF-8
-Proste, niskopoziomowe rozszerzenie PHP wykorzystując libsodium.
 
 %package spl
 Summary:	Standard PHP Library module for PHP
@@ -1985,7 +1985,7 @@ cp -p php.ini-production php.ini
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
+
 %patch7 -p1
 %{?with_milter:%patch8 -p1}
 %patch9 -p1
@@ -2051,7 +2051,7 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/gd/libgd
 #%{__rm} -r ext/mbstring/libmbfl
 %{__rm} -r ext/mbstring/oniguruma
-%{__rm} -r ext/pcre/pcrelib
+%{__rm} -r ext/pcre/pcre2lib
 #%{__rm} -r ext/soap/interop
 %{__rm} -r ext/xmlrpc/libxmlrpc
 #%{__rm} -r ext/zip/lib
@@ -2131,6 +2131,11 @@ ix86=: x8664=: \
 	sh -xe %{_sourcedir}/skip-tests.sh
 
 %build
+get_version() {
+	local define="$1" filename="$2"
+	awk -vdefine="$define" '/#define/ && $2 == define {print $3}' "$filename" | xargs
+}
+
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
 if [ $API != %{php_api_version} ]; then
 	echo "Set %%define php_api_version to $API and re-run."
@@ -2156,14 +2161,14 @@ if [ $API != %{php_pdo_api_version} ]; then
 fi
 
 # Check for some extension version
-ver=$(sed -n '/#define PHP_FILEINFO_VERSION /{s/.* "//;s/".*$//;p}' ext/fileinfo/php_fileinfo.h)
-if test "$ver" != "%{fileinfover}"; then
+ver=$(awk '/#define PHP_FILEINFO_VERSION/ {print $3}' ext/fileinfo/php_fileinfo.h | xargs)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream FILEINFO version is now ${ver}, expecting %{fileinfover}.
 	: Update the fileinfover macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_PHAR_VERSION /{s/.* "//;s/".*$//;p}' ext/phar/php_phar.h)
-if test "$ver" != "%{pharver}"; then
+ver=$(get_version PHP_PHAR_VERSION ext/phar/php_phar.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream PHAR version is now ${ver}, expecting %{pharver}.
 	: Update the pharver macro and rebuild.
 	exit 1
@@ -2196,8 +2201,8 @@ if test "$ver" != "%{phpdbgver}"; then
 	: Update the phpdbgver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -rne 's,.*<version>(.+)</version>,\1,p' ext/bz2/package.xml)
-if test "$ver" != "%{bz2ver}"; then
+ver=$(get_version PHP_BZ2_VERSION ext/bz2/php_bz2.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream BZIP2 version is now ${ver}, expecting %{bz2ver}.
 	: Update the bz2ver macro and rebuild.
 	exit 1
@@ -2206,14 +2211,14 @@ ver=$(awk '/#define PHP_ENCHANT_VERSION/ {print $3}' ext/enchant/php_enchant.h |
 if test "$ver" != "PHP_VERSION"; then
 	exit 1
 fi
-ver=$(awk '/#define PHP_HASH_VERSION/ {print $3}' ext/hash/php_hash.h | xargs)
-if test "$ver" != "%{hashver}"; then
+ver=$(get_version PHP_HASH_VERSION ext/hash/php_hash.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream HASH version is now ${ver}, expecting %{hashver}.
 	: Update the hashver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_INTL_VERSION /{s/.* "//;s/".*$//;p}' ext/intl/php_intl.h)
-if test "$ver" != "%{intlver}"; then
+ver=$(get_version PHP_INTL_VERSION ext/intl/php_intl.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream Intl version is now ${ver}, expecting %{intlver}.
 	: Update the intlver macro and rebuild.
 	exit 1
@@ -2233,9 +2238,15 @@ fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
 export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
 	-I%{_includedir}/xmlrpc-epi"
+
+# This should be detected by configure and set there,
+# but looks like the build system is hosed on 7.3
+export CXXFLAGS="%{rpmcxxflags} -fPIC -DPIC"
+export CFLAGS="%{rpmcflags} -fPIC -DPIC"
+
 %if %{with intl}
 # icu 59+ C++ API requires C++ >= 11
-CXXFLAGS="%{rpmcxxflags} -std=c++11"
+CXXFLAGS="$CXXFLAGS -std=c++11"
 %endif
 
 sapis="
@@ -3004,7 +3015,7 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,TESTING2,UNIX-BUILD-SYSTEM,input_filter}
+%doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,UNIX-BUILD-SYSTEM,input_filter}
 %attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_libdir}/libphp_common.so
@@ -3064,8 +3075,7 @@ fi
 %if %{with dom}
 %files dom
 %defattr(644,root,root,755)
-%doc ext/dom/{CREDITS,TODO}
-%doc ext/dom/examples
+%doc ext/dom/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dom.ini
 %attr(755,root,root) %{php_extensiondir}/dom.so
 %endif
@@ -3073,7 +3083,7 @@ fi
 %if %{with enchant}
 %files enchant
 %defattr(644,root,root,755)
-%doc ext/enchant/{CREDITS,docs/examples}
+%doc ext/enchant/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/enchant.ini
 %attr(755,root,root) %{php_extensiondir}/enchant.so
 %endif
@@ -3097,7 +3107,7 @@ fi
 %if %{with filter}
 %files filter
 %defattr(644,root,root,755)
-%doc ext/filter/{CREDITS,docs/*}
+%doc ext/filter/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/filter.ini
 %attr(755,root,root) %{php_extensiondir}/filter.so
 %endif
@@ -3129,7 +3139,7 @@ fi
 %if %{with gmp}
 %files gmp
 %defattr(644,root,root,755)
-%doc ext/gmp/{CREDITS,README,TODO}
+%doc ext/gmp/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{php_extensiondir}/gmp.so
 %endif
@@ -3169,7 +3179,7 @@ fi
 %if %{with intl}
 %files intl
 %defattr(644,root,root,755)
-%doc ext/intl/{CREDITS,TODO}
+%doc ext/intl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/intl.ini
 %attr(755,root,root) %{php_extensiondir}/intl.so
 %endif
@@ -3193,7 +3203,7 @@ fi
 %if %{with mbstring}
 %files mbstring
 %defattr(644,root,root,755)
-%doc ext/mbstring/{CREDITS,README*}
+%doc ext/mbstring/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mbstring.ini
 %attr(755,root,root) %{php_extensiondir}/mbstring.so
 %endif
@@ -3201,7 +3211,7 @@ fi
 %if %{with mysqli}
 %files mysqli
 %defattr(644,root,root,755)
-%doc ext/mysqli/{CREDITS,TODO}
+%doc ext/mysqli/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mysqli.ini
 %attr(755,root,root) %{php_extensiondir}/mysqli.so
 %endif
@@ -3265,7 +3275,7 @@ fi
 %if %{with pdo}
 %files pdo
 %defattr(644,root,root,755)
-%doc ext/pdo/{CREDITS,README,TODO}
+%doc ext/pdo/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
 %attr(755,root,root) %{php_extensiondir}/pdo.so
 %endif
@@ -3337,7 +3347,7 @@ fi
 %if %{with phar}
 %files phar
 %defattr(644,root,root,755)
-%doc ext/phar/{CREDITS,TODO}
+%doc ext/phar/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/phar.ini
 %attr(755,root,root) %{php_extensiondir}/phar.so
 %attr(755,root,root) %{_bindir}/phar%{php_suffix}.phar
@@ -3401,7 +3411,6 @@ fi
 %files simplexml
 %defattr(644,root,root,755)
 %doc ext/simplexml/{CREDITS,README}
-%doc ext/simplexml/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
 
@@ -3415,7 +3424,7 @@ fi
 
 %files soap
 %defattr(644,root,root,755)
-%doc ext/soap/{CREDITS,TODO*}
+%doc ext/soap/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/soap.ini
 %attr(755,root,root) %{php_extensiondir}/soap.so
 
@@ -3435,7 +3444,7 @@ fi
 
 %files spl
 %defattr(644,root,root,755)
-%doc ext/spl/{CREDITS,README,TODO}
+%doc ext/spl/{CREDITS,README}
 %doc ext/spl/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
 %attr(755,root,root) %{php_extensiondir}/spl.so
@@ -3484,8 +3493,7 @@ fi
 %if %{with tidy}
 %files tidy
 %defattr(644,root,root,755)
-%doc ext/tidy/{CREDITS,README}
-%doc ext/tidy/examples
+%doc ext/tidy/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tidy.ini
 %attr(755,root,root) %{php_extensiondir}/tidy.so
 %endif
@@ -3512,8 +3520,7 @@ fi
 
 %files xmlreader
 %defattr(644,root,root,755)
-%doc ext/xmlreader/{CREDITS,README,TODO}
-%doc ext/xmlreader/examples
+%doc ext/xmlreader/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlreader.ini
 %attr(755,root,root) %{php_extensiondir}/xmlreader.so
 
@@ -3527,8 +3534,7 @@ fi
 
 %files xmlwriter
 %defattr(644,root,root,755)
-%doc ext/xmlwriter/{CREDITS,TODO}
-%doc ext/xmlwriter/examples
+%doc ext/xmlwriter/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlwriter.ini
 %attr(755,root,root) %{php_extensiondir}/xmlwriter.so
 
@@ -3542,7 +3548,7 @@ fi
 
 %files zip
 %defattr(644,root,root,755)
-%doc ext/zip/{CREDITS,TODO}
+%doc ext/zip/CREDITS
 %doc ext/zip/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zip.ini
 %attr(755,root,root) %{php_extensiondir}/zip.so

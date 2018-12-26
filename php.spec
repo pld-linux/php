@@ -9,7 +9,6 @@
 # TODO 5.4:
 # - update imap annotations patch (needs api porting)
 # - update imap myrights patch (needs api porting)
-# --with-libmbfl=DIR      MBSTRING: Use external libmbfl.  DIR is the libmbfl base install directory BUNDLED
 # TODO:
 # - fileinfo extension bundles magic db in library: data_file.c (dump of magic.mgc) is 14M
 #   - 2.3M fileinfo.so php54-fileinfo-5.4.6-0.15.x86_64

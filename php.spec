@@ -96,7 +96,8 @@
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
-%bcond_without	xsl		# without xsl extension module
+%bcond_without	xsl			# without xsl extension module
+%bcond_without	zip			# without zip extension module
 # extensions options
 %bcond_without	argon2		# argon2 password hashing
 %bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
@@ -262,7 +263,7 @@ BuildRequires:	libtool >= 1.4.3
 %endif
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
-BuildRequires:	libzip-devel >= 1.3.1
+%{?with_zip:BuildRequires:	libzip-devel >= 1.3.1}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
@@ -2415,8 +2416,7 @@ for sapi in $sapis; do
 	%{?with_xsl:--with-xsl=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
-	--with-libzip \
-	--enable-zip=shared,/usr \
+	%{?with_zip:--enable-zip=shared,/usr --with-libzip} \
 
 	# save for debug
 	cp -f Makefile Makefile.$sapi
@@ -3544,12 +3544,14 @@ fi
 %attr(755,root,root) %{php_extensiondir}/xsl.so
 %endif
 
+%if %{with zip}
 %files zip
 %defattr(644,root,root,755)
 %doc ext/zip/CREDITS
 %doc ext/zip/examples
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/zip.ini
 %attr(755,root,root) %{php_extensiondir}/zip.so
+%endif
 
 %files zlib
 %defattr(644,root,root,755)

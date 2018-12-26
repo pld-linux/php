@@ -230,7 +230,7 @@ BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison
 BuildRequires:	bzip2-devel >= 1.0.0
-%{?with_curl:BuildRequires:	curl-devel >= 7.12.0}
+%{?with_curl:BuildRequires:	curl-devel >= 7.15.5}
 BuildRequires:	cyrus-sasl-devel >= 2
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel

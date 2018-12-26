@@ -217,10 +217,6 @@ BuildRequires:	cyrus-sasl-devel >= 2
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
-%{?with_kerberos5:BuildRequires:	heimdal-devel}
-%{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
-%{?with_ffi:BuildRequires:	libffi-devel}
-%{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
@@ -230,13 +226,17 @@ BuildRequires:	gd-devel >= 2.1
 %endif
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel >= 4.2
+%{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_fpm:BuildRequires:	libapparmor-devel}
+%{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
+%{?with_ffi:BuildRequires:	libffi-devel}
 %{?with_intl:BuildRequires:	libicu-devel >= 50.1}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libpng-devel >= 1.0.8
+%{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %{?with_intl:BuildRequires:	libstdc++-devel}
 BuildRequires:	libtool >= 2:2.4.6
 %{?with_webp:BuildRequires:	libwebp-devel}
@@ -1593,6 +1593,7 @@ Moduł PHP dodający obsługę gniazdek.
 
 %package sodium
 Summary:	Wrapper for the Sodium cryptographic library
+Summary(pl.UTF-8):	Interfejs do biblioteki kryptograficznej Sodium
 Group:		Libraries
 URL:		https://paragonie.com/book/pecl-libsodium
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -1600,6 +1601,9 @@ Provides:	php(sodium) = %{sodiumver}
 
 %description sodium
 A simple, low-level PHP extension for libsodium.
+
+%description sodium -l pl.UTF-8
+Proste, niskopoziomowe rozszerzenie PHP wykorzystując libsodium.
 
 %package sqlite3
 Summary:	SQLite3 extension module for PHP

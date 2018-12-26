@@ -2726,6 +2726,8 @@ sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_c
 # better solution?
 sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/acinclude.m4
 
+install -p ext/ext_skel.php $RPM_BUILD_ROOT%{_bindir}
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -3014,8 +3016,9 @@ fi
 %files devel
 %defattr(644,root,root,755)
 %doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,UNIX-BUILD-SYSTEM,input_filter}
-%attr(755,root,root) %{_bindir}/phpize
+%attr(755,root,root) %{_bindir}/ext_skel.php
 %attr(755,root,root) %{_bindir}/php-config
+%attr(755,root,root) %{_bindir}/phpize
 %attr(755,root,root) %{_libdir}/libphp_common.so
 %{_libdir}/libphp_common.la
 %{_includedir}/php

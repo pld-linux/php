@@ -269,6 +269,7 @@ Patch258:	php-5.3.29-CVE-2015-0232.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
+BuildRequires:	apache-base
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison
@@ -280,9 +281,11 @@ BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 BuildRequires:	file
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
+BuildRequires:	libatomic-devel
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10-3}
 BuildRequires:	mysql-devel
 BuildRequires:	pkgconfig
+BuildRequires:	re2c
 BuildRequires:	sed >= 4.0
 %if %{with mssql} || %{with sybase_ct}
 BuildRequires:	freetds-devel >= 0.82

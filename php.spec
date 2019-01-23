@@ -249,6 +249,7 @@ Patch72:	x32-suhosin.patch
 Patch73:	php-bug-68486.patch
 Patch74:	mysqli-err.patch
 Patch75:	openssl.patch
+Patch76:	php-bug-61930.patch
 # Fixes for security bugs
 # https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
 # also from RHEL6/CentOS7
@@ -2147,6 +2148,7 @@ gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch73 -p1
 %patch74 -p1
 %patch75 -p1
+%patch76 -p1
 
 %patch220 -p1
 

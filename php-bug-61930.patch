@@ -1,0 +1,71 @@
+commit 7b0107cc5d3d90655957680ef9cf916dce6875a7
+Author: Stanislav Malyshev <stas@php.net>
+Date:   Sun Feb 17 13:28:42 2013 -0800
+
+    fix bug #61930: openssl corrupts ssl key resource when using openssl_get_publickey()
+
+diff --git a/NEWS b/NEWS
+index 37c1332be3..bedc6a4dcf 100644
+--- a/NEWS
++++ b/NEWS
+@@ -12,6 +12,10 @@ PHP                                                                        NEWS
+ - Mbstring:
+   . mb_split() can now handle empty matches like preg_split() does. (Moriyoshi)
+ 
++- OpenSSL:
++  . Fixed bug #61930 (openssl corrupts ssl key resource when using 
++    openssl_get_publickey()). (Stas)
++
+ - SPL:
+   . Fixed bug #64228 (RecursiveDirectoryIterator always assumes SKIP_DOTS).
+     (patch by kriss@krizalys.com, Laruence)
+diff --git a/ext/openssl/openssl.c b/ext/openssl/openssl.c
+index 328c1ee937..d7ac117e51 100644
+--- a/ext/openssl/openssl.c
++++ b/ext/openssl/openssl.c
+@@ -3204,6 +3204,7 @@ PHP_FUNCTION(openssl_pkey_get_public)
+ 	if (pkey == NULL) {
+ 		RETURN_FALSE;
+ 	}
++	zend_list_addref(Z_LVAL_P(return_value));
+ }
+ /* }}} */
+ 
+@@ -3240,6 +3241,7 @@ PHP_FUNCTION(openssl_pkey_get_private)
+ 	if (pkey == NULL) {
+ 		RETURN_FALSE;
+ 	}
++	zend_list_addref(Z_LVAL_P(return_value));
+ }
+ 
+ /* }}} */
+diff --git a/ext/openssl/tests/bug61930.phpt b/ext/openssl/tests/bug61930.phpt
+new file mode 100644
+index 0000000000..55dc42fded
+--- /dev/null
++++ b/ext/openssl/tests/bug61930.phpt
+@@ -0,0 +1,24 @@
++--TEST--
++Bug #61930: openssl corrupts ssl key resource when using openssl_get_publickey()
++--SKIPIF--
++<?php
++if (!extension_loaded("openssl")) die("skip");
++?>
++--FILE--
++<?php
++$cert = file_get_contents(__DIR__.'/cert.crt');
++
++$data = <<<DATA
++Please verify me
++DATA;
++
++$sig = 'f9Gyb6NV/ENn7GUa37ygTLcF93XHf5fbFTnoYF/O+fXbq3iChGUbET0RuhOsptlAODi6JsDLnJO4ikcVZo0tC1fFTj3LyCuPy3ZdgJbbVxQ/rviROCmuMFTqUW/Xa2LQYiapeCCgLQeWTLg7TM/BoHEkKbKLG/XT5jHvep1758A=';
++
++$key = openssl_get_publickey($cert);
++var_dump(openssl_get_publickey($key));
++var_dump(openssl_verify($data, base64_decode($sig), $key));
++?>
++--EXPECTF--
++resource(%d) of type (OpenSSL key)
++int(1)
++

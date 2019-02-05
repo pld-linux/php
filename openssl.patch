@@ -1,7 +1,7 @@
-diff -urNp -x '*.orig' php-5.3.29.org/acinclude.m4 php-5.3.29/acinclude.m4
---- php-5.3.29.org/acinclude.m4	2019-01-23 19:59:45.941494615 +0100
-+++ php-5.3.29/acinclude.m4	2019-01-23 20:00:41.361067964 +0100
-@@ -2333,8 +2333,10 @@ AC_DEFUN([PHP_SETUP_OPENSSL],[
+diff -ruNp php-5.3.29.orig/acinclude.m4 php-5.3.29/acinclude.m4
+--- php-5.3.29.orig/acinclude.m4	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/acinclude.m4	2019-02-05 23:42:46.539242592 +0100
+@@ -2331,8 +2331,10 @@ AC_DEFUN([PHP_SETUP_OPENSSL],[
        AC_MSG_ERROR([OpenSSL version 0.9.6 or greater required.])
      fi
  
@@ -13,9 +13,9 @@ diff -urNp -x '*.orig' php-5.3.29.org/acinclude.m4 php-5.3.29/acinclude.m4
        PHP_EVAL_INCLINE($OPENSSL_INCS)
      fi
    fi
-diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/openssl/openssl.c
---- php-5.3.29.org/ext/openssl/openssl.c	2019-01-23 19:59:45.691481503 +0100
-+++ php-5.3.29/ext/openssl/openssl.c	2019-01-23 20:00:41.361067964 +0100
+diff -ruNp php-5.3.29.orig/ext/openssl/openssl.c php-5.3.29/ext/openssl/openssl.c
+--- php-5.3.29.orig/ext/openssl/openssl.c	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/openssl/openssl.c	2019-02-05 23:45:52.821213335 +0100
 @@ -68,6 +68,13 @@
  
  #define DEBUG_SMIME	0
@@ -205,7 +205,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
 +		char *str = emalloc(len + 1); \
 +		BN_bn2bin(_bn, (unsigned char*)str); \
 +		str[len] = 0; \
-+		add_assoc_stringl(&_array, #_name, str, len, 0); \
++		add_assoc_stringl(_array, #_name, str, len, 0); \
 +	} \
 +} while (0);
 +
@@ -426,7 +426,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  						if (EVP_PKEY_assign_DH(pkey, dh)) {
  							RETURN_RESOURCE(zend_list_insert(pkey, le_key));
  						}
-@@ -3289,63 +3466,79 @@ PHP_FUNCTION(openssl_pkey_get_details)
+@@ -3289,63 +3466,82 @@ PHP_FUNCTION(openssl_pkey_get_details)
  	/*TODO: Use the real values once the openssl constants are used 
  	 * See the enum at the top of this file
  	 */
@@ -455,14 +455,15 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
 +				ktype = OPENSSL_KEYTYPE_RSA;
 +
 +				if (rsa != NULL) {
-+					zval z_rsa;
++					zval *z_rsa;
 +					const BIGNUM *n, *e, *d, *p, *q, *dmp1, *dmq1, *iqmp;
 +
 +					RSA_get0_key(rsa, &n, &e, &d);
 +					RSA_get0_factors(rsa, &p, &q);
 +					RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
 +
-+					array_init(&z_rsa);
++					ALLOC_INIT_ZVAL(z_rsa);
++					array_init(z_rsa);
 +					OPENSSL_PKEY_GET_BN(z_rsa, n);
 +					OPENSSL_PKEY_GET_BN(z_rsa, e);
 +					OPENSSL_PKEY_GET_BN(z_rsa, d);
@@ -471,7 +472,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
 +					OPENSSL_PKEY_GET_BN(z_rsa, dmp1);
 +					OPENSSL_PKEY_GET_BN(z_rsa, dmq1);
 +					OPENSSL_PKEY_GET_BN(z_rsa, iqmp);
-+					add_assoc_zval(return_value, "rsa", &z_rsa);
++					add_assoc_zval(return_value, "rsa", z_rsa);
 +				}
  			}
 -
@@ -498,19 +499,20 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
 +				ktype = OPENSSL_KEYTYPE_DSA;
 +
 +				if (dsa != NULL) {
-+					zval z_dsa;
++					zval *z_dsa;
 +					const BIGNUM *p, *q, *g, *priv_key, *pub_key;
 +
 +					DSA_get0_pqg(dsa, &p, &q, &g);
 +					DSA_get0_key(dsa, &pub_key, &priv_key);
 +
-+					array_init(&z_dsa);
++					ALLOC_INIT_ZVAL(z_dsa);
++					array_init(z_dsa);
 +					OPENSSL_PKEY_GET_BN(z_dsa, p);
 +					OPENSSL_PKEY_GET_BN(z_dsa, q);
 +					OPENSSL_PKEY_GET_BN(z_dsa, g);
 +					OPENSSL_PKEY_GET_BN(z_dsa, priv_key);
 +					OPENSSL_PKEY_GET_BN(z_dsa, pub_key);
-+					add_assoc_zval(return_value, "dsa", &z_dsa);
++					add_assoc_zval(return_value, "dsa", z_dsa);
 +				}
  			}
  			break;
@@ -533,25 +535,26 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
 +				ktype = OPENSSL_KEYTYPE_DH;
 +
 +				if (dh != NULL) {
-+					zval z_dh;
++					zval *z_dh;
 +					const BIGNUM *p, *q, *g, *priv_key, *pub_key;
 +
 +					DH_get0_pqg(dh, &p, &q, &g);
 +					DH_get0_key(dh, &pub_key, &priv_key);
 +
-+					array_init(&z_dh);
++					ALLOC_INIT_ZVAL(z_dh);
++					array_init(z_dh);
 +					OPENSSL_PKEY_GET_BN(z_dh, p);
 +					OPENSSL_PKEY_GET_BN(z_dh, g);
 +					OPENSSL_PKEY_GET_BN(z_dh, priv_key);
 +					OPENSSL_PKEY_GET_BN(z_dh, pub_key);
-+					add_assoc_zval(return_value, "dh", &z_dh);
++					add_assoc_zval(return_value, "dh", z_dh);
 +				}
  			}
 -
  			break;
  #ifdef EVP_PKEY_EC 
  		case EVP_PKEY_EC:
-@@ -3844,13 +4037,13 @@ PHP_FUNCTION(openssl_private_encrypt)
+@@ -3844,13 +4040,13 @@ PHP_FUNCTION(openssl_private_encrypt)
  	cryptedlen = EVP_PKEY_size(pkey);
  	cryptedbuf = emalloc(cryptedlen + 1);
  
@@ -567,7 +570,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  						padding) == cryptedlen);
  			break;
  		default:
-@@ -3902,13 +4095,13 @@ PHP_FUNCTION(openssl_private_decrypt)
+@@ -3902,13 +4098,13 @@ PHP_FUNCTION(openssl_private_decrypt)
  	cryptedlen = EVP_PKEY_size(pkey);
  	crypttemp = emalloc(cryptedlen + 1);
  
@@ -583,7 +586,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  					padding);
  			if (cryptedlen != -1) {
  				cryptedbuf = emalloc(cryptedlen + 1);
-@@ -3967,13 +4160,13 @@ PHP_FUNCTION(openssl_public_encrypt)
+@@ -3967,13 +4163,13 @@ PHP_FUNCTION(openssl_public_encrypt)
  	cryptedlen = EVP_PKEY_size(pkey);
  	cryptedbuf = emalloc(cryptedlen + 1);
  
@@ -599,7 +602,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  						padding) == cryptedlen);
  			break;
  		default:
-@@ -4026,13 +4219,13 @@ PHP_FUNCTION(openssl_public_decrypt)
+@@ -4026,13 +4222,13 @@ PHP_FUNCTION(openssl_public_decrypt)
  	cryptedlen = EVP_PKEY_size(pkey);
  	crypttemp = emalloc(cryptedlen + 1);
  
@@ -615,7 +618,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  					padding);
  			if (cryptedlen != -1) {
  				cryptedbuf = emalloc(cryptedlen + 1);
-@@ -4096,7 +4289,7 @@ PHP_FUNCTION(openssl_sign)
+@@ -4096,7 +4292,7 @@ PHP_FUNCTION(openssl_sign)
  	long keyresource = -1;
  	char * data;
  	int data_len;
@@ -624,7 +627,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  	zval *method = NULL;
  	long signature_algo = OPENSSL_ALGO_SHA1;
  	const EVP_MD *mdtype;
-@@ -4129,9 +4322,11 @@ PHP_FUNCTION(openssl_sign)
+@@ -4129,9 +4325,11 @@ PHP_FUNCTION(openssl_sign)
  	siglen = EVP_PKEY_size(pkey);
  	sigbuf = emalloc(siglen + 1);
  
@@ -639,7 +642,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  		zval_dtor(signature);
  		sigbuf[siglen] = '\0';
  		ZVAL_STRINGL(signature, (char *)sigbuf, siglen, 0);
-@@ -4140,7 +4335,7 @@ PHP_FUNCTION(openssl_sign)
+@@ -4140,7 +4338,7 @@ PHP_FUNCTION(openssl_sign)
  		efree(sigbuf);
  		RETVAL_FALSE;
  	}
@@ -648,7 +651,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  	if (keyresource == -1) {
  		EVP_PKEY_free(pkey);
  	}
-@@ -4154,7 +4349,7 @@ PHP_FUNCTION(openssl_verify)
+@@ -4154,7 +4352,7 @@ PHP_FUNCTION(openssl_verify)
  	zval **key;
  	EVP_PKEY *pkey;
  	int err;
@@ -657,7 +660,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  	const EVP_MD *mdtype;
  	long keyresource = -1;
  	char * data;	int data_len;
-@@ -4188,10 +4383,13 @@ PHP_FUNCTION(openssl_verify)
+@@ -4188,10 +4386,13 @@ PHP_FUNCTION(openssl_verify)
  		RETURN_FALSE;
  	}
  
@@ -675,7 +678,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  
  	if (keyresource == -1) {
  		EVP_PKEY_free(pkey);
-@@ -4215,7 +4413,7 @@ PHP_FUNCTION(openssl_seal)
+@@ -4215,7 +4416,7 @@ PHP_FUNCTION(openssl_seal)
  	char *method =NULL;
  	int method_len = 0;
  	const EVP_CIPHER *cipher;
@@ -684,7 +687,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  
  	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "szza/|s", &data, &data_len, &sealdata, &ekeys, &pubkeys, &method, &method_len) == FAILURE) {
  		return;
-@@ -4262,7 +4460,9 @@ PHP_FUNCTION(openssl_seal)
+@@ -4261,7 +4462,9 @@ PHP_FUNCTION(openssl_seal)
  		i++;
  	}
  
@@ -695,7 +698,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  		RETVAL_FALSE;
  		goto clean_exit;
  	}
-@@ -4273,15 +4473,16 @@ PHP_FUNCTION(openssl_seal)
+@@ -4272,15 +4475,16 @@ PHP_FUNCTION(openssl_seal)
  	iv = ivlen ? emalloc(ivlen + 1) : NULL;
  #endif
  	/* allocate one byte extra to make room for \0 */
@@ -715,7 +718,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  
  	if (len1 + len2 > 0) {
  		zval_dtor(sealdata);
-@@ -4310,6 +4511,7 @@ PHP_FUNCTION(openssl_seal)
+@@ -4309,6 +4513,7 @@ PHP_FUNCTION(openssl_seal)
  		efree(buf);
  	}
  	RETVAL_LONG(len1 + len2);
@@ -723,7 +726,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  
  clean_exit:
  	for (i=0; i<nkeys; i++) {
-@@ -4336,7 +4538,7 @@ PHP_FUNCTION(openssl_open)
+@@ -4335,7 +4540,7 @@ PHP_FUNCTION(openssl_open)
  	int len1, len2;
  	unsigned char *buf;
  	long keyresource = -1;
@@ -732,7 +735,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  	char * data;	int data_len;
  	char * ekey;	int ekey_len;
  	char *method =NULL;
-@@ -4365,28 +4567,22 @@ PHP_FUNCTION(openssl_open)
+@@ -4364,28 +4569,22 @@ PHP_FUNCTION(openssl_open)
  	
  	buf = emalloc(data_len + 1);
  
@@ -772,7 +775,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  }
  /* }}} */
  
-@@ -4691,7 +4887,7 @@ PHP_FUNCTION(openssl_digest)
+@@ -4690,7 +4889,7 @@ PHP_FUNCTION(openssl_digest)
  	char *data, *method;
  	int data_len, method_len;
  	const EVP_MD *mdtype;
@@ -781,7 +784,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  	int siglen;
  	unsigned char *sigbuf;
  
-@@ -4707,9 +4903,11 @@ PHP_FUNCTION(openssl_digest)
+@@ -4706,9 +4905,11 @@ PHP_FUNCTION(openssl_digest)
  	siglen = EVP_MD_size(mdtype);
  	sigbuf = emalloc(siglen + 1);
  
@@ -796,7 +799,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  		if (raw_output) {
  			sigbuf[siglen] = '\0';
  			RETVAL_STRINGL((char *)sigbuf, siglen, 0);
-@@ -4725,6 +4923,7 @@ PHP_FUNCTION(openssl_digest)
+@@ -4724,6 +4925,7 @@ PHP_FUNCTION(openssl_digest)
  		efree(sigbuf);
  		RETVAL_FALSE;
  	}
@@ -804,7 +807,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  }
  /* }}} */
  
-@@ -4770,7 +4969,7 @@ PHP_FUNCTION(openssl_encrypt)
+@@ -4769,7 +4971,7 @@ PHP_FUNCTION(openssl_encrypt)
  	char *data, *method, *password, *iv = "";
  	int data_len, method_len, password_len, iv_len = 0, max_iv_len;
  	const EVP_CIPHER *cipher_type;
@@ -813,7 +816,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  	int i = 0, outlen, keylen;
  	unsigned char *outbuf, *key;
  	zend_bool free_iv;
-@@ -4784,6 +4983,12 @@ PHP_FUNCTION(openssl_encrypt)
+@@ -4783,6 +4985,12 @@ PHP_FUNCTION(openssl_encrypt)
  		RETURN_FALSE;
  	}
  
@@ -826,7 +829,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  	keylen = EVP_CIPHER_key_length(cipher_type);
  	if (keylen > password_len) {
  		key = emalloc(keylen);
-@@ -4802,16 +5007,16 @@ PHP_FUNCTION(openssl_encrypt)
+@@ -4801,16 +5009,16 @@ PHP_FUNCTION(openssl_encrypt)
  	outlen = data_len + EVP_CIPHER_block_size(cipher_type);
  	outbuf = emalloc(outlen + 1);
  
@@ -848,7 +851,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  		outlen += i;
  		if (raw_output) {
  			outbuf[outlen] = '\0';
-@@ -4834,7 +5039,7 @@ PHP_FUNCTION(openssl_encrypt)
+@@ -4833,7 +5041,7 @@ PHP_FUNCTION(openssl_encrypt)
  	if (free_iv) {
  		efree(iv);
  	}
@@ -857,7 +860,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  }
  /* }}} */
  
-@@ -4846,7 +5051,7 @@ PHP_FUNCTION(openssl_decrypt)
+@@ -4845,7 +5053,7 @@ PHP_FUNCTION(openssl_decrypt)
  	char *data, *method, *password, *iv = "";
  	int data_len, method_len, password_len, iv_len = 0;
  	const EVP_CIPHER *cipher_type;
@@ -866,7 +869,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  	int i, outlen, keylen;
  	unsigned char *outbuf, *key;
  	int base64_str_len;
-@@ -4868,10 +5073,17 @@ PHP_FUNCTION(openssl_decrypt)
+@@ -4867,10 +5075,17 @@ PHP_FUNCTION(openssl_decrypt)
  		RETURN_FALSE;
  	}
  
@@ -884,7 +887,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  			RETURN_FALSE;
  		}
  		data_len = base64_str_len;
-@@ -4892,14 +5104,14 @@ PHP_FUNCTION(openssl_decrypt)
+@@ -4891,14 +5106,14 @@ PHP_FUNCTION(openssl_decrypt)
  	outlen = data_len + EVP_CIPHER_block_size(cipher_type);
  	outbuf = emalloc(outlen + 1);
  
@@ -904,7 +907,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  		outlen += i;
  		outbuf[outlen] = '\0';
  		RETVAL_STRINGL((char *)outbuf, outlen, 0);
-@@ -4916,7 +5128,7 @@ PHP_FUNCTION(openssl_decrypt)
+@@ -4915,7 +5130,7 @@ PHP_FUNCTION(openssl_decrypt)
  	if (base64_str) {
  		efree(base64_str);
  	}
@@ -913,7 +916,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  }
  /* }}} */
  
-@@ -4954,6 +5166,7 @@ PHP_FUNCTION(openssl_dh_compute_key)
+@@ -4953,6 +5168,7 @@ PHP_FUNCTION(openssl_dh_compute_key)
  	zval *key;
  	char *pub_str;
  	int pub_len;
@@ -921,7 +924,7 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  	EVP_PKEY *pkey;
  	BIGNUM *pub;
  	char *data;
-@@ -4962,15 +5175,18 @@ PHP_FUNCTION(openssl_dh_compute_key)
+@@ -4961,15 +5177,18 @@ PHP_FUNCTION(openssl_dh_compute_key)
  	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sr", &pub_str, &pub_len, &key) == FAILURE) {
  		return;
  	}
@@ -944,9 +947,9 @@ diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/openssl.c php-5.3.29/ext/opens
  
  	if (len >= 0) {
  		data[len] = 0;
-diff -urNp -x '*.orig' php-5.3.29.org/ext/openssl/xp_ssl.c php-5.3.29/ext/openssl/xp_ssl.c
---- php-5.3.29.org/ext/openssl/xp_ssl.c	2014-08-13 21:22:50.000000000 +0200
-+++ php-5.3.29/ext/openssl/xp_ssl.c	2019-01-23 20:00:41.361067964 +0100
+diff -ruNp php-5.3.29.orig/ext/openssl/xp_ssl.c php-5.3.29/ext/openssl/xp_ssl.c
+--- php-5.3.29.orig/ext/openssl/xp_ssl.c	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/openssl/xp_ssl.c	2019-02-05 23:42:46.543242570 +0100
 @@ -338,9 +338,14 @@ static inline int php_openssl_setup_cryp
  			break;
  #endif

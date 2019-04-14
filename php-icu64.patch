@@ -1,0 +1,166 @@
+--- php-5.3.29/ext/intl/msgformat/msgformat_helpers.cpp.orig	2019-04-14 11:05:27.295916785 +0200
++++ php-5.3.29/ext/intl/msgformat/msgformat_helpers.cpp	2019-04-14 11:11:34.521781755 +0200
+@@ -38,11 +38,11 @@
+  */
+ class MessageFormatAdapter {
+ public:
+-    static const Formattable::Type* getArgTypeList(const MessageFormat& m,
++    static const icu::Formattable::Type* getArgTypeList(const icu::MessageFormat& m,
+                                                    int32_t& count);
+ };
+-const Formattable::Type*
+-MessageFormatAdapter::getArgTypeList(const MessageFormat& m,
++const icu::Formattable::Type*
++icu::MessageFormatAdapter::getArgTypeList(const icu::MessageFormat& m,
+                                      int32_t& count) {
+     return m.getArgTypeList(count);
+ }
+@@ -51,16 +51,16 @@
+ U_CFUNC int32_t umsg_format_arg_count(UMessageFormat *fmt) 
+ {
+ 	int32_t fmt_count = 0;
+-	MessageFormatAdapter::getArgTypeList(*(const MessageFormat*)fmt, fmt_count);
++	icu::MessageFormatAdapter::getArgTypeList(*(const icu::MessageFormat*)fmt, fmt_count);
+ 	return fmt_count;
+ }
+ 
+ U_CFUNC void umsg_format_helper(UMessageFormat *fmt, int arg_count, zval **args, UChar **formatted, int *formatted_len, UErrorCode *status TSRMLS_DC)
+ {
+ 	int fmt_count = 0;
+-    const Formattable::Type* argTypes =
+-		MessageFormatAdapter::getArgTypeList(*(const MessageFormat*)fmt, fmt_count);
+-	Formattable* fargs = new Formattable[fmt_count ? fmt_count : 1];
++    const icu::Formattable::Type* argTypes =
++		icu::MessageFormatAdapter::getArgTypeList(*(const icu::MessageFormat*)fmt, fmt_count);
++	icu::Formattable* fargs = new icu::Formattable[fmt_count ? fmt_count : 1];
+ 
+ 	for(int32_t i = 0; i < fmt_count; ++i) {
+         UChar  *stringVal = NULL;
+@@ -68,22 +68,22 @@
+ 		int64_t tInt64 = 0;
+ 
+ 		switch(argTypes[i]) {
+-			case Formattable::kDate:
++			case icu::Formattable::kDate:
+ 				convert_to_long_ex(&args[i]);
+ 				fargs[i].setDate(U_MILLIS_PER_SECOND * (double)Z_LVAL_P(args[i]));
+ 				break;
+ 
+-			case Formattable::kDouble:
++			case icu::Formattable::kDouble:
+ 				convert_to_double_ex(&args[i]);
+ 			    fargs[i].setDouble(Z_DVAL_P(args[i]));
+ 				break;
+             
+-	        case Formattable::kLong:
++	        case icu::Formattable::kLong:
+ 				convert_to_long_ex(&args[i]);
+ 			    fargs[i].setLong(Z_LVAL_P(args[i]));
+ 				break;
+ 
+-	        case Formattable::kInt64:
++	        case icu::Formattable::kInt64:
+ 				if(Z_TYPE_P(args[i]) == IS_DOUBLE) {
+ 					tInt64 = (int64_t)Z_DVAL_P(args[i]);
+ 				} else if(Z_TYPE_P(args[i]) == IS_LONG) {
+@@ -96,7 +96,7 @@
+ 			    fargs[i].setInt64(tInt64);
+ 				break;
+             
+-	        case Formattable::kString:
++	        case icu::Formattable::kString:
+ 		        convert_to_string_ex(&args[i]);
+ 				intl_convert_utf8_to_utf16(&stringVal, &stringLen, Z_STRVAL_P(args[i]), Z_STRLEN_P(args[i]), status);
+ 				if(U_FAILURE(*status)){
+@@ -107,19 +107,19 @@
+ 				efree(stringVal);
+ 			    break;
+             
+-			case Formattable::kArray:
+-			case Formattable::kObject:
++			case icu::Formattable::kArray:
++			case icu::Formattable::kObject:
+ 				*status = U_UNSUPPORTED_ERROR;
+ 				delete[] fargs;
+ 				return;
+         }		
+ 	}
+ 
+-    UnicodeString resultStr;
+-    FieldPosition fieldPosition(0);
++	icu::UnicodeString resultStr;
++	icu::FieldPosition fieldPosition(0);
+     
+     /* format the message */
+-    ((const MessageFormat*)fmt)->format(fargs, fmt_count, resultStr, fieldPosition, *status);
++    ((const icu::MessageFormat*)fmt)->format(fargs, fmt_count, resultStr, fieldPosition, *status);
+ 
+     delete[] fargs;
+ 
+@@ -136,8 +136,8 @@
+ 
+ U_CFUNC void umsg_parse_helper(UMessageFormat *fmt, int *count, zval ***args, UChar *source, int source_len, UErrorCode *status)
+ {
+-    UnicodeString srcString(source, source_len);
+-    Formattable *fargs = ((const MessageFormat*)fmt)->parse(srcString, *count, *status);
++	icu::UnicodeString srcString(source, source_len);
++	icu::Formattable *fargs = ((const icu::MessageFormat*)fmt)->parse(srcString, *count, *status);
+ 
+ 	if(U_FAILURE(*status)) {
+ 		return;
+@@ -149,14 +149,14 @@
+     for(int32_t i = 0; i < *count; i++) {
+ 	    int64_t aInt64;
+ 		double aDate;
+-		UnicodeString temp;
++		icu::UnicodeString temp;
+ 		char *stmp;
+ 		int stmp_len;
+ 
+ 		ALLOC_INIT_ZVAL((*args)[i]);
+ 		
+ 		switch(fargs[i].getType()) {
+-        case Formattable::kDate:
++        case icu::Formattable::kDate:
+ 			aDate = ((double)fargs[i].getDate())/U_MILLIS_PER_SECOND;
+ 			if(aDate > LONG_MAX || aDate < -LONG_MAX) {
+ 				ZVAL_DOUBLE((*args)[i], aDate<0?ceil(aDate):floor(aDate));
+@@ -165,15 +165,15 @@
+ 			}
+             break;
+ 
+-        case Formattable::kDouble:
++        case icu::Formattable::kDouble:
+ 			ZVAL_DOUBLE((*args)[i], (double)fargs[i].getDouble());
+             break;
+ 
+-        case Formattable::kLong:
++        case icu::Formattable::kLong:
+ 			ZVAL_LONG((*args)[i], fargs[i].getLong());
+             break;
+ 
+-        case Formattable::kInt64:
++        case icu::Formattable::kInt64:
+             aInt64 = fargs[i].getInt64();
+ 			if(aInt64 > LONG_MAX || aInt64 < -LONG_MAX) {
+ 				ZVAL_DOUBLE((*args)[i], (double)aInt64);
+@@ -182,7 +182,7 @@
+ 			}
+             break;
+ 
+-        case Formattable::kString:
++        case icu::Formattable::kString:
+             fargs[i].getString(temp);
+ 			intl_convert_utf16_to_utf8(&stmp, &stmp_len, temp.getBuffer(), temp.length(), status);
+ 			if(U_FAILURE(*status)) {
+@@ -192,8 +192,8 @@
+ 			ZVAL_STRINGL((*args)[i], stmp, stmp_len, 0);
+             break;
+ 
+-        case Formattable::kObject:
+-        case Formattable::kArray:
++        case icu::Formattable::kObject:
++        case icu::Formattable::kArray:
+             *status = U_ILLEGAL_ARGUMENT_ERROR;
+ 			cleanup_zvals();
+             break;

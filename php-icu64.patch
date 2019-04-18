@@ -1,0 +1,263 @@
+--- php-5.5.38.orig/ext/intl/breakiterator/breakiterator_class.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/breakiterator/breakiterator_class.cpp	2019-04-18 09:26:37.409910360 +0200
+@@ -38,6 +38,7 @@
+ }
+ 
+ using PHP::CodePointBreakIterator;
++using icu::RuleBasedBreakIterator;
+ 
+ /* {{{ Global variables */
+ zend_class_entry *BreakIterator_ce_ptr;
+--- php-5.5.38.orig/ext/intl/breakiterator/breakiterator_class.h	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/breakiterator/breakiterator_class.h	2019-04-18 09:27:25.925787455 +0200
+@@ -26,6 +26,8 @@
+ 
+ #ifndef USE_BREAKITERATOR_POINTER
+ typedef void BreakIterator;
++#else
++using icu::BreakIterator;
+ #endif
+ 
+ typedef struct {
+--- php-5.5.38.orig/ext/intl/breakiterator/breakiterator_methods.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/breakiterator/breakiterator_methods.cpp	2019-04-18 09:30:32.998928523 +0200
+@@ -32,6 +32,8 @@
+ }
+ 
+ using PHP::CodePointBreakIterator;
++using icu::BreakIterator;
++using icu::Locale;
+ 
+ U_CFUNC PHP_METHOD(BreakIterator, __construct)
+ {
+--- php-5.5.38.orig/ext/intl/breakiterator/codepointiterator_internal.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/breakiterator/codepointiterator_internal.cpp	2019-04-18 09:24:40.240427586 +0200
+@@ -30,6 +30,7 @@
+ #define U_ALIGNMENT_OFFSET_UP(ptr) (sizeof(UAlignedMemory) - U_ALIGNMENT_OFFSET(ptr))
+ 
+ using namespace PHP;
++using icu::UCharCharacterIterator;
+ 
+ UOBJECT_DEFINE_RTTI_IMPLEMENTATION(CodePointBreakIterator);
+ 
+--- php-5.5.38.orig/ext/intl/breakiterator/codepointiterator_internal.h	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/breakiterator/codepointiterator_internal.h	2019-04-18 09:25:57.127796222 +0200
+@@ -18,8 +18,11 @@
+ #define CODEPOINTITERATOR_INTERNAL_H
+ 
+ #include <unicode/brkiter.h>
++#include <unicode/unistr.h>
+ 
+-using U_ICU_NAMESPACE::BreakIterator;
++using icu::BreakIterator;
++using icu::CharacterIterator;
++using icu::UnicodeString;
+ 
+ namespace PHP {
+ 
+--- php-5.5.38.orig/ext/intl/breakiterator/rulebasedbreakiterator_methods.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/breakiterator/rulebasedbreakiterator_methods.cpp	2019-04-18 09:30:55.920130219 +0200
+@@ -25,6 +25,9 @@
+ 
+ #include "../ext/intl_convertcpp.h"
+ 
++using icu::RuleBasedBreakIterator;
++using icu::Locale;
++
+ static inline RuleBasedBreakIterator *fetch_rbbi(BreakIterator_object *bio) {
+ 	return (RuleBasedBreakIterator*)bio->biter;
+ }
+--- php-5.5.38.orig/ext/intl/calendar/calendar_class.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/calendar/calendar_class.cpp	2019-04-18 09:21:08.825998526 +0200
+@@ -34,6 +34,9 @@
+ #include <assert.h>
+ }
+ 
++using icu::GregorianCalendar;
++using icu::Locale;
++
+ /* {{{ Global variables */
+ zend_class_entry *Calendar_ce_ptr;
+ zend_class_entry *GregorianCalendar_ce_ptr;
+--- php-5.5.38.orig/ext/intl/calendar/calendar_class.h	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/calendar/calendar_class.h	2019-04-18 08:51:22.553104240 +0200
+@@ -26,6 +26,8 @@
+ 
+ #ifndef USE_CALENDAR_POINTER
+ typedef void Calendar;
++#else
++using icu::Calendar;
+ #endif
+ 
+ typedef struct {
+--- php-5.5.38.orig/ext/intl/calendar/calendar_methods.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/calendar/calendar_methods.cpp	2019-04-18 09:21:37.634177141 +0200
+@@ -40,6 +40,8 @@
+ }
+ #include "../common/common_enum.h"
+ 
++using icu::Locale;
++
+ U_CFUNC PHP_METHOD(IntlCalendar, __construct)
+ {
+ 	zend_throw_exception( NULL,
+--- php-5.5.38.orig/ext/intl/calendar/gregoriancalendar_methods.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/calendar/gregoriancalendar_methods.cpp	2019-04-18 09:23:00.341851246 +0200
+@@ -32,6 +32,11 @@
+ #include <ext/date/php_date.h>
+ }
+ 
++using icu::GregorianCalendar;
++using icu::Locale;
++using icu::UnicodeString;
++using icu::StringPiece;
++
+ static inline GregorianCalendar *fetch_greg(Calendar_object *co) {
+ 	return (GregorianCalendar*)co->ucal;
+ }
+--- php-5.5.38.orig/ext/intl/common/common_date.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/common/common_date.cpp	2019-04-18 08:53:40.357013115 +0200
+@@ -17,6 +17,8 @@
+ #include "../ext/intl_cppshims.h"
+ 
+ #include <unicode/calendar.h>
++using icu::TimeZone;
++using icu::UnicodeString;
+ 
+ extern "C" {
+ #include "../php_intl.h"
+--- php-5.5.38.orig/ext/intl/common/common_date.h	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/common/common_date.h	2019-04-18 09:04:53.802375635 +0200
+@@ -27,6 +27,7 @@
+ #ifdef __cplusplus
+ 
+ #include <unicode/timezone.h>
++using icu::TimeZone;
+ 
+ U_CFUNC TimeZone *timezone_convert_datetimezone(int type, void *object, int is_datetime, intl_error *outside_error, const char *func TSRMLS_DC);
+ U_CFUNC int intl_datetime_decompose(zval *z, double *millis, TimeZone **tz,
+--- php-5.5.38.orig/ext/intl/common/common_enum.h	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/common/common_enum.h	2019-04-18 08:50:49.214683321 +0200
+@@ -69,6 +69,7 @@
+ U_CFUNC void zoi_with_current_invalidate_current(zend_object_iterator *iter);
+ 
+ #ifdef __cplusplus
++using icu::StringEnumeration;
+ U_CFUNC void IntlIterator_from_StringEnumeration(StringEnumeration *se, zval *object);
+ #endif
+ 
+--- php-5.5.38.orig/ext/intl/dateformat/dateformat_format_object.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/dateformat/dateformat_format_object.cpp	2019-04-18 08:55:34.509673920 +0200
+@@ -33,6 +33,12 @@
+ #include "../common/common_date.h"
+ }
+ 
++using icu::Locale;
++using icu::DateFormat;
++using icu::GregorianCalendar;
++using icu::StringPiece;
++using icu::SimpleDateFormat;
++
+ static const DateFormat::EStyle valid_styles[] = {
+ 		DateFormat::kNone,
+ 		DateFormat::kFull,
+--- php-5.5.38.orig/ext/intl/dateformat/dateformat_helpers.h	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/dateformat/dateformat_helpers.h	2019-04-18 09:07:05.049267391 +0200
+@@ -22,11 +22,18 @@
+ #endif
+ 
+ #include <unicode/calendar.h>
++#include <unicode/gregocal.h>
++#include <unicode/datefmt.h>
+ 
+ extern "C" {
+ #include "../php_intl.h"
+ }
+ 
++using icu::Locale;
++using icu::Calendar;
++using icu::GregorianCalendar;
++using icu::DateFormat;
++
+ int datefmt_process_calendar_arg(zval* calendar_zv,
+ 								 Locale const& locale,
+ 								 const char *func_name,
+--- php-5.5.38.orig/ext/intl/intl_convertcpp.h	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/intl_convertcpp.h	2019-04-18 08:49:50.358252987 +0200
+@@ -24,6 +24,7 @@
+ 
+ #include <unicode/unistr.h>
+ #include <zend_types.h>
++using icu::UnicodeString;
+ 
+ int intl_stringFromChar(UnicodeString &ret, char *str, int32_t str_len, UErrorCode *status);
+ 
+--- php-5.5.38.orig/ext/intl/msgformat/msgformat_helpers.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/msgformat/msgformat_helpers.cpp	2019-04-18 09:00:43.482564710 +0200
+@@ -27,6 +27,7 @@
+ #include <unicode/timezone.h>
+ #include <unicode/datefmt.h>
+ #include <unicode/calendar.h>
++#include <unicode/strenum.h>
+ 
+ #include <vector>
+ 
+@@ -76,6 +77,16 @@
+ #endif
+ U_NAMESPACE_END
+ 
++using icu::Formattable;
++using icu::Format;
++using icu::DateFormat;
++using icu::MessageFormat;
++#ifdef HAS_MESSAGE_PATTERN
++using icu::MessagePattern;
++#endif
++using icu::MessageFormatAdapter;
++using icu::FieldPosition;
++
+ U_CFUNC int32_t umsg_format_arg_count(UMessageFormat *fmt)
+ {
+ 	int32_t fmt_count = 0;
+--- php-5.5.38.orig/ext/intl/timezone/timezone_class.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/timezone/timezone_class.cpp	2019-04-18 09:01:40.738904566 +0200
+@@ -37,6 +37,8 @@
+ #include <ext/date/php_date.h>
+ }
+ 
++using icu::Calendar;
++
+ /* {{{ Global variables */
+ U_CDECL_BEGIN
+ zend_class_entry *TimeZone_ce_ptr = NULL;
+--- php-5.5.38.orig/ext/intl/timezone/timezone_class.h	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/timezone/timezone_class.h	2019-04-18 08:58:02.620784547 +0200
+@@ -29,6 +29,8 @@
+ 
+ #ifndef USE_TIMEZONE_POINTER
+ typedef void TimeZone;
++#else
++using icu::TimeZone;
+ #endif
+ 
+ typedef struct {
+--- php-5.5.38.orig/ext/intl/timezone/timezone_methods.cpp	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/intl/timezone/timezone_methods.cpp	2019-04-18 09:20:17.116617981 +0200
+@@ -23,6 +23,7 @@
+ #include <unicode/locid.h>
+ #include <unicode/timezone.h>
+ #include <unicode/ustring.h>
++#include <unicode/calendar.h>
+ #include "intl_convertcpp.h"
+ 
+ #include "../common/common_date.h"
+@@ -37,6 +38,9 @@
+ }
+ #include "common/common_enum.h"
+ 
++using icu::Locale;
++using icu::Calendar;
++
+ U_CFUNC PHP_METHOD(IntlTimeZone, __construct)
+ {
+ 	zend_throw_exception( NULL,

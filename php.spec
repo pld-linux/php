@@ -1,5 +1,8 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
+# TODO 7.4:
+# - follow upstream: drop spl, pcre, hash subpackages (tired of maintaining them)
+# - handle acinclude.m4 -> build/php.m4 rename
 # TODO 7.3:
 # - branch php-7.2 and merge dev-7.3 into head once official announcement ready
 # TODO 7.2:
@@ -147,7 +150,7 @@
 
 %define		subver %{nil}
 %define		orgname	php
-%define		ver_suffix 73
+%define		ver_suffix 74
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -156,8 +159,8 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.3.4
-Release:	2
+Version:	7.4.0
+Release:	0.1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -165,8 +168,9 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://downloads.php.net/~cmb/php-%{version}%{subver}.tar.xz
-Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	eb860e97b4be43c1aad056fa7dde1157
+#Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://github.com/php/php-src/archive/PHP-7.4/%{orgname}-%{version}.tar.gz
+# Source0-md5:	e54970ae767eae731995f5bb2b4e0f43
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -323,7 +327,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
 %define		zipver		1.15.4
-%define		phpdbgver	0.5.0
+%define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
@@ -1976,7 +1980,11 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
+%if 0
 %setup -q -n %{orgname}-%{version}%{?subver}
+%else
+%setup -q -n php-src-PHP-7.4
+%endif
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1
@@ -2194,8 +2202,8 @@ if test "$ver" != "%{jsonver}"; then
 	: Update the jsonver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHPDBG_VERSION /{s/.* "//;s/".*$//;p}' sapi/phpdbg/phpdbg.h)
-if test "$ver" != "%{phpdbgver}"; then
+ver=$(get_version PHPDBG_VERSION sapi/phpdbg/phpdbg.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream phpdbg version is now ${ver}, expecting %{phpdbgver}.
 	: Update the phpdbgver macro and rebuild.
 	exit 1

@@ -1,5 +1,5 @@
---- php-7.3.0alpha3/php.ini~	2018-07-09 13:40:12.000000000 +0300
-+++ php-7.3.0alpha3/php.ini	2018-07-09 17:27:47.804465246 +0300
+--- php-src-PHP-7.4/php.ini~	2019-05-05 01:01:58.000000000 +0300
++++ php-src-PHP-7.4/php.ini	2019-05-05 01:02:49.674577615 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -127,14 +127,12 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -844,49 +844,9 @@
+@@ -847,47 +847,8 @@
  ; deprecated in a future PHP major version. So, when it is possible, please
  ; move to the new ('extension=<ext>) syntax.
  ;
 -; Notes for Windows environments :
-+; Ideally in PLD Linux you should install appropriate php73-<extension> or
-+; php73-pecl-<extension> package.
- ;
+-;
 -; - Many DLL files are located in the extensions/ (PHP 4) or ext/ (PHP 5+)
 -;   extension folders as well as the separate PECL DLL download (PHP 5+).
 -;   Be sure to appropriately set the extension_dir directive.
@@ -147,7 +145,6 @@
 -;extension=gmp
 -;extension=intl
 -;extension=imap
--;extension=interbase
 -;extension=ldap
 -;extension=mbstring
 -;extension=exif      ; Must be after mbstring as it depends on it
@@ -175,10 +172,11 @@
 -;extension=tidy
 -;extension=xmlrpc
 -;extension=xsl
--
++; Ideally in PLD Linux you should install appropriate php74-<extension> or
++; php74-pecl-<extension> package.
+ 
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;
- ;;;;;;;;;;;;;;;;;;;
 @@ -923,19 +883,19 @@
  ; Use of this INI entry is deprecated, use global input_encoding instead.
  ; If empty, default_charset or input_encoding or iconv.input_encoding is used.
@@ -202,16 +200,6 @@
  
  [intl]
  ;intl.default_locale =
-@@ -1191,6 +1104,9 @@
- ; http://php.net/mysqli.default-socket
- mysqli.default_socket =
- 
-+; The name of the character set to use as the default character set.
-+;mysqli.connect_charset=utf8
-+
- ; Default host for mysql_connect() (doesn't apply in safe mode).
- ; http://php.net/mysqli.default-host
- mysqli.default_host =
 @@ -1357,7 +1273,7 @@
  
  [browscap]
@@ -230,10 +218,11 @@
  
  ; (time to live) Sets the number of second while cached file will be used
  ; instead of original one.
-@@ -1670,133 +1670,6 @@
+@@ -1666,147 +1666,7 @@
+ 
  [dba]
  ;dba.default_handler=
- 
+-
 -[opcache]
 -; Determines if Zend OPCache is enabled
 -;opcache.enable=1
@@ -361,6 +350,20 @@
 -; optimizations.
 -;opcache.opt_debug_level=0
 -
+-; Specifies a PHP script that is going to be compiled and executed at server
+-; start-up.
+-; http://php.net/opcache.preload
+-;opcache.preload=
+-
+-; Prevents caching files that are less than this number of seconds old. It
+-; protects from caching of incompletely updated files. In case all file updates
+-; on your site are atomic, you may increase performance by setting it to "0".
+-;opcache.file_update_protection=2
+-
+-; Absolute path used to store shared lockfiles (for *nix only).
+-;opcache.lockfile_path=/tmp
+-
++;
  [curl]
  ; A default value for the CURLOPT_CAINFO option. This is required to be an
  ; absolute path.

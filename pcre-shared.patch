@@ -1,18 +1,18 @@
---- php-7.3.0RC5/ext/pcre/config0.m4~	2018-11-06 12:22:53.000000000 +0200
-+++ php-7.3.0RC5/ext/pcre/config0.m4	2018-11-12 13:30:52.805036671 +0200
-@@ -84,8 +84,9 @@
-       ])
-     fi
+--- php-src-PHP-7.4/ext/pcre/config0.m4~	2019-05-04 15:24:15.000000000 +0300
++++ php-src-PHP-7.4/ext/pcre/config0.m4	2019-05-05 18:48:35.524688151 +0300
+@@ -58,8 +58,9 @@
+       fi
+   fi
  
--    PHP_NEW_EXTENSION(pcre, php_pcre.c, no,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
-+    PHP_NEW_EXTENSION(pcre, php_pcre.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
-     PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h])
-+    EXTRA_LIBS="$EXTRA_LIBS -lpcre2-8"
-   else
-     AC_MSG_CHECKING([for PCRE library to use])
-     AC_MSG_RESULT([bundled])
---- php-7.3.0alpha3/ext/pcre/php_pcre.h~	2018-07-03 15:56:43.000000000 +0300
-+++ php-7.3.0alpha3/ext/pcre/php_pcre.h	2018-07-10 11:11:55.739017013 +0300
+-  PHP_NEW_EXTENSION(pcre, php_pcre.c, no,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
++  PHP_NEW_EXTENSION(pcre, php_pcre.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
+   PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h])
++  EXTRA_LIBS="$EXTRA_LIBS -lpcre2-8"
+ else
+   AC_MSG_CHECKING([for PCRE library to use])
+   AC_MSG_RESULT([bundled])
+--- php-7.3.0beta3/ext/pcre/php_pcre.h~	2018-09-11 11:41:50.000000000 +0300
++++ php-7.3.0beta3/ext/pcre/php_pcre.h	2018-09-11 11:41:54.865778887 +0300
 @@ -33,7 +33,29 @@
  #include <locale.h>
  #endif

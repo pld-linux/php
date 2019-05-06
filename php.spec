@@ -2048,7 +2048,6 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 %{__rm} ext/recode/config9.m4
 
 # remove all bundled libraries not to link with them accidentally
-%{__rm} -r ext/sqlite3/libsqlite
 #%{__rm} -r ext/bcmath/libbcmath
 #%{__rm} -r ext/date/lib
 #%{__rm} -r ext/fileinfo/libmagic

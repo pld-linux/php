@@ -18,7 +18,6 @@
 #   - 2.3M fileinfo.so php-fileinfo-5.3.16-1.x86_64
 #   -  13K fileinfo.so php-pecl-fileinfo-1.0.4-8.amd64
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
-# - wddx: restore session support (not compiled in due DL extension check)
 # - modularize standard (output from pure php -m)?
 # - some mods should be shared:
 #$ php -m
@@ -97,7 +96,6 @@
 %bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	tidy		# without Tidy extension module
-%bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	xsl			# without xsl extension module
 %bcond_without	zip			# without zip extension module
@@ -1826,27 +1824,6 @@ support.
 %description tokenizer -l pl.UTF-8
 Moduł PHP dodający obsługę tokenizera do PHP.
 
-%package wddx
-Summary:	wddx extension module for PHP
-Summary(pl.UTF-8):	Moduł wddx dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.wddx.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-# - wddx doesn't require session as it's disabled at compile time:
-#   if HAVE_PHP_SESSION && !defined(COMPILE_DL_SESSION)
-#   see also php.spec#rev1.120.2.22
-#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
-Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
-Provides:	php(wddx)
-Obsoletes:	php-wddx < 4:5.3.28-7
-
-%description wddx
-This is a dynamic shared object (DSO) for PHP that will add wddx
-support.
-
-%description wddx -l pl.UTF-8
-Moduł PHP umożliwiający korzystanie z wddx.
-
 %package xml
 Summary:	XML extension module for PHP
 Summary(pl.UTF-8):	Moduł XML dla PHP
@@ -2378,7 +2355,6 @@ for sapi in $sapis; do
 	--enable-sockets=shared \
 	%{__with_without sodium sodium shared} \
 	--enable-tokenizer=shared \
-	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
 	--enable-xmlreader=shared \
 	%{__with_without bz2 bz2 shared} \
@@ -2495,8 +2471,6 @@ generate_inifiles() {
 		# opcache.so is zend extension
 		nm $so | grep -q zend_extension_entry && ext=zend_extension
 		conf="$mod.ini"
-		# xml needs to be loaded before wddx
-		[ "$mod" = "wddx" ] && conf="xml_$mod.ini"
 		# pre needs to be loaded before SPL
 		[ "$mod" = "pcre" ] && conf="PCRE.ini"
 		# spl needs to be loaded before mysqli
@@ -2907,7 +2881,6 @@ fi \
 %extension_scripts sysvshm
 %extension_scripts tidy
 %extension_scripts tokenizer
-%extension_scripts wddx
 %extension_scripts xml
 %extension_scripts xmlreader
 %extension_scripts xmlrpc
@@ -3509,14 +3482,6 @@ fi
 %doc ext/tokenizer/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tokenizer.ini
 %attr(755,root,root) %{php_extensiondir}/tokenizer.so
-
-%if %{with wddx}
-%files wddx
-%defattr(644,root,root,755)
-%doc ext/wddx/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*wddx.ini
-%attr(755,root,root) %{php_extensiondir}/wddx.so
-%endif
 
 %files xml
 %defattr(644,root,root,755)

@@ -83,10 +83,6 @@ mv ext/standard/tests/general_functions/proc_nice_basic.phpt{,.skip}
 mv ext/standard/tests/general_functions/proc_open02.phpt{,.skip}
 # Test setlocale() function : usage variations - Setting all available locales in the platform
 mv ext/standard/tests/strings/setlocale_variation2.phpt{,.skip}
-# wddx session serializer handler (serialize)
-mv ext/wddx/tests/004.phpt{,.skip}
-# wddx session serializer handler (deserialize)
-mv ext/wddx/tests/005.phpt{,.skip}
 # xmlrpc_encode_request() and various arguments
 mv ext/xmlrpc/tests/002.phpt{,.skip}
 # Bug #40576 (double values are truncated to 6 decimal digits when encoding)

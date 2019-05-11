@@ -2031,7 +2031,6 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/dba/libinifile
 #%{__rm} -r ext/gd/libgd
 #%{__rm} -r ext/mbstring/libmbfl
-%{__rm} -r ext/mbstring/oniguruma
 %{__rm} -r ext/pcre/pcre2lib
 #%{__rm} -r ext/soap/interop
 %{__rm} -r ext/xmlrpc/libxmlrpc

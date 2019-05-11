@@ -186,7 +186,6 @@ Patch1:		%{orgname}-pldlogo.patch
 Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
-Patch5:		%{orgname}-filter-shared.patch
 
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		milter.patch
@@ -1991,7 +1990,6 @@ cp -p php.ini-production php.ini
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
 
 %patch7 -p1
 %{?with_milter:%patch8 -p1}

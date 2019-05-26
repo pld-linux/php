@@ -168,7 +168,7 @@ Group:		Libraries
 #Source0:	https://downloads.php.net/~cmb/php-%{version}%{subver}.tar.xz
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://github.com/php/php-src/archive/PHP-7.4/%{orgname}-%{version}.tar.gz
-# Source0-md5:	e54970ae767eae731995f5bb2b4e0f43
+# Source0-md5:	5ddd943d45880a2fa7389b6fc4aeec3a
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -229,7 +229,7 @@ URL:		http://php.net/
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
-BuildRequires:	bison
+BuildRequires:	bison >= 3.0.0
 BuildRequires:	bzip2-devel >= 1.0.0
 %{?with_curl:BuildRequires:	curl-devel >= 7.15.5}
 BuildRequires:	cyrus-sasl-devel >= 2

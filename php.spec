@@ -2203,8 +2203,13 @@ export EXTENSION_DIR="%{php_extensiondir}"
 if [ ! -f _built-conf ]; then
 	# now remove Makefile copies
 	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs1,apxs2,litespeed,phpdbg,milter}
+
+	# Force use of system libtool:
+	mv build/libtool.m4 build/libtool.m4.saved
+	cat %{_aclocaldir}/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m4 > build/libtool.m4
 	%{__libtoolize}
 	%{__aclocal}
+
 	cp -f /usr/share/automake/config.* .
 	./buildconf --force
 	touch _built-conf

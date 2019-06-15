@@ -2,7 +2,6 @@
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
 # TODO 7.4:
 # - follow upstream: drop spl, pcre, hash subpackages (tired of maintaining them)
-# - handle acinclude.m4 -> build/php.m4 rename
 # TODO 7.3:
 # - branch php-7.2 and merge dev-7.3 into head once official announcement ready
 # TODO 7.2:
@@ -146,7 +145,7 @@
 %undefine	with_filter
 %endif
 
-%define		subver %{nil}
+%define		subver alpha1
 %define		orgname	php
 %define		ver_suffix 74
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -165,10 +164,9 @@ Epoch:		4
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-#Source0:	https://downloads.php.net/~cmb/php-%{version}%{subver}.tar.xz
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://github.com/php/php-src/archive/PHP-7.4/%{orgname}-%{version}.tar.gz
-# Source0-md5:	5ddd943d45880a2fa7389b6fc4aeec3a
+Source0:	https://downloads.php.net/~derick/php-%{version}%{subver}.tar.xz
+# Source0-md5:	29592e9a73c0ae615c4b7e2b4761184f
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -309,9 +307,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20180731
-%define		zend_module_api		20180731
-%define		zend_extension_api	320180731
+%define		php_api_version		20190529
+%define		zend_module_api		%{php_api_version}
+%define		zend_extension_api	3%{zend_module_api}
 %define		php_pdo_api_version	20170320
 
 # Extension versions
@@ -1956,11 +1954,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%if 0
 %setup -q -n %{orgname}-%{version}%{?subver}
-%else
-%setup -q -n php-src-PHP-7.4
-%endif
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1

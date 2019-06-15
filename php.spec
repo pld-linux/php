@@ -2313,7 +2313,7 @@ for sapi in $sapis; do
 	%{__enable_disable fileinfo fileinfo shared} \
 	%{__enable_disable ftp ftp shared} \
 	%{?with_intl:--enable-intl=shared} \
-	--enable-libxml \
+	--with-libxml \
 	%{__enable_disable mbstring mbstring shared,all} \
 	--with-onig=/usr \
 	--enable-mbregex \

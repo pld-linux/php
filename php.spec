@@ -2315,7 +2315,6 @@ for sapi in $sapis; do
 	%{?with_intl:--enable-intl=shared} \
 	--with-libxml \
 	%{__enable_disable mbstring mbstring shared,all} \
-	--with-onig=/usr \
 	--enable-mbregex \
 	%{__enable_disable pcntl pcntl shared} \
 	%{__enable_disable pdo pdo shared} \

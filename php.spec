@@ -1,11 +1,7 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
 # TODO 7.4:
-# - follow upstream: drop spl, pcre, hash subpackages (tired of maintaining them)
-# TODO 7.3:
-# - branch php-7.2 and merge dev-7.3 into head once official announcement ready
-# TODO 7.2:
-# - https://github.com/php/php-src/blob/php-7.2.0/UPGRADING
+# - follow upstream: drop spl, pcre, subpackages (tired of maintaining them)
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # TODO 5.4:
@@ -62,7 +58,6 @@
 %bcond_without	gd		# without GD extension module
 %bcond_without	gettext		# without gettext extension module
 %bcond_without	gmp		# without gmp extension module
-%bcond_without	hash		# without hash extension module
 %bcond_without	iconv		# without iconv extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	intl		# without Intl extension module
@@ -241,7 +236,6 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-mysql-ssl-context.patch
 Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
-Patch72:	phar-hash-shared.patch
 URL:		http://php.net/
 %{?with_pdo_firebase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -589,10 +583,12 @@ Provides:	%{name}(zend_extension_api) = %{zend_extension_api}
 Provides:	%{name}(zend_module_api) = %{zend_module_api}
 Provides:	%{name}-core
 Provides:	%{name}-date
+Provides:	%{name}-hash = %{epoch}:%{version}-%{release}
 Provides:	%{name}-reflection
 Provides:	%{name}-standard
 Provides:	php(core) = %{version}
 Provides:	php(date)
+Provides:	php(hash) = %{hashver}
 Provides:	php(libxml)
 Provides:	php(reflection)
 Provides:	php(standard)
@@ -600,17 +596,23 @@ Provides:	php(standard)
 %{?with_pcre:%requires_ge_to	pcre2-8 pcre2-8-devel}
 Suggests:	browscap
 Obsoletes:	php-common < 4:5.3.28-7
-# withdrawn modules
 Obsoletes:	php-filepro < 4:5.2.0
+Obsoletes:	php-hash < 4:5.3.28-7
 Obsoletes:	php-hwapi < 4:5.2.0
 Obsoletes:	php-hyperwave < 3:5.0.0
 Obsoletes:	php-java < 3:5.0.0
 Obsoletes:	php-mcal < 3:5.0.0
 Obsoletes:	php-pecl-domxml
+Obsoletes:	php-pecl-hash < %{hashver}
 Obsoletes:	php-qtdom < 3:5.0.0
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	php55-common < 4:5.5.10-4
 Conflicts:	rpm < 4.4.2-0.2
+%if %{with mhash}
+Provides:	php(mhash)
+Provides:	php-mhash = %{epoch}:%{version}-%{release}
+Obsoletes:	php-mhash < 4:5.3.0
+%endif
 
 %description common
 Common files needed by both Apache modules and CGI/CLI SAPIs.
@@ -983,29 +985,6 @@ length number support with GNU MP library.
 %description gmp -l pl.UTF-8
 Moduł PHP umożliwiający korzystanie z biblioteki gmp do obliczeń na
 liczbach o dowolnej długości.
-
-%package hash
-Summary:	HASH Message Digest Framework
-Summary(pl.UTF-8):	Szkielet do obliczania skrótów wiadomości
-Group:		Libraries
-URL:		http://php.net/manual/en/book.gmp.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(hash) = %{hashver}
-%if %{with mhash}
-Provides:	php(mhash)
-Provides:	php-mhash = %{epoch}:%{version}-%{release}
-Obsoletes:	php-mhash < 4:5.3.0
-%endif
-Obsoletes:	php-hash < 4:5.3.28-7
-Obsoletes:	php-pecl-hash < %{hashver}
-
-%description hash
-Native implementations of common message digest algorithms using a
-generic factory method.
-
-%description hash -l pl.UTF-8
-Natywne implementacje popularnych algorytmów obliczania skrótów
-wiadomości przy użyciu wspólnego interfejsu.
 
 %package iconv
 Summary:	iconv extension module for PHP
@@ -2003,7 +1982,6 @@ cp -p php.ini-production php.ini
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch70 -p1
 %patch71 -p1
-%patch72 -p1 -b .phar-shared
 
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -2319,7 +2297,6 @@ for sapi in $sapis; do
 	%{__enable_disable pcntl pcntl shared} \
 	%{__enable_disable pdo pdo shared} \
 	%{__enable_disable json json shared} \
-	%{__enable_disable hash hash shared} \
 	--enable-xmlwriter=shared \
 %if %{with fpm}
 	--with-fpm-user=http \
@@ -2474,8 +2451,6 @@ generate_inifiles() {
 		[ "$mod" = "spl" ] && conf="SPL.ini"
 		# session needs to be loaded before php-pecl-http, php-pecl-memcache, php-pecl-session_mysql
 		[ "$mod" = "session" ] && conf="Session.ini"
-		# hash needs to be loaded before mysqlnd
-		[ "$mod" = "hash" ] && conf="Hash.ini"
 		# mysqlnd needs to be loaded before mysqli,pdo_mysqli
 		[ "$mod" = "mysqlnd" ] && conf="MySQLND.ini"
 		echo "+ $conf"
@@ -2836,7 +2811,6 @@ fi \
 %extension_scripts gd
 %extension_scripts gettext
 %extension_scripts gmp
-%extension_scripts hash
 %extension_scripts iconv
 %extension_scripts imap
 %extension_scripts intl
@@ -3117,14 +3091,6 @@ fi
 %doc ext/gmp/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/gmp.ini
 %attr(755,root,root) %{php_extensiondir}/gmp.so
-%endif
-
-%if %{with hash}
-%files hash
-%defattr(644,root,root,755)
-%doc ext/hash/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/Hash.ini
-%attr(755,root,root) %{php_extensiondir}/hash.so
 %endif
 
 %if %{with iconv}

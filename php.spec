@@ -2977,7 +2977,7 @@ fi
 
 %files common
 %defattr(644,root,root,755)
-%doc CREDITS EXTENSIONS LICENSE NEWS UPGRADING* Zend/{LICENSE.Zend,README*} php.ini-* .gdbinit
+%doc EXTENSIONS LICENSE NEWS UPGRADING* Zend/{LICENSE.Zend,README*} php.ini-* .gdbinit
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
@@ -2988,7 +2988,7 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,UNIX-BUILD-SYSTEM,input_filter}
+%doc CODING_STANDARDS.md docs/*.md
 %attr(755,root,root) %{_bindir}/ext_skel.php
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_bindir}/phpize
@@ -3041,7 +3041,7 @@ fi
 %if %{with dba}
 %files dba
 %defattr(644,root,root,755)
-%doc ext/dba/{CREDITS,README}
+%doc ext/dba/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dba.ini
 %attr(755,root,root) %{php_extensiondir}/dba.so
 %endif
@@ -3121,7 +3121,7 @@ fi
 %if %{with hash}
 %files hash
 %defattr(644,root,root,755)
-%doc ext/hash/{CREDITS,README}
+%doc ext/hash/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/Hash.ini
 %attr(755,root,root) %{php_extensiondir}/hash.so
 %endif
@@ -3209,7 +3209,6 @@ fi
 %if %{with opcache}
 %files opcache
 %defattr(644,root,root,755)
-%doc ext/opcache/README
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/opcache.ini
 %attr(755,root,root) %{php_extensiondir}/opcache.so
 %endif
@@ -3217,7 +3216,7 @@ fi
 %if %{with openssl}
 %files openssl
 %defattr(644,root,root,755)
-%doc ext/openssl/{CREDITS,README}
+%doc ext/openssl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/openssl.ini
 %attr(755,root,root) %{php_extensiondir}/openssl.so
 %endif
@@ -3225,7 +3224,7 @@ fi
 %if %{with pcntl}
 %files pcntl
 %defattr(644,root,root,755)
-%doc ext/pcntl/{CREDITS,README}
+%doc ext/pcntl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
 %endif
@@ -3241,7 +3240,7 @@ fi
 %if %{with pdo}
 %files pdo
 %defattr(644,root,root,755)
-%doc ext/pdo/{CREDITS,README}
+%doc ext/pdo/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
 %attr(755,root,root) %{php_extensiondir}/pdo.so
 %endif
@@ -3249,7 +3248,7 @@ fi
 %if %{with pdo_dblib}
 %files pdo-dblib
 %defattr(644,root,root,755)
-%doc ext/pdo_dblib/{CREDITS,README}
+%doc ext/pdo_dblib/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_dblib.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_dblib.so
 %endif
@@ -3305,7 +3304,7 @@ fi
 %if %{with pgsql}
 %files pgsql
 %defattr(644,root,root,755)
-%doc ext/pgsql/{CREDITS,README}
+%doc ext/pgsql/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pgsql.ini
 %attr(755,root,root) %{php_extensiondir}/pgsql.so
 %endif
@@ -3338,7 +3337,6 @@ fi
 %if %{with pspell}
 %files pspell
 %defattr(644,root,root,755)
-%doc ext/pspell/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pspell.ini
 %attr(755,root,root) %{php_extensiondir}/pspell.so
 %endif
@@ -3346,7 +3344,7 @@ fi
 %if %{with readline}
 %files readline
 %defattr(644,root,root,755)
-%doc ext/readline/{CREDITS,README*}
+%doc ext/readline/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/readline.ini
 %attr(755,root,root) %{php_extensiondir}/readline.so
 %endif
@@ -3370,13 +3368,13 @@ fi
 
 %files shmop
 %defattr(644,root,root,755)
-%doc ext/shmop/{CREDITS,README}
+%doc ext/shmop/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/shmop.ini
 %attr(755,root,root) %{php_extensiondir}/shmop.so
 
 %files simplexml
 %defattr(644,root,root,755)
-%doc ext/simplexml/{CREDITS,README}
+%doc ext/simplexml/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
 
@@ -3410,8 +3408,7 @@ fi
 
 %files spl
 %defattr(644,root,root,755)
-%doc ext/spl/{CREDITS,README}
-%doc ext/spl/examples
+%doc ext/spl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
 %attr(755,root,root) %{php_extensiondir}/spl.so
 
@@ -3478,7 +3475,7 @@ fi
 
 %files xmlreader
 %defattr(644,root,root,755)
-%doc ext/xmlreader/{CREDITS,README}
+%doc ext/xmlreader/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlreader.ini
 %attr(755,root,root) %{php_extensiondir}/xmlreader.so
 

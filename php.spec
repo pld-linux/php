@@ -203,7 +203,6 @@ Patch22:	%{orgname}-both-apxs.patch
 Patch23:	%{orgname}-builddir.patch
 Patch24:	%{orgname}-zlib-for-getimagesize.patch
 Patch25:	%{orgname}-stupidapache_version.patch
-Patch26:	%{orgname}-pear.patch
 Patch27:	%{orgname}-config-dir.patch
 Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
@@ -1915,7 +1914,6 @@ cp -p php.ini-production php.ini
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
-%patch26 -p1
 %patch27 -p1
 %patch29 -p1
 %patch31 -p1
@@ -2138,6 +2136,11 @@ if test "$ver" != "PHP_VERSION"; then
 fi
 
 export EXTENSION_DIR="%{php_extensiondir}"
+
+# Set PEAR_INSTALLDIR to ensure that the hard-coded include_path
+# includes the PEAR directory even though pear is packaged separately.
+export PEAR_INSTALLDIR=%{php_pear_dir}
+
 # configure once (for faster debugging purposes)
 if [ ! -f _built-conf ]; then
 	# now remove Makefile copies
@@ -2317,7 +2320,6 @@ for sapi in $sapis; do
 	%{__with_without pcre pcre-regex /usr} \
 	%{?with_pcre:--with-external-pcre} \
 	%{__enable_disable filter filter shared} \
-	--with-pear=%{php_pear_dir} \
 	%{__with_without pgsql pgsql shared,/usr} \
 	%{__enable_disable phar phar shared} \
 	--with-png-dir=/usr \

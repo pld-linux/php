@@ -2306,7 +2306,7 @@ for sapi in $sapis; do
 		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	litespeed)
-		sapi_args='--with-litespeed'
+		sapi_args='--enable-litespeed'
 	;;
 	phpdbg)
 		sapi_args='--enable-phpdbg %{?debug:--enable-phpdbg-debug}'

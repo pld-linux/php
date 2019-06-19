@@ -2338,7 +2338,7 @@ for sapi in $sapis; do
 	%{?with_pdo_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pdo_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
-	%{?with_webp:--with-webp-dir=/usr} \
+	%{?with_webp:--with-webp-dir=/usr --with-webp} \
 	--without-libexpat-dir \
 	%{__enable_disable posix posix shared} \
 	--enable-shared \
@@ -2361,7 +2361,8 @@ for sapi in $sapis; do
 	%{?with_enchant:--with-enchant=shared,/usr} \
 	--with-freetype-dir=shared \
 	%{__with_without gettext gettext shared} \
-	%{__with_without gd gd shared%{?with_system_gd:,/usr}} \
+	%{__enable_disable gd gd shared%{?with_system_gd:,/usr}} \
+	%{?with_system_gd:--with-external-gd} \
 	--with-gdbm \
 	%{__with_without gmp gmp shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \

@@ -11,15 +11,6 @@
 #   - 2.3M fileinfo.so php-fileinfo-5.3.16-1.x86_64
 #   -  13K fileinfo.so php-pecl-fileinfo-1.0.4-8.amd64
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
-# - modularize standard (output from pure php -m)?
-# - some mods should be shared:
-#$ php -m
-# [PHP Modules]
-# Core
-# date
-# libxml
-# Reflection
-# standard
 #
 # Conditional build:
 # - packaging options

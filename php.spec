@@ -2334,7 +2334,7 @@ for sapi in $sapis; do
 	%{?with_xsl:--with-xsl=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
-	%{?with_zip:--enable-zip=shared,/usr --with-libzip} \
+	%{?with_zip:--with-zip=shared,/usr} \
 
 	# save for debug
 	cp -f Makefile Makefile.$sapi

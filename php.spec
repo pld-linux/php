@@ -566,7 +566,6 @@ Requires:	php-dirs >= 1.4
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
 Requires:	zlib >= 1.2.0.4
-Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}(debug) = %{php_debug}
 Provides:	%{name}(modules_api) = %{php_api_version}
 Provides:	%{name}(thread-safety) = %{_zend_zts}

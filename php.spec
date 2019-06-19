@@ -1,7 +1,7 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
 # TODO 7.4:
-# - follow upstream: drop spl, pcre, subpackages (tired of maintaining them)
+# - follow upstream: drop spl, subpackages (tired of maintaining them)
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # TODO 5.4:
@@ -72,7 +72,6 @@
 %bcond_without	opcache		# without Enable Zend OPcache extension support
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcntl		# without pcntl extension module
-%bcond_without	pcre		# without PCRE extension module
 %bcond_without	pdo		# without PDO extension module
 %bcond_without	pdo_dblib	# without PDO dblib extension module
 %bcond_without	pdo_firebird	# without PDO Firebird extension module
@@ -143,11 +142,6 @@
 %ifnarch %{ix86} %{x8664} x32
 # unsupported, see sapi/cgi/fpm/fpm_atomic.h
 %undefine	with_fpm
-%endif
-
-# filter depends on pcre
-%if %{without pcre}
-%undefine	with_filter
 %endif
 
 %if %{without pdo}
@@ -225,7 +219,6 @@ Patch45:	%{orgname}-imap-annotations.patch
 Patch46:	%{orgname}-imap-myrights.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
-Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
@@ -289,7 +282,7 @@ BuildRequires:	openssl-devel >= 1.0.1
 %endif
 %{?with_oci:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
-%{?with_pcre:BuildRequires:	pcre2-8-devel >= 10.30}
+BuildRequires:	pcre2-8-devel >= 10.30
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -584,16 +577,18 @@ Provides:	%{name}(zend_module_api) = %{zend_module_api}
 Provides:	%{name}-core
 Provides:	%{name}-date
 Provides:	%{name}-hash = %{epoch}:%{version}-%{release}
+Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	%{name}-reflection
 Provides:	%{name}-standard
 Provides:	php(core) = %{version}
 Provides:	php(date)
 Provides:	php(hash) = %{hashver}
 Provides:	php(libxml)
+Provides:	php(pcre)
 Provides:	php(reflection)
 Provides:	php(standard)
 %{!?with_mysqlnd:Obsoletes:	%{name}-mysqlnd}
-%{?with_pcre:%requires_ge_to	pcre2-8 pcre2-8-devel}
+%requires_ge_to	pcre2-8 pcre2-8-devel
 Suggests:	browscap
 Obsoletes:	php-common < 4:5.3.28-7
 Obsoletes:	php-filepro < 4:5.2.0
@@ -607,6 +602,7 @@ Obsoletes:	php-pecl-hash < %{hashver}
 Obsoletes:	php-qtdom < 3:5.0.0
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	php55-common < 4:5.5.10-4
+Obsoletes:	php-pcre < 4:5.3.28-7
 Conflicts:	rpm < 4.4.2-0.2
 %if %{with mhash}
 Provides:	php(mhash)
@@ -643,7 +639,7 @@ Requires:	libtool >= 2:2.4.6
 %else
 Requires:	libtool
 %endif
-%{?with_pcre:Requires:	pcre2-8-devel >= 10.30}
+Requires:	pcre2-8-devel >= 10.30
 Requires:	shtool
 Provides:	php-devel = %{epoch}:%{version}-%{release}
 Obsoletes:	php-devel
@@ -1260,22 +1256,6 @@ waitpid(), signal() etc.
 %description pcntl -l pl.UTF-8
 Moduł PHP umożliwiający tworzenie nowych procesów i kontrolę nad nimi.
 Obsługuje funkcje takie jak fork(), waitpid(), signal() i podobne.
-
-%package pcre
-Summary:	PCRE extension module for PHP
-Summary(pl.UTF-8):	Moduł PCRE dla PHP
-Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(pcre)
-Obsoletes:	php-pcre < 4:5.3.28-7
-
-%description pcre
-This is a dynamic shared object (DSO) for PHP that will add Perl
-Compatible Regular Expression support.
-
-%description pcre -l pl.UTF-8
-Moduł PHP umożliwiający korzystanie z perlowych wyrażeń regularnych
-(Perl Compatible Regular Expressions)
 
 %package pdo
 Summary:	PHP Data Objects (PDO)
@@ -1969,7 +1949,6 @@ cp -p php.ini-production php.ini
 #%patch46 -p1 # imap myrights. fixme
 %patch50 -p1
 %patch51 -p1 -b .spl-shared
-%patch52 -p1 -b .pcre-shared
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1
@@ -2354,6 +2333,7 @@ for sapi in $sapis; do
 	%{?with_kerberos5:--with-kerberos} \
 	--with-tcadb=/usr \
 	%{__with_without pcre pcre-regex /usr} \
+	%{?with_pcre:--with-external-pcre} \
 	%{__enable_disable filter filter shared} \
 	--with-pear=%{php_pear_dir} \
 	%{__with_without pgsql pgsql shared,/usr} \
@@ -2445,8 +2425,6 @@ generate_inifiles() {
 		# opcache.so is zend extension
 		nm $so | grep -q zend_extension_entry && ext=zend_extension
 		conf="$mod.ini"
-		# pre needs to be loaded before SPL
-		[ "$mod" = "pcre" ] && conf="PCRE.ini"
 		# spl needs to be loaded before mysqli
 		[ "$mod" = "spl" ] && conf="SPL.ini"
 		# session needs to be loaded before php-pecl-http, php-pecl-memcache, php-pecl-session_mysql
@@ -2823,7 +2801,6 @@ fi \
 %extension_scripts odbc
 %extension_scripts opcache
 %extension_scripts openssl
-%extension_scripts pcre
 %extension_scripts pdo
 %extension_scripts pdo-dblib
 %extension_scripts pdo-firebird
@@ -3194,14 +3171,6 @@ fi
 %doc ext/pcntl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
-%endif
-
-%if %{with pcre}
-%files pcre
-%defattr(644,root,root,755)
-%doc ext/pcre/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/PCRE.ini
-%attr(755,root,root) %{php_extensiondir}/pcre.so
 %endif
 
 %if %{with pdo}

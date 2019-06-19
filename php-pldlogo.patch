@@ -8,14 +8,14 @@
 +		/* PLD Linux */
 +		php_info_print_box_start(0);
 +		if (!sapi_module.phpinfo_as_text) {
-+			php_info_print("<a href=\"http://www.pld-linux.org/\"><img src=\"");
++			php_info_print("<a href=\"https://www.pld-linux.org/\"><img src=\"");
 +			php_info_print(PLD_LOGO_DATA_URI "\" border=\"0\" align=\"right\" alt=\"PLD Linux logo\"></a>\n");
 +		}
 +		php_info_print("This server is using PLD Linux.");
 +		if (!sapi_module.phpinfo_as_text)
-+			php_info_print("<br />More information at <a href=\"http://www.pld-linux.org/\">http://www.pld-linux.org/</a>.<br />\n");
++			php_info_print("<br />More information at <a href=\"https://www.pld-linux.org/\">https://www.pld-linux.org/</a>.<br />\n");
 +		else
-+			php_info_print("\nMore information at http://www.pld-linux.org/.\n");
++			php_info_print("\nMore information at https://www.pld-linux.org/.\n");
 +		php_info_print_box_end();
 +
  		php_info_print_table_start();

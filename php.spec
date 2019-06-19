@@ -253,7 +253,7 @@ BuildRequires:	gmp-devel >= 4.2
 %{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_fpm:BuildRequires:	libapparmor-devel}
-%{?with_intl:BuildRequires:	libicu-devel >= 4.4}
+%{?with_intl:BuildRequires:	libicu-devel >= 50.1}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libpng-devel >= 1.0.8

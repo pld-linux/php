@@ -180,7 +180,6 @@ Patch1:		%{orgname}-pldlogo.patch
 Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
-
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		milter.patch
 Patch9:		libtool-tag.patch
@@ -197,7 +196,6 @@ Patch25:	%{orgname}-stupidapache_version.patch
 Patch27:	%{orgname}-config-dir.patch
 Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
-Patch34:	%{orgname}-libtool.patch
 Patch39:	%{orgname}-use-prog_sendmail.patch
 Patch41:	%{orgname}-fpm-config.patch
 Patch42:	%{orgname}-fpm-shared.patch
@@ -249,11 +247,7 @@ BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libpng-devel >= 1.0.8
 %{?with_intl:BuildRequires:	libstdc++-devel}
 %{?with_webp:BuildRequires:	libwebp-devel}
-%if "%{pld_release}" != "ac"
 BuildRequires:	libtool >= 2:2.4.6
-%else
-BuildRequires:	libtool >= 1.4.3
-%endif
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
 %{?with_zip:BuildRequires:	libzip-devel >= 1.3.1}
@@ -622,13 +616,9 @@ Summary(ru.UTF-8):	Пакет разработки для построения �
 Summary(uk.UTF-8):	Пакет розробки для побудови розширень PHP
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	autoconf >= 2.13
-Requires:	automake
-%if "%{pld_release}" != "ac"
+Requires:	autoconf >= 2.59
+Requires:	automake >= 1.4d
 Requires:	libtool >= 2:2.4.6
-%else
-Requires:	libtool
-%endif
 Requires:	pcre2-8-devel >= 10.30
 Requires:	shtool
 Provides:	php-devel = %{epoch}:%{version}-%{release}
@@ -1908,9 +1898,6 @@ cp -p php.ini-production php.ini
 %patch27 -p1
 %patch29 -p1
 %patch31 -p1
-%if "%{pld_release}" != "ac"
-%patch34 -p1
-%endif
 %patch39 -p1
 %patch41 -p1
 %patch42 -p1
@@ -2598,20 +2585,6 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
 # for CLI SAPI only
 %{__mv} $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
 
-# use system automake and {lib,sh}tool
-ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/%{name}/build
-ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/%{name}/build
-for fn in libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4; do
-	f=%{_aclocaldir}/$fn
-	test -f $f || continue
-	ln -snf $f $RPM_BUILD_ROOT%{_libdir}/%{name}/build
-done
-for fn in ltmain.sh config/ltmain.sh build-aux/ltmain.sh; do
-	f=/usr/share/libtool/$fn
-	test -f $f || continue
-	ln -snf $f $RPM_BUILD_ROOT%{_libdir}/%{name}/build
-	break
-done
 sed -i -e '/^phpdir/ s,/php/build,/%{name}/build,' $RPM_BUILD_ROOT%{_bindir}/phpize
 
 # for php-pecl-mailparse
@@ -2625,8 +2598,6 @@ cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
 # fix install paths, avoid evil rpaths
 sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
-# better solution?
-sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/acinclude.m4
 
 install -p ext/ext_skel.php $RPM_BUILD_ROOT%{_bindir}
 

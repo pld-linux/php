@@ -2,9 +2,6 @@
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
-# TODO 5.4:
-# - update imap annotations patch (needs api porting)
-# - update imap myrights patch (needs api porting)
 # TODO:
 # - fileinfo extension bundles magic db in library: data_file.c (dump of magic.mgc) is 14M
 #   - 2.3M fileinfo.so php54-fileinfo-5.4.6-0.15.x86_64
@@ -201,8 +198,6 @@ Patch41:	%{orgname}-fpm-config.patch
 Patch42:	%{orgname}-fpm-shared.patch
 Patch43:	%{orgname}-silent-session-cleanup.patch
 Patch44:	%{orgname}-include_path.patch
-Patch45:	%{orgname}-imap-annotations.patch
-Patch46:	%{orgname}-imap-myrights.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch53:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
@@ -1903,8 +1898,6 @@ cp -p php.ini-production php.ini
 %patch42 -p1
 %patch43 -p1
 %patch44 -p1
-#%patch45 -p1 # imap annotations. fixme
-#%patch46 -p1 # imap myrights. fixme
 %patch50 -p1
 
 %patch53 -p1

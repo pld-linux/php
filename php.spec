@@ -81,7 +81,11 @@
 %bcond_without	pcre		# without PCRE extension module
 %bcond_without	pdo		# without PDO extension module
 %bcond_without	pdo_dblib	# without PDO dblib extension module
+%bcond_without	pdo_firebird	# without PDO Firebird extension module
 %bcond_without	pdo_mysql	# without PDO MySQL extension module
+%bcond_without	pdo_oci	# without PDO oci extension module
+%bcond_without	pdo_odbc	# without PDO ODBC extension module
+%bcond_without	pdo_pgsql	# without PDO pgsql extension module
 %bcond_without	pdo_sqlite	# without PDO SQLite extension module
 %bcond_without	pgsql		# without PostgreSQL extension module
 %bcond_without	phar		# without Phar extension module
@@ -135,6 +139,22 @@
 %undefine	with_interbase
 %endif
 
+%if %{without odbc}
+%undefine	with_pdo_odbc
+%endif
+
+%if %{without pgsql}
+%undefine	with_pdo_pgsql
+%endif
+
+%if %{without oci}
+%undefine	with_pdo_oci
+%endif
+
+%if %{without interbase} || %{with interbase_inst}
+%undefine	with_pdo_firebird
+%endif
+
 %ifnarch %{ix86} %{x8664} x32
 # unsupported, see sapi/cgi/fpm/fpm_atomic.h
 %undefine	with_fpm
@@ -143,6 +163,16 @@
 # filter depends on pcre
 %if %{without pcre}
 %undefine	with_filter
+%endif
+
+%if %{without pdo}
+%undefine	with_pdo_dblib
+%undefine	with_pdo_firebird
+%undefine	with_pdo_mysql
+%undefine	with_pdo_oci
+%undefine	with_pdo_odbc
+%undefine	with_pdo_pgsql
+%undefine	with_pdo_sqlite
 %endif
 
 %define		subver alpha1
@@ -2328,15 +2358,15 @@ for sapi in $sapis; do
 %if %{with pdo_dblib}
 	--with-pdo-dblib=shared \
 %endif
-%if %{with interbase} && %{without interbase_inst}
+%if %{with pdo_firebird}
 	--with-pdo-firebird=shared,/usr \
 %endif
 	%{?with_mhash:--with-mhash=yes} \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	%{__with_without pdo_mysql pdo-mysql shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd}} \
-	%{?with_oci:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
-	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
-	%{?with_pgsql:--with-pdo-pgsql=shared} \
+	%{?with_pdo_oci:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
+	%{?with_pdo_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
+	%{?with_pdo_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
 	%{?with_webp:--with-webp-dir=/usr} \
 	--without-libexpat-dir \
@@ -3200,7 +3230,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/mysqlnd.so
 %endif
 
-%if %{with oci}
+%if %{with pdo_oci}
 %files oci8
 %defattr(644,root,root,755)
 %doc ext/oci8/{CREDITS,README}
@@ -3264,7 +3294,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pdo_dblib.so
 %endif
 
-%if %{with interbase} && !%{with interbase_inst}
+%if %{with pdo_firebird}
 %files pdo-firebird
 %defattr(644,root,root,755)
 %doc ext/pdo_firebird/CREDITS
@@ -3288,7 +3318,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pdo_oci.so
 %endif
 
-%if %{with odbc}
+%if %{with pdo_odbc}
 %files pdo-odbc
 %defattr(644,root,root,755)
 %doc ext/pdo_odbc/CREDITS
@@ -3296,7 +3326,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pdo_odbc.so
 %endif
 
-%if %{with pgsql}
+%if %{with pdo_pgsql}
 %files pdo-pgsql
 %defattr(644,root,root,755)
 %doc ext/pdo_pgsql/CREDITS

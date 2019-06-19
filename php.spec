@@ -65,7 +65,6 @@
 %bcond_without	hash		# without hash extension module
 %bcond_without	iconv		# without iconv extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_without	interbase	# without InterBase extension module
 %bcond_without	intl		# without Intl extension module
 %bcond_without	json		# without json extension module
 %bcond_without	ldap		# without LDAP extension module
@@ -134,11 +133,6 @@
 %undefine	with_milter
 %endif
 
-%ifnarch %{ix86} %{x8664} x32 sparc sparcv9 alpha
-# ppc disabled (broken on th-ppc)
-%undefine	with_interbase
-%endif
-
 %if %{without odbc}
 %undefine	with_pdo_odbc
 %endif
@@ -149,10 +143,6 @@
 
 %if %{without oci}
 %undefine	with_pdo_oci
-%endif
-
-%if %{without interbase} || %{with interbase_inst}
-%undefine	with_pdo_firebird
 %endif
 
 %ifnarch %{ix86} %{x8664} x32
@@ -253,7 +243,7 @@ Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
 Patch72:	phar-hash-shared.patch
 URL:		http://php.net/
-%{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
+%{?with_pdo_firebase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
@@ -1056,26 +1046,6 @@ Moduł PHP dodający obsługę skrzynek IMAP.
 
 %description imap -l pt_BR.UTF-8
 Um módulo para aplicações PHP que usam IMAP.
-
-%package interbase
-Summary:	InterBase/Firebird database module for PHP
-Summary(pl.UTF-8):	Moduł bazy danych InterBase/Firebird dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.ibase.php
-%if %{with interbase_inst}
-%{?requires_php_extension}
-%else
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%endif
-Provides:	php(interbase)
-Obsoletes:	php-interbase < 4:5.3.28-7
-
-%description interbase
-This is a dynamic shared object (DSO) for PHP that will add InterBase
-and Firebird database support.
-
-%description interbase -l pl.UTF-8
-Moduł PHP umożliwiający dostęp do baz danych InterBase i Firebird.
 
 %package intl
 Summary:	Internationalization extension (ICU wrapper)
@@ -2395,7 +2365,6 @@ for sapi in $sapis; do
 	--with-gdbm \
 	%{__with_without gmp gmp shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
-	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
 	--with-jpeg-dir=/usr \
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	%{?with_mm:--with-mm} \
@@ -2869,7 +2838,6 @@ fi \
 %extension_scripts hash
 %extension_scripts iconv
 %extension_scripts imap
-%extension_scripts interbase
 %extension_scripts intl
 %extension_scripts json
 %extension_scripts ldap
@@ -3172,14 +3140,6 @@ fi
 %doc ext/imap/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/imap.ini
 %attr(755,root,root) %{php_extensiondir}/imap.so
-%endif
-
-%if %{with interbase}
-%files interbase
-%defattr(644,root,root,755)
-%doc ext/interbase/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/interbase.ini
-%attr(755,root,root) %{php_extensiondir}/interbase.so
 %endif
 
 %if %{with intl}

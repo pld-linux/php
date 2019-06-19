@@ -1,7 +1,5 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
-# TODO 7.4:
-# - follow upstream: drop spl, subpackages (tired of maintaining them)
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # TODO 5.4:
@@ -218,7 +216,6 @@ Patch44:	%{orgname}-include_path.patch
 Patch45:	%{orgname}-imap-annotations.patch
 Patch46:	%{orgname}-imap-myrights.patch
 Patch50:	extension-shared-optional-dep.patch
-Patch51:	spl-shared.patch
 Patch53:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
@@ -569,6 +566,7 @@ Requires:	php-dirs >= 1.4
 Requires:	rpm-whiteout >= 1.28
 Requires:	tzdata
 Requires:	zlib >= 1.2.0.4
+Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
 Provides:	%{name}(debug) = %{php_debug}
 Provides:	%{name}(modules_api) = %{php_api_version}
 Provides:	%{name}(thread-safety) = %{_zend_zts}
@@ -578,6 +576,7 @@ Provides:	%{name}-core
 Provides:	%{name}-date
 Provides:	%{name}-hash = %{epoch}:%{version}-%{release}
 Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}
+Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-reflection
 Provides:	%{name}-standard
 Provides:	php(core) = %{version}
@@ -586,6 +585,7 @@ Provides:	php(hash) = %{hashver}
 Provides:	php(libxml)
 Provides:	php(pcre)
 Provides:	php(reflection)
+Provides:	php(spl)
 Provides:	php(standard)
 %{!?with_mysqlnd:Obsoletes:	%{name}-mysqlnd}
 %requires_ge_to	pcre2-8 pcre2-8-devel
@@ -597,12 +597,13 @@ Obsoletes:	php-hwapi < 4:5.2.0
 Obsoletes:	php-hyperwave < 3:5.0.0
 Obsoletes:	php-java < 3:5.0.0
 Obsoletes:	php-mcal < 3:5.0.0
+Obsoletes:	php-pcre < 4:5.3.28-7
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-pecl-hash < %{hashver}
 Obsoletes:	php-qtdom < 3:5.0.0
+Obsoletes:	php-spl < 4:5.3.28-7
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	php55-common < 4:5.5.10-4
-Obsoletes:	php-pcre < 4:5.3.28-7
 Conflicts:	rpm < 4.4.2-0.2
 %if %{with mhash}
 Provides:	php(mhash)
@@ -1637,24 +1638,6 @@ Provides:	php(sodium) = %{sodiumver}
 %description sodium
 A simple, low-level PHP extension for libsodium.
 
-%package spl
-Summary:	Standard PHP Library module for PHP
-Summary(pl.UTF-8):	Moduł biblioteki standardowej (Standard PHP Library) dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.spl.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
-Provides:	php(spl)
-Obsoletes:	php-spl < 4:5.3.28-7
-
-%description spl
-This is a dynamic shared object (DSO) for PHP that will add Standard
-PHP Library support.
-
-%description spl -l pl.UTF-8
-Moduł PHP z biblioteką standardową PHP (SPL - Standard PHP Library).
-
 %package sqlite3
 Summary:	SQLite3 extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite3 dla PHP
@@ -1948,7 +1931,7 @@ cp -p php.ini-production php.ini
 #%patch45 -p1 # imap annotations. fixme
 #%patch46 -p1 # imap myrights. fixme
 %patch50 -p1
-%patch51 -p1 -b .spl-shared
+
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1
@@ -2425,8 +2408,6 @@ generate_inifiles() {
 		# opcache.so is zend extension
 		nm $so | grep -q zend_extension_entry && ext=zend_extension
 		conf="$mod.ini"
-		# spl needs to be loaded before mysqli
-		[ "$mod" = "spl" ] && conf="SPL.ini"
 		# session needs to be loaded before php-pecl-http, php-pecl-memcache, php-pecl-session_mysql
 		[ "$mod" = "session" ] && conf="Session.ini"
 		# mysqlnd needs to be loaded before mysqli,pdo_mysqli
@@ -2821,7 +2802,6 @@ fi \
 %extension_scripts soap
 %extension_scripts sockets
 %extension_scripts sodium
-%extension_scripts spl
 %extension_scripts sqlite3
 %extension_scripts sysvmsg
 %extension_scripts sysvsem
@@ -3341,12 +3321,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sodium.ini
 %attr(755,root,root) %{php_extensiondir}/sodium.so
 %endif
-
-%files spl
-%defattr(644,root,root,755)
-%doc ext/spl/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
-%attr(755,root,root) %{php_extensiondir}/spl.so
 
 %if %{with sqlite3}
 %files sqlite3

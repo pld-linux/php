@@ -210,7 +210,7 @@ Patch68:	php-mysql-ssl-context.patch
 Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
 URL:		http://php.net/
-%{?with_pdo_firebase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
+%{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d

@@ -2263,8 +2263,7 @@ for sapi in $sapis; do
 	%{?with_pdo_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pdo_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
-	%{?with_webp:--with-webp-dir=/usr --with-webp} \
-	--without-libexpat-dir \
+	%{?with_webp:--with-webp} \
 	%{__enable_disable posix posix shared} \
 	--enable-shared \
 	%{__enable_disable session session shared} \
@@ -2284,7 +2283,7 @@ for sapi in $sapis; do
 	--with-db4 \
 	%{__with_without iconv iconv shared} \
 	%{?with_enchant:--with-enchant=shared,/usr} \
-	--with-freetype-dir=shared \
+	--with-freetype \
 	%{__with_without gettext gettext shared} \
 	%{__enable_disable gd gd shared%{?with_system_gd:,/usr}} \
 	%{?with_system_gd:--with-external-gd} \
@@ -2292,7 +2291,7 @@ for sapi in $sapis; do
 	%{__with_without gmp gmp shared} \
 	%{__with_without ffi ffi shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
-	--with-jpeg-dir=/usr \
+	--with-jpeg \
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	%{?with_mm:--with-mm} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
@@ -2302,12 +2301,10 @@ for sapi in $sapis; do
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \
 	--with-tcadb=/usr \
-	%{__with_without pcre pcre-regex /usr} \
 	%{?with_pcre:--with-external-pcre} \
 	%{__enable_disable filter filter shared} \
 	%{__with_without pgsql pgsql shared,/usr} \
 	%{__enable_disable phar phar shared} \
-	--with-png-dir=/usr \
 	%{?with_pspell:--with-pspell=shared} \
 	%{__with_without readline readline shared} \
 	%{?with_recode:--with-recode=shared} \

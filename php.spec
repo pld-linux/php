@@ -2254,7 +2254,7 @@ for sapi in $sapis; do
 	--with-pdo-dblib=shared \
 %endif
 %if %{with pdo_firebird}
-	--with-pdo-firebird=shared,/usr \
+	--with-pdo-firebird=shared \
 %endif
 	%{?with_mhash:--with-mhash=yes} \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
@@ -2262,7 +2262,7 @@ for sapi in $sapis; do
 	%{?with_pdo_oci:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_pdo_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pdo_pgsql:--with-pdo-pgsql=shared} \
-	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
+	%{?with_pdo_sqlite:--with-pdo-sqlite=shared} \
 	%{?with_webp:--with-webp} \
 	%{__enable_disable posix posix shared} \
 	--enable-shared \
@@ -2282,10 +2282,10 @@ for sapi in $sapis; do
 	%{__with_without curl curl shared} \
 	--with-db4 \
 	%{__with_without iconv iconv shared} \
-	%{?with_enchant:--with-enchant=shared,/usr} \
+	%{?with_enchant:--with-enchant=shared} \
 	--with-freetype \
 	%{__with_without gettext gettext shared} \
-	%{__enable_disable gd gd shared%{?with_system_gd:,/usr}} \
+	%{__enable_disable gd gd shared} \
 	%{?with_system_gd:--with-external-gd} \
 	--with-gdbm \
 	%{__with_without gmp gmp shared} \
@@ -2303,21 +2303,20 @@ for sapi in $sapis; do
 	--with-tcadb=/usr \
 	%{?with_pcre:--with-external-pcre} \
 	%{__enable_disable filter filter shared} \
-	%{__with_without pgsql pgsql shared,/usr} \
+	%{__with_without pgsql pgsql shared} \
 	%{__enable_disable phar phar shared} \
 	%{?with_pspell:--with-pspell=shared} \
 	%{__with_without readline readline shared} \
 	%{?with_recode:--with-recode=shared} \
 	%{?with_snmp:--with-snmp=shared} \
 	%{!?with_pdo_sqlite:--without-pdo-sqlite} \
-	%{__with_without sqlite3 sqlite3 shared,/usr} \
+	%{__with_without sqlite3 sqlite3 shared} \
 	%{?with_tidy:--with-tidy=shared} \
-	%{?with_odbc:--with-unixODBC=shared,/usr} \
+	%{?with_odbc:--with-unixODBC=shared} \
 	%{__with_without xmlrpc xmlrpc shared,/usr} \
 	%{?with_xsl:--with-xsl=shared} \
 	--with-zlib=shared \
-	--with-zlib-dir=shared,/usr \
-	%{?with_zip:--with-zip=shared,/usr} \
+	%{?with_zip:--with-zip=shared} \
 
 	# save for debug
 	cp -f Makefile Makefile.$sapi

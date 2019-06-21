@@ -4,8 +4,8 @@ it's needed for ext/intl
 but it requires icu which already links with stdc++
 so just omit PHP_ADD_LIBRARY(stdc++)
 
---- php-7.0.6/acinclude.m4~	2016-05-16 18:31:11.000000000 +0300
-+++ php-7.0.6/acinclude.m4	2016-05-16 18:50:34.614991634 +0300
+--- php-7.0.6/build/php.m4~	2016-05-16 18:31:11.000000000 +0300
++++ php-7.0.6/build/php.m4	2016-05-16 18:50:34.614991634 +0300
 @@ -762,7 +762,6 @@
    if test -z "$php_cxx_done"; then
      AC_PROG_CXX

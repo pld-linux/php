@@ -12,8 +12,8 @@
  PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
  
  PHP_SUBST(PHP_EXECUTABLE)
---- php-5.5.11/Makefile.global	2014-04-27 15:05:38.963814051 +0300
-+++ php-5.5.11/Makefile.global	2014-04-27 15:09:54.438443707 +0300
+--- php-5.5.11/build/Makefile.global	2014-04-27 15:05:38.963814051 +0300
++++ php-5.5.11/build/Makefile.global	2014-04-27 15:09:54.438443707 +0300
 @@ -81,8 +81,15 @@
  		done; \
  	fi

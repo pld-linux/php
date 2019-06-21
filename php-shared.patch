@@ -1,17 +1,17 @@
---- php-7.0.0RC3/configure.ac~	2015-09-26 14:55:35.000000000 +0300
-+++ php-7.0.0RC3/configure.ac	2015-09-26 15:13:29.581882625 +0300
-@@ -224,6 +224,9 @@
- dnl check for -R, etc. switch
+--- php-src-PHP-7.4/configure.ac~	2019-05-25 12:37:30.000000000 +0300
++++ php-src-PHP-7.4/configure.ac	2019-05-26 10:07:36.385580763 +0300
+@@ -202,6 +202,9 @@
+ dnl Check for -R, etc. switch.
  PHP_RUNPATH_SWITCH
  
 +dnl Always shared
 +PHP_BUILD_SHARED
 +
- dnl Checks for some support/generator progs
+ dnl Checks for some support/generator progs.
  PHP_PROG_AWK
- PHP_PROG_BISON
---- php-5.2.4/Makefile.global~	2007-08-31 19:13:58.000000000 +0300
-+++ php-5.2.4/Makefile.global	2007-08-31 19:19:33.799017413 +0300
+ PHP_PROG_BISON([3.0.0])
+--- php-5.2.4/build/Makefile.global~	2007-08-31 19:13:58.000000000 +0300
++++ php-5.2.4/build/Makefile.global	2007-08-31 19:19:33.799017413 +0300
 @@ -13,8 +13,12 @@
  	
  build-modules: $(PHP_MODULES)

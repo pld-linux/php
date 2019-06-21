@@ -8,8 +8,8 @@
  
  PHP_CHECK_FUNC(dlopen, dl)
  if test "$ac_cv_func_dlopen" = "yes"; then
---- php-7.3.0beta3/acinclude.m4~	2018-08-28 13:26:36.000000000 +0300
-+++ php-7.3.0beta3/acinclude.m4	2018-09-05 18:56:49.744106256 +0300
+--- php-7.3.0beta3/build/php.m4~	2018-08-28 13:26:36.000000000 +0300
++++ php-7.3.0beta3/build/php.m4	2018-09-05 18:56:49.744106256 +0300
 @@ -1829,18 +1829,18 @@
  dnl Wrapper for AC_CHECK_LIB
  dnl

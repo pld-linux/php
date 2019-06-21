@@ -1,30 +1,13 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
-# TODO 7.3:
-# - branch php-7.2 and merge dev-7.3 into head once official announcement ready
-# TODO 7.2:
-# - https://github.com/php/php-src/blob/php-7.2.0/UPGRADING
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
-# TODO 5.4:
-# - update imap annotations patch (needs api porting)
-# - update imap myrights patch (needs api porting)
 # TODO:
 # - fileinfo extension bundles magic db in library: data_file.c (dump of magic.mgc) is 14M
 #   - 2.3M fileinfo.so php54-fileinfo-5.4.6-0.15.x86_64
 #   - 2.3M fileinfo.so php-fileinfo-5.3.16-1.x86_64
 #   -  13K fileinfo.so php-pecl-fileinfo-1.0.4-8.amd64
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
-# - wddx: restore session support (not compiled in due DL extension check)
-# - modularize standard (output from pure php -m)?
-# - some mods should be shared:
-#$ php -m
-# [PHP Modules]
-# Core
-# date
-# libxml
-# Reflection
-# standard
 #
 # Conditional build:
 # - packaging options
@@ -55,16 +38,15 @@
 %bcond_without	dom		# without DOM extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	exif		# without EXIF extension module
+%bcond_without	ffi		# without FFI extension module
 %bcond_without	fileinfo	# without fileinfo extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	ftp		# without FTP extension module
 %bcond_without	gd		# without GD extension module
 %bcond_without	gettext		# without gettext extension module
 %bcond_without	gmp		# without gmp extension module
-%bcond_without	hash		# without hash extension module
 %bcond_without	iconv		# without iconv extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_without	interbase	# without InterBase extension module
 %bcond_without	intl		# without Intl extension module
 %bcond_without	json		# without json extension module
 %bcond_without	ldap		# without LDAP extension module
@@ -77,10 +59,13 @@
 %bcond_without	opcache		# without Enable Zend OPcache extension support
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcntl		# without pcntl extension module
-%bcond_without	pcre		# without PCRE extension module
 %bcond_without	pdo		# without PDO extension module
 %bcond_without	pdo_dblib	# without PDO dblib extension module
+%bcond_without	pdo_firebird	# without PDO Firebird extension module
 %bcond_without	pdo_mysql	# without PDO MySQL extension module
+%bcond_without	pdo_oci	# without PDO oci extension module
+%bcond_without	pdo_odbc	# without PDO ODBC extension module
+%bcond_without	pdo_pgsql	# without PDO pgsql extension module
 %bcond_without	pdo_sqlite	# without PDO SQLite extension module
 %bcond_without	pgsql		# without PostgreSQL extension module
 %bcond_without	phar		# without Phar extension module
@@ -94,7 +79,6 @@
 %bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	tidy		# without Tidy extension module
-%bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	xsl			# without xsl extension module
 %bcond_without	zip			# without zip extension module
@@ -130,9 +114,16 @@
 %undefine	with_milter
 %endif
 
-%ifnarch %{ix86} %{x8664} x32 sparc sparcv9 alpha
-# ppc disabled (broken on th-ppc)
-%undefine	with_interbase
+%if %{without odbc}
+%undefine	with_pdo_odbc
+%endif
+
+%if %{without pgsql}
+%undefine	with_pdo_pgsql
+%endif
+
+%if %{without oci}
+%undefine	with_pdo_oci
 %endif
 
 %ifnarch %{ix86} %{x8664} x32
@@ -140,14 +131,19 @@
 %undefine	with_fpm
 %endif
 
-# filter depends on pcre
-%if %{without pcre}
-%undefine	with_filter
+%if %{without pdo}
+%undefine	with_pdo_dblib
+%undefine	with_pdo_firebird
+%undefine	with_pdo_mysql
+%undefine	with_pdo_oci
+%undefine	with_pdo_odbc
+%undefine	with_pdo_pgsql
+%undefine	with_pdo_sqlite
 %endif
 
-%define		subver %{nil}
+%define		subver alpha1
 %define		orgname	php
-%define		ver_suffix 73
+%define		ver_suffix 74
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -156,17 +152,17 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.3.4
-Release:	2
+Version:	7.4.0
+Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-#Source0:	https://downloads.php.net/~cmb/php-%{version}%{subver}.tar.xz
-Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	eb860e97b4be43c1aad056fa7dde1157
+#Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://downloads.php.net/~derick/php-%{version}%{subver}.tar.xz
+# Source0-md5:	29592e9a73c0ae615c4b7e2b4761184f
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -182,8 +178,6 @@ Patch1:		%{orgname}-pldlogo.patch
 Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
-Patch5:		%{orgname}-filter-shared.patch
-
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		milter.patch
 Patch9:		libtool-tag.patch
@@ -197,21 +191,15 @@ Patch22:	%{orgname}-both-apxs.patch
 Patch23:	%{orgname}-builddir.patch
 Patch24:	%{orgname}-zlib-for-getimagesize.patch
 Patch25:	%{orgname}-stupidapache_version.patch
-Patch26:	%{orgname}-pear.patch
 Patch27:	%{orgname}-config-dir.patch
 Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
-Patch34:	%{orgname}-libtool.patch
 Patch39:	%{orgname}-use-prog_sendmail.patch
 Patch41:	%{orgname}-fpm-config.patch
 Patch42:	%{orgname}-fpm-shared.patch
 Patch43:	%{orgname}-silent-session-cleanup.patch
 Patch44:	%{orgname}-include_path.patch
-Patch45:	%{orgname}-imap-annotations.patch
-Patch46:	%{orgname}-imap-myrights.patch
 Patch50:	extension-shared-optional-dep.patch
-Patch51:	spl-shared.patch
-Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
 Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
@@ -222,13 +210,12 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-mysql-ssl-context.patch
 Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
-Patch72:	phar-hash-shared.patch
 URL:		http://php.net/
-%{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
+%{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
-BuildRequires:	bison
+BuildRequires:	bison >= 3.0.0
 BuildRequires:	bzip2-devel >= 1.0.0
 %{?with_curl:BuildRequires:	curl-devel >= 7.15.5}
 BuildRequires:	cyrus-sasl-devel >= 2
@@ -237,6 +224,7 @@ BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
+%{?with_ffi:BuildRequires:	libffi-devel}
 %{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
@@ -250,17 +238,13 @@ BuildRequires:	gmp-devel >= 4.2
 %{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_fpm:BuildRequires:	libapparmor-devel}
-%{?with_intl:BuildRequires:	libicu-devel >= 4.4}
+%{?with_intl:BuildRequires:	libicu-devel >= 50.1}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libpng-devel >= 1.0.8
 %{?with_intl:BuildRequires:	libstdc++-devel}
-%{?with_webp:BuildRequires:	libwebp-devel}
-%if "%{pld_release}" != "ac"
 BuildRequires:	libtool >= 2:2.4.6
-%else
-BuildRequires:	libtool >= 1.4.3
-%endif
+%{?with_webp:BuildRequires:	libwebp-devel}
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
 %{?with_zip:BuildRequires:	libzip-devel >= 1.3.1}
@@ -276,7 +260,7 @@ BuildRequires:	openssl-devel >= 1.0.1
 %endif
 %{?with_oci:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
-%{?with_pcre:BuildRequires:	pcre2-8-devel >= 10.30}
+BuildRequires:	pcre2-8-devel >= 10.30
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
@@ -308,9 +292,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20180731
-%define		zend_module_api		20180731
-%define		zend_extension_api	320180731
+%define		php_api_version		20190529
+%define		zend_module_api		%{php_api_version}
+%define		zend_extension_api	3%{zend_module_api}
 %define		php_pdo_api_version	20170320
 
 # Extension versions
@@ -323,7 +307,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
 %define		zipver		1.15.4
-%define		phpdbgver	0.5.0
+%define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
@@ -570,28 +554,42 @@ Provides:	%{name}(zend_extension_api) = %{zend_extension_api}
 Provides:	%{name}(zend_module_api) = %{zend_module_api}
 Provides:	%{name}-core
 Provides:	%{name}-date
+Provides:	%{name}-hash = %{epoch}:%{version}-%{release}
+Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	%{name}-reflection
+Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-standard
 Provides:	php(core) = %{version}
 Provides:	php(date)
+Provides:	php(hash) = %{hashver}
 Provides:	php(libxml)
+Provides:	php(pcre)
 Provides:	php(reflection)
+Provides:	php(spl)
 Provides:	php(standard)
 %{!?with_mysqlnd:Obsoletes:	%{name}-mysqlnd}
-%{?with_pcre:%requires_ge_to	pcre2-8 pcre2-8-devel}
+%requires_ge_to	pcre2-8 pcre2-8-devel
 Suggests:	browscap
 Obsoletes:	php-common < 4:5.3.28-7
-# withdrawn modules
 Obsoletes:	php-filepro < 4:5.2.0
+Obsoletes:	php-hash < 4:5.3.28-7
 Obsoletes:	php-hwapi < 4:5.2.0
 Obsoletes:	php-hyperwave < 3:5.0.0
 Obsoletes:	php-java < 3:5.0.0
 Obsoletes:	php-mcal < 3:5.0.0
+Obsoletes:	php-pcre < 4:5.3.28-7
 Obsoletes:	php-pecl-domxml
+Obsoletes:	php-pecl-hash < %{hashver}
 Obsoletes:	php-qtdom < 3:5.0.0
+Obsoletes:	php-spl < 4:5.3.28-7
 Conflicts:	php4-common < 3:4.4.4-8
 Conflicts:	php55-common < 4:5.5.10-4
 Conflicts:	rpm < 4.4.2-0.2
+%if %{with mhash}
+Provides:	php(mhash)
+Provides:	php-mhash = %{epoch}:%{version}-%{release}
+Obsoletes:	php-mhash < 4:5.3.0
+%endif
 
 %description common
 Common files needed by both Apache modules and CGI/CLI SAPIs.
@@ -615,14 +613,10 @@ Summary(ru.UTF-8):	Пакет разработки для построения �
 Summary(uk.UTF-8):	Пакет розробки для побудови розширень PHP
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	autoconf >= 2.13
-Requires:	automake
-%if "%{pld_release}" != "ac"
+Requires:	autoconf >= 2.59
+Requires:	automake >= 1.4d
 Requires:	libtool >= 2:2.4.6
-%else
-Requires:	libtool
-%endif
-%{?with_pcre:Requires:	pcre2-8-devel >= 10.30}
+Requires:	pcre2-8-devel >= 10.30
 Requires:	shtool
 Provides:	php-devel = %{epoch}:%{version}-%{release}
 Obsoletes:	php-devel
@@ -842,6 +836,17 @@ support in image files.
 %description exif -l pl.UTF-8
 Moduł PHP dodający obsługę znaczników EXIF w plikach obrazków.
 
+%package ffi
+Summary:	%{modname} - Foreign Function Interface
+Group:		Libraries
+URL:		https://www.php.net/manual/en/book.ffi.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(ffi) = %{version}
+
+%description ffi
+FFI is a multi-platform extension for PHP that allows you to bind to
+functions from arbitrary shared libraries and call them.
+
 %package fileinfo
 Summary:	libmagic bindings
 Summary(pl.UTF-8):	Wiązania do libmagic
@@ -965,29 +970,6 @@ length number support with GNU MP library.
 Moduł PHP umożliwiający korzystanie z biblioteki gmp do obliczeń na
 liczbach o dowolnej długości.
 
-%package hash
-Summary:	HASH Message Digest Framework
-Summary(pl.UTF-8):	Szkielet do obliczania skrótów wiadomości
-Group:		Libraries
-URL:		http://php.net/manual/en/book.gmp.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(hash) = %{hashver}
-%if %{with mhash}
-Provides:	php(mhash)
-Provides:	php-mhash = %{epoch}:%{version}-%{release}
-Obsoletes:	php-mhash < 4:5.3.0
-%endif
-Obsoletes:	php-hash < 4:5.3.28-7
-Obsoletes:	php-pecl-hash < %{hashver}
-
-%description hash
-Native implementations of common message digest algorithms using a
-generic factory method.
-
-%description hash -l pl.UTF-8
-Natywne implementacje popularnych algorytmów obliczania skrótów
-wiadomości przy użyciu wspólnego interfejsu.
-
 %package iconv
 Summary:	iconv extension module for PHP
 Summary(pl.UTF-8):	Moduł iconv dla PHP
@@ -1027,26 +1009,6 @@ Moduł PHP dodający obsługę skrzynek IMAP.
 
 %description imap -l pt_BR.UTF-8
 Um módulo para aplicações PHP que usam IMAP.
-
-%package interbase
-Summary:	InterBase/Firebird database module for PHP
-Summary(pl.UTF-8):	Moduł bazy danych InterBase/Firebird dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.ibase.php
-%if %{with interbase_inst}
-%{?requires_php_extension}
-%else
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-%endif
-Provides:	php(interbase)
-Obsoletes:	php-interbase < 4:5.3.28-7
-
-%description interbase
-This is a dynamic shared object (DSO) for PHP that will add InterBase
-and Firebird database support.
-
-%description interbase -l pl.UTF-8
-Moduł PHP umożliwiający dostęp do baz danych InterBase i Firebird.
 
 %package intl
 Summary:	Internationalization extension (ICU wrapper)
@@ -1282,22 +1244,6 @@ waitpid(), signal() etc.
 %description pcntl -l pl.UTF-8
 Moduł PHP umożliwiający tworzenie nowych procesów i kontrolę nad nimi.
 Obsługuje funkcje takie jak fork(), waitpid(), signal() i podobne.
-
-%package pcre
-Summary:	PCRE extension module for PHP
-Summary(pl.UTF-8):	Moduł PCRE dla PHP
-Group:		Libraries
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(pcre)
-Obsoletes:	php-pcre < 4:5.3.28-7
-
-%description pcre
-This is a dynamic shared object (DSO) for PHP that will add Perl
-Compatible Regular Expression support.
-
-%description pcre -l pl.UTF-8
-Moduł PHP umożliwiający korzystanie z perlowych wyrażeń regularnych
-(Perl Compatible Regular Expressions)
 
 %package pdo
 Summary:	PHP Data Objects (PDO)
@@ -1679,24 +1625,6 @@ Provides:	php(sodium) = %{sodiumver}
 %description sodium
 A simple, low-level PHP extension for libsodium.
 
-%package spl
-Summary:	Standard PHP Library module for PHP
-Summary(pl.UTF-8):	Moduł biblioteki standardowej (Standard PHP Library) dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.spl.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Requires:	%{name}-simplexml = %{epoch}:%{version}-%{release}
-Provides:	php(spl)
-Obsoletes:	php-spl < 4:5.3.28-7
-
-%description spl
-This is a dynamic shared object (DSO) for PHP that will add Standard
-PHP Library support.
-
-%description spl -l pl.UTF-8
-Moduł PHP z biblioteką standardową PHP (SPL - Standard PHP Library).
-
 %package sqlite3
 Summary:	SQLite3 extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite3 dla PHP
@@ -1822,27 +1750,6 @@ support.
 
 %description tokenizer -l pl.UTF-8
 Moduł PHP dodający obsługę tokenizera do PHP.
-
-%package wddx
-Summary:	wddx extension module for PHP
-Summary(pl.UTF-8):	Moduł wddx dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.wddx.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-# - wddx doesn't require session as it's disabled at compile time:
-#   if HAVE_PHP_SESSION && !defined(COMPILE_DL_SESSION)
-#   see also php.spec#rev1.120.2.22
-#Requires:	%{name}-session = %{epoch}:%{version}-%{release}
-Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
-Provides:	php(wddx)
-Obsoletes:	php-wddx < 4:5.3.28-7
-
-%description wddx
-This is a dynamic shared object (DSO) for PHP that will add wddx
-support.
-
-%description wddx -l pl.UTF-8
-Moduł PHP umożliwiający korzystanie z wddx.
 
 %package xml
 Summary:	XML extension module for PHP
@@ -1983,7 +1890,6 @@ cp -p php.ini-production php.ini
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
 
 %patch7 -p1
 %{?with_milter:%patch8 -p1}
@@ -1997,23 +1903,16 @@ cp -p php.ini-production php.ini
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
-%patch26 -p1
 %patch27 -p1
 %patch29 -p1
 %patch31 -p1
-%if "%{pld_release}" != "ac"
-%patch34 -p1
-%endif
 %patch39 -p1
 %patch41 -p1
 %patch42 -p1
 %patch43 -p1
 %patch44 -p1
-#%patch45 -p1 # imap annotations. fixme
-#%patch46 -p1 # imap myrights. fixme
 %patch50 -p1
-%patch51 -p1 -b .spl-shared
-%patch52 -p1 -b .pcre-shared
+
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 %patch55 -p1
@@ -2026,7 +1925,6 @@ cp -p php.ini-production php.ini
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch70 -p1
 %patch71 -p1
-%patch72 -p1 -b .phar-shared
 
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
@@ -2040,7 +1938,6 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 %{__rm} ext/recode/config9.m4
 
 # remove all bundled libraries not to link with them accidentally
-%{__rm} -r ext/sqlite3/libsqlite
 #%{__rm} -r ext/bcmath/libbcmath
 #%{__rm} -r ext/date/lib
 #%{__rm} -r ext/fileinfo/libmagic
@@ -2049,8 +1946,7 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/dba/libinifile
 #%{__rm} -r ext/gd/libgd
 #%{__rm} -r ext/mbstring/libmbfl
-%{__rm} -r ext/mbstring/oniguruma
-%{__rm} -r ext/pcre/pcre2lib
+#%{__rm} -r ext/pcre/pcre2lib
 #%{__rm} -r ext/soap/interop
 %{__rm} -r ext/xmlrpc/libxmlrpc
 #%{__rm} -r ext/zip/lib
@@ -2194,8 +2090,8 @@ if test "$ver" != "%{jsonver}"; then
 	: Update the jsonver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHPDBG_VERSION /{s/.* "//;s/".*$//;p}' sapi/phpdbg/phpdbg.h)
-if test "$ver" != "%{phpdbgver}"; then
+ver=$(get_version PHPDBG_VERSION sapi/phpdbg/phpdbg.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream phpdbg version is now ${ver}, expecting %{phpdbgver}.
 	: Update the phpdbgver macro and rebuild.
 	exit 1
@@ -2224,12 +2120,22 @@ if test "$ver" != "PHP_VERSION"; then
 fi
 
 export EXTENSION_DIR="%{php_extensiondir}"
+
+# Set PEAR_INSTALLDIR to ensure that the hard-coded include_path
+# includes the PEAR directory even though pear is packaged separately.
+export PEAR_INSTALLDIR=%{php_pear_dir}
+
 # configure once (for faster debugging purposes)
 if [ ! -f _built-conf ]; then
 	# now remove Makefile copies
 	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs1,apxs2,litespeed,phpdbg,milter}
+
+	# Force use of system libtool:
+	mv build/libtool.m4 build/libtool.m4.saved
+	cat %{_aclocaldir}/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m4 > build/libtool.m4
 	%{__libtoolize}
 	%{__aclocal}
+
 	cp -f /usr/share/automake/config.* .
 	./buildconf --force
 	touch _built-conf
@@ -2296,7 +2202,7 @@ for sapi in $sapis; do
 		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
 	;;
 	litespeed)
-		sapi_args='--with-litespeed'
+		sapi_args='--enable-litespeed'
 	;;
 	phpdbg)
 		sapi_args='--enable-phpdbg %{?debug:--enable-phpdbg-debug}'
@@ -2333,14 +2239,12 @@ for sapi in $sapis; do
 	%{__enable_disable fileinfo fileinfo shared} \
 	%{__enable_disable ftp ftp shared} \
 	%{?with_intl:--enable-intl=shared} \
-	--enable-libxml \
+	--with-libxml \
 	%{__enable_disable mbstring mbstring shared,all} \
-	--with-onig=/usr \
 	--enable-mbregex \
 	%{__enable_disable pcntl pcntl shared} \
 	%{__enable_disable pdo pdo shared} \
 	%{__enable_disable json json shared} \
-	%{__enable_disable hash hash shared} \
 	--enable-xmlwriter=shared \
 %if %{with fpm}
 	--with-fpm-user=http \
@@ -2349,18 +2253,17 @@ for sapi in $sapis; do
 %if %{with pdo_dblib}
 	--with-pdo-dblib=shared \
 %endif
-%if %{with interbase} && %{without interbase_inst}
+%if %{with pdo_firebird}
 	--with-pdo-firebird=shared,/usr \
 %endif
 	%{?with_mhash:--with-mhash=yes} \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	%{__with_without pdo_mysql pdo-mysql shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd}} \
-	%{?with_oci:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
-	%{?with_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
-	%{?with_pgsql:--with-pdo-pgsql=shared} \
+	%{?with_pdo_oci:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
+	%{?with_pdo_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
+	%{?with_pdo_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared,/usr} \
-	%{?with_webp:--with-webp-dir=/usr} \
-	--without-libexpat-dir \
+	%{?with_webp:--with-webp} \
 	%{__enable_disable posix posix shared} \
 	--enable-shared \
 	%{__enable_disable session session shared} \
@@ -2373,7 +2276,6 @@ for sapi in $sapis; do
 	--enable-sockets=shared \
 	%{__with_without sodium sodium shared} \
 	--enable-tokenizer=shared \
-	%{?with_wddx:--enable-wddx=shared} \
 	--enable-xml=shared \
 	--enable-xmlreader=shared \
 	%{__with_without bz2 bz2 shared} \
@@ -2381,14 +2283,15 @@ for sapi in $sapis; do
 	--with-db4 \
 	%{__with_without iconv iconv shared} \
 	%{?with_enchant:--with-enchant=shared,/usr} \
-	--with-freetype-dir=shared \
+	--with-freetype \
 	%{__with_without gettext gettext shared} \
-	%{__with_without gd gd shared%{?with_system_gd:,/usr}} \
+	%{__enable_disable gd gd shared%{?with_system_gd:,/usr}} \
+	%{?with_system_gd:--with-external-gd} \
 	--with-gdbm \
 	%{__with_without gmp gmp shared} \
+	%{__with_without ffi ffi shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
-	%{?with_interbase:--with-interbase=shared%{!?with_interbase_inst:,/usr}} \
-	--with-jpeg-dir=/usr \
+	--with-jpeg \
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	%{?with_mm:--with-mm} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
@@ -2398,12 +2301,10 @@ for sapi in $sapis; do
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \
 	--with-tcadb=/usr \
-	%{__with_without pcre pcre-regex /usr} \
+	%{?with_pcre:--with-external-pcre} \
 	%{__enable_disable filter filter shared} \
-	--with-pear=%{php_pear_dir} \
 	%{__with_without pgsql pgsql shared,/usr} \
 	%{__enable_disable phar phar shared} \
-	--with-png-dir=/usr \
 	%{?with_pspell:--with-pspell=shared} \
 	%{__with_without readline readline shared} \
 	%{?with_recode:--with-recode=shared} \
@@ -2416,7 +2317,7 @@ for sapi in $sapis; do
 	%{?with_xsl:--with-xsl=shared} \
 	--with-zlib=shared \
 	--with-zlib-dir=shared,/usr \
-	%{?with_zip:--enable-zip=shared,/usr --with-libzip} \
+	%{?with_zip:--with-zip=shared,/usr} \
 
 	# save for debug
 	cp -f Makefile Makefile.$sapi
@@ -2490,16 +2391,8 @@ generate_inifiles() {
 		# opcache.so is zend extension
 		nm $so | grep -q zend_extension_entry && ext=zend_extension
 		conf="$mod.ini"
-		# xml needs to be loaded before wddx
-		[ "$mod" = "wddx" ] && conf="xml_$mod.ini"
-		# pre needs to be loaded before SPL
-		[ "$mod" = "pcre" ] && conf="PCRE.ini"
-		# spl needs to be loaded before mysqli
-		[ "$mod" = "spl" ] && conf="SPL.ini"
 		# session needs to be loaded before php-pecl-http, php-pecl-memcache, php-pecl-session_mysql
 		[ "$mod" = "session" ] && conf="Session.ini"
-		# hash needs to be loaded before mysqlnd
-		[ "$mod" = "hash" ] && conf="Hash.ini"
 		# mysqlnd needs to be loaded before mysqli,pdo_mysqli
 		[ "$mod" = "mysqlnd" ] && conf="MySQLND.ini"
 		echo "+ $conf"
@@ -2696,20 +2589,6 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
 # for CLI SAPI only
 %{__mv} $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/readline.ini,cli.d}
 
-# use system automake and {lib,sh}tool
-ln -snf /usr/share/automake/config.{guess,sub} $RPM_BUILD_ROOT%{_libdir}/%{name}/build
-ln -snf %{_bindir}/shtool $RPM_BUILD_ROOT%{_libdir}/%{name}/build
-for fn in libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4; do
-	f=%{_aclocaldir}/$fn
-	test -f $f || continue
-	ln -snf $f $RPM_BUILD_ROOT%{_libdir}/%{name}/build
-done
-for fn in ltmain.sh config/ltmain.sh build-aux/ltmain.sh; do
-	f=/usr/share/libtool/$fn
-	test -f $f || continue
-	ln -snf $f $RPM_BUILD_ROOT%{_libdir}/%{name}/build
-	break
-done
 sed -i -e '/^phpdir/ s,/php/build,/%{name}/build,' $RPM_BUILD_ROOT%{_bindir}/phpize
 
 # for php-pecl-mailparse
@@ -2723,8 +2602,6 @@ cp -a tests/* $RPM_BUILD_ROOT%{php_data_dir}/tests/php
 
 # fix install paths, avoid evil rpaths
 sed -i -e "s|^libdir=.*|libdir='%{_libdir}'|" $RPM_BUILD_ROOT%{_libdir}/libphp_common.la
-# better solution?
-sed -i -e 's|libphp_common.la|$(libdir)/libphp_common.la|' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/acinclude.m4
 
 install -p ext/ext_skel.php $RPM_BUILD_ROOT%{_bindir}
 
@@ -2854,16 +2731,15 @@ fi \
 %extension_scripts dom
 %extension_scripts enchant
 %extension_scripts exif
+%extension_scripts ffi
 %extension_scripts fileinfo
 %extension_scripts filter
 %extension_scripts ftp
 %extension_scripts gd
 %extension_scripts gettext
 %extension_scripts gmp
-%extension_scripts hash
 %extension_scripts iconv
 %extension_scripts imap
-%extension_scripts interbase
 %extension_scripts intl
 %extension_scripts json
 %extension_scripts ldap
@@ -2874,17 +2750,16 @@ fi \
 %extension_scripts odbc
 %extension_scripts opcache
 %extension_scripts openssl
-%extension_scripts pcre
+%extension_scripts pcntl
 %extension_scripts pdo
 %extension_scripts pdo-dblib
 %extension_scripts pdo-firebird
-%extension_scripts pdo-oci
 %extension_scripts pdo-mysql
+%extension_scripts pdo-oci
 %extension_scripts pdo-odbc
 %extension_scripts pdo-pgsql
 %extension_scripts pdo-sqlite
 %extension_scripts pgsql
-%extension_scripts pcntl
 %extension_scripts posix
 %extension_scripts pspell
 %extension_scripts recode
@@ -2895,14 +2770,12 @@ fi \
 %extension_scripts soap
 %extension_scripts sockets
 %extension_scripts sodium
-%extension_scripts spl
 %extension_scripts sqlite3
 %extension_scripts sysvmsg
 %extension_scripts sysvsem
 %extension_scripts sysvshm
 %extension_scripts tidy
 %extension_scripts tokenizer
-%extension_scripts wddx
 %extension_scripts xml
 %extension_scripts xmlreader
 %extension_scripts xmlrpc
@@ -3004,7 +2877,7 @@ fi
 
 %files common
 %defattr(644,root,root,755)
-%doc CREDITS EXTENSIONS LICENSE NEWS UPGRADING* Zend/{LICENSE.Zend,README*} php.ini-* .gdbinit
+%doc EXTENSIONS LICENSE NEWS UPGRADING* Zend/{LICENSE.Zend,README*} php.ini-* .gdbinit
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
@@ -3015,7 +2888,7 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%doc CODING_STANDARDS README.{EXT_SKEL,PARAMETER_PARSING_API,SELF-CONTAINED-EXTENSIONS,STREAMS,SUBMITTING_PATCH,TESTING,UNIX-BUILD-SYSTEM,input_filter}
+%doc CODING_STANDARDS.md docs/*.md
 %attr(755,root,root) %{_bindir}/ext_skel.php
 %attr(755,root,root) %{_bindir}/php-config
 %attr(755,root,root) %{_bindir}/phpize
@@ -3068,7 +2941,7 @@ fi
 %if %{with dba}
 %files dba
 %defattr(644,root,root,755)
-%doc ext/dba/{CREDITS,README}
+%doc ext/dba/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/dba.ini
 %attr(755,root,root) %{php_extensiondir}/dba.so
 %endif
@@ -3095,6 +2968,14 @@ fi
 %doc ext/exif/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
 %attr(755,root,root) %{php_extensiondir}/exif.so
+%endif
+
+%if %{with ffi}
+%files ffi
+%defattr(644,root,root,755)
+%doc ext/ffi/CREDITS
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ffi.ini
+%attr(755,root,root) %{php_extensiondir}/ffi.so
 %endif
 
 %if %{with fileinfo}
@@ -3145,14 +3026,6 @@ fi
 %attr(755,root,root) %{php_extensiondir}/gmp.so
 %endif
 
-%if %{with hash}
-%files hash
-%defattr(644,root,root,755)
-%doc ext/hash/{CREDITS,README}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/Hash.ini
-%attr(755,root,root) %{php_extensiondir}/hash.so
-%endif
-
 %if %{with iconv}
 %files iconv
 %defattr(644,root,root,755)
@@ -3167,14 +3040,6 @@ fi
 %doc ext/imap/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/imap.ini
 %attr(755,root,root) %{php_extensiondir}/imap.so
-%endif
-
-%if %{with interbase}
-%files interbase
-%defattr(644,root,root,755)
-%doc ext/interbase/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/interbase.ini
-%attr(755,root,root) %{php_extensiondir}/interbase.so
 %endif
 
 %if %{with intl}
@@ -3225,7 +3090,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/mysqlnd.so
 %endif
 
-%if %{with oci}
+%if %{with pdo_oci}
 %files oci8
 %defattr(644,root,root,755)
 %doc ext/oci8/{CREDITS,README}
@@ -3244,7 +3109,6 @@ fi
 %if %{with opcache}
 %files opcache
 %defattr(644,root,root,755)
-%doc ext/opcache/README
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/opcache.ini
 %attr(755,root,root) %{php_extensiondir}/opcache.so
 %endif
@@ -3252,7 +3116,7 @@ fi
 %if %{with openssl}
 %files openssl
 %defattr(644,root,root,755)
-%doc ext/openssl/{CREDITS,README}
+%doc ext/openssl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/openssl.ini
 %attr(755,root,root) %{php_extensiondir}/openssl.so
 %endif
@@ -3260,23 +3124,15 @@ fi
 %if %{with pcntl}
 %files pcntl
 %defattr(644,root,root,755)
-%doc ext/pcntl/{CREDITS,README}
+%doc ext/pcntl/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pcntl.ini
 %attr(755,root,root) %{php_extensiondir}/pcntl.so
-%endif
-
-%if %{with pcre}
-%files pcre
-%defattr(644,root,root,755)
-%doc ext/pcre/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/PCRE.ini
-%attr(755,root,root) %{php_extensiondir}/pcre.so
 %endif
 
 %if %{with pdo}
 %files pdo
 %defattr(644,root,root,755)
-%doc ext/pdo/{CREDITS,README}
+%doc ext/pdo/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo.ini
 %attr(755,root,root) %{php_extensiondir}/pdo.so
 %endif
@@ -3284,12 +3140,12 @@ fi
 %if %{with pdo_dblib}
 %files pdo-dblib
 %defattr(644,root,root,755)
-%doc ext/pdo_dblib/{CREDITS,README}
+%doc ext/pdo_dblib/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pdo_dblib.ini
 %attr(755,root,root) %{php_extensiondir}/pdo_dblib.so
 %endif
 
-%if %{with interbase} && !%{with interbase_inst}
+%if %{with pdo_firebird}
 %files pdo-firebird
 %defattr(644,root,root,755)
 %doc ext/pdo_firebird/CREDITS
@@ -3313,7 +3169,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pdo_oci.so
 %endif
 
-%if %{with odbc}
+%if %{with pdo_odbc}
 %files pdo-odbc
 %defattr(644,root,root,755)
 %doc ext/pdo_odbc/CREDITS
@@ -3321,7 +3177,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pdo_odbc.so
 %endif
 
-%if %{with pgsql}
+%if %{with pdo_pgsql}
 %files pdo-pgsql
 %defattr(644,root,root,755)
 %doc ext/pdo_pgsql/CREDITS
@@ -3340,7 +3196,7 @@ fi
 %if %{with pgsql}
 %files pgsql
 %defattr(644,root,root,755)
-%doc ext/pgsql/{CREDITS,README}
+%doc ext/pgsql/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pgsql.ini
 %attr(755,root,root) %{php_extensiondir}/pgsql.so
 %endif
@@ -3373,7 +3229,6 @@ fi
 %if %{with pspell}
 %files pspell
 %defattr(644,root,root,755)
-%doc ext/pspell/{CREDITS,README}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/pspell.ini
 %attr(755,root,root) %{php_extensiondir}/pspell.so
 %endif
@@ -3381,7 +3236,7 @@ fi
 %if %{with readline}
 %files readline
 %defattr(644,root,root,755)
-%doc ext/readline/{CREDITS,README*}
+%doc ext/readline/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/readline.ini
 %attr(755,root,root) %{php_extensiondir}/readline.so
 %endif
@@ -3405,13 +3260,13 @@ fi
 
 %files shmop
 %defattr(644,root,root,755)
-%doc ext/shmop/{CREDITS,README}
+%doc ext/shmop/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/shmop.ini
 %attr(755,root,root) %{php_extensiondir}/shmop.so
 
 %files simplexml
 %defattr(644,root,root,755)
-%doc ext/simplexml/{CREDITS,README}
+%doc ext/simplexml/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/simplexml.ini
 %attr(755,root,root) %{php_extensiondir}/simplexml.so
 
@@ -3442,13 +3297,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/sodium.ini
 %attr(755,root,root) %{php_extensiondir}/sodium.so
 %endif
-
-%files spl
-%defattr(644,root,root,755)
-%doc ext/spl/{CREDITS,README}
-%doc ext/spl/examples
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/SPL.ini
-%attr(755,root,root) %{php_extensiondir}/spl.so
 
 %if %{with sqlite3}
 %files sqlite3
@@ -3505,14 +3353,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/tokenizer.ini
 %attr(755,root,root) %{php_extensiondir}/tokenizer.so
 
-%if %{with wddx}
-%files wddx
-%defattr(644,root,root,755)
-%doc ext/wddx/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*wddx.ini
-%attr(755,root,root) %{php_extensiondir}/wddx.so
-%endif
-
 %files xml
 %defattr(644,root,root,755)
 %doc ext/xml/CREDITS
@@ -3521,7 +3361,7 @@ fi
 
 %files xmlreader
 %defattr(644,root,root,755)
-%doc ext/xmlreader/{CREDITS,README}
+%doc ext/xmlreader/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/xmlreader.ini
 %attr(755,root,root) %{php_extensiondir}/xmlreader.so
 

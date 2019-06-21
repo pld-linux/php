@@ -38,6 +38,7 @@
 %bcond_without	dom		# without DOM extension module
 %bcond_without	enchant		# without Enchant extension module
 %bcond_without	exif		# without EXIF extension module
+%bcond_without	ffi		# without FFI extension module
 %bcond_without	fileinfo	# without fileinfo extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	ftp		# without FTP extension module
@@ -223,6 +224,7 @@ BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
+%{?with_ffi:BuildRequires:	libffi-devel}
 %{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
@@ -833,6 +835,17 @@ support in image files.
 
 %description exif -l pl.UTF-8
 Moduł PHP dodający obsługę znaczników EXIF w plikach obrazków.
+
+%package ffi
+Summary:	%{modname} - Foreign Function Interface
+Group:		Libraries
+URL:		https://www.php.net/manual/en/book.ffi.php
+Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Provides:	php(ffi) = %{version}
+
+%description ffi
+FFI is a multi-platform extension for PHP that allows you to bind to
+functions from arbitrary shared libraries and call them.
 
 %package fileinfo
 Summary:	libmagic bindings
@@ -2277,6 +2290,7 @@ for sapi in $sapis; do
 	%{?with_system_gd:--with-external-gd} \
 	--with-gdbm \
 	%{__with_without gmp gmp shared} \
+	%{__with_without ffi ffi shared} \
 	%{?with_imap:--with-imap=shared --with-imap-ssl} \
 	--with-jpeg-dir=/usr \
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
@@ -2720,6 +2734,7 @@ fi \
 %extension_scripts dom
 %extension_scripts enchant
 %extension_scripts exif
+%extension_scripts ffi
 %extension_scripts fileinfo
 %extension_scripts filter
 %extension_scripts ftp
@@ -2956,6 +2971,14 @@ fi
 %doc ext/exif/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/exif.ini
 %attr(755,root,root) %{php_extensiondir}/exif.so
+%endif
+
+%if %{with ffi}
+%files ffi
+%defattr(644,root,root,755)
+%doc ext/ffi/CREDITS
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/ffi.ini
+%attr(755,root,root) %{php_extensiondir}/ffi.so
 %endif
 
 %if %{with fileinfo}

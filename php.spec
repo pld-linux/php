@@ -241,8 +241,8 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libpng-devel >= 1.0.8
 %{?with_intl:BuildRequires:	libstdc++-devel}
-%{?with_webp:BuildRequires:	libwebp-devel}
 BuildRequires:	libtool >= 2:2.4.6
+%{?with_webp:BuildRequires:	libwebp-devel}
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
 %{?with_zip:BuildRequires:	libzip-devel >= 1.3.1}
@@ -554,8 +554,8 @@ Provides:	%{name}-core
 Provides:	%{name}-date
 Provides:	%{name}-hash = %{epoch}:%{version}-%{release}
 Provides:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-reflection
+Provides:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}-standard
 Provides:	php(core) = %{version}
 Provides:	php(date)
@@ -2738,16 +2738,16 @@ fi \
 %extension_scripts odbc
 %extension_scripts opcache
 %extension_scripts openssl
+%extension_scripts pcntl
 %extension_scripts pdo
 %extension_scripts pdo-dblib
 %extension_scripts pdo-firebird
-%extension_scripts pdo-oci
 %extension_scripts pdo-mysql
+%extension_scripts pdo-oci
 %extension_scripts pdo-odbc
 %extension_scripts pdo-pgsql
 %extension_scripts pdo-sqlite
 %extension_scripts pgsql
-%extension_scripts pcntl
 %extension_scripts posix
 %extension_scripts pspell
 %extension_scripts recode

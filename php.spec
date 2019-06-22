@@ -59,6 +59,7 @@
 %bcond_without	opcache		# without Enable Zend OPcache extension support
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcntl		# without pcntl extension module
+%bcond_without	pcre_jit	# PCRE JIT
 %bcond_without	pdo		# without PDO extension module
 %bcond_without	pdo_dblib	# without PDO dblib extension module
 %bcond_without	pdo_firebird	# without PDO Firebird extension module
@@ -92,6 +93,11 @@
 
 %define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
+
+# segfaults on x32
+%ifarch x32
+%undefine	with_pcre_jit
+%endif
 
 # disable all sapis
 %if %{with gcov}
@@ -2302,7 +2308,8 @@ for sapi in $sapis; do
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \
 	--with-tcadb=/usr \
-	%{?with_pcre:--with-external-pcre} \
+	--with-external-pcre \
+	%{__with_without pcre_jit pcre-jit} \
 	%{__enable_disable filter filter shared} \
 	%{__with_without pgsql pgsql shared} \
 	%{__enable_disable phar phar shared} \

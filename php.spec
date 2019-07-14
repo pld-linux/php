@@ -277,7 +277,7 @@ BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.566
 BuildRequires:	sed >= 4.0
 %if %{with sqlite3} || %{with pdo_sqlite}
-BuildRequires:	sqlite3-devel >= 3.3.9
+BuildRequires:	sqlite3-devel >= 3.7.4
 %endif
 %{?with_systemtap:BuildRequires:	systemtap-sdt-devel}
 BuildRequires:	tar >= 1:1.22

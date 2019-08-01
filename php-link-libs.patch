@@ -1,13 +1,3 @@
---- php-4.3.0/configure.ac.orig	Fri Dec 27 05:07:18 2002
-+++ php-4.3.0/configure.ac	Thu Jan  2 20:34:43 2003
-@@ -288,7 +288,6 @@
- PHP_CHECK_FUNC(htonl, socket)
- PHP_CHECK_FUNC(gethostname, nsl)
- PHP_CHECK_FUNC(gethostbyaddr, nsl)
--PHP_CHECK_FUNC(yp_get_default_domain, nsl)
- 
- PHP_CHECK_FUNC(dlopen, dl)
- if test "$ac_cv_func_dlopen" = "yes"; then
 --- php-7.3.0beta3/build/php.m4~	2018-08-28 13:26:36.000000000 +0300
 +++ php-7.3.0beta3/build/php.m4	2018-09-05 18:56:49.744106256 +0300
 @@ -1829,18 +1829,18 @@

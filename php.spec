@@ -73,7 +73,6 @@
 %bcond_without	posix		# without POSIX extension module
 %bcond_without	pspell		# without pspell extension module
 %bcond_without	readline	# without readline extension module
-%bcond_without	recode		# without recode extension module
 %bcond_without	session		# without session extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sodium		# without sodium extension module
@@ -270,7 +269,6 @@ BuildRequires:	pcre2-8-devel >= 10.30
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
-%{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.566
@@ -1502,24 +1500,6 @@ cgi SAPIs).
 %description readline -l pl.UTF-8
 Moduł PHP dodający obsługę funkcji readline (tylko do SAPI cli i cgi).
 
-%package recode
-Summary:	recode extension module for PHP
-Summary(pl.UTF-8):	Moduł recode dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.recode.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	recode >= 3.5d-3
-Provides:	php(recode)
-Obsoletes:	php-recode < 4:5.3.28-7
-
-%description recode
-This is a dynamic shared object (DSO) for PHP that will add recode
-support.
-
-%description recode -l pl.UTF-8
-Moduł PHP dodający możliwość konwersji kodowania plików (poprzez
-bibliotekę recode).
-
 %package session
 Summary:	session extension module for PHP
 Summary(pl.UTF-8):	Moduł session dla PHP
@@ -1939,9 +1919,6 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 # com_dotnet is Win32-only
 %{__rm} -r ext/com_dotnet
 
-# conflict seems to be resolved by recode patches
-%{__rm} ext/recode/config9.m4
-
 # remove all bundled libraries not to link with them accidentally
 #%{__rm} -r ext/bcmath/libbcmath
 #%{__rm} -r ext/date/lib
@@ -2313,7 +2290,6 @@ for sapi in $sapis; do
 	%{__enable_disable phar phar shared} \
 	%{?with_pspell:--with-pspell=shared} \
 	%{__with_without readline readline shared} \
-	%{?with_recode:--with-recode=shared} \
 	%{?with_snmp:--with-snmp=shared} \
 	%{!?with_pdo_sqlite:--without-pdo-sqlite} \
 	%{__with_without sqlite3 sqlite3 shared} \
@@ -2767,7 +2743,6 @@ fi \
 %extension_scripts pgsql
 %extension_scripts posix
 %extension_scripts pspell
-%extension_scripts recode
 %extension_scripts session
 %extension_scripts shmop
 %extension_scripts simplexml
@@ -3244,14 +3219,6 @@ fi
 %doc ext/readline/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/readline.ini
 %attr(755,root,root) %{php_extensiondir}/readline.so
-%endif
-
-%if %{with recode}
-%files recode
-%defattr(644,root,root,755)
-%doc ext/recode/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/recode.ini
-%attr(755,root,root) %{php_extensiondir}/recode.so
 %endif
 
 %if %{with session}

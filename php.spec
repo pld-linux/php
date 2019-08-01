@@ -215,7 +215,6 @@ Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 # https://bugs.php.net/bug.php?id=68344
 Patch68:	php-mysql-ssl-context.patch
-Patch70:	mysqlnd-ssl.patch
 Patch71:	libdb-info.patch
 URL:		http://php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1930,7 +1929,6 @@ cp -p php.ini-production php.ini
 %patch66 -p1
 %patch67 -p1
 #%patch68 -p1 DROP or update to 7.0 APIs
-%patch70 -p1
 %patch71 -p1
 
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4

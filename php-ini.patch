@@ -1,5 +1,5 @@
---- php-src-PHP-7.4/php.ini~	2019-05-05 01:01:58.000000000 +0300
-+++ php-src-PHP-7.4/php.ini	2019-05-05 01:02:49.674577615 +0300
+--- php-7.4.0beta1/php.ini~	2019-08-01 12:11:42.000000000 +0300
++++ php-7.4.0beta1/php.ini	2019-08-01 13:04:23.234196613 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -218,11 +218,10 @@
  
  ; (time to live) Sets the number of second while cached file will be used
  ; instead of original one.
-@@ -1666,147 +1666,7 @@
- 
+@@ -1674,150 +1674,6 @@
  [dba]
  ;dba.default_handler=
--
+ 
 -[opcache]
 -; Determines if Zend OPCache is enabled
 -;opcache.enable=1
@@ -320,6 +319,10 @@
 -; errors.
 -;opcache.mmap_base=
 -
+-; Facilitates multiple OPcache instances per user (for Windows only). All PHP
+-; processes with the same cache ID and user share an OPcache instance.
+-;opcache.cache_id=
+-
 -; Enables and sets the second level cache directory.
 -; It should improve performance when SHM memory is full, at server restart or
 -; SHM reset. The default "" disables file based caching.
@@ -363,7 +366,6 @@
 -; Absolute path used to store shared lockfiles (for *nix only).
 -;opcache.lockfile_path=/tmp
 -
-+;
  [curl]
  ; A default value for the CURLOPT_CAINFO option. This is required to be an
  ; absolute path.

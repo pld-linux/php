@@ -3,10 +3,10 @@ $ php -r 'var_dump(array(get_cfg_var("cfg_file_path"),php_ini_loaded_file()));'
 
 https://github.com/pld-linux/php/commit/762ec2e
 
---- php-7.0.0RC6.orig/main/php_ini.c	2015-11-10 23:58:52.227101032 +0200
-+++ php-7.0.0RC6/main/php_ini.c	2015-11-11 00:01:43.502674750 +0200
-@@ -375,12 +375,19 @@
- }
+--- php-7.4.0beta1.oric/main/php_ini.c	2019-07-24 12:38:41.000000000 +0300
++++ php-7.4.0beta1/main/php_ini.c	2019-08-02 15:30:54.118722110 +0300
+@@ -410,12 +410,19 @@
+ #endif
  /* }}} */
  
 +static int php_csort(const struct dirent **a, const struct dirent **b)
@@ -25,52 +25,44 @@ https://github.com/pld-linux/php/commit/762ec2e
  	int php_ini_scanned_path_len;
  	char *open_basedir;
  	int free_ini_search_path = 0;
-@@ -557,8 +564,26 @@
- 				}
+@@ -595,21 +602,28 @@
  			}
  		}
-+		/* Search (global) php.ini file in search path */
-+		if (!fh.handle.fp) {
-+			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &opened_path);
-+			if (fh.handle.fp) {
-+				fh.filename = ZSTR_VAL(opened_path);
-+
-+				// parse the ini file now
-+				PG(open_basedir) = open_basedir;
-+				fh.type = ZEND_HANDLE_FP;
-+				zend_parse_ini_file(&fh, 1, ZEND_INI_SCANNER_NORMAL, (zend_ini_parser_cb_t) php_ini_parser_cb, &configuration_hash TSRMLS_CC);
-+				open_basedir = PG(open_basedir);
-+				PG(open_basedir) = NULL;
-+				fh.handle.fp = NULL;
-+
-+				php_ini_loaded_file = estrdup(fh.filename);
-+				fh.filename = NULL;
-+			}
-+		}
  
 -		/* Otherwise search for php-%sapi-module-name%.ini file in search path */
-+		/* Also search for php-%sapi-module-name%.ini file in search path */
- 		if (!fh.handle.fp) {
- 			const char *fmt = "php-%s.ini";
- 			char *ini_fname;
-@@ -568,15 +593,8 @@
- 			if (fh.handle.fp) {
- 				fh.filename = ZSTR_VAL(opened_path);
++		/* Search (global) php.ini file in search path */
+ 		if (!fp) {
+-			const char *fmt = "php-%s.ini";
+-			char *ini_fname;
+-			spprintf(&ini_fname, 0, fmt, sapi_module.name);
+-			fp = php_fopen_with_path(ini_fname, "r", php_ini_search_path, &opened_path);
+-			efree(ini_fname);
++			fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &opened_path);
+ 			if (fp) {
++				zend_file_handle fh;
+ 				filename = ZSTR_VAL(opened_path);
++				zend_stream_init_fp(&fh, VCWD_FOPEN(filename, "r"), filename);
++				RESET_ACTIVE_INI_HASH();
++
++				zend_parse_ini_file(&fh, 1, ZEND_INI_SCANNER_NORMAL, (zend_ini_parser_cb_t) php_ini_parser_cb, &configuration_hash);
++
++				php_ini_loaded_file = estrdup(filename);
  			}
--		}
+ 		}
  
 -		/* If still no ini file found, search for php.ini file in search path */
--		if (!fh.handle.fp) {
--			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &opened_path);
--			if (fh.handle.fp) {
--				fh.filename = ZSTR_VAL(opened_path);
--			}
--		}
-+ 		}
- 	}
- 
- 	if (free_ini_search_path) {
-@@ -593,14 +611,28 @@
++		/* Also search for php-%sapi-module-name%.ini file in search path */
+ 		if (!fp) {
+-			fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &opened_path);
++			const char *fmt = "php-%s.ini";
++			char *ini_fname;
++			spprintf(&ini_fname, 0, fmt, sapi_module.name);
++			fp = php_fopen_with_path(ini_fname, "r", php_ini_search_path, &opened_path);
++			efree(ini_fname);
+ 			if (fp) {
+ 				filename = ZSTR_VAL(opened_path);
+ 			}
+@@ -631,14 +645,28 @@
  
  		{
  			zval tmp;
@@ -100,7 +92,7 @@ https://github.com/pld-linux/php/commit/762ec2e
  			php_ini_opened_path = zend_strndup(Z_STRVAL(tmp), Z_STRLEN(tmp));
  		}
  	}
-@@ -624,13 +656,15 @@
+@@ -661,12 +689,14 @@
  		zend_llist scanned_ini_list;
  		zend_llist_element *element;
  		int l, total_l = 0;
@@ -109,7 +101,6 @@ https://github.com/pld-linux/php/commit/762ec2e
  		int lenpath;
  
  		zend_llist_init(&scanned_ini_list, sizeof(char *), (llist_dtor_func_t) free_estring, 1);
- 		memset(&fh2, 0, sizeof(fh2));
  
 -		bufpath = estrdup(php_ini_scanned_path);
 +		bufpath = emalloc(strlen(php_ini_scanned_path) + strlen(fmt) + strlen(sapi_module.name));
@@ -117,7 +108,7 @@ https://github.com/pld-linux/php/commit/762ec2e
  		for (debpath = bufpath ; debpath ; debpath=endpath) {
  			endpath = strchr(debpath, DEFAULT_DIR_SEPARATOR);
  			if (endpath) {
-@@ -643,7 +677,7 @@
+@@ -679,7 +709,7 @@
  			}
  			lenpath = (int)strlen(debpath);
  

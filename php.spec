@@ -8,6 +8,7 @@
 #   - 2.3M fileinfo.so php-fileinfo-5.3.16-1.x86_64
 #   -  13K fileinfo.so php-pecl-fileinfo-1.0.4-8.amd64
 # - ttyname_r() misdetected http://bugs.php.net/bug.php?id=48820
+# - replace php-sapi-ini-file.patch with file in <sapi>.d directory
 #
 # Conditional build:
 # - packaging options

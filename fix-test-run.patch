@@ -1,13 +1,11 @@
 --- php-5.4.0alpha2/configure.ac~	2011-08-07 12:43:31.000000000 +0300
 +++ php-5.4.0alpha2/configure.ac	2011-08-07 12:44:11.495394662 +0300
-@@ -1271,6 +1271,11 @@
+@@ -1271,6 +1271,9 @@
    ;;
  esac
  
-+# shift so that pcre, spl, ... are loaded first
++# shift so that extensions like xml are loaded first
 +PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/xml.la \),\2\1,')
-+PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/spl.la \),\2\1,')
-+PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/pcre.la \),\2\1,')
 +
  PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
  
@@ -31,13 +29,12 @@
  	if test "x$(PHP_MODULES)" != "x"; then \
  		for i in $(PHP_MODULES)""; do \
  			. $$i; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
-@@ -111,7 +118,10 @@
+@@ -111,7 +118,9 @@
  		TEST_PHP_EXECUTABLE=$(PHP_EXECUTABLE) \
  		TEST_PHP_SRCDIR=$(top_srcdir) \
  		CC="$(CC)" \
 -			$(PHP_EXECUTABLE) -n -c $(top_builddir)/tmp-php.ini $(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini -d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) $(TESTS); \
 +			$(PHP_EXECUTABLE) -n -c $(top_builddir)/tmp-php.ini \
-+			-d extension_dir=$(top_builddir)/modules/ -d 'extension=$(EXTENSION_DIR)/pcre.$(SHLIB_DL_SUFFIX_NAME)' \
 +			$(PHP_TEST_SETTINGS) $(top_srcdir)/run-tests.php -n -c $(top_builddir)/tmp-php.ini \
 +			-d extension_dir=$(top_builddir)/modules/ $(PHP_TEST_SHARED_EXTENSIONS) $(RUN_TESTS_SETTINGS) $(TESTS); \
  		TEST_RESULT_EXIT_CODE=$$?; \

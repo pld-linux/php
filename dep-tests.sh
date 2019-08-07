@@ -3,14 +3,13 @@
 
 with_mysqlnd=mysqlnd
 
-dep_spl="pcre simplexml"
-dep_session="spl $dep_spl"
-dep_filter='pcre'
+dep_session=""
+dep_filter=''
 dep_eaccelerator='session'
-dep_mysqlnd='hash'
+dep_mysqlnd=''
 dep_mysql="$dep_mysqlnd $with_mysqlnd"
-dep_mysqli="$dep_spl spl $dep_mysqlnd $with_mysqlnd"
-dep_pdo="$dep_spl spl"
+dep_mysqli="$dep_mysqlnd $with_mysqlnd"
+dep_pdo=""
 dep_pdo_sqlite="$dep_pdo pdo"
 dep_pdo_pgsql="$dep_pdo pdo"
 dep_pdo_oci="$dep_pdo pdo"
@@ -18,17 +17,17 @@ dep_pdo_odbc="$dep_pdo pdo"
 dep_pdo_firebird="$dep_pdo pdo"
 dep_pdo_dblib="$dep_pdo pdo"
 dep_pdo_mysql="$dep_pdo pdo $dep_mysqlnd $with_mysqlnd"
-dep_simplexml="$dep_spl spl"
-dep_imap="pcre"
-dep_phar="$dep_spl spl hash"
+dep_simplexml=""
+dep_imap=""
+dep_phar=""
 dep_sqlite="$dep_pdo pdo"
-dep_fileinfo="pcre"
+dep_fileinfo=""
 dep_wddx='xml'
 dep_xmlreader='dom'
 dep_xmlrpc='xml'
 dep_xsl='dom'
-dep_snmp="$dep_spl spl snmp"
-dep_opcache='pcre'
+dep_snmp="snmp"
+dep_opcache=''
 
 php=${PHP:-$(php-config --php-binary)}
 ext_dir=${EXTENSION_DIR:-$(php-config --extension-dir)}

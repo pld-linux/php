@@ -33,31 +33,35 @@ dep_opcache='pcre'
 php=${PHP:-$(php-config --php-binary)}
 ext_dir=${EXTENSION_DIR:-$(php-config --extension-dir)}
 conf_dir=${CONFIG_DIR:-$(php-config --sysconfdir)/conf.d $(php-config --sysconfdir)/cli.d}
-tmpini=$(mktemp)
 
-# poldek --sn ac-ready -u php-*
-for ext in ${*:-$ext_dir/*.so}; do
-	[ -f $ext ] || continue
-	ext=${ext##*/}; ext=${ext%.so}
+test_deps() {
+	tmpini=$(mktemp)
 
-	deps=$(eval echo \$dep_$ext)
-	# add ext itself, if already not in list (spl case)
-	[[ $deps = *\ $ext\ * ]] || deps="$deps $ext"
+	# poldek --sn ac-ready -u php-*
+	for ext in ${*:-$ext_dir/*.so}; do
+		[ -f $ext ] || continue
+		ext=${ext##*/}; ext=${ext%.so}
 
-	echo -n "$ext (deps: ${deps# })..."
+		deps=$(eval echo \$dep_$ext)
+		# add ext itself, if already not in list (spl case)
+		[[ $deps = *\ $ext\ * ]] || deps="$deps $ext"
 
-	# special: opcache is listed as "Zend Opcache"
-	[ "$ext" = "opcache" ] && ext="zend opcache"
+		echo -n "$ext (deps: ${deps# })..."
 
-	grep -rlE '^(zend_)?extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_ALL=C sort | xargs cat > $tmpini
-	$php -n -d extension_dir=$ext_dir -c $tmpini -r "exit(extension_loaded('${ext}') ? 0 : 1);"
-	rc=$?
-	if [ $rc = 0 ]; then
-		echo OK
-	else
-		echo FAIL
-		echo "Failed config was:"
-		cat $tmpini
-	fi
-done
-rm -f $t
+		# special: opcache is listed as "Zend Opcache"
+		[ "$ext" = "opcache" ] && ext="zend opcache"
+
+		grep -rlE '^(zend_)?extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_ALL=C sort | xargs cat > $tmpini
+		$php -n -d extension_dir=$ext_dir -c $tmpini -r "exit(extension_loaded('${ext}') ? 0 : 1);"
+		rc=$?
+		if [ $rc = 0 ]; then
+			echo OK
+		else
+			echo FAIL
+			echo "Failed config was:"
+			cat $tmpini
+		fi
+	done
+}
+
+test_deps "$@"

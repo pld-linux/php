@@ -51,7 +51,7 @@ test_deps() {
 		# special: opcache is listed as "Zend Opcache"
 		[ "$ext" = "opcache" ] && ext="zend opcache"
 
-		grep -rlE '^(zend_)?extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_ALL=C sort | xargs cat > $tmpini
+		grep -rlE '^(zend_)?extension=('$(echo "${deps# }" | tr ' ' '|')')$' $conf_dir | LC_ALL=C sort | xargs cat > $tmpini
 		$php -n -d extension_dir=$ext_dir -c $tmpini -r "exit(extension_loaded('${ext}') ? 0 : 1);"
 		rc=$?
 		if [ $rc = 0 ]; then
@@ -64,4 +64,54 @@ test_deps() {
 	done
 }
 
-test_deps "$@"
+_resolve_extension_deps() {
+	local name="$1"
+
+	eval echo \$dep_$ext
+}
+
+# Prints a load order (0-based integer) for the given extension name. Extension
+# with lower load order should be loaded before exts with higher load order.
+# It's based on number of dependencies of the extension (with exception for
+# "imap"), which is flawed, but simple and good enough for now.
+#
+# _extension_load_order adopted from alpine linux:
+# https://github.com/alpinelinux/aports/blob/v3.10.1/community/php7/APKBUILD#L639-L653
+_extension_load_order() {
+	local name="$1"
+	local deps=$(eval "echo \$dep_$name")
+
+	case "$name" in
+		# XXX: This must be loaded after recode, even though it does
+		# not depend on it. So we must use this hack...
+		imap) echo 1;;
+		*) echo "${deps:=$(_resolve_extension_deps $name)}" | wc -w;;
+	esac
+}
+
+generate_ini() {
+	local load_order
+
+	rm -rf conf.d
+	install -d conf.d
+	for module in ${*:-$ext_dir/*.so}; do
+		[ -f $module ] || continue
+		extname=${module##*/}; extname=${extname%.so}
+
+		ext=extension
+		# opcache.so is zend extension
+		nm $module | grep -q zend_extension_entry && ext=zend_extension
+
+		load_order=$(_extension_load_order "$extname")
+		cat > conf.d/$(printf %02d $load_order)_$extname.ini <<-EOF
+			; Enable $extname $ext module
+			$ext=$extname
+		EOF
+	done
+}
+
+if [ -n "$GENERATE_INI" ]; then
+	generate_ini "$@"
+else
+	test_deps "$@"
+fi

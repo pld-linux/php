@@ -2416,9 +2416,10 @@ exit $rc
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache{,1}},%{_sysconfdir}/{apache,cgi}} \
+install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/cgi} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache2handler}.d \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
-	$RPM_BUILD_ROOT/etc/{apache/conf.d,httpd/conf.d} \
+	$RPM_BUILD_ROOT/etc/httpd/conf.d \
 	$RPM_BUILD_ROOT%{_mandir}/man{1,8} \
 
 cp -pf php_config.h.cli main/php_config.h
@@ -2544,9 +2545,6 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 cp -p conf.d/*.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 cp -p %{_sourcedir}/opcache.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 
-# per SAPI ini directories
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache,apache2handler}.d
-
 # for CLI SAPI only
 %{__mv} $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/??_readline.ini,cli.d}
 
@@ -2626,7 +2624,6 @@ fi
 # common package are very important for all this to work.
 
 # restart webserver at the end of transaction
-[ ! -f /etc/apache/conf.d/??_mod_php.conf ] || %service -q apache restart
 [ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
 
 %triggerpostun common -- php-common < 4:5.3.28-7

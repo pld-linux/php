@@ -146,7 +146,7 @@
 %undefine	with_pdo_sqlite
 %endif
 
-%define		subver beta1
+%define		subver beta2
 %define		rel	1
 %define		orgname	php
 %define		ver_suffix 74
@@ -168,7 +168,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~derick/php-%{version}%{subver}.tar.xz
-# Source0-md5:	fa3501cf158adce37359667383ddb672
+# Source0-md5:	51a42ffa81be306d7a1b2f073e4fba05
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -307,7 +307,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		fileinfover	%{version}
 %define		hashver		%{version}
 %define		intlver		%{version}
-%define		jsonver		1.7.0
+%define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
 %define		zipver		1.15.4
@@ -2066,8 +2066,8 @@ if test "$ver" != "%{zipver}"; then
 	: Update the zipver macro and rebuild.
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_JSON_VERSION /{s/.* "//;s/".*$//;p}' ext/json/php_json.h)
-if test "$ver" != "%{jsonver}"; then
+ver=$(get_version PHP_JSON_VERSION ext/json/php_json.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream JSON version is now ${ver}, expecting %{jsonver}.
 	: Update the jsonver macro and rebuild.
 	exit 1

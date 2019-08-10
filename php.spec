@@ -2455,7 +2455,7 @@ libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
 # install-cgi
 libtool --mode=install install -p sapi/cgi/php-cgi $RPM_BUILD_ROOT%{_bindir}/%{name}.cgi
 ln -sf %{name}.cgi $RPM_BUILD_ROOT%{_bindir}/%{name}.fcgi
-cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/php-cgi-fcgi.ini
+cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/cgi-fcgi.d/php.ini
 %endif
 
 # install FCGI PM
@@ -2503,11 +2503,11 @@ ln -sf php%{ver_suffix} $RPM_BUILD_ROOT%{_bindir}/php
 
 cp -p php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
 cp -p %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/timezone.ini
-cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
+cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/cli.d/php.ini
 
 %if %{with apache2}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
-cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-apache2handler.ini
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/apache2handler.d/php.ini
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp7.la
 %endif
 
@@ -2743,7 +2743,7 @@ fi
 %files -n apache-mod_%{name}-core
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/apache2handler.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-apache2handler.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache2handler.d/php.ini
 %attr(755,root,root) %{_libdir}/apache/libphp7-*.*.so
 %endif
 
@@ -2757,7 +2757,7 @@ fi
 %files cgi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cgi-fcgi.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cgi-fcgi.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cgi-fcgi.d/php.ini
 %attr(755,root,root) %{_bindir}/%{name}.cgi
 %attr(755,root,root) %{_bindir}/%{name}.fcgi
 %endif
@@ -2771,7 +2771,7 @@ fi
 %files cli
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/cli.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php-cli.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cli.d/php.ini
 %attr(755,root,root) %{_bindir}/php%{ver_suffix}
 %{_mandir}/man1/php%{ver_suffix}.1*
 

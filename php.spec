@@ -174,6 +174,7 @@ Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
 Source4:	%{orgname}-apache.ini
 Source5:	%{orgname}-cli.ini
+Source6:	timezone.ini
 Source10:	%{orgname}-fpm.init
 Source11:	%{orgname}-fpm.logrotate
 Source12:	%{orgname}-branch.sh
@@ -2417,7 +2418,7 @@ exit $rc
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/cgi} \
-	$RPM_BUILD_ROOT%{_sysconfdir}/{cgi-fcgi,cli,apache2handler}.d \
+	$RPM_BUILD_ROOT%{_sysconfdir}/{conf,cgi-fcgi,cli,apache2handler}.d \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/etc/httpd/conf.d \
 	$RPM_BUILD_ROOT%{_mandir}/man{1,8} \
@@ -2526,6 +2527,7 @@ echo ".so php%{ver_suffix}.1" >$RPM_BUILD_ROOT%{_mandir}/man1/php.1
 ln -sf php%{ver_suffix} $RPM_BUILD_ROOT%{_bindir}/php
 
 cp -p php.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.ini
+cp -p %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/conf.d/timezone.ini
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/php-cli.ini
 
 %if %{with apache2}
@@ -2610,7 +2612,7 @@ if ! grep -q '^date.timezone[[:space:]]*=' %{_sysconfdir}/php.ini && [ -f /etc/s
 	TIMEZONE=
 	. /etc/sysconfig/timezone
 	if [ "$TIMEZONE" ]; then
-		%{__sed} -i -e "s,^;date.timezone[[:space:]]*=.*,date.timezone = $TIMEZONE," %{_sysconfdir}/php.ini
+		%{__sed} -i -e "s,^;date.timezone[[:space:]]*=.*,date.timezone = $TIMEZONE," %{_sysconfdir}/conf.d/timezone.ini
 	fi
 fi
 
@@ -2838,6 +2840,7 @@ fi
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/timezone.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
 

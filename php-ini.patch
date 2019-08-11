@@ -1,5 +1,5 @@
---- php-7.4.0beta1/php.ini~	2019-08-01 12:11:42.000000000 +0300
-+++ php-7.4.0beta1/php.ini	2019-08-01 13:04:23.234196613 +0300
+--- php-7.4.0beta1/php.ini	2019-08-01 13:04:23.234196613 +0300
++++ php-7.4.0beta2/php.ini	2019-08-11 11:16:25.219875168 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -21,7 +21,7 @@
  
  ;;;;;;;;;;;;;;;;;;;
  ; Quick Reference ;
-@@ -181,10 +181,8 @@
+@@ -167,10 +181,8 @@
  ; php.ini Options  ;
  ;;;;;;;;;;;;;;;;;;;;
  ; Name for user-defined php.ini (.htaccess) files. Default is ".user.ini"
@@ -33,7 +33,7 @@
  
  ; TTL for user-defined php.ini files (time-to-live) in seconds. Default is 300 seconds (5 minutes)
  ;user_ini.cache_ttl = 300
-@@ -223,7 +237,7 @@
+@@ -225,7 +237,7 @@
  ; Development Value: Off
  ; Production Value: Off
  ; http://php.net/short-open-tag
@@ -42,7 +42,7 @@
  
  ; Allow ASP-style <% %> tags.
  ; http://php.net/asp-tags
-@@ -372,7 +372,7 @@
+@@ -360,7 +372,7 @@
  ; threat in any way, but it makes it possible to determine whether you use PHP
  ; on your server or not.
  ; http://php.net/expose-php
@@ -51,7 +51,7 @@
  
  ;;;;;;;;;;;;;;;;;;;
  ; Resource Limits ;
-@@ -756,9 +756,7 @@
+@@ -744,9 +756,7 @@
  
  ; Directory in which the loadable extensions (modules) reside.
  ; http://php.net/extension-dir
@@ -62,7 +62,7 @@
  
  ; Directory where the temporary files should be placed.
  ; Defaults to the system default (see sys_get_temp_dir)
-@@ -768,64 +768,6 @@
+@@ -758,64 +768,6 @@
  ; http://php.net/enable-dl
  enable_dl = Off
  
@@ -127,7 +127,7 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -847,47 +847,8 @@
+@@ -895,47 +847,8 @@
  ; deprecated in a future PHP major version. So, when it is possible, please
  ; move to the new ('extension=<ext>) syntax.
  ;
@@ -177,7 +177,19 @@
  
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;
-@@ -923,19 +883,19 @@
+@@ -954,8 +867,9 @@
+ 
+ [Date]
+ ; Defines the default timezone used by the date functions
+-; http://php.net/date.timezone
+-;date.timezone =
++; http://php.net/date.timezone.
++;
++; NOTE: In PLD Linux the /etc/php/conf.d/timezone.ini is used to set timezone
+ 
+ ; http://php.net/date.default-latitude
+ ;date.default_latitude = 31.7667
+@@ -970,19 +884,19 @@
  ; Use of this INI entry is deprecated, use global input_encoding instead.
  ; If empty, default_charset or input_encoding or iconv.input_encoding is used.
  ; The precedence is: default_charset < input_encoding < iconv.input_encoding
@@ -200,7 +212,7 @@
  
  [intl]
  ;intl.default_locale =
-@@ -1357,7 +1273,7 @@
+@@ -1360,7 +1274,7 @@
  
  [browscap]
  ; http://php.net/browscap
@@ -209,7 +221,7 @@
  
  [Session]
  ; Handler used to store/retrieve data.
-@@ -1660,7 +1660,7 @@
+@@ -1747,7 +1661,7 @@
  
  ; Sets the directory name where SOAP extension will put cache files.
  ; http://php.net/soap.wsdl-cache-dir
@@ -218,7 +230,7 @@
  
  ; (time to live) Sets the number of second while cached file will be used
  ; instead of original one.
-@@ -1674,150 +1674,6 @@
+@@ -1761,150 +1675,6 @@
  [dba]
  ;dba.default_handler=
  

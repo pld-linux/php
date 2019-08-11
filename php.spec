@@ -2417,7 +2417,8 @@ exit $rc
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_libdir}/{php,apache},%{_sysconfdir}/cgi} \
+install -d \
+	$RPM_BUILD_ROOT%{_libdir}/{php,apache} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{conf,cgi-fcgi,cli,apache2handler}.d \
 	$RPM_BUILD_ROOT{%{_sbindir},%{_bindir}} \
 	$RPM_BUILD_ROOT/etc/httpd/conf.d \

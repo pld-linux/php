@@ -90,7 +90,6 @@
 %bcond_without	system_gd	# system gd
 %bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 
-%define apxs1		/usr/sbin/apxs1
 %define	apxs2		/usr/sbin/apxs
 
 # segfaults on x32
@@ -2111,7 +2110,7 @@ export PEAR_INSTALLDIR=%{php_pear_dir}
 # configure once (for faster debugging purposes)
 if [ ! -f _built-conf ]; then
 	# now remove Makefile copies
-	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs1,apxs2,litespeed,phpdbg,milter}
+	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs2,litespeed,phpdbg,milter}
 
 	# Force use of system libtool:
 	mv build/libtool.m4 build/libtool.m4.saved

@@ -202,7 +202,6 @@ Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
 Patch39:	%{orgname}-use-prog_sendmail.patch
 Patch41:	%{orgname}-fpm-config.patch
-Patch42:	%{orgname}-fpm-shared.patch
 Patch43:	%{orgname}-silent-session-cleanup.patch
 Patch44:	%{orgname}-include_path.patch
 Patch50:	extension-shared-optional-dep.patch
@@ -1894,7 +1893,6 @@ cp -p php.ini-production php.ini
 %patch31 -p1
 %patch39 -p1
 %patch41 -p1
-%patch42 -p1
 %patch43 -p1
 %patch44 -p1
 %patch50 -p1

@@ -2202,7 +2202,7 @@ for sapi in $sapis; do
 %endif
 	--with-libdir=%{_lib} \
 	--with-config-file-path=%{_sysconfdir} \
-	--with-config-file-scan-dir=%{_sysconfdir}/conf.d \
+	--with-config-file-scan-dir=%{_sysconfdir}/conf.d:%{_sysconfdir}/$sapi.d \
 	--with-system-tzdata \
 	%{?with_argon2:--with-password-argon2} \
 	--%{!?with_debug:dis}%{?with_debug:en}able-debug \

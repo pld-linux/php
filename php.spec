@@ -26,7 +26,6 @@
 %bcond_without	cgi		# disable CGI/FCGI SAPI
 %bcond_without	fpm		# disable FPM SAPI
 %bcond_without	litespeed	# build litespeed SAPI
-%bcond_with	milter		# disable Milter SAPI
 %bcond_without	phpdbg		# disable phpdbg SAPI
 # - Extensions
 %bcond_without	bcmath		# without bcmath extension module
@@ -113,11 +112,6 @@
 %undefine	with_mm
 %endif
 
-# milter requires ZTS
-%if %{with milter} && %{without zts}
-%undefine	with_milter
-%endif
-
 %if %{without odbc}
 %undefine	with_pdo_odbc
 %endif
@@ -185,7 +179,6 @@ Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
-Patch8:		milter.patch
 Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
@@ -1877,7 +1870,6 @@ cp -p php.ini-production php.ini
 %patch4 -p1
 
 %patch7 -p1
-%{?with_milter:%patch8 -p1}
 %patch9 -p1
 %patch10 -p1
 %patch14 -p1
@@ -2108,7 +2100,7 @@ export PEAR_INSTALLDIR=%{php_pear_dir}
 # configure once (for faster debugging purposes)
 if [ ! -f _built-conf ]; then
 	# now remove Makefile copies
-	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs2,litespeed,phpdbg,milter}
+	rm -f Makefile.{cgi-fcgi,fpm,cli,apxs2,litespeed,phpdbg}
 
 	# Force use of system libtool:
 	mv build/libtool.m4 build/libtool.m4.saved
@@ -2154,9 +2146,6 @@ apxs2
 %if %{with phpdbg}
 phpdbg
 %endif
-%if %{with milter}
-milter
-%endif
 "
 for sapi in $sapis; do
 	: SAPI $sapi
@@ -2186,9 +2175,6 @@ for sapi in $sapis; do
 	;;
 	phpdbg)
 		sapi_args='--enable-phpdbg %{?debug:--enable-phpdbg-debug}'
-	;;
-	milter)
-		sapi_args='--with-milter'
 	;;
 	esac
 
@@ -2334,10 +2320,6 @@ cp -af Makefile.cli Makefile
 	PHPDBG_EXTRA_LIBS=-lreadline
 %endif
 
-%if %{with milter}
-%{__make} -f Makefile.milter milter
-%endif
-
 # CGI/FCGI
 %if %{with cgi}
 cp -pf php_config.h.cgi-fcgi main/php_config.h
@@ -2464,11 +2446,6 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 %{__mv} $RPM_BUILD_ROOT%{_bindir}/phpdbg{,%{ver_suffix}}
 %{__mv} $RPM_BUILD_ROOT%{_mandir}/man1/phpdbg{,%{ver_suffix}}.1
 %endif
-%endif
-
-%if %{with milter}
-%{__make} -f Makefile.milter install-milter \
-	INSTALL_ROOT=$RPM_BUILD_ROOT
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
@@ -2824,12 +2801,6 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/phpdbg%{php_suffix}
 %{_mandir}/man1/phpdbg%{php_suffix}.1*
-%endif
-
-%if %{with milter}
-%files milter
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/php-milter
 %endif
 
 %files common

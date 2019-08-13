@@ -1,3 +1,25 @@
+The ini loading order is in PLD (as of 7.4.0beta2):
+- openat(AT_FDCWD, "/etc/php74/php-cli.ini", O_RDONLY) = -1 ENOENT (No such file or directory)
+- openat(AT_FDCWD, "/etc/php74/php.ini", O_RDONLY) = 4
+- openat(AT_FDCWD, "/etc/php74/conf.d", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_CLOEXEC|O_DIRECTORY) = 4
+- openat(AT_FDCWD, "/etc/php74/conf.d/00_curl.ini", O_RDONLY) = 4
+- openat(AT_FDCWD, "/etc/php74/conf.d/00_json.ini", O_RDONLY) = 4
+- openat(AT_FDCWD, "/etc/php74/conf.d/00_opcache.ini", O_RDONLY) = 4
+- openat(AT_FDCWD, "/etc/php74/conf.d/00_xml.ini", O_RDONLY) = 4
+- openat(AT_FDCWD, "/etc/php74/conf.d/opcache.ini", O_RDONLY) = 4
+- openat(AT_FDCWD, "/etc/php74/conf.d/timezone.ini", O_RDONLY) = 4
+- openat(AT_FDCWD, "/etc/php74/cli.d", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_CLOEXEC|O_DIRECTORY) = 4
+- openat(AT_FDCWD, "/etc/php74/cli.d/00_readline.ini", O_RDONLY) = 4
+- openat(AT_FDCWD, "/etc/php74/cli.d/php.ini", O_RDONLY) = 4
+
+1. load php-<sapi>.ini; if exists treat as main php.ini
+2. load php.ini if php-<sapi>.ini was not found
+3. load conf.d/DD_*.ini to load extra extension and zend_extension lines
+4. load conf.d/*.ini to load extra ini settings not involving loading extension
+5. load <sapi>.d same way as conf.d
+
+This allows minimal patch, but still allowing to have main php ini and sapi specific overrides
+
 To test which is main php.ini:
 $ php -r 'var_dump(array(get_cfg_var("cfg_file_path"),php_ini_loaded_file()));'
 

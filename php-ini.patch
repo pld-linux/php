@@ -1,5 +1,5 @@
---- php-7.4.0beta1/php.ini	2019-08-01 13:04:23.234196613 +0300
-+++ php-7.4.0beta2/php.ini	2019-08-11 11:16:25.219875168 +0300
+--- php-7.4.0RC2/php.ini~	2019-09-23 10:43:53.000000000 +0300
++++ php-7.4.0RC2/php.ini	2019-09-23 11:52:45.049464720 +0300
 @@ -82,6 +82,20 @@
  ; much more verbose when it comes to errors. We recommending using the
  ; development version only in development environments as errors shown to
@@ -127,7 +127,7 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -895,47 +847,8 @@
+@@ -849,48 +849,8 @@
  ; deprecated in a future PHP major version. So, when it is possible, please
  ; move to the new ('extension=<ext>) syntax.
  ;
@@ -139,6 +139,7 @@
 -;
 -;extension=bz2
 -;extension=curl
+-;extension=ffi
 -;extension=fileinfo
 -;extension=gd2
 -;extension=gettext
@@ -230,7 +231,7 @@
  
  ; (time to live) Sets the number of second while cached file will be used
  ; instead of original one.
-@@ -1761,150 +1675,6 @@
+@@ -1670,155 +1670,6 @@
  [dba]
  ;dba.default_handler=
  
@@ -369,6 +370,11 @@
 -; start-up.
 -; http://php.net/opcache.preload
 -;opcache.preload=
+-
+-; Preloading code as root is not allowed for security reasons. This directive
+-; facilitates to let the preloading to be run as another user.
+-; http://php.net/opcache.preload_user
+-;opcache.preload_user=
 -
 -; Prevents caching files that are less than this number of seconds old. It
 -; protects from caching of incompletely updated files. In case all file updates

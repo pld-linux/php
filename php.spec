@@ -14,7 +14,7 @@
 %bcond_without	alternatives	# use alternatives system to select default phar and php-fpm
 %bcond_with	default_php	# build this PHP as default PHP in system (disables alternatives)
 # - General options:
-%bcond_without	embed		# disable building Embedded API
+%bcond_with	embed		# disable building Embedded API
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_without	kerberos5	# without Kerberos5 support
 %bcond_with	systemtap	# systemtap/DTrace support
@@ -139,7 +139,7 @@
 %undefine	with_pdo_sqlite
 %endif
 
-%define		subver RC2
+%define		subver RC3
 %define		rel	1
 %define		orgname	php
 %define		ver_suffix 74
@@ -161,7 +161,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~derick/php-%{version}%{subver}.tar.xz
-# Source0-md5:	ce70af5947ae2228b3408952f8c71be8
+# Source0-md5:	16bab715ced5f8af92344c4400d7bed5
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

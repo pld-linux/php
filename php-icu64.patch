@@ -167,7 +167,7 @@
  #endif
  
  #include <unicode/calendar.h>
-+#include <unicode/gregocal.h>
++
 +#include <unicode/datefmt.h>
  
  extern "C" {
@@ -176,7 +176,7 @@
  
 +using icu::Locale;
 +using icu::Calendar;
-+using icu::GregorianCalendar;
++
 +using icu::DateFormat;
 +
  int datefmt_process_calendar_arg(zval* calendar_zv,
@@ -261,3 +261,15 @@
  U_CFUNC PHP_METHOD(IntlTimeZone, __construct)
  {
  	zend_throw_exception( NULL,
+
+--- php-7.0.33/ext/intl/dateformat/dateformat_helpers.cpp~	2018-12-04 18:22:53.000000000 +0100
++++ php-7.0.33/ext/intl/dateformat/dateformat_helpers.cpp	2019-10-19 21:29:32.416045611 +0200
+@@ -28,6 +28,8 @@ extern "C" {
+ #include "../calendar/calendar_class.h"
+ }
+ 
++using icu::GregorianCalendar;
++
+ int datefmt_process_calendar_arg(zval* calendar_zv,
+ 								 Locale const& locale,
+ 								 const char *func_name,

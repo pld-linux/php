@@ -164,3 +164,14 @@
              *status = U_ILLEGAL_ARGUMENT_ERROR;
  			cleanup_zvals();
              break;
+--- php-5.4.45/ext/intl/php_intl.h~	2015-09-01 22:09:37.000000000 +0200
++++ php-5.4.45/ext/intl/php_intl.h	2019-10-19 22:42:30.454962149 +0200
+@@ -22,6 +22,8 @@
+ 
+ #include <php.h>
+ 
++#undef U_SHOW_CPLUSPLUS_API
++#define U_SHOW_CPLUSPLUS_API 0
+ #include "collator/collator_sort.h"
+ #include "grapheme/grapheme.h"
+ #include "intl_error.h"

@@ -140,7 +140,7 @@
 %endif
 
 %define		subver RC3
-%define		rel	2
+%define		rel	3
 %define		orgname	php
 %define		ver_suffix 74
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}

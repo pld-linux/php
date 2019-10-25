@@ -143,7 +143,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_alternatives
 %endif
 
-%define		rel	49
+%define		rel	50
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -255,6 +255,7 @@ Patch77:	php-icu64.patch
 # https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
 # also from RHEL6/CentOS7
 Patch220:	php-5.3.3-CVE-2011-4153.patch
+Patch221:	CVE-2019-11043.patch
 
 Patch247:	php-5.3.3-CVE-2014-2497.patch
 
@@ -2153,6 +2154,7 @@ gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch77 -p1
 
 %patch220 -p1
+%patch221 -p1
 
 %patch247 -p1
 

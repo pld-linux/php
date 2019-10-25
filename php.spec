@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	6
+%define		rel	7
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -234,7 +234,7 @@ Patch62:	mcrypt-libs.patch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
-
+Patch68:	CVE-2019-11043.patch
 Patch69:	fpm-conf-split.patch
 Patch70:	mysqlnd-ssl.patch
 Patch72:	phar-hash-shared.patch
@@ -2148,7 +2148,7 @@ exit 1
 %{?with_system_libzip:%patch65 -p1}
 %patch66 -p1
 %patch67 -p1
-
+%patch68 -p1
 %patch70 -p1
 %patch72 -p1
 %patch73 -p1

@@ -139,7 +139,7 @@
 %undefine	with_pdo_sqlite
 %endif
 
-%define		subver RC4
+%define		subver RC5
 %define		rel	1
 %define		orgname	php
 %define		ver_suffix 74
@@ -161,7 +161,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~derick/php-%{version}%{subver}.tar.xz
-# Source0-md5:	afdd15b80f6cc18215691c629058d095
+# Source0-md5:	f26a23a42fd663400219b7145fcf4d0f
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

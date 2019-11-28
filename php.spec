@@ -139,7 +139,6 @@
 %undefine	with_pdo_sqlite
 %endif
 
-%define		subver RC5
 %define		rel	1
 %define		orgname	php
 %define		ver_suffix 74
@@ -152,7 +151,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.4.0
-Release:	2.%{subver}.%{rel}
+Release:	3
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -160,8 +159,8 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://downloads.php.net/~derick/php-%{version}%{subver}.tar.xz
-# Source0-md5:	f26a23a42fd663400219b7145fcf4d0f
+Source0:	https://downloads.php.net/~derick/php-%{version}.tar.xz
+# Source0-md5:	c2ab075e03e4757014196640c24dad25
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -1861,7 +1860,7 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
-%setup -q -n %{orgname}-%{version}%{?subver}
+%setup -q -n %{orgname}-%{version}
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1

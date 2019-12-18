@@ -75,12 +75,13 @@
  PHPAPI pcre* pcre_get_compiled_regex(zend_string *regex, pcre_extra **extra, int *options);
  PHPAPI pcre* pcre_get_compiled_regex_ex(zend_string *regex, pcre_extra **extra, int *preg_options, int *coptions);
  
-@@ -56,14 +78,18 @@
+@@ -78,18 +78,23 @@ typedef struct {
  	int refcount;
  } pcre_cache_entry;
  
 +PCRE_EXTERN
  PHPAPI pcre_cache_entry* pcre_get_compiled_regex_cache(zend_string *regex);
+ PHPAPI pcre_cache_entry* pcre_get_compiled_regex_cache_ex(zend_string *regex, int locale_aware);
  
 +PCRE_EXTERN
  PHPAPI void  php_pcre_match_impl(  pcre_cache_entry *pce, char *subject, int subject_len, zval *return_value,
@@ -93,6 +94,10 @@
 +PCRE_EXTERN
  PHPAPI void  php_pcre_split_impl(  pcre_cache_entry *pce, zend_string *subject_str, zval *return_value,
  	zend_long limit_val, zend_long flags);
+ 
++PCRE_EXTERN
+ PHPAPI void  php_pcre_grep_impl(   pcre_cache_entry *pce, zval *input, zval *return_value,
+ 	zend_long flags);
  
 --- php-5.3.1.pcre/ext/pcre/php_pcre.c	2009-11-30 21:38:01.759684456 +0000
 +++ php-7.2.0beta1/ext/pcre/php_pcre.c	2017-07-22 12:42:57.878062137 +0300

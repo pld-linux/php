@@ -43,12 +43,13 @@
  PHPAPI pcre2_code* pcre_get_compiled_regex(zend_string *regex, uint32_t *capture_count, uint32_t *options);
  PHPAPI pcre2_code* pcre_get_compiled_regex_ex(zend_string *regex, uint32_t *capture_count, uint32_t *preg_options, uint32_t *coptions);
  
-@@ -45,14 +67,18 @@
+@@ -71,18 +71,23 @@ extern zend_module_entry pcre_module_ent
  
  typedef struct _pcre_cache_entry pcre_cache_entry;
  
 +PCRE_EXTERN
  PHPAPI pcre_cache_entry* pcre_get_compiled_regex_cache(zend_string *regex);
+ PHPAPI pcre_cache_entry* pcre_get_compiled_regex_cache_ex(zend_string *regex, int locale_aware);
  
 +PCRE_EXTERN
  PHPAPI void  php_pcre_match_impl(  pcre_cache_entry *pce, char *subject, size_t subject_len, zval *return_value,
@@ -61,6 +62,10 @@
 +PCRE_EXTERN
  PHPAPI void  php_pcre_split_impl(  pcre_cache_entry *pce, zend_string *subject_str, zval *return_value,
  	zend_long limit_val, zend_long flags);
+ 
++PCRE_EXTERN
+ PHPAPI void  php_pcre_grep_impl(   pcre_cache_entry *pce, zval *input, zval *return_value,
+ 	zend_long flags);
  
 --- php-7.3.0beta3/ext/pcre/php_pcre.c~	2018-09-11 11:43:27.000000000 +0300
 +++ php-7.3.0beta3/ext/pcre/php_pcre.c	2018-09-11 11:43:30.747506034 +0300

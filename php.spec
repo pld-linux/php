@@ -831,7 +831,8 @@ support in image files.
 Moduł PHP dodający obsługę znaczników EXIF w plikach obrazków.
 
 %package ffi
-Summary:	%{modname} - Foreign Function Interface
+Summary:	Foreign Function Interface module for PHP
+Summary(pl.UTF-8):	Moduł Foreign Function Interface (interfejsu do obcych języków) dla PHP
 Group:		Libraries
 URL:		https://www.php.net/manual/en/book.ffi.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
@@ -840,6 +841,10 @@ Provides:	php(ffi) = %{version}
 %description ffi
 FFI is a multi-platform extension for PHP that allows you to bind to
 functions from arbitrary shared libraries and call them.
+
+%description ffi -l pl.UTF-8
+FFI to wieloplatformowe rozszerzenie dla PHP pozwalające dowiązywać
+funkcje z dowolnych bibliotek współdzielonych i wywoływać je.
 
 %package fileinfo
 Summary:	libmagic bindings

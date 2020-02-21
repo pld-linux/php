@@ -127,19 +127,22 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -849,48 +849,8 @@
+@@ -856,50 +856,10 @@ default_socket_timeout = 60
  ; deprecated in a future PHP major version. So, when it is possible, please
  ; move to the new ('extension=<ext>) syntax.
  ;
 -; Notes for Windows environments :
--;
+ ;
 -; - Many DLL files are located in the extensions/ (PHP 4) or ext/ (PHP 5+)
 -;   extension folders as well as the separate PECL DLL download (PHP 5+).
 -;   Be sure to appropriately set the extension_dir directive.
--;
++; Ideally in PLD Linux you should install appropriate php74-<extension> or
++; php74-pecl-<extension> package.
+ ;
 -;extension=bz2
 -;extension=curl
 -;extension=ffi
+-;extension=ftp
 -;extension=fileinfo
 -;extension=gd2
 -;extension=gettext
@@ -173,11 +176,10 @@
 -;extension=tidy
 -;extension=xmlrpc
 -;extension=xsl
-+; Ideally in PLD Linux you should install appropriate php74-<extension> or
-+; php74-pecl-<extension> package.
- 
+-
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;
+ ;;;;;;;;;;;;;;;;;;;
 @@ -954,8 +867,9 @@
  
  [Date]

@@ -29,7 +29,7 @@
 %bcond_without	phpdbg		# disable phpdbg SAPI
 # - Extensions
 %bcond_without	bcmath		# without bcmath extension module
-%bcond_without	bz2		# without bz2 extension module
+%bcond_without	bzip2		# without bz2 extension module
 %bcond_without	calendar	# without calendar extension module
 %bcond_without	ctype		# without ctype extension module
 %bcond_without	curl		# without CURL extension module
@@ -2255,7 +2255,7 @@ for sapi in $sapis; do
 	--enable-tokenizer=shared \
 	--enable-xml=shared \
 	--enable-xmlreader=shared \
-	%{__with_without bz2 bz2 shared} \
+	%{__with_without bzip2 bz2 shared} \
 	%{__with_without curl curl shared} \
 	--with-db4 \
 	%{__with_without iconv iconv shared} \
@@ -2846,7 +2846,7 @@ fi
 %attr(755,root,root) %{php_extensiondir}/bcmath.so
 %endif
 
-%if %{with bz2}
+%if %{with bzip2}
 %files bz2
 %defattr(644,root,root,755)
 %doc ext/bz2/CREDITS

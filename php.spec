@@ -139,7 +139,7 @@
 %undefine	with_pdo_sqlite
 %endif
 
-%define		rel	2
+%define		rel	3
 %define		orgname	php
 %define		ver_suffix 74
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}

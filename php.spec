@@ -1982,6 +1982,9 @@ cp -p php.ini-production php.ini
 %patch73 -p1
 %patch74 -p1
 
+sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
+      run-tests.php
+
 %{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
 # cleanup backups after patching

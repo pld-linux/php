@@ -140,7 +140,7 @@
 %endif
 
 %define		orgname	php
-%define		ver_suffix 74
+%define		ver_suffix 80
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -149,16 +149,17 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.4.6
-Release:	3
+Version:	8.0.0
+Release:	0.beta4.0
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	523b7d61e5fa8ea15375f6d1f7e2876a
+#Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://downloads.php.net/~pollita/php-%{version}beta4.tar.xz
+# Source0-md5:	a30173dc7d5b75d82253dcbf4c7f2fe4
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -1867,29 +1868,34 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
+%if 0
 %setup -q -n %{orgname}-%{version}
+%else
+%setup -q -n %{orgname}-%{version}beta4
+%endif
+
 cp -p php.ini-production php.ini
-%patch0 -p1
+#%patch0 -p1
 %patch1 -p1
-%patch2 -p1
+#%patch2 -p1 -b .mail
 %patch3 -p1
 %patch4 -p1
 
-%patch7 -p1
+#%patch7 -p1 -b .sapi-ini-file
 %patch9 -p1
-%patch10 -p1
+#%patch10 -p1 -b .ini
 %patch14 -p1
-%patch17 -p1
+#%patch17 -p1 -b readline
 %patch18 -p1
 %patch21 -p1
-%patch22 -p1
+#%patch22 -p1 -b .both-apxs
 %patch23 -p1
-%patch24 -p1
+#%patch24 -p1 -b .zlib-for-getimagesize
 %patch25 -p1
 %patch27 -p1
 %patch29 -p1
 %patch31 -p1
-%patch39 -p1
+#%patch39 -p1 -b .use-prog_sendmail
 %patch41 -p1
 %patch43 -p1
 %patch44 -p1
@@ -1897,15 +1903,15 @@ cp -p php.ini-production php.ini
 
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
-%patch55 -p1
-%patch59 -p1 -b .systzdata
+#%patch55 -p1
+#%patch59 -p1 -b .systzdata
 %if %{with instantclient}
 %patch60 -p1 -b .instantclient
 %endif
 %patch66 -p1
-%patch67 -p1
+%patch67 -p1 -b .mysql-lib-ver-mismatch
 #%patch68 -p1 DROP or update to 7.0 APIs
-%patch71 -p1
+#%patch71 -p1 -b .libdb-info
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

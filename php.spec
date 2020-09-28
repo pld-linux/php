@@ -1887,7 +1887,7 @@ cp -p php.ini-production php.ini
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
 #%patch55 -p1
-#%patch59 -p1 -b .systzdata
+%patch59 -p1 -b .systzdata
 %if %{with instantclient}
 %patch60 -p1 -b .instantclient
 %endif

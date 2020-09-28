@@ -5,6 +5,7 @@ Add support for use of the system timezone database, rather
 than embedding a copy.  Discussed upstream but was not desired.
 
 History:
+r19: adapt for timelib 2020.02 (in 8.0.0beta2)
 r18: adapt for autotool change in 7.3.3RC1
 r17: adapt for timelib 2018.01 (in 7.3.2RC1)
 r16: adapt for timelib 2017.06 (in 7.2.3RC1)
@@ -29,10 +30,10 @@ r3: fix a crash if /usr/share/zoneinfo doesn't exist (Raphael Geissert)
 r2: add filesystem trawl to set up name alias index
 r1: initial revision
 
-diff -up php-7.3.3RC1/ext/date/config0.m4.systzdata php-7.3.3RC1/ext/date/config0.m4
---- php-7.3.3RC1/ext/date/config0.m4.systzdata	2019-02-19 14:57:51.314601701 +0100
-+++ php-7.3.3RC1/ext/date/config0.m4	2019-02-19 14:58:29.050812587 +0100
-@@ -9,6 +9,19 @@ io.h
+diff -up php-8.0.0beta3/ext/date/config0.m4.systzdata php-8.0.0beta3/ext/date/config0.m4
+--- php-8.0.0beta3/ext/date/config0.m4.systzdata	2020-09-01 19:13:26.000000000 +0200
++++ php-8.0.0beta3/ext/date/config0.m4	2020-09-02 08:07:51.039979873 +0200
+@@ -4,6 +4,19 @@ AC_CHECK_HEADERS([io.h])
  dnl Check for strtoll, atoll
  AC_CHECK_FUNCS(strtoll atoll)
  
@@ -52,10 +53,10 @@ diff -up php-7.3.3RC1/ext/date/config0.m4.systzdata php-7.3.3RC1/ext/date/config
  PHP_DATE_CFLAGS="-I@ext_builddir@/lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -DHAVE_TIMELIB_CONFIG_H=1"
  timelib_sources="lib/astro.c lib/dow.c lib/parse_date.c lib/parse_tz.c
                   lib/timelib.c lib/tm2unixtime.c lib/unixtime2tm.c lib/parse_iso_intervals.c lib/interval.c"
-diff -up php-7.3.3RC1/ext/date/lib/parse_tz.c.systzdata php-7.3.3RC1/ext/date/lib/parse_tz.c
---- php-7.3.3RC1/ext/date/lib/parse_tz.c.systzdata	2019-02-19 12:18:27.000000000 +0100
-+++ php-7.3.3RC1/ext/date/lib/parse_tz.c	2019-02-19 14:57:20.397428931 +0100
-@@ -25,8 +25,21 @@
+diff -up php-8.0.0beta3/ext/date/lib/parse_tz.c.systzdata php-8.0.0beta3/ext/date/lib/parse_tz.c
+--- php-8.0.0beta3/ext/date/lib/parse_tz.c.systzdata	2020-09-01 19:13:26.000000000 +0200
++++ php-8.0.0beta3/ext/date/lib/parse_tz.c	2020-09-02 08:07:51.039979873 +0200
+@@ -26,8 +26,21 @@
  #include "timelib.h"
  #include "timelib_private.h"
  
@@ -77,7 +78,7 @@ diff -up php-7.3.3RC1/ext/date/lib/parse_tz.c.systzdata php-7.3.3RC1/ext/date/li
  
  #if (defined(__APPLE__) || defined(__APPLE_CC__)) && (defined(__BIG_ENDIAN__) || defined(__LITTLE_ENDIAN__))
  # if defined(__LITTLE_ENDIAN__)
-@@ -87,6 +100,11 @@ static int read_php_preamble(const unsig
+@@ -94,6 +107,11 @@ static int read_php_preamble(const unsig
  {
  	uint32_t version;
  
@@ -89,11 +90,11 @@ diff -up php-7.3.3RC1/ext/date/lib/parse_tz.c.systzdata php-7.3.3RC1/ext/date/li
  	/* read ID */
  	version = (*tzf)[3] - '0';
  	*tzf += 4;
-@@ -411,7 +429,429 @@ void timelib_dump_tzinfo(timelib_tzinfo
+@@ -418,7 +436,429 @@ void timelib_dump_tzinfo(timelib_tzinfo
  	}
  }
  
--static int seek_to_tz_position(const unsigned char **tzf, char *timezone, const timelib_tzdb *tzdb)
+-static int seek_to_tz_position(const unsigned char **tzf, const char *timezone, const timelib_tzdb *tzdb)
 +#ifdef HAVE_SYSTEM_TZDATA
 +
 +#ifdef HAVE_SYSTEM_TZDATA_PREFIX
@@ -516,15 +517,15 @@ diff -up php-7.3.3RC1/ext/date/lib/parse_tz.c.systzdata php-7.3.3RC1/ext/date/li
 +
 +#endif
 +
-+static int inmem_seek_to_tz_position(const unsigned char **tzf, char *timezone, const timelib_tzdb *tzdb)
++static int inmem_seek_to_tz_position(const unsigned char **tzf, const char *timezone, const timelib_tzdb *tzdb)
  {
  	int left = 0, right = tzdb->index_size - 1;
  
-@@ -437,9 +877,48 @@ static int seek_to_tz_position(const uns
+@@ -444,9 +884,48 @@ static int seek_to_tz_position(const uns
  	return 0;
  }
  
-+static int seek_to_tz_position(const unsigned char **tzf, char *timezone,
++static int seek_to_tz_position(const unsigned char **tzf, const char *timezone,
 +			       char **map, size_t *maplen,
 +			       const timelib_tzdb *tzdb)
 +{
@@ -569,8 +570,8 @@ diff -up php-7.3.3RC1/ext/date/lib/parse_tz.c.systzdata php-7.3.3RC1/ext/date/li
  }
  
  const timelib_tzdb_index_entry *timelib_timezone_identifiers_list(const timelib_tzdb *tzdb, int *count)
-@@ -451,7 +930,30 @@ const timelib_tzdb_index_entry *timelib_
- int timelib_timezone_id_is_valid(char *timezone, const timelib_tzdb *tzdb)
+@@ -458,7 +937,30 @@ const timelib_tzdb_index_entry *timelib_
+ int timelib_timezone_id_is_valid(const char *timezone, const timelib_tzdb *tzdb)
  {
  	const unsigned char *tzf;
 -	return (seek_to_tz_position(&tzf, timezone, tzdb));
@@ -601,8 +602,8 @@ diff -up php-7.3.3RC1/ext/date/lib/parse_tz.c.systzdata php-7.3.3RC1/ext/date/li
  }
  
  static int skip_64bit_preamble(const unsigned char **tzf, timelib_tzinfo *tz)
-@@ -493,12 +995,14 @@ static timelib_tzinfo* timelib_tzinfo_ct
- timelib_tzinfo *timelib_parse_tzfile(char *timezone, const timelib_tzdb *tzdb, int *error_code)
+@@ -500,12 +1002,14 @@ static timelib_tzinfo* timelib_tzinfo_ct
+ timelib_tzinfo *timelib_parse_tzfile(const char *timezone, const timelib_tzdb *tzdb, int *error_code)
  {
  	const unsigned char *tzf;
 +	char *memmap = NULL;
@@ -617,7 +618,7 @@ diff -up php-7.3.3RC1/ext/date/lib/parse_tz.c.systzdata php-7.3.3RC1/ext/date/li
  		tmp = timelib_tzinfo_ctor(timezone);
  
  		version = read_preamble(&tzf, tmp, &type);
-@@ -537,11 +1041,36 @@ timelib_tzinfo *timelib_parse_tzfile(cha
+@@ -540,11 +1044,36 @@ timelib_tzinfo *timelib_parse_tzfile(con
  		}
  		skip_posix_string(&tzf, tmp);
  

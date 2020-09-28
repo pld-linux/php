@@ -1857,7 +1857,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %endif
 
 cp -p php.ini-production php.ini
-#%patch0 -p1
+%patch0 -p1
 %patch1 -p1
 #%patch2 -p1 -b .mail
 %patch3 -p1

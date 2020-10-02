@@ -49,7 +49,6 @@
 %bcond_without	iconv		# without iconv extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	intl		# without Intl extension module
-%bcond_without	json		# without json extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mbstring	# without mbstring extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
@@ -2205,7 +2204,6 @@ for sapi in $sapis; do
 	--enable-mbregex \
 	%{__enable_disable pcntl pcntl shared} \
 	%{__enable_disable pdo pdo shared} \
-	%{__enable_disable json json shared} \
 	--enable-xmlwriter=shared \
 %if %{with fpm}
 	--with-fpm-user=http \
@@ -2972,13 +2970,9 @@ fi
 %attr(755,root,root) %{php_extensiondir}/intl.so
 %endif
 
-%if %{with json}
 %files json
 %defattr(644,root,root,755)
 %doc ext/json/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_json.ini
-%attr(755,root,root) %{php_extensiondir}/json.so
-%endif
 
 %if %{with ldap}
 %files ldap

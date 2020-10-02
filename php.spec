@@ -286,9 +286,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20190902
+%define		php_api_version		20200804
 %define		zend_module_api		%{php_api_version}
-%define		zend_extension_api	3%{zend_module_api}
+%define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20170320
 
 # Extension versions
@@ -300,7 +300,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.15.6
+%define		zipver		1.19.1-dev
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 

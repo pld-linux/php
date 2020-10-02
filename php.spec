@@ -1,5 +1,7 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
+# TODO 8.0:
+# - removed packages: xmlrpc
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # TODO:
@@ -78,7 +80,6 @@
 %bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	tidy		# without Tidy extension module
-%bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	xsl			# without xsl extension module
 %bcond_without	zip			# without zip extension module
 # extensions options
@@ -271,7 +272,6 @@ BuildRequires:	tar >= 1:1.22
 %{?with_tidy:BuildRequires:	tidy-devel}
 BuildRequires:	tokyocabinet-devel
 %{?with_odbc:BuildRequires:	unixODBC-devel}
-%{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel >= 0.54.1}
 BuildRequires:	xz
 BuildRequires:	zlib-devel >= 1.2.0.4
 %if %{with apache2}
@@ -1776,23 +1776,6 @@ Moduł PHP umożliwiający analizę plików XML w trybie Pull. Czytnik
 działa jako kursor przechodzący przez strumień dokumentu i
 zatrzymujący się na każdym węźle po drodze.
 
-%package xmlrpc
-Summary:	xmlrpc extension module for PHP
-Summary(pl.UTF-8):	Moduł xmlrpc dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.xmlrpc.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
-Provides:	php(xmlrpc)
-Obsoletes:	php-xmlrpc < 4:5.3.28-7
-
-%description xmlrpc
-This is a dynamic shared object (DSO) for PHP that will add XMLRPC
-support.
-
-%description xmlrpc -l pl.UTF-8
-Moduł PHP dodający obsługę XMLRPC.
-
 %package xmlwriter
 Summary:	Fast, non-cached, forward-only means to write XML data
 Summary(pl.UTF-8):	Szybka, nie cachowana metoda zapisu danych w formacie XML
@@ -1917,8 +1900,6 @@ sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \
       run-tests.php
 
-%{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
-
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 
@@ -1936,7 +1917,6 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/mbstring/libmbfl
 #%{__rm} -r ext/pcre/pcre2lib
 #%{__rm} -r ext/soap/interop
-%{__rm} -r ext/xmlrpc/libxmlrpc
 #%{__rm} -r ext/zip/lib
 %{__rm} ext/date/lib/timezonedb.h
 
@@ -2129,8 +2109,7 @@ if [ ! -f _built-conf ]; then
 	touch _built-conf
 fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
-export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
-	-I%{_includedir}/xmlrpc-epi"
+export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags}"
 
 # This should be detected by configure and set there,
 # but looks like the build system is hosed on 7.3
@@ -2296,7 +2275,6 @@ for sapi in $sapis; do
 	%{__with_without sqlite3 sqlite3 shared} \
 	%{?with_tidy:--with-tidy=shared} \
 	%{?with_odbc:--with-unixODBC=shared} \
-	%{__with_without xmlrpc xmlrpc shared,/usr} \
 	%{?with_xsl:--with-xsl=shared} \
 	--with-zlib=shared \
 	%{?with_zip:--with-zip=shared} \
@@ -2729,7 +2707,6 @@ fi \
 %extension_scripts tokenizer
 %extension_scripts xml
 %extension_scripts xmlreader
-%extension_scripts xmlrpc
 %extension_scripts xmlwriter
 %extension_scripts xsl
 %extension_scripts zip
@@ -3303,14 +3280,6 @@ fi
 %doc ext/xmlreader/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_xmlreader.ini
 %attr(755,root,root) %{php_extensiondir}/xmlreader.so
-
-%if %{with xmlrpc}
-%files xmlrpc
-%defattr(644,root,root,755)
-%doc ext/xmlrpc/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_xmlrpc.ini
-%attr(755,root,root) %{php_extensiondir}/xmlrpc.so
-%endif
 
 %files xmlwriter
 %defattr(644,root,root,755)

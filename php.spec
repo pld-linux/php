@@ -2189,7 +2189,6 @@ for sapi in $sapis; do
 	%{?with_argon2:--with-password-argon2} \
 	--%{!?with_debug:dis}%{?with_debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
-	--enable-inline-optimization \
 	--enable-option-checking=fatal \
 	%{__enable_disable bcmath bcmath shared} \
 	%{__enable_disable calendar calendar shared} \

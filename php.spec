@@ -197,7 +197,6 @@ Patch43:	%{orgname}-silent-session-cleanup.patch
 Patch44:	%{orgname}-include_path.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch53:	fix-test-run.patch
-Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
 Patch66:	php-db.patch
@@ -1885,7 +1884,7 @@ cp -p php.ini-production php.ini
 
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
-#%patch55 -p1
+
 %patch59 -p1 -b .systzdata
 %if %{with instantclient}
 %patch60 -p1 -b .instantclient

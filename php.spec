@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.0.0
-Release:	0.beta4.0
+Release:	0.rc1.0
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -158,8 +158,8 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://downloads.php.net/~pollita/php-%{version}beta4.tar.xz
-# Source0-md5:	a30173dc7d5b75d82253dcbf4c7f2fe4
+Source0:	https://downloads.php.net/~carusogabriel/php-%{version}rc1.tar.xz
+# Source0-md5:	95923f24e336801d704d4177fcb3e0ce
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -284,7 +284,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20200804
+%define		php_api_version		20200930
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20170320
@@ -298,7 +298,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.19.1-dev
+%define		zipver		1.19.1
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
@@ -1852,7 +1852,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %if 0
 %setup -q -n %{orgname}-%{version}
 %else
-%setup -q -n %{orgname}-%{version}beta4
+%setup -q -n %{orgname}-%{version}rc1
 %endif
 
 cp -p php.ini-production php.ini

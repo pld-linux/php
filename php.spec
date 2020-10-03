@@ -1869,7 +1869,7 @@ cp -p php.ini-production php.ini
 #%patch17 -p1 -b readline
 %patch18 -p1
 %patch21 -p1
-#%patch22 -p1 -b .both-apxs
+%patch22 -p1
 %patch23 -p1
 #%patch24 -p1 -b .zlib-for-getimagesize
 %patch25 -p1

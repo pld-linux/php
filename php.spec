@@ -1864,7 +1864,7 @@ cp -p php.ini-production php.ini
 
 #%patch7 -p1 -b .sapi-ini-file
 %patch9 -p1
-#%patch10 -p1 -b .ini
+%patch10 -p1 -b .ini
 %patch14 -p1
 #%patch17 -p1 -b readline
 %patch18 -p1

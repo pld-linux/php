@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	33
+%define		rel	34
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}

@@ -1,16 +1,16 @@
---- php-7.0.0beta1/ext/dba/dba.c.libdb	2015-07-08 02:24:59.119020904 +0200
-+++ php-7.0.0beta1/ext/dba/dba.c	2015-07-08 07:01:43.158767655 +0200
-@@ -52,6 +52,10 @@
- #include "php_qdbm.h"
- #include "php_tcadb.h"
+--- php-8.0.0rc1/ext/dba/dba.c~	2020-10-09 19:00:25.000000000 +0300
++++ php-8.0.0rc1/ext/dba/dba.c	2020-10-09 19:01:14.638869747 +0300
+@@ -50,6 +50,10 @@
+ #include "php_lmdb.h"
+ #include "dba_arginfo.h"
  
 +#ifdef DB4_INCLUDE_FILE
 +#include DB4_INCLUDE_FILE
 +#endif
 +
- /* {{{ arginfo */
- ZEND_BEGIN_ARG_INFO_EX(arginfo_dba_popen, 0, 0, 2)
- 	ZEND_ARG_INFO(0, path)
+ PHP_MINIT_FUNCTION(dba);
+ PHP_MSHUTDOWN_FUNCTION(dba);
+ PHP_MINFO_FUNCTION(dba);
 @@ -545,6 +549,10 @@ PHP_MINFO_FUNCTION(dba)
  
  	php_info_print_table_start();

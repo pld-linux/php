@@ -1869,7 +1869,7 @@ cp -p php.ini-production php.ini
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
-#%patch24 -p1 -b .zlib-for-getimagesize
+%patch24 -p1 -b .zlib-for-getimagesize
 %patch25 -p1
 %patch27 -p1
 %patch29 -p1

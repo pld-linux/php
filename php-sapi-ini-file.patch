@@ -25,22 +25,20 @@ $ php -r 'var_dump(array(get_cfg_var("cfg_file_path"),php_ini_loaded_file()));'
 
 https://github.com/pld-linux/php/commit/762ec2e
 
-diff --git a/main/php_ini.c b/main/php_ini.c
-index d508c13b50..2cf28eb7f5 100644
---- a/main/php_ini.c
-+++ b/main/php_ini.c
-@@ -410,6 +410,11 @@ static void php_load_zend_extension_cb(void *arg) { }
- #endif
- /* }}} */
+--- php-8.0.0rc1/main/php_ini.c~	2020-10-09 18:15:48.000000000 +0300
++++ php-8.0.0rc1/main/php_ini.c	2020-10-09 18:42:20.087488856 +0300
+@@ -65,6 +65,11 @@
+ PHPAPI char *php_ini_scanned_path=NULL;
+ PHPAPI char *php_ini_scanned_files=NULL;
  
 +static int php_csort(const struct dirent **a, const struct dirent **b)
 +{
 +	return strcmp((*a)->d_name,(*b)->d_name);
 +}
 +
- /* {{{ php_init_config
-  */
- int php_init_config(void)
+ /* {{{ php_ini_displayer_cb */
+ static ZEND_COLD void php_ini_displayer_cb(zend_ini_entry *ini_entry, int type)
+ {
 @@ -661,12 +666,14 @@ int php_init_config(void)
  		zend_llist scanned_ini_list;
  		zend_llist_element *element;

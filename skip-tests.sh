@@ -83,15 +83,6 @@ mv ext/standard/tests/general_functions/proc_nice_basic.phpt{,.skip}
 mv ext/standard/tests/general_functions/proc_open02.phpt{,.skip}
 # Test setlocale() function : usage variations - Setting all available locales in the platform
 mv ext/standard/tests/strings/setlocale_variation2.phpt{,.skip}
-# xmlrpc_encode_request() and various arguments
-mv ext/xmlrpc/tests/002.phpt{,.skip}
-# Bug #40576 (double values are truncated to 6 decimal digits when encoding)
-$ix86 mv ext/xmlrpc/tests/bug40576.phpt{,.skip}
-$x8664 mv ext/xmlrpc/tests/bug40576_64bit.phpt{,.skip}
-# Bug #45555 (Segfault with invalid non-string as register_introspection_callback)
-mv ext/xmlrpc/tests/bug45555.phpt{,.skip}
-# Bug #45556 (Return value from callback isn't freed)
-mv ext/xmlrpc/tests/bug45556.phpt{,.skip}
 # apache_request_headers() stack overflow.
 mv sapi/cgi/tests/apache_request_headers.phpt{,.skip}
 # show information about extension

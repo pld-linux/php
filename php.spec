@@ -1,5 +1,7 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
+# TODO 8.0:
+# - removed packages: xmlrpc
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # TODO:
@@ -14,7 +16,7 @@
 %bcond_without	alternatives	# use alternatives system to select default phar and php-fpm
 %bcond_with	default_php	# build this PHP as default PHP in system (disables alternatives)
 # - General options:
-%bcond_without	embed		# disable building Embedded API
+%bcond_with	embed		# disable building Embedded API
 %bcond_with	gcov		# Enable Code coverage reporting
 %bcond_without	kerberos5	# without Kerberos5 support
 %bcond_with	systemtap	# systemtap/DTrace support
@@ -47,7 +49,6 @@
 %bcond_without	iconv		# without iconv extension module
 %bcond_without	imap		# without IMAP extension module
 %bcond_without	intl		# without Intl extension module
-%bcond_without	json		# without json extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mbstring	# without mbstring extension module
 %bcond_without	mhash		# without mhash extension (supported by hash extension)
@@ -78,7 +79,6 @@
 %bcond_without	sqlite2		# without SQLite extension module
 %bcond_without	sqlite3		# without SQLite3 extension module
 %bcond_without	tidy		# without Tidy extension module
-%bcond_without	xmlrpc		# without XML-RPC extension module
 %bcond_without	xsl			# without xsl extension module
 %bcond_without	zip			# without zip extension module
 # extensions options
@@ -140,7 +140,7 @@
 %endif
 
 %define		orgname	php
-%define		ver_suffix 74
+%define		ver_suffix 80
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -149,16 +149,17 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.4.6
-Release:	3
+Version:	8.0.0
+Release:	0.rc1.1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	523b7d61e5fa8ea15375f6d1f7e2876a
+#Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://downloads.php.net/~carusogabriel/php-%{version}rc1.tar.xz
+# Source0-md5:	95923f24e336801d704d4177fcb3e0ce
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -180,7 +181,6 @@ Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 Patch14:	%{orgname}-no_pear_install.patch
-Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
 Patch21:	%{orgname}-dba-link.patch
 Patch22:	%{orgname}-both-apxs.patch
@@ -196,7 +196,6 @@ Patch43:	%{orgname}-silent-session-cleanup.patch
 Patch44:	%{orgname}-include_path.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch53:	fix-test-run.patch
-Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
 Patch66:	php-db.patch
@@ -270,7 +269,6 @@ BuildRequires:	tar >= 1:1.22
 %{?with_tidy:BuildRequires:	tidy-devel}
 BuildRequires:	tokyocabinet-devel
 %{?with_odbc:BuildRequires:	unixODBC-devel}
-%{?with_xmlrpc:BuildRequires:	xmlrpc-epi-devel >= 0.54.1}
 BuildRequires:	xz
 BuildRequires:	zlib-devel >= 1.2.0.4
 %if %{with apache2}
@@ -285,9 +283,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20190902
+%define		php_api_version		20200930
 %define		zend_module_api		%{php_api_version}
-%define		zend_extension_api	3%{zend_module_api}
+%define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20170320
 
 # Extension versions
@@ -299,7 +297,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.15.6
+%define		zipver		1.19.1
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
@@ -1775,23 +1773,6 @@ Moduł PHP umożliwiający analizę plików XML w trybie Pull. Czytnik
 działa jako kursor przechodzący przez strumień dokumentu i
 zatrzymujący się na każdym węźle po drodze.
 
-%package xmlrpc
-Summary:	xmlrpc extension module for PHP
-Summary(pl.UTF-8):	Moduł xmlrpc dla PHP
-Group:		Libraries
-URL:		http://php.net/manual/en/book.xmlrpc.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-xml = %{epoch}:%{version}-%{release}
-Provides:	php(xmlrpc)
-Obsoletes:	php-xmlrpc < 4:5.3.28-7
-
-%description xmlrpc
-This is a dynamic shared object (DSO) for PHP that will add XMLRPC
-support.
-
-%description xmlrpc -l pl.UTF-8
-Moduł PHP dodający obsługę XMLRPC.
-
 %package xmlwriter
 Summary:	Fast, non-cached, forward-only means to write XML data
 Summary(pl.UTF-8):	Szybka, nie cachowana metoda zapisu danych w formacie XML
@@ -1867,29 +1848,33 @@ compression support to PHP.
 Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
+%if 0
 %setup -q -n %{orgname}-%{version}
+%else
+%setup -q -n %{orgname}-%{version}rc1
+%endif
+
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
+#%patch2 -p1 -b .mail
 %patch3 -p1
 %patch4 -p1
 
-%patch7 -p1
+%patch7 -p1 -b .sapi-ini-file
 %patch9 -p1
-%patch10 -p1
+%patch10 -p1 -b .ini
 %patch14 -p1
-%patch17 -p1
 %patch18 -p1
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
-%patch24 -p1
+%patch24 -p1 -b .zlib-for-getimagesize
 %patch25 -p1
 %patch27 -p1
 %patch29 -p1
 %patch31 -p1
-%patch39 -p1
+%patch39 -p1 -b .use-prog_sendmail
 %patch41 -p1
 %patch43 -p1
 %patch44 -p1
@@ -1897,21 +1882,19 @@ cp -p php.ini-production php.ini
 
 %patch53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
-%patch55 -p1
+
 %patch59 -p1 -b .systzdata
 %if %{with instantclient}
 %patch60 -p1 -b .instantclient
 %endif
 %patch66 -p1
-%patch67 -p1
+%patch67 -p1 -b .mysql-lib-ver-mismatch
 #%patch68 -p1 DROP or update to 7.0 APIs
-%patch71 -p1
+%patch71 -p1 -b .libdb-info
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \
       run-tests.php
-
-%{__sed} -i -e '/PHP_ADD_LIBRARY_WITH_PATH/s#xmlrpc,#xmlrpc-epi,#' ext/xmlrpc/config.m4
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
@@ -1930,7 +1913,6 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/mbstring/libmbfl
 #%{__rm} -r ext/pcre/pcre2lib
 #%{__rm} -r ext/soap/interop
-%{__rm} -r ext/xmlrpc/libxmlrpc
 #%{__rm} -r ext/zip/lib
 %{__rm} ext/date/lib/timezonedb.h
 
@@ -2123,8 +2105,7 @@ if [ ! -f _built-conf ]; then
 	touch _built-conf
 fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
-export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
-	-I%{_includedir}/xmlrpc-epi"
+export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags}"
 
 # This should be detected by configure and set there,
 # but looks like the build system is hosed on 7.3
@@ -2204,7 +2185,6 @@ for sapi in $sapis; do
 	%{?with_argon2:--with-password-argon2} \
 	--%{!?with_debug:dis}%{?with_debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
-	--enable-inline-optimization \
 	--enable-option-checking=fatal \
 	%{__enable_disable bcmath bcmath shared} \
 	%{__enable_disable calendar calendar shared} \
@@ -2221,7 +2201,6 @@ for sapi in $sapis; do
 	--enable-mbregex \
 	%{__enable_disable pcntl pcntl shared} \
 	%{__enable_disable pdo pdo shared} \
-	%{__enable_disable json json shared} \
 	--enable-xmlwriter=shared \
 %if %{with fpm}
 	--with-fpm-user=http \
@@ -2290,7 +2269,6 @@ for sapi in $sapis; do
 	%{__with_without sqlite3 sqlite3 shared} \
 	%{?with_tidy:--with-tidy=shared} \
 	%{?with_odbc:--with-unixODBC=shared} \
-	%{__with_without xmlrpc xmlrpc shared,/usr} \
 	%{?with_xsl:--with-xsl=shared} \
 	--with-zlib=shared \
 	%{?with_zip:--with-zip=shared} \
@@ -2723,7 +2701,6 @@ fi \
 %extension_scripts tokenizer
 %extension_scripts xml
 %extension_scripts xmlreader
-%extension_scripts xmlrpc
 %extension_scripts xmlwriter
 %extension_scripts xsl
 %extension_scripts zip
@@ -2990,13 +2967,9 @@ fi
 %attr(755,root,root) %{php_extensiondir}/intl.so
 %endif
 
-%if %{with json}
 %files json
 %defattr(644,root,root,755)
 %doc ext/json/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_json.ini
-%attr(755,root,root) %{php_extensiondir}/json.so
-%endif
 
 %if %{with ldap}
 %files ldap
@@ -3297,14 +3270,6 @@ fi
 %doc ext/xmlreader/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_xmlreader.ini
 %attr(755,root,root) %{php_extensiondir}/xmlreader.so
-
-%if %{with xmlrpc}
-%files xmlrpc
-%defattr(644,root,root,755)
-%doc ext/xmlrpc/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_xmlrpc.ini
-%attr(755,root,root) %{php_extensiondir}/xmlrpc.so
-%endif
 
 %files xmlwriter
 %defattr(644,root,root,755)

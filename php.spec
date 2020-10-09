@@ -1874,7 +1874,7 @@ cp -p php.ini-production php.ini
 %patch27 -p1
 %patch29 -p1
 %patch31 -p1
-#%patch39 -p1 -b .use-prog_sendmail
+%patch39 -p1 -b .use-prog_sendmail
 %patch41 -p1
 %patch43 -p1
 %patch44 -p1

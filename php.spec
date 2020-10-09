@@ -181,7 +181,6 @@ Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 Patch14:	%{orgname}-no_pear_install.patch
-Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
 Patch21:	%{orgname}-dba-link.patch
 Patch22:	%{orgname}-both-apxs.patch
@@ -1866,7 +1865,6 @@ cp -p php.ini-production php.ini
 %patch9 -p1
 %patch10 -p1 -b .ini
 %patch14 -p1
-#%patch17 -p1 -b readline
 %patch18 -p1
 %patch21 -p1
 %patch22 -p1

@@ -1862,7 +1862,7 @@ cp -p php.ini-production php.ini
 %patch3 -p1
 %patch4 -p1
 
-#%patch7 -p1 -b .sapi-ini-file
+%patch7 -p1 -b .sapi-ini-file
 %patch9 -p1
 %patch10 -p1 -b .ini
 %patch14 -p1

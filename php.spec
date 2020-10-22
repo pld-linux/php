@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	34
+%define		rel	35
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2023,6 +2023,9 @@ mv sapi/cli/tests/022.phpt{,.broken}
 
 sh -xe %{_sourcedir}/skip-tests.sh
 
+# make colliding symbol static
+%{__sed} -i -e 's/^char \*yytext/static &/' Zend/zend_{ini,language}_scanner.c
+
 %build
 API=$(awk '/#define PHP_API_VERSION/{print $3}' main/php.h)
 if [ $API != %{php_api_version} ]; then
@@ -2111,7 +2114,6 @@ for sapi in $sapis; do
 	--with-system-tzdata \
 	--%{!?debug:dis}%{?debug:en}able-debug \
 	%{?with_zts:--enable-maintainer-zts} \
-	%{?with_suhosin:--enable-suhosin} \
 	%{?with_zend_multibyte:--enable-zend-multibyte} \
 	--enable-inline-optimization \
 	--enable-bcmath=shared \

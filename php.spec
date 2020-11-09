@@ -196,7 +196,6 @@ Patch43:	%{orgname}-silent-session-cleanup.patch
 Patch44:	%{orgname}-include_path.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch53:	fix-test-run.patch
-Patch55:	bug-52078-fileinode.patch
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
 Patch66:	php-db.patch

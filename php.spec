@@ -147,8 +147,8 @@ Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
 Summary(pt_BR.UTF-8):	A linguagem de script PHP
-Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
-Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
+Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
+Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.0.0
 Release:	1.%{subver}.1

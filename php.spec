@@ -142,7 +142,7 @@
 %define		orgname	php
 %define		ver_suffix 80
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
-%define		subver RC3
+%define		subver RC5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -160,7 +160,7 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
 Source0:	https://downloads.php.net/~carusogabriel/php-%{version}%{subver}.tar.xz
-# Source0-md5:	60162de680b1c0777ff0249bc5de929c
+# Source0-md5:	2809a29c4bb82640e4d0860f904d9d4f
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -1876,10 +1876,7 @@ cp -p php.ini-production php.ini
 %patch43 -p1
 %patch44 -p1
 %patch50 -p1
-
 %patch53 -p1
-%undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
-
 %patch59 -p1 -b .systzdata
 %if %{with instantclient}
 %patch60 -p1 -b .instantclient

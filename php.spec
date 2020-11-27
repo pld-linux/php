@@ -2584,7 +2584,14 @@ fi
 # restart webserver at the end of transaction
 [ ! -f /etc/httpd/conf.d/??_mod_php.conf ] || %service -q httpd restart
 
-%triggerpostun common -- php-common < 4:5.3.28-7
+%triggerpostun common -- %{name}-common < 4:5.6.4-2, php-common < 4:5.6.4-2
+# switch to browscap package if the ini file has original value
+%{__sed} -i -e 's#%{_sysconfdir}/browscap.ini#/usr/share/browscap/php_browscap.ini#' %{_sysconfdir}/php.ini
+# disable browscap, if optional package not present
+if [ ! -e /usr/share/browscap/php_browscap.ini ]; then
+	%{__sed} -i -e 's#^browscap = /usr/share/browscap/php_browscap.ini#;&#' %{_sysconfdir}/php.ini
+fi
+
 # migrate configs /etc/php/conf.d -> /etc/phpXY/conf.d/
 # do config migration in php-common trigger, as the trigger is ran after all packages are upgraded
 # this way we can stick to one trigger, instead of attaching one for each (sub)package!
@@ -2604,14 +2611,6 @@ for f in /etc/php/*.ini.rpmsave /etc/php/*.d/*.ini.rpmsave; do
 		s#/etc/php#%{_sysconfdir}#
 	' $nf
 done
-
-%triggerpostun common -- %{name}-common < 4:5.6.4-2, php-common < 4:5.6.4-2
-# switch to browscap package if the ini file has original value
-%{__sed} -i -e 's#%{_sysconfdir}/browscap.ini#/usr/share/browscap/php_browscap.ini#' %{_sysconfdir}/php.ini
-# disable browscap, if optional package not present
-if [ ! -e /usr/share/browscap/php_browscap.ini ]; then
-	%{__sed} -i -e 's#^browscap = /usr/share/browscap/php_browscap.ini#;&#' %{_sysconfdir}/php.ini
-fi
 
 %triggerpostun -n apache-mod_%{name} -- apache-mod_%{name} < 4:7.0.0-2.RC4
 sed -i -e 's#modules/libphp[57].so#modules/mod_php.so#g' /etc/httpd/conf.d/*_mod_php.conf

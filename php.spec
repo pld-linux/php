@@ -142,7 +142,6 @@
 %define		orgname	php
 %define		ver_suffix 80
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
-%define		subver RC5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -151,16 +150,15 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.0.0
-Release:	1.%{subver}.1
+Release:	2
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-#Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://downloads.php.net/~carusogabriel/php-%{version}%{subver}.tar.xz
-# Source0-md5:	2809a29c4bb82640e4d0860f904d9d4f
+Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	52ad70ea64968d6095c6e38139533d57
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

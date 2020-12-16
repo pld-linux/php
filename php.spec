@@ -1,7 +1,5 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
-# TODO 8.0:
-# - removed packages: xmlrpc
 # TODO 5.6:
 # - enable --with-fpm-systemd, but ensure it checks for sd_booted()
 # TODO:

@@ -189,7 +189,6 @@ Patch24:	%{orgname}-zlib-for-getimagesize.patch
 Patch25:	%{orgname}-stupidapache_version.patch
 Patch27:	%{orgname}-config-dir.patch
 Patch29:	%{orgname}-fcgi-graceful.patch
-Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
 Patch39:	%{orgname}-use-prog_sendmail.patch
 Patch41:	%{orgname}-fpm-config.patch
 Patch43:	%{orgname}-silent-session-cleanup.patch
@@ -1890,7 +1889,6 @@ cp -p php.ini-production php.ini
 %patch25 -p1
 %patch27 -p1
 %patch29 -p1
-%patch31 -p1
 %patch39 -p1
 %patch41 -p1
 %patch43 -p1

@@ -462,7 +462,7 @@ Summary:	/usr/bin/php symlink
 Summary(pl.UTF-8):	Dowiązanie symboliczne /usr/bin/php
 Group:		Development/Languages/PHP
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
-%if "%_rpmversion" != "4.16.0"
+%if "%_rpmversion" != "4.16.1.2"
 Obsoletes:	/usr/bin/php
 %endif
 Obsoletes:	php-program < 4:5.3.28-7

@@ -13,8 +13,8 @@
 --- php-5.2.4/Makefile.global~	2007-08-31 19:13:58.000000000 +0300
 +++ php-5.2.4/Makefile.global	2007-08-31 19:19:33.799017413 +0300
 @@ -13,8 +13,12 @@
- 	
- build-modules: $(PHP_MODULES)
+ 
+ build-binaries: $(PHP_BINARIES)
  
 -libphp$(PHP_MAJOR_VERSION).la: $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS)
 -	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(EXTRA_CFLAGS) -rpath $(phptempdir) $(EXTRA_LDFLAGS) $(LDFLAGS) $(PHP_RPATHS) $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@
@@ -65,7 +65,7 @@
 --- php-5.4.0alpha2/sapi/cli/config.m4~	2011-06-20 23:27:39.000000000 +0300
 +++ php-5.4.0alpha2/sapi/cli/config.m4	2011-08-01 10:34:01.072624745 +0300
 @@ -31,7 +31,7 @@
-     BUILD_CLI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_BINARY_OBJS) \$(PHP_CLI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -Lnetware -lphp5lib -o \$(SAPI_CLI_PATH)"
+     BUILD_CLI="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_BINARY_OBJS:.lo=.o) \$(PHP_CLI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CLI_PATH)"
      ;;
    *)
 -    BUILD_CLI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_CLI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CLI_PATH)"
@@ -101,7 +101,7 @@
 --- php-7.0.0RC3/sapi/phpdbg/config.m4~	2015-09-16 15:49:38.000000000 +0300
 +++ php-7.0.0RC3/sapi/phpdbg/config.m4	2015-09-27 21:25:34.413134698 +0300
 @@ -40,7 +40,7 @@
-   
+ 
    BUILD_PHPDBG="\$(LIBTOOL) --mode=link \
          \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \
 -                \$(PHP_GLOBAL_OBJS) \

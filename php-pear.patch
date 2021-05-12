@@ -10,7 +10,7 @@
 -fi
 -
  PHP_ARG_WITH(pear, [whether to install PEAR],
- [  --with-pear=DIR         Install PEAR in DIR [PREFIX/lib/php]
+ [  --with-pear=DIR         Install PEAR in DIR @<:@PREFIX/lib/php@:>@
    --without-pear          Do not install PEAR], DEFAULT, yes)
 @@ -1137,19 +1137,6 @@
    --without-pear          Do not install PEAR], DEFAULT, yes)
@@ -41,5 +41,5 @@
 -                          (this forces --without-pear)], yes, no)
 +                          ], yes, no)
  
- AC_MSG_CHECKING(for CLI build)
- if test "$PHP_CLI" != "no"; then
+ AC_CHECK_FUNCS(setproctitle)
+ 

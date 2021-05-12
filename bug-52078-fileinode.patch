@@ -58,7 +58,7 @@
 --- php-5.3.3/ext/standard/tests/file/fileinode_variation1.phpt~	2008-11-26 12:10:19.000000000 +0200
 +++ php-5.3.3/ext/standard/tests/file/fileinode_variation1.phpt	2010-07-26 19:35:31.216291870 +0300
 @@ -42,7 +42,7 @@
- 
+ ?>
  --EXPECTF--
  *** Testing fileinode() with links ***
 -int(%d)
@@ -319,7 +319,7 @@
  *** Done ***
 --- php-5.3.3/tests/security/open_basedir_fileinode.phpt~	2008-05-09 11:39:44.000000000 +0300
 +++ php-5.3.3/tests/security/open_basedir_fileinode.phpt	2010-07-27 22:51:29.603089549 +0300
-@@ -46,10 +46,10 @@
+@@ -46,9 +46,9 @@
  
  Warning: fileinode(): open_basedir restriction in effect. File(./../.) is not within the allowed path(s): (.) in %s on line %d
  bool(false)
@@ -334,7 +334,6 @@
 +int(%i)
 +int(%i)
  *** Finished testing open_basedir configuration [fileinode] ***
- 
 --- php-5.3.3/ext/spl/tests/SplFileInfo_getInode_basic.phpt~	2010-08-04 16:25:21.000000000 +0300
 +++ php-5.3.3/ext/spl/tests/SplFileInfo_getInode_basic.phpt	2010-08-04 16:28:32.722932851 +0300
 @@ -11,6 +11,7 @@

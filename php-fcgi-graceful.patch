@@ -27,12 +27,12 @@ echo "end!<br>\n";
 +/* Socket we are listening on incoming connections */
 +static int fcgi_fd = 0;
 +
- /**
-  * Process group
-  */
+ #ifndef PHP_WIN32
+ /* Did parent received exit signals SIG_TERM/SIG_INT/SIG_QUIT */
+ static int exit_signal = 0;
 @@ -1221,6 +1224,21 @@
- 	exit(0);
  }
+ #endif
  
 +/**
 + * Graceful shutdown. Close listening sockets.
@@ -58,8 +58,8 @@ echo "end!<br>\n";
  	char *bindpath = NULL;
 -	int fcgi_fd = 0;
  	fcgi_request *request = NULL;
+ 	int warmup_repeats = 0;
  	int repeats = 1;
- 	int benchmark = 0;
 @@ -2080,9 +2080,14 @@
  						parent = 0;
  

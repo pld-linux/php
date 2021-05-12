@@ -5,8 +5,8 @@ see also http://bugs.php.net/bug.php?id=29611
 --- php-7.0/ext/standard/image.c~	2015-05-21 23:10:45.000000000 +0300
 +++ php-7.0/ext/standard/image.c	2015-05-21 23:11:22.424948534 +0300
 @@ -31,7 +31,7 @@
+ #include "win32/php_stdint.h"
  #endif
- #include "php_image.h"
  
 -#if HAVE_ZLIB && !defined(COMPILE_DL_ZLIB)
 +#if HAVE_ZLIB
@@ -20,7 +20,7 @@ see also http://bugs.php.net/bug.php?id=29611
 -#if HAVE_ZLIB && !defined(COMPILE_DL_ZLIB)
 +#if HAVE_ZLIB
  	REGISTER_LONG_CONSTANT("IMAGETYPE_SWC",     IMAGE_FILETYPE_SWC,     CONST_CS | CONST_PERSISTENT);
- #endif	
+ #endif
  	REGISTER_LONG_CONSTANT("IMAGETYPE_IFF",     IMAGE_FILETYPE_IFF,     CONST_CS | CONST_PERSISTENT);
 @@ -184,7 +184,7 @@
  }
@@ -30,7 +30,7 @@ see also http://bugs.php.net/bug.php?id=29611
 +#if HAVE_ZLIB
  /* {{{ php_handle_swc
   */
- static struct gfxinfo *php_handle_swc(php_stream * stream TSRMLS_DC)
+ static struct gfxinfo *php_handle_swc(php_stream * stream)
 @@ -1321,7 +1321,7 @@
  			result = php_handle_swf(stream);
  			break;

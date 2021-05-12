@@ -80,8 +80,8 @@
  #include "ext/standard/info.h"
  #include "ext/standard/basic_functions.h"
 @@ -208,6 +211,17 @@
- 	REGISTER_LONG_CONSTANT("PREG_JIT_STACKLIMIT_ERROR", PHP_PCRE_JIT_STACKLIMIT_ERROR, CONST_CS | CONST_PERSISTENT);
- 	REGISTER_STRING_CONSTANT("PCRE_VERSION", (char *)pcre_version(), CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_BOOL_CONSTANT("PCRE_JIT_SUPPORT", 0, CONST_CS | CONST_PERSISTENT);
+ #endif
  
 +#if COMPILE_DL_PCRE
 +	pcre_get_compiled_regex_p = pcre_get_compiled_regex;
@@ -121,7 +121,7 @@
 --- php-5.3.2/sapi/cli/tests/018.phpt~	2008-03-17 16:05:39.000000000 +0200
 +++ php-5.3.2/sapi/cli/tests/018.phpt	2010-03-16 20:41:11.341251246 +0200
 @@ -20,8 +20,6 @@
- --EXPECTF--     
+ --EXPECTF--
  [PHP Modules]
  %a
 -pcre

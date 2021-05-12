@@ -1,7 +1,7 @@
 --- php-7.3.24/acinclude.m4~	2020-11-09 14:38:20.000000000 +0200
 +++ php-7.3.24/acinclude.m4	2020-11-09 14:39:53.522036584 +0200
 @@ -1731,8 +1731,10 @@
- dnl Search for the sendmail binary.
+ dnl Search for the sendmail binary
  dnl
  AC_DEFUN([PHP_PROG_SENDMAIL], [
 -  PHP_ALT_PATH=/usr/bin:/usr/sbin:/usr/etc:/etc:/usr/ucblib:/usr/lib

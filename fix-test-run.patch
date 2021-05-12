@@ -1,8 +1,8 @@
 --- php-5.4.0alpha2/configure.ac~	2011-08-07 12:43:31.000000000 +0300
 +++ php-5.4.0alpha2/configure.ac	2011-08-07 12:44:11.495394662 +0300
 @@ -1271,6 +1271,11 @@
-   ;;
- esac
+ PHP_OS=`uname | xargs`
+ AC_DEFINE_UNQUOTED(PHP_OS,"$PHP_OS",[uname output])
  
 +# shift so that pcre, spl, ... are loaded first
 +PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/xml.la \),\2\1,')

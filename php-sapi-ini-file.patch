@@ -6,7 +6,7 @@ https://github.com/pld-linux/php/commit/762ec2e
 --- php-7.0.0RC6.orig/main/php_ini.c	2015-11-10 23:58:52.227101032 +0200
 +++ php-7.0.0RC6/main/php_ini.c	2015-11-11 00:01:43.502674750 +0200
 @@ -375,12 +375,19 @@
- }
+ #endif
  /* }}} */
  
 +static int php_csort(const struct dirent **a, const struct dirent **b)

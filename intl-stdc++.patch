@@ -17,10 +17,10 @@ so just omit PHP_ADD_LIBRARY(stdc++)
 --- php-7.0.6/ext/intl/config.m4~	2016-04-28 21:13:06.000000000 +0300
 +++ php-7.0.6/ext/intl/config.m4	2016-05-16 18:49:53.909531704 +0300
 @@ -6,6 +6,7 @@
- [  --enable-intl           Enable internationalization support])
+     [Enable internationalization support])])
  
  if test "$PHP_INTL" != "no"; then
 +  dnl -lstdc++ not needed, will be inherited from icu
    PHP_SETUP_ICU(INTL_SHARED_LIBADD)
    PHP_SUBST(INTL_SHARED_LIBADD)
-   PHP_REQUIRE_CXX()
+   INTL_COMMON_FLAGS="$ICU_CFLAGS -Wno-write-strings -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"

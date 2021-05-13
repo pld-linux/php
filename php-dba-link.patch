@@ -8,4 +8,4 @@
 +            LIBS=$old_LIBS
              lib_found=1
            ])
-         ])
+         ],[])

@@ -7,5 +7,5 @@
 -#if !defined(MYSQL_USE_MYSQLND)
 +#if 0 && !defined(MYSQL_USE_MYSQLND)
  	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
- 		php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+ 		php_error_docref(NULL, E_WARNING,
  						"Headers and client library minor version mismatch. Headers:%d Library:%ld",

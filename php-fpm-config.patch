@@ -20,16 +20,16 @@
 --- php-5.6.5/sapi/fpm/www.conf.in~	2015-02-04 19:26:16.000000000 +0200
 +++ php-5.6.5/sapi/fpm/www.conf.in	2015-02-04 19:27:25.275218535 +0200
 @@ -32,7 +32,7 @@
- ;                            specific port;
+ ;                            (IPv6 and IPv4-mapped) on a specific port;
  ;   '/path/to/unix/socket' - to listen on a unix socket.
  ; Note: This value is mandatory.
 -listen = 127.0.0.1:9000
 +listen = /var/run/php/@processname@.sock
  
  ; Set listen(2) backlog.
- ; Default Value: 65535 (-1 on FreeBSD and OpenBSD)
+ ; Default Value: 511 (-1 on FreeBSD and OpenBSD)
 @@ -46,9 +46,9 @@
- ; BSD-derived systems allow connections regardless of permissions. 
+ ; and group can be specified either by name or by their numeric IDs.
  ; Default Values: user and group are set as the running user
  ;                 mode is set to 0660
 -;listen.owner = @php_fpm_user@
@@ -83,5 +83,5 @@
 +		$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf; \
 +		$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf; \
  	fi
- 	
+ 
  	@echo "Installing PHP FPM man page:      $(INSTALL_ROOT)$(mandir)/man8/"

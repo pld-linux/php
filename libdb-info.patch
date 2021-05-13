@@ -1,8 +1,8 @@
 --- php-7.0.0beta1/ext/dba/dba.c.libdb	2015-07-08 02:24:59.119020904 +0200
 +++ php-7.0.0beta1/ext/dba/dba.c	2015-07-08 07:01:43.158767655 +0200
 @@ -52,6 +52,10 @@
- #include "php_qdbm.h"
  #include "php_tcadb.h"
+ #include "php_lmdb.h"
  
 +#ifdef DB4_INCLUDE_FILE
 +#include DB4_INCLUDE_FILE

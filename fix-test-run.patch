@@ -1,15 +1,15 @@
 --- php-5.4.0alpha2/configure.ac~	2011-08-07 12:43:31.000000000 +0300
 +++ php-5.4.0alpha2/configure.ac	2011-08-07 12:44:11.495394662 +0300
 @@ -1271,6 +1271,9 @@
-   ;;
- esac
+ PHP_OS=`uname | xargs`
+ AC_DEFINE_UNQUOTED(PHP_OS,"$PHP_OS",[uname output])
  
 +# shift so that extensions like xml are loaded first
 +PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/xml.la \),\2\1,')
 +
  PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
  
- PHP_SUBST(PHP_EXECUTABLE)
+ PHP_SUBST(PHP_FASTCGI_OBJS)
 --- php-5.5.11/build/Makefile.global	2014-04-27 15:05:38.963814051 +0300
 +++ php-5.5.11/build/Makefile.global	2014-04-27 15:09:54.438443707 +0300
 @@ -81,8 +81,15 @@

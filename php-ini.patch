@@ -1,9 +1,11 @@
 --- php-7.4.0RC2/php.ini~	2019-09-23 10:43:53.000000000 +0300
 +++ php-7.4.0RC2/php.ini	2019-09-23 11:52:45.049464720 +0300
-@@ -82,6 +82,20 @@
- ; much more verbose when it comes to errors. We recommending using the
- ; development version only in development environments as errors shown to
+@@ -82,8 +82,19 @@
+ ; much more verbose when it comes to errors. We recommend using the
+ ; development version only in development environments, as errors shown to
  ; application users can inadvertently leak otherwise secure information.
+-
+-; This is the php.ini-production INI file.
 +;
 +; This is the default settings file for new PHP installations from
 +; PLD Linux Distribution.
@@ -17,7 +19,6 @@
 +; /etc/php/php-cli.ini, /etc/php/php-apache.ini...) is INCLUDED
 +; (so you don't have to duplicate whole large file to override only
 +; few options)
-+
  
  ;;;;;;;;;;;;;;;;;;;
  ; Quick Reference ;
@@ -40,8 +41,8 @@
 -short_open_tag = Off
 +short_open_tag = On
  
- ; Allow ASP-style <% %> tags.
- ; http://php.net/asp-tags
+ ; The number of significant digits displayed in floating point numbers.
+ ; http://php.net/precision
 @@ -360,7 +372,7 @@
  ; threat in any way, but it makes it possible to determine whether you use PHP
  ; on your server or not.
@@ -213,8 +214,8 @@
 -;iconv.output_encoding =
 +iconv.output_encoding = UTF-8
  
- [intl]
- ;intl.default_locale =
+ [imap]
+ ; rsh/ssh logins are disabled by default. Use this INI entry if you want to
 @@ -1360,7 +1274,7 @@
  
  [browscap]

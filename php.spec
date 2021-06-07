@@ -147,7 +147,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.0.6
+Version:	8.0.7
 Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -156,7 +156,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	d7b95830ccbc909980bd0c202e6606ad
+# Source0-md5:	ee5d675f8e9d58fcdc4c887d3d9e8412
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -617,6 +617,7 @@ Obsoletes:	php56-devel
 Obsoletes:	php70-devel
 Obsoletes:	php71-devel
 Obsoletes:	php73-devel
+Obsoletes:	php74-devel
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.
@@ -2279,7 +2280,7 @@ cp -af Makefile.cli Makefile
 	MYSQLND_SHARED_LIBADD="-lssl -lcrypto"
 
 %if %{with apache2}
-%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp7.la -f Makefile.apxs2
+%{__make} libtool-sapi LIBTOOL_SAPI=sapi/apache2handler/libphp8.la -f Makefile.apxs2
 %endif
 
 %if %{with litespeed}
@@ -2287,7 +2288,7 @@ cp -af Makefile.cli Makefile
 %endif
 
 %if %{with embed}
-%{__make} -f Makefile.embed libphp7.la
+%{__make} -f Makefile.embed libphp8.la
 %endif
 
 %if %{with phpdbg}
@@ -2402,9 +2403,9 @@ v=$(echo %{version} | cut -d. -f1-2)
 
 # install Apache2 DSO module
 %if %{with apache2}
-libtool --mode=install install -p sapi/apache2handler/libphp7.la $RPM_BUILD_ROOT%{_libdir}/apache
-%{__mv} $RPM_BUILD_ROOT%{_libdir}/apache/libphp7{,-$v}.so
-ln -s libphp7-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/mod_php.so
+libtool --mode=install install -p sapi/apache2handler/libphp8.la $RPM_BUILD_ROOT%{_libdir}/apache
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/apache/libphp8{,-$v}.so
+ln -s libphp8-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/mod_php.so
 %endif
 
 # install litespeed sapi
@@ -2466,7 +2467,7 @@ touch $RPM_BUILD_ROOT%{_sbindir}/php-fpm
 # we could use install-headers from Makefile.embed, but that would reinstall all headers
 # install-sapi installs to wrong dir, so just do it all manually
 install -d $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
-install -p libs/libphp7.so $RPM_BUILD_ROOT%{_libdir}
+install -p libs/libphp8.so $RPM_BUILD_ROOT%{_libdir}
 cp -p sapi/embed/php_embed.h $RPM_BUILD_ROOT%{_includedir}/php/sapi/embed
 %endif
 
@@ -2484,7 +2485,7 @@ cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/cli.d/php.ini
 %if %{with apache2}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/apache2handler.d/php.ini
-%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp7.la
+%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.la
 %endif
 
 # ensure that paths are correct for current php version and arch
@@ -2718,7 +2719,7 @@ fi
 %defattr(644,root,root,755)
 %dir %{_sysconfdir}/apache2handler.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache2handler.d/php.ini
-%attr(755,root,root) %{_libdir}/apache/libphp7-*.*.so
+%attr(755,root,root) %{_libdir}/apache/libphp8-*.*.so
 %endif
 
 %if %{with litespeed}
@@ -2739,7 +2740,7 @@ fi
 %if %{with embed}
 %files embedded
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libphp7.so
+%attr(755,root,root) %{_libdir}/libphp8.so
 %endif
 
 %files cli

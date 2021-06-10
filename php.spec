@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	9
+%define		rel	10
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -526,6 +526,17 @@ Group:		Development/Languages/PHP
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Obsoletes:	/usr/bin/php
 Obsoletes:	php-program < 4:5.3.28-7
+Obsoletes:	php4-program
+Obsoletes:	php52-program
+Obsoletes:	php53-program
+Obsoletes:	php54-program
+Obsoletes:	php55-program
+Obsoletes:	php70-program
+Obsoletes:	php71-program
+Obsoletes:	php72-program
+Obsoletes:	php73-program
+Obsoletes:	php74-program
+Obsoletes:	php80-program
 
 %description program
 Package providing /usr/bin/php symlink to PHP CLI.

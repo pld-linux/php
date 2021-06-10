@@ -143,7 +143,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_alternatives
 %endif
 
-%define		rel	52
+%define		rel	53
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -554,8 +554,18 @@ Summary:	/usr/bin/php symlink
 Summary(pl.UTF-8):	Dowiązanie symboliczne /usr/bin/php
 Group:		Development/Languages/PHP
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
-Obsoletes:	/usr/bin/php
 Obsoletes:	php-program < 4:5.3.28-7
+Obsoletes:	php4-program
+Obsoletes:	php52-program
+Obsoletes:	php54-program
+Obsoletes:	php55-program
+Obsoletes:	php56-program
+Obsoletes:	php70-program
+Obsoletes:	php71-program
+Obsoletes:	php72-program
+Obsoletes:	php73-program
+Obsoletes:	php74-program
+Obsoletes:	php80-program
 
 %description program
 Package providing /usr/bin/php symlink to PHP CLI.

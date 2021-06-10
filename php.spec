@@ -157,7 +157,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.3.28
-Release:	1
+Release:	2
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -487,6 +487,17 @@ Summary(pl.UTF-8):	Dowiązanie symboliczne /usr/bin/php
 Group:		Development/Languages/PHP
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Obsoletes:	php-program < 4:5.3.28-7
+Obsoletes:	php4-program
+Obsoletes:	php52-program
+Obsoletes:	php53-program
+Obsoletes:	php54-program
+Obsoletes:	php55-program
+Obsoletes:	php56-program
+Obsoletes:	php70-program
+Obsoletes:	php71-program
+Obsoletes:	php72-program
+Obsoletes:	php74-program
+Obsoletes:	php80-program
 
 %description program
 Package providing /usr/bin/php symlink to PHP CLI.

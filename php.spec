@@ -402,7 +402,6 @@ PHP - це мова написання скриптів, що вбудовуют
 Summary:	PHP DSO module for Apache 1.3.x
 Summary(pl.UTF-8):	Moduł DSO (Dynamic Shared Object) PHP dla Apache 1.3.x
 Group:		Development/Languages/PHP
-Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	apache1(EAPI) >= 1.3.33-2
 Requires:	apache1-mod_mime

@@ -184,7 +184,6 @@ Patch11:	embed.patch
 Patch12:	http://ilia.ws/patch/type_hint_53_v2.txt
 %endif
 Patch14:	%{orgname}-no_pear_install.patch
-#Patch15:	%{orgname}-zlib.patch # no longer needed?
 Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
 Patch19:	%{orgname}-gd_imagerotate_enable.patch
@@ -198,7 +197,6 @@ Patch26:	%{orgname}-pear.patch
 Patch27:	%{orgname}-config-dir.patch
 Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
-#Patch32:	%{orgname}-curl-limit-speed.patch # applied upstream
 Patch34:	%{orgname}-libtool.patch
 Patch35:	%{orgname}-tds.patch
 Patch36:	%{orgname}-mysql-charsetphpini.patch
@@ -212,20 +210,15 @@ Patch44:	%{orgname}-include_path.patch
 Patch45:	%{orgname}-imap-annotations.patch
 Patch46:	%{orgname}-imap-myrights.patch
 Patch47:	suhosin.patch
-#Patch49:	%{orgname}-m4-divert.patch # no longer needed, upstream supports new ac
 Patch50:	extension-shared-optional-dep.patch
 Patch51:	spl-shared.patch
 Patch52:	pcre-shared.patch
 Patch53:	fix-test-run.patch
-#Patch54:	mysqlnd-shared.patch # shared build supported upstream
 Patch55:	bug-52078-fileinode.patch
-#Patch57:	bug-52448.patch # outdated
 Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
-#Patch61:	%{orgname}-krb5-ac.patch # not needed on 5.4 anymore
 Patch62:	mcrypt-libs.patch
 Patch63:	%{orgname}-mysql-nowarning.patch
-#Patch64:	%{orgname}-m4.patch # not needed on 5.4 branch
 Patch65:	system-libzip.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch

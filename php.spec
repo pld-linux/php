@@ -507,7 +507,6 @@ Summary:	/usr/bin/php symlink
 Summary(pl.UTF-8):	Dowiązanie symboliczne /usr/bin/php
 Group:		Development/Languages/PHP
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
-Obsoletes:	/usr/bin/php
 Obsoletes:	php-program < 4:5.3.28-7
 Obsoletes:	php4-program
 Obsoletes:	php52-program

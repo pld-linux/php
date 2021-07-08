@@ -2,7 +2,7 @@
 +++ ./sapi/cgi/cgi_main.c	2007-09-05 20:54:19.390089070 +0300
 @@ -558,12 +558,7 @@
  		request = (fcgi_request*) SG(server_context);
- 		if (request) {			
+ 		if (request) {
  			int len = strlen(message);
 -			char *buf = malloc(len+2);
 -

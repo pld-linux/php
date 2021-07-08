@@ -7,7 +7,7 @@
 +	STD_PHP_INI_ENTRY("mysqli.connect_charset",			NULL,	PHP_INI_ALL,		OnUpdateString,		connect_charset,	zend_mysqli_globals,		mysqli_globals)
  	STD_PHP_INI_BOOLEAN("mysqli.reconnect",				"0",	PHP_INI_SYSTEM,		OnUpdateLong,		reconnect,			zend_mysqli_globals,		mysqli_globals)
  	STD_PHP_INI_BOOLEAN("mysqli.allow_local_infile",	"1",	PHP_INI_SYSTEM,		OnUpdateLong,		allow_local_infile,	zend_mysqli_globals,		mysqli_globals)
- #ifdef MYSQLI_USE_MYSQLND
+ PHP_INI_END()
 @@ -475,6 +476,7 @@
  	mysqli_globals->default_user = NULL;
  	mysqli_globals->default_pw = NULL;
@@ -38,8 +38,8 @@
 +	}
 +
  #if !defined(MYSQLI_USE_MYSQLND)
- 	if (mysql_real_connect(mysql->mysql, hostname, username, passwd, dbname, port, socket, CLIENT_MULTI_RESULTS) == NULL)
- #else
+ 	/* BC for prior to bug fix #53425 */
+ 	flags |= CLIENT_MULTI_RESULTS;
 --- php-5.3.1/ext/mysqli/php_mysqli_structs.h~	2009-10-14 16:51:25.000000000 +0300
 +++ php-5.3.1/ext/mysqli/php_mysqli_structs.h	2010-02-20 01:04:56.512214846 +0200
 @@ -358,6 +358,7 @@

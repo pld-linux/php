@@ -1,8 +1,8 @@
 --- php-5.2.4/Makefile.global~	2007-08-31 19:13:58.000000000 +0300
 +++ php-5.2.4/Makefile.global	2007-08-31 19:19:33.799017413 +0300
 @@ -13,8 +13,12 @@
- 	
- build-modules: $(PHP_MODULES)
+ 
+ build-binaries: $(PHP_BINARIES)
  
 -libphp$(PHP_MAJOR_VERSION).la: $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS)
 -	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(EXTRA_CFLAGS) -rpath $(phptempdir) $(EXTRA_LDFLAGS) $(LDFLAGS) $(PHP_RPATHS) $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@

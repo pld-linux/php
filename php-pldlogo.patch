@@ -1,8 +1,8 @@
 --- php-4.3.3RC3/ext/standard/info.c.orig	2003-06-19 18:43:41.000000000 +0200
 +++ php-4.3.3RC3/ext/standard/info.c	2003-08-16 21:37:18.705836072 +0200
 @@ -518,6 +518,21 @@
- 		PUTS(!sapi_module.phpinfo_as_text?"<br />":"\n");
- 		PUTS(zend_version);
+ 			zend_html_puts(zend_version, strlen(zend_version) TSRMLS_CC);
+ 		}
  		php_info_print_box_end();
 +		/* PLD Linux */
 +		php_info_print_box_start(0);
@@ -31,12 +31,14 @@ diff -urN php-4.2.1RC2.org/ext/standard/info.h php-4.2.1RC2/ext/standard/info.h
  #define PHP_CREDITS_GUID  "PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000"
 +#define PLD_LOGO_GUID	"PHPE9568F40-D428-11d2-A769-00AA001ACF42"
  
+ BEGIN_EXTERN_C()
  PHP_FUNCTION(phpversion);
- PHP_FUNCTION(phpinfo);
 --- php-4.3.0.org/main/logos.h	Sat May 11 20:49:24 2002
 +++ php-4.3.0/main/logos.h	Sat May 11 20:50:32 2002
-@@ -1503,1 +1503,127 @@
- 	249, 249, 207, 233,   5,   4,   0,  59 };
+@@ -1503,3 +1503,127 @@
+ 	 54, 240,   3,  66, 148,   6, 228, 178,  11, 192, 
+ 	192,   4, 236, 158, 239,   2,  17,  16,   0,  59};
+ 
 +
 +
 +unsigned char pld_logo[] = {

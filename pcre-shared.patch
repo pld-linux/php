@@ -86,8 +86,8 @@
 --- php-5.3.1/ext/standard/browscap.c	2009-06-06 02:40:49.000000000 +0000
 +++ php-5.3.1.pcre/ext/standard/browscap.c	2009-11-30 21:33:00.775241138 +0000
 @@ -31,6 +31,11 @@
- static zval *current_section;
- static char *current_section_name;
+ #define BROWSCAP_G(v)	(browscap_globals.v)
+ #endif
  
 +#if COMPILE_DL_PCRE
 +// will be visible in here

@@ -2,7 +2,7 @@
 +++ php-5.3.17/sapi/fpm/php-fpm.conf.in	2012-10-12 12:35:47.601602945 +0300
 @@ -12,7 +12,7 @@
  ; Relative path can also be used. They will be prefixed by:
- ;  - the global prefix if it's been set (-p arguement)
+ ;  - the global prefix if it's been set (-p argument)
  ;  - @prefix@ otherwise
 -;include=etc/fpm.d/*.conf
 +;include=/etc/php/fpm.d/*.conf
@@ -33,7 +33,7 @@
 -listen = 127.0.0.1:9000
 +listen = /var/run/php/@processname@.sock
  
- ; Set listen(2) backlog. A value of '-1' means unlimited.
+ ; Set listen(2) backlog.
  ; Default Value: 128 (-1 on FreeBSD and OpenBSD)
 @@ -105,7 +105,7 @@
  ; must be separated by a comma. If this value is left blank, connections will be
@@ -42,8 +42,8 @@
 -;listen.allowed_clients = 127.0.0.1
 +listen.allowed_clients = 127.0.0.1
  
- ; Set permissions for unix socket, if one is used. In Linux, read/write
- ; permissions must be set in order to allow connections from a web server. Many
+ ; Specify the nice(2) priority to apply to the pool processes (only if set)
+ ; The value can vary from -19 (highest priority) to 20 (lower priority)
 @@ -277,7 +277,7 @@
  ; the current environment.
  ; Default Value: clean env

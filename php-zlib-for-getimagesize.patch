@@ -5,8 +5,8 @@ see also http://bugs.php.net/bug.php?id=29611
 --- php-4.4.1/ext/standard/image.c	2005-07-27 14:22:36.000000000 +0300
 +++ /tmp/image.c	2006-01-06 19:14:00.000000000 +0200
 @@ -31,7 +31,7 @@
+ #include "win32/php_stdint.h"
  #endif
- #include "php_image.h"
  
 -#if HAVE_ZLIB && !defined(COMPILE_DL_ZLIB)
 +#if HAVE_ZLIB
@@ -39,4 +39,4 @@ see also http://bugs.php.net/bug.php?id=29611
 +#if HAVE_ZLIB
  			result = php_handle_swc(stream TSRMLS_CC);
  #else
- 			php_error_docref(NULL TSRMLS_CC, E_NOTICE, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled.");
+ 			php_error_docref(NULL TSRMLS_CC, E_NOTICE, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled");

@@ -10,7 +10,7 @@
 -fi
 -
  PHP_ARG_WITH(pear, [whether to install PEAR],
- [  --with-pear=DIR         Install PEAR in DIR [PREFIX/lib/php]
+ [  --with-pear=DIR         Install PEAR in DIR @<:@PREFIX/lib/php@:>@
    --without-pear          Do not install PEAR], DEFAULT, yes)
 @@ -1023,11 +1023,11 @@
    dnl

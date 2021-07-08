@@ -72,7 +72,7 @@
 +#ifdef HAVE_SPL && !COMPILE_DL_SPL
  	ZEND_MOD_REQUIRED("spl")
  #endif
- 	{NULL, NULL, NULL}
+ 	ZEND_MOD_END
 --- php-5.3.1/ext/phar/Makefile.frag~	2009-07-23 15:48:04.000000000 +0000
 +++ php-5.3.1/ext/phar/Makefile.frag	2009-11-30 16:10:29.687175948 +0000
 @@ -10,7 +10,7 @@

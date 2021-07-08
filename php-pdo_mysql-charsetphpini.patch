@@ -24,7 +24,7 @@ small.
 +	}
 +
  	if (mysqlnd_connect(H->server, host, dbh->username, dbh->password, password_len, dbname, dbname_len,
- 						port, unix_socket, connect_opts, PDO_MYSQL_G(mysqlnd_thd_zval_cache) TSRMLS_CC) == NULL) {
+ 						port, unix_socket, connect_opts TSRMLS_CC) == NULL) {
  #else
 --- php-5.3.3/ext/pdo_mysql/pdo_mysql.c~	2010-07-24 19:23:14.000000000 +0300
 +++ php-5.3.3/ext/pdo_mysql/pdo_mysql.c	2010-07-24 19:24:48.363581841 +0300

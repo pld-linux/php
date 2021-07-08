@@ -8,10 +8,10 @@
 +#include <string.h>
  #include "php.h"
  #include "ext/standard/info.h"
- 
+ #include "ext/standard/php_string.h"
 @@ -35,6 +37,8 @@
  #include "php_ini.h"
- #include "safe_mode.h"
+ #include "php_string.h"
  #include "exec.h"
 +#include "zend_operators.h"
 +#include "zend_globals.h"
@@ -19,7 +19,7 @@
  #ifdef PHP_WIN32
  #include "win32/sendmail.h"
 @@ -107,6 +111,18 @@
- 		return;
+ 		MAIL_ASCIIZ_CHECK(extra_cmd, extra_cmd_len);
  	}
  
 +    /* search for To: and Subject: headers which should be specified in proper mail() parameters, not in additional headers */
@@ -38,7 +38,7 @@
  		to_r = estrndup(to, to_len);
  		for (; to_len; to_len--) {
 @@ -231,8 +247,42 @@
- 			return 0;
+ 			MAIL_RET(0);
  		}
  #endif
 -		fprintf(sendmail, "To: %s\n", to);

@@ -16,7 +16,7 @@
 +		if (key_resources[i] == -1 && pkeys[i] != NULL) {
  			EVP_PKEY_free(pkeys[i]);
  		}
- 		if (eks[i]) { 
+ 		if (eks[i]) {
 diff --git a/ext/openssl/tests/bug71475.phpt b/ext/openssl/tests/bug71475.phpt
 new file mode 100644
 index 0000000..680753d

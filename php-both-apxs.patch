@@ -1,7 +1,7 @@
 --- php-5.2.4/Makefile.global~	2007-08-31 19:35:54.000000000 +0300
 +++ php-5.2.4/Makefile.global	2007-08-31 19:40:18.287528480 +0300
 @@ -21,6 +21,12 @@
- 	$(LIBTOOL) --mode=link $(CC) -rpath $(phptempdir) $(EXTRA_LDFLAGS) $(LDFLAGS) $(PHP_RPATHS) $(phptempdir)/libphp_common.la $(PHP_SAPI_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@
+ 	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(EXTRA_CFLAGS) -rpath $(phptempdir) $(EXTRA_LDFLAGS) $(LDFLAGS) $(PHP_RPATHS) $(phptempdir)/libphp_common.la $(PHP_SAPI_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@
  	-@$(LIBTOOL) --silent --mode=install cp $@ $(phptempdir)/$@ >/dev/null 2>&1
  
 +$(LIBTOOL_SAPI): libphp_common.la $(PHP_SAPI_OBJS)

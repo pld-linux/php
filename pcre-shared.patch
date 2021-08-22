@@ -1,6 +1,7 @@
---- php-5.3.1/ext/pcre/config0.m4	2009-11-30 22:09:24.385647500 +0000
-+++ php-5.3.24/ext/pcre/config0.m4	2013-04-17 13:37:52.761509001 +0300
-@@ -11,7 +11,7 @@
+diff -urNp -x '*.orig' php-5.3.29.org/ext/pcre/config0.m4 php-5.3.29/ext/pcre/config0.m4
+--- php-5.3.29.org/ext/pcre/config0.m4	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/pcre/config0.m4	2021-08-22 23:32:13.171860812 +0200
+@@ -11,7 +11,7 @@ PHP_ARG_WITH(pcre-regex,,
  
    if test "$PHP_PCRE_REGEX" != "yes" && test "$PHP_PCRE_REGEX" != "no"; then
      AC_MSG_CHECKING([for PCRE headers location])
@@ -9,7 +10,7 @@
        test -f $i/pcre.h && PCRE_INCDIR=$i
      done
  
-@@ -21,7 +21,7 @@
+@@ -21,7 +21,7 @@ PHP_ARG_WITH(pcre-regex,,
      AC_MSG_RESULT([$PCRE_INCDIR])
  
      AC_MSG_CHECKING([for PCRE library location])
@@ -18,7 +19,7 @@
        test -f $j/libpcre.a || test -f $j/libpcre.$SHLIB_SUFFIX_NAME && PCRE_LIBDIR=$j
      done
      
-@@ -43,12 +43,14 @@
+@@ -43,12 +43,14 @@ PHP_ARG_WITH(pcre-regex,,
        AC_MSG_ERROR([The PCRE extension requires PCRE library version >= 6.6])
      fi
  
@@ -35,8 +36,43 @@
    else
      AC_MSG_CHECKING([for PCRE library to use])
      AC_MSG_RESULT([bundled])
---- php-5.3.1/ext/pcre/php_pcre.h	2009-11-30 20:59:04.046581246 +0200
-+++ php-5.3.1.pcre/ext/pcre/php_pcre.h	2009-11-30 21:38:06.435493243 +0000
+diff -urNp -x '*.orig' php-5.3.29.org/ext/pcre/php_pcre.c php-5.3.29/ext/pcre/php_pcre.c
+--- php-5.3.29.org/ext/pcre/php_pcre.c	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/pcre/php_pcre.c	2021-08-22 23:32:13.171860812 +0200
+@@ -27,6 +27,11 @@
+ 
+ #if HAVE_PCRE || HAVE_BUNDLED_PCRE
+ 
++#if COMPILE_DL_PCRE
++#undef pcre_get_compiled_regex
++PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *preg_options TSRMLS_DC);
++#endif
++
+ #include "ext/standard/php_string.h"
+ 
+ #define PREG_PATTERN_ORDER			1
+@@ -153,6 +158,10 @@ static PHP_MINIT_FUNCTION(pcre)
+ 	REGISTER_LONG_CONSTANT("PREG_BAD_UTF8_OFFSET_ERROR", PHP_PCRE_BAD_UTF8_OFFSET_ERROR, CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_STRING_CONSTANT("PCRE_VERSION", (char *)pcre_version(), CONST_CS | CONST_PERSISTENT);
+ 
++#if COMPILE_DL_PCRE
++	pcre_get_compiled_regex_p = pcre_get_compiled_regex;
++#endif
++
+ 	return SUCCESS;
+ }
+ /* }}} */
+@@ -444,6 +453,7 @@ PHPAPI pcre_cache_entry* pcre_get_compil
+ }
+ /* }}} */
+ 
++
+ /* {{{ pcre_get_compiled_regex
+  */
+ PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *preg_options TSRMLS_DC)
+diff -urNp -x '*.orig' php-5.3.29.org/ext/pcre/php_pcre.h php-5.3.29/ext/pcre/php_pcre.h
+--- php-5.3.29.org/ext/pcre/php_pcre.h	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/pcre/php_pcre.h	2021-08-22 23:32:13.171860812 +0200
 @@ -34,7 +34,12 @@
  #endif
  
@@ -50,44 +86,12 @@
  PHPAPI pcre* pcre_get_compiled_regex_ex(char *regex, pcre_extra **extra, int *preg_options, int *coptions TSRMLS_DC);
  
  extern zend_module_entry pcre_module_entry;
---- php-5.3.1/ext/pcre/php_pcre.c	2009-11-30 21:10:01.370473754 +0200
-+++ php-5.3.1.pcre/ext/pcre/php_pcre.c	2009-11-30 21:38:01.759684456 +0000
-@@ -27,6 +27,11 @@
- 
- #if HAVE_PCRE || HAVE_BUNDLED_PCRE
- 
-+#if COMPILE_DL_PCRE
-+#undef pcre_get_compiled_regex
-+PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *preg_options TSRMLS_DC);
-+#endif
-+
- #include "ext/standard/php_string.h"
- 
- #define PREG_PATTERN_ORDER			1
-@@ -153,6 +158,10 @@
- 	REGISTER_LONG_CONSTANT("PREG_BAD_UTF8_OFFSET_ERROR", PHP_PCRE_BAD_UTF8_OFFSET_ERROR, CONST_CS | CONST_PERSISTENT);
- 	REGISTER_STRING_CONSTANT("PCRE_VERSION", (char *)pcre_version(), CONST_CS | CONST_PERSISTENT);
- 
-+#if COMPILE_DL_PCRE
-+	pcre_get_compiled_regex_p = pcre_get_compiled_regex;
-+#endif
-+
- 	return SUCCESS;
- }
- /* }}} */
-@@ -429,6 +438,7 @@
- }
- /* }}} */
- 
-+
- /* {{{ pcre_get_compiled_regex
-  */
- PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *preg_options TSRMLS_DC)
---- php-5.3.1/ext/standard/browscap.c	2009-06-06 02:40:49.000000000 +0000
-+++ php-5.3.1.pcre/ext/standard/browscap.c	2009-11-30 21:33:00.775241138 +0000
-@@ -31,6 +31,11 @@
- static zval *current_section;
- static char *current_section_name;
+diff -urNp -x '*.orig' php-5.3.29.org/ext/standard/browscap.c php-5.3.29/ext/standard/browscap.c
+--- php-5.3.29.org/ext/standard/browscap.c	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/standard/browscap.c	2021-08-22 23:32:13.171860812 +0200
+@@ -51,6 +51,11 @@ ZEND_DECLARE_MODULE_GLOBALS(browscap)
+ #define BROWSCAP_G(v)	(browscap_globals.v)
+ #endif
  
 +#if COMPILE_DL_PCRE
 +// will be visible in here
@@ -97,9 +101,10 @@
  #define DEFAULT_SECTION_NAME "Default Browser Capability Settings"
  
  /* OBJECTS_FIXME: This whole extension needs going through. The use of objects looks pretty broken here */
---- php-5.3.2/sapi/cli/tests/018.phpt~	2008-03-17 16:05:39.000000000 +0200
-+++ php-5.3.2/sapi/cli/tests/018.phpt	2010-03-16 20:41:11.341251246 +0200
-@@ -20,8 +20,6 @@
+diff -urNp -x '*.orig' php-5.3.29.org/sapi/cli/tests/018.phpt php-5.3.29/sapi/cli/tests/018.phpt
+--- php-5.3.29.org/sapi/cli/tests/018.phpt	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/sapi/cli/tests/018.phpt	2021-08-22 23:32:13.171860812 +0200
+@@ -20,8 +20,6 @@ echo "Done\n";
  --EXPECTF--     
  [PHP Modules]
  %a

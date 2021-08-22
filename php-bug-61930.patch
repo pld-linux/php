@@ -4,21 +4,6 @@ Date:   Sun Feb 17 13:28:42 2013 -0800
 
     fix bug #61930: openssl corrupts ssl key resource when using openssl_get_publickey()
 
-diff --git a/NEWS b/NEWS
-index 37c1332be3..bedc6a4dcf 100644
---- a/NEWS
-+++ b/NEWS
-@@ -12,6 +12,10 @@ PHP                                                                        NEWS
- - Mbstring:
-   . mb_split() can now handle empty matches like preg_split() does. (Moriyoshi)
- 
-+- OpenSSL:
-+  . Fixed bug #61930 (openssl corrupts ssl key resource when using 
-+    openssl_get_publickey()). (Stas)
-+
- - SPL:
-   . Fixed bug #64228 (RecursiveDirectoryIterator always assumes SKIP_DOTS).
-     (patch by kriss@krizalys.com, Laruence)
 diff --git a/ext/openssl/openssl.c b/ext/openssl/openssl.c
 index 328c1ee937..d7ac117e51 100644
 --- a/ext/openssl/openssl.c

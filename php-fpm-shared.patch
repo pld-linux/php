@@ -1,6 +1,19 @@
---- php-5.3.3/sapi/fpm/config.m4~	2010-06-16 11:58:42.000000000 +0300
-+++ php-5.3.3/sapi/fpm/config.m4	2010-07-24 22:32:25.642457281 +0300
-@@ -600,7 +600,7 @@
+diff -urNp -x '*.orig' php-5.3.29.org/sapi/fpm/Makefile.frag php-5.3.29/sapi/fpm/Makefile.frag
+--- php-5.3.29.org/sapi/fpm/Makefile.frag	2021-08-22 23:31:24.021916033 +0200
++++ php-5.3.29/sapi/fpm/Makefile.frag	2021-08-22 23:31:26.618579785 +0200
+@@ -4,7 +4,7 @@ $(builddir)/fpm:
+ 	@mkdir -p $(builddir)/fpm
+ 	@mkdir -p $(builddir)/fpm/events
+ 
+-$(SAPI_FPM_PATH): $(builddir)/fpm $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)
++$(SAPI_FPM_PATH): $(builddir)/fpm libphp_common.la $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)
+ 	$(BUILD_FPM)
+ 
+ $(builddir)/fpm/fpm_conf.lo: $(builddir)/../../main/build-defs.h
+diff -urNp -x '*.orig' php-5.3.29.org/sapi/fpm/config.m4 php-5.3.29/sapi/fpm/config.m4
+--- php-5.3.29.org/sapi/fpm/config.m4	2021-08-22 23:31:24.021916033 +0200
++++ php-5.3.29/sapi/fpm/config.m4	2021-08-22 23:31:26.618579785 +0200
+@@ -637,7 +637,7 @@ if test "$PHP_FPM" != "no"; then
          BUILD_FPM="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_SAPI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(SAPI_EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_FPM_PATH)"
        ;;
        *)
@@ -9,14 +22,3 @@
        ;;
    esac
  
---- php-5.3.3/sapi/fpm/Makefile.frag~	2010-05-30 01:00:43.000000000 +0300
-+++ php-5.3.3/sapi/fpm/Makefile.frag	2010-07-24 22:33:51.945781258 +0300
-@@ -3,7 +3,7 @@
- $(builddir)/fpm: 
- 	@mkdir -p $(builddir)/fpm
- 
--$(SAPI_FPM_PATH): $(builddir)/fpm $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)
-+$(SAPI_FPM_PATH): $(builddir)/fpm libphp_common.la $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)
- 	$(BUILD_FPM)
- 
- $(builddir)/fpm/fpm_conf.lo: $(builddir)/../../main/build-defs.h

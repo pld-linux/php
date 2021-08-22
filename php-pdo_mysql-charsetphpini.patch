@@ -3,9 +3,10 @@ understand what this patch is supposed to do as in 5.3 the ini section is
 enabled only if mysqlnd driver is enabled which makes the contexts really
 small.
 
---- php-5.3.1/ext/pdo_mysql/mysql_driver.c~	2010-02-20 01:08:04.000000000 +0200
-+++ php-5.3.1/ext/pdo_mysql/mysql_driver.c	2010-02-20 01:08:52.982186037 +0200
-@@ -436,6 +436,7 @@
+diff -urNp -x '*.orig' php-5.3.29.org/ext/pdo_mysql/mysql_driver.c php-5.3.29/ext/pdo_mysql/mysql_driver.c
+--- php-5.3.29.org/ext/pdo_mysql/mysql_driver.c	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/pdo_mysql/mysql_driver.c	2021-08-22 23:31:05.181937166 +0200
+@@ -566,6 +566,7 @@ static int pdo_mysql_handle_factory(pdo_
  	pdo_mysql_db_handle *H;
  	int i, ret = 0;
  	char *host = NULL, *unix_socket = NULL;
@@ -13,7 +14,7 @@ small.
  	unsigned int port = 3306;
  	char *dbname;
  	struct pdo_data_src_parser vars[] = {
-@@ -731,6 +731,12 @@
+@@ -768,6 +769,12 @@ static int pdo_mysql_handle_factory(pdo_
  		password_len = strlen(dbh->password);
  	}
  
@@ -24,11 +25,12 @@ small.
 +	}
 +
  	if (mysqlnd_connect(H->server, host, dbh->username, dbh->password, password_len, dbname, dbname_len,
- 						port, unix_socket, connect_opts, PDO_MYSQL_G(mysqlnd_thd_zval_cache) TSRMLS_CC) == NULL) {
+ 						port, unix_socket, connect_opts TSRMLS_CC) == NULL) {
  #else
---- php-5.3.3/ext/pdo_mysql/pdo_mysql.c~	2010-07-24 19:23:14.000000000 +0300
-+++ php-5.3.3/ext/pdo_mysql/pdo_mysql.c	2010-07-24 19:24:48.363581841 +0300
-@@ -56,6 +56,7 @@
+diff -urNp -x '*.orig' php-5.3.29.org/ext/pdo_mysql/pdo_mysql.c php-5.3.29/ext/pdo_mysql/pdo_mysql.c
+--- php-5.3.29.org/ext/pdo_mysql/pdo_mysql.c	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/pdo_mysql/pdo_mysql.c	2021-08-22 23:31:05.181937166 +0200
+@@ -66,6 +66,7 @@ PHP_INI_BEGIN()
  #if PDO_DBG_ENABLED
  	STD_PHP_INI_ENTRY("pdo_mysql.debug",	NULL, PHP_INI_SYSTEM, OnUpdateString, debug, zend_pdo_mysql_globals, pdo_mysql_globals)
  #endif
@@ -36,7 +38,7 @@ small.
  PHP_INI_END()
  /* }}} */
  
-@@ -89,9 +90,7 @@
+@@ -103,9 +104,7 @@ static PHP_MINIT_FUNCTION(pdo_mysql)
  static PHP_MSHUTDOWN_FUNCTION(pdo_mysql)
  {
  	php_pdo_unregister_driver(&pdo_mysql_driver);
@@ -46,7 +48,7 @@ small.
  
  	return SUCCESS;
  }
-@@ -161,6 +161,7 @@
+@@ -175,6 +174,7 @@ static PHP_GINIT_FUNCTION(pdo_mysql)
  	pdo_mysql_globals->debug = NULL;	/* The actual string */
  	pdo_mysql_globals->dbg = NULL;	/* The DBG object*/
  #endif
@@ -54,9 +56,10 @@ small.
  }
  /* }}} */
  
---- php-5.3.2RC3/ext/pdo_mysql/php_pdo_mysql_int.h~	2010-02-04 11:37:38.000000000 +0200
-+++ php-5.3.2RC3/ext/pdo_mysql/php_pdo_mysql_int.h	2010-02-26 19:11:47.484055898 +0200
-@@ -69,6 +69,7 @@
+diff -urNp -x '*.orig' php-5.3.29.org/ext/pdo_mysql/php_pdo_mysql_int.h php-5.3.29/ext/pdo_mysql/php_pdo_mysql_int.h
+--- php-5.3.29.org/ext/pdo_mysql/php_pdo_mysql_int.h	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/pdo_mysql/php_pdo_mysql_int.h	2021-08-22 23:31:05.181937166 +0200
+@@ -72,6 +72,7 @@ ZEND_BEGIN_MODULE_GLOBALS(pdo_mysql)
  	char          *debug; /* The actual string */
  	MYSQLND_DEBUG *dbg;	/* The DBG object */
  #endif

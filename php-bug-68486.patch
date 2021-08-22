@@ -4,21 +4,6 @@ Date:   Sat Apr 4 15:03:46 2015 -0700
 
     Fix bug #68486 and bug #69218 (segfault in apache2handler with apache 2.4)
 
-diff --git a/NEWS b/NEWS
-index 9c8e0ec..75aa306 100644
---- a/NEWS
-+++ b/NEWS
-@@ -2,6 +2,10 @@ PHP                                                                        NEWS
- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
- ?? ??? 2015 PHP 5.4.40
- 
-+- Apache2 Handler SAPI:
-+  . Fixed bug #69218 (potential remote code execution with apache 2.4
-+    apache2handler). (Patrick Schaaf)
-+
- - Fileinfo:
-   . Fixed bug #68819 (Fileinfo on specific file causes spurious OOM and/or 
-     segfault). (Anatol Belski))
 diff --git a/sapi/apache2handler/sapi_apache2.c b/sapi/apache2handler/sapi_apache2.c
 index e97f11c..cfebc5f 100644
 --- a/sapi/apache2handler/sapi_apache2.c

@@ -1,14 +1,15 @@
---- php-5.3.1/ext/mysqli/mysqli.c~	2010-02-20 00:58:34.000000000 +0200
-+++ php-5.3.1/ext/mysqli/mysqli.c	2010-02-20 01:00:22.459111311 +0200
-@@ -602,6 +602,7 @@
+diff -urNp -x '*.orig' php-5.5.38.org/ext/mysqli/mysqli.c php-5.5.38/ext/mysqli/mysqli.c
+--- php-5.5.38.org/ext/mysqli/mysqli.c	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/mysqli/mysqli.c	2021-08-23 23:03:01.249944392 +0200
+@@ -570,6 +570,7 @@ PHP_INI_BEGIN()
  #else
  	STD_PHP_INI_ENTRY("mysqli.default_socket",			NULL,	PHP_INI_ALL,		OnUpdateStringUnempty,	default_socket,	zend_mysqli_globals,		mysqli_globals)
  #endif
 +	STD_PHP_INI_ENTRY("mysqli.connect_charset",			NULL,	PHP_INI_ALL,		OnUpdateString,		connect_charset,	zend_mysqli_globals,		mysqli_globals)
  	STD_PHP_INI_BOOLEAN("mysqli.reconnect",				"0",	PHP_INI_SYSTEM,		OnUpdateLong,		reconnect,			zend_mysqli_globals,		mysqli_globals)
  	STD_PHP_INI_BOOLEAN("mysqli.allow_local_infile",	"1",	PHP_INI_SYSTEM,		OnUpdateLong,		allow_local_infile,	zend_mysqli_globals,		mysqli_globals)
- #ifdef MYSQLI_USE_MYSQLND
-@@ -475,6 +476,7 @@
+ PHP_INI_END()
+@@ -591,6 +592,7 @@ static PHP_GINIT_FUNCTION(mysqli)
  	mysqli_globals->default_user = NULL;
  	mysqli_globals->default_pw = NULL;
  	mysqli_globals->default_socket = NULL;
@@ -16,9 +17,10 @@
  	mysqli_globals->reconnect = 0;
  	mysqli_globals->report_mode = 0;
  	mysqli_globals->report_ht = 0;
---- php-5.3.4/ext/mysqli/mysqli_nonapi.c~	2010-12-12 23:07:03.000000000 +0200
-+++ php-5.3.4/ext/mysqli/mysqli_nonapi.c	2010-12-12 23:07:36.497424912 +0200
-@@ -61,7 +61,7 @@
+diff -urNp -x '*.orig' php-5.5.38.org/ext/mysqli/mysqli_nonapi.c php-5.5.38/ext/mysqli/mysqli_nonapi.c
+--- php-5.5.38.org/ext/mysqli/mysqli_nonapi.c	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/mysqli/mysqli_nonapi.c	2021-08-23 23:03:01.249944392 +0200
+@@ -62,7 +62,7 @@ void mysqli_common_connect(INTERNAL_FUNC
  	MY_MYSQL			*mysql = NULL;
  	MYSQLI_RESOURCE		*mysqli_resource = NULL;
  	zval				*object = getThis();
@@ -27,7 +29,7 @@
  	int					hostname_len = 0, username_len = 0, passwd_len = 0, dbname_len = 0, socket_len = 0;
  	zend_bool			persistent = FALSE;
  	long				port = 0, flags = 0;
-@@ -241,6 +241,12 @@
+@@ -233,6 +233,12 @@ void mysqli_common_connect(INTERNAL_FUNC
  	}
  #endif
  
@@ -38,11 +40,12 @@
 +	}
 +
  #if !defined(MYSQLI_USE_MYSQLND)
- 	if (mysql_real_connect(mysql->mysql, hostname, username, passwd, dbname, port, socket, CLIENT_MULTI_RESULTS) == NULL)
- #else
---- php-5.3.1/ext/mysqli/php_mysqli_structs.h~	2009-10-14 16:51:25.000000000 +0300
-+++ php-5.3.1/ext/mysqli/php_mysqli_structs.h	2010-02-20 01:04:56.512214846 +0200
-@@ -358,6 +358,7 @@
+ 	/* BC for prior to bug fix #53425 */
+ 	flags |= CLIENT_MULTI_RESULTS;
+diff -urNp -x '*.orig' php-5.5.38.org/ext/mysqli/php_mysqli_structs.h php-5.5.38/ext/mysqli/php_mysqli_structs.h
+--- php-5.5.38.org/ext/mysqli/php_mysqli_structs.h	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/mysqli/php_mysqli_structs.h	2021-08-23 23:03:01.249944392 +0200
+@@ -329,6 +329,7 @@ ZEND_BEGIN_MODULE_GLOBALS(mysqli)
  	char			*default_user;
  	char			*default_socket;
  	char			*default_pw;

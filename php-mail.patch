@@ -1,16 +1,17 @@
---- php-5.2.0/ext/standard/mail.c	2006-12-01 14:20:27.881416250 +0100
-+++ php-5.2.4/ext/standard/mail.c	2007-08-31 19:25:50.777713042 +0300
-@@ -35,6 +37,8 @@
+diff -urNp -x '*.orig' php-5.5.38.org/ext/standard/mail.c php-5.5.38/ext/standard/mail.c
+--- php-5.5.38.org/ext/standard/mail.c	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/standard/mail.c	2021-08-23 23:02:04.213300320 +0200
+@@ -46,6 +46,8 @@
  #include "php_ini.h"
- #include "safe_mode.h"
+ #include "php_string.h"
  #include "exec.h"
 +#include "zend_operators.h"
 +#include "zend_globals.h"
  
  #ifdef PHP_WIN32
  #include "win32/sendmail.h"
-@@ -107,6 +111,18 @@
- 		return;
+@@ -124,6 +126,18 @@ PHP_FUNCTION(mail)
+ 		MAIL_ASCIIZ_CHECK(extra_cmd, extra_cmd_len);
  	}
  
 +    /* search for To: and Subject: headers which should be specified in proper mail() parameters, not in additional headers */
@@ -28,8 +29,8 @@
  	if (to_len > 0) {
  		to_r = estrndup(to, to_len);
  		for (; to_len; to_len--) {
-@@ -231,8 +247,42 @@
- 			return 0;
+@@ -395,8 +409,42 @@ PHPAPI int php_mail(char *to, char *subj
+ 			MAIL_RET(0);
  		}
  #endif
 -		fprintf(sendmail, "To: %s\n", to);

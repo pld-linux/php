@@ -1,8 +1,21 @@
---- php-7.0.0RC6/ext/phar/config.m4	2015-11-17 19:13:50.877662712 +0200
-+++ php-7.0.0RC6/ext/phar/config.m4	2015-11-20 12:51:24.088185045 +0200
-@@ -7,13 +7,13 @@
+diff -urNp -x '*.orig' php-5.6.40.org/ext/phar/Makefile.frag php-5.6.40/ext/phar/Makefile.frag
+--- php-5.6.40.org/ext/phar/Makefile.frag	2021-08-23 23:20:33.969055218 +0200
++++ php-5.6.40/ext/phar/Makefile.frag	2021-08-23 23:20:34.982387483 +0200
+@@ -9,7 +9,7 @@ PHP_PHARCMD_EXECUTABLE = ` \
+ 		$(top_srcdir)/build/shtool echo -n -- "$(top_builddir)/$(SAPI_CLI_PATH) -n"; \
+ 		if test "x$(PHP_MODULES)" != "x"; then \
+ 		$(top_srcdir)/build/shtool echo -n -- " -d extension_dir=$(top_builddir)/modules"; \
+-		for i in pcre spl bz2 zlib phar; do \
++		for i in pcre spl bz2 zlib hash phar; do \
+ 			if test -f "$(top_builddir)/modules/$$i.la"; then \
+ 				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
+ 			fi; \
+diff -urNp -x '*.orig' php-5.6.40.org/ext/phar/config.m4 php-5.6.40/ext/phar/config.m4
+--- php-5.6.40.org/ext/phar/config.m4	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/phar/config.m4	2021-08-23 23:20:34.982387483 +0200
+@@ -7,13 +7,13 @@ PHP_ARG_ENABLE(phar, for phar archive su
  if test "$PHP_PHAR" != "no"; then
-   PHP_NEW_EXTENSION(phar, util.c tar.c zip.c stream.c func_interceptors.c dirstream.c phar.c phar_object.c phar_path_check.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
+   PHP_NEW_EXTENSION(phar, util.c tar.c zip.c stream.c func_interceptors.c dirstream.c phar.c phar_object.c phar_path_check.c, $ext_shared)
    AC_MSG_CHECKING([for phar openssl support])
 -  if test "$PHP_HASH_SHARED" != "yes"; then
 -    if test "$PHP_HASH" != "no"; then
@@ -20,14 +33,3 @@
    if test "$PHP_OPENSSL_SHARED" = "yes"; then
      AC_MSG_RESULT([no (shared openssl)])
    else
---- php-7.0.0RC7/ext/phar/Makefile.frag~	2015-11-23 11:06:31.000000000 +0200
-+++ php-7.0.0RC7/ext/phar/Makefile.frag	2015-11-23 11:15:36.452443959 +0200
-@@ -9,7 +9,7 @@
- 		$(top_srcdir)/build/shtool echo -n -- "$(top_builddir)/$(SAPI_CLI_PATH) -n"; \
- 		if test "x$(PHP_MODULES)" != "x"; then \
- 		$(top_srcdir)/build/shtool echo -n -- " -d extension_dir=$(top_builddir)/modules"; \
--		for i in pcre spl bz2 zlib phar; do \
-+		for i in pcre spl bz2 zlib hash phar; do \
- 			if test -f "$(top_builddir)/modules/$$i.la"; then \
- 				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
- 			fi; \

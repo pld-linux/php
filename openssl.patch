@@ -1,5 +1,6 @@
---- php-5.6.38/ext/openssl/openssl.c	2018-09-12 00:12:36.000000000 +0200
-+++ php-5.6.38/ext/openssl/openssl.c	2018-09-14 14:30:33.582224863 +0200
+diff -urNp -x '*.orig' php-5.6.40.org/ext/openssl/openssl.c php-5.6.40/ext/openssl/openssl.c
+--- php-5.6.40.org/ext/openssl/openssl.c	2021-08-23 23:18:57.552489303 +0200
++++ php-5.6.40/ext/openssl/openssl.c	2021-08-23 23:18:58.475821680 +0200
 @@ -531,6 +531,14 @@ zend_module_entry openssl_module_entry =
  ZEND_GET_MODULE(openssl)
  #endif
@@ -691,7 +692,7 @@
  
  	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "szza/|s", &data, &data_len, &sealdata, &ekeys, &pubkeys, &method, &method_len) == FAILURE) {
  		return;
-@@ -4967,9 +5115,10 @@ PHP_FUNCTION(openssl_seal)
+@@ -4968,9 +5116,10 @@ PHP_FUNCTION(openssl_seal)
  		i++;
  	}
  
@@ -704,7 +705,7 @@
  		goto clean_exit;
  	}
  
-@@ -4979,15 +5128,15 @@ PHP_FUNCTION(openssl_seal)
+@@ -4980,15 +5129,15 @@ PHP_FUNCTION(openssl_seal)
  	iv = ivlen ? emalloc(ivlen + 1) : NULL;
  #endif
  	/* allocate one byte extra to make room for \0 */
@@ -726,14 +727,16 @@
  		goto clean_exit;
  	}
  
-@@ -5018,5 +5167,5 @@ PHP_FUNCTION(openssl_seal)
+@@ -5019,7 +5168,7 @@ PHP_FUNCTION(openssl_seal)
  		efree(buf);
  	}
  	RETVAL_LONG(len1 + len2);
 -	EVP_CIPHER_CTX_cleanup(&ctx);
 +	EVP_CIPHER_CTX_free(ctx);
  
-@@ -5045,7 +5194,7 @@ PHP_FUNCTION(openssl_open)
+ clean_exit:
+ 	for (i=0; i<nkeys; i++) {
+@@ -5046,7 +5195,7 @@ PHP_FUNCTION(openssl_open)
  	int len1, len2;
  	unsigned char *buf;
  	long keyresource = -1;
@@ -742,7 +745,7 @@
  	char * data;	int data_len;
  	char * ekey;	int ekey_len;
  	char *method =NULL;
-@@ -5071,27 +5220,26 @@ PHP_FUNCTION(openssl_open)
+@@ -5072,27 +5221,26 @@ PHP_FUNCTION(openssl_open)
  	} else {
  		cipher = EVP_rc4();
  	}
@@ -782,7 +785,7 @@
  }
  /* }}} */
  
-@@ -5151,7 +5299,7 @@ PHP_FUNCTION(openssl_digest)
+@@ -5152,7 +5300,7 @@ PHP_FUNCTION(openssl_digest)
  	char *data, *method;
  	int data_len, method_len;
  	const EVP_MD *mdtype;
@@ -791,7 +794,7 @@
  	int siglen;
  	unsigned char *sigbuf;
  
-@@ -5167,9 +5315,10 @@ PHP_FUNCTION(openssl_digest)
+@@ -5168,9 +5316,10 @@ PHP_FUNCTION(openssl_digest)
  	siglen = EVP_MD_size(mdtype);
  	sigbuf = emalloc(siglen + 1);
  
@@ -805,7 +808,7 @@
  		if (raw_output) {
  			sigbuf[siglen] = '\0';
  			RETVAL_STRINGL((char *)sigbuf, siglen, 0);
-@@ -5185,6 +5334,8 @@ PHP_FUNCTION(openssl_digest)
+@@ -5186,6 +5335,8 @@ PHP_FUNCTION(openssl_digest)
  		efree(sigbuf);
  		RETVAL_FALSE;
  	}
@@ -814,7 +817,7 @@
  }
  /* }}} */
  
-@@ -5230,7 +5381,7 @@ PHP_FUNCTION(openssl_encrypt)
+@@ -5231,7 +5382,7 @@ PHP_FUNCTION(openssl_encrypt)
  	char *data, *method, *password, *iv = "";
  	int data_len, method_len, password_len, iv_len = 0, max_iv_len;
  	const EVP_CIPHER *cipher_type;
@@ -823,7 +826,7 @@
  	int i=0, outlen, keylen;
  	unsigned char *outbuf, *key;
  	zend_bool free_iv;
-@@ -5244,6 +5395,12 @@ PHP_FUNCTION(openssl_encrypt)
+@@ -5245,6 +5396,12 @@ PHP_FUNCTION(openssl_encrypt)
  		RETURN_FALSE;
  	}
  
@@ -836,7 +839,7 @@
  	keylen = EVP_CIPHER_key_length(cipher_type);
  	if (keylen > password_len) {
  		key = emalloc(keylen);
-@@ -5262,19 +5419,19 @@ PHP_FUNCTION(openssl_encrypt)
+@@ -5263,19 +5420,19 @@ PHP_FUNCTION(openssl_encrypt)
  	outlen = data_len + EVP_CIPHER_block_size(cipher_type);
  	outbuf = safe_emalloc(outlen, 1, 1);
  
@@ -862,7 +865,7 @@
  		outlen += i;
  		if (options & OPENSSL_RAW_DATA) {
  			outbuf[outlen] = '\0';
-@@ -5301,7 +5458,7 @@ PHP_FUNCTION(openssl_encrypt)
+@@ -5302,7 +5459,7 @@ PHP_FUNCTION(openssl_encrypt)
  	if (free_iv) {
  		efree(iv);
  	}
@@ -871,7 +874,7 @@
  }
  /* }}} */
  
-@@ -5313,7 +5470,7 @@ PHP_FUNCTION(openssl_decrypt)
+@@ -5314,7 +5471,7 @@ PHP_FUNCTION(openssl_decrypt)
  	char *data, *method, *password, *iv = "";
  	int data_len, method_len, password_len, iv_len = 0;
  	const EVP_CIPHER *cipher_type;
@@ -880,7 +883,7 @@
  	int i, outlen, keylen;
  	unsigned char *outbuf, *key;
  	int base64_str_len;
-@@ -5335,10 +5492,17 @@ PHP_FUNCTION(openssl_decrypt)
+@@ -5336,10 +5493,17 @@ PHP_FUNCTION(openssl_decrypt)
  		RETURN_FALSE;
  	}
  
@@ -898,7 +901,7 @@
  			RETURN_FALSE;
  		}
  		data_len = base64_str_len;
-@@ -5359,17 +5523,17 @@ PHP_FUNCTION(openssl_decrypt)
+@@ -5360,17 +5524,17 @@ PHP_FUNCTION(openssl_decrypt)
  	outlen = data_len + EVP_CIPHER_block_size(cipher_type);
  	outbuf = emalloc(outlen + 1);
  
@@ -922,7 +925,7 @@
  		outlen += i;
  		outbuf[outlen] = '\0';
  		RETVAL_STRINGL((char *)outbuf, outlen, 0);
-@@ -5386,7 +5550,7 @@ PHP_FUNCTION(openssl_decrypt)
+@@ -5387,7 +5551,7 @@ PHP_FUNCTION(openssl_decrypt)
  	if (base64_str) {
  		efree(base64_str);
  	}
@@ -931,7 +934,7 @@
  }
  /* }}} */
  
-@@ -5424,6 +5588,7 @@ PHP_FUNCTION(openssl_dh_compute_key)
+@@ -5425,6 +5589,7 @@ PHP_FUNCTION(openssl_dh_compute_key)
  	zval *key;
  	char *pub_str;
  	int pub_len;
@@ -939,7 +942,7 @@
  	EVP_PKEY *pkey;
  	BIGNUM *pub;
  	char *data;
-@@ -5433,14 +5598,18 @@ PHP_FUNCTION(openssl_dh_compute_key)
+@@ -5434,14 +5599,18 @@ PHP_FUNCTION(openssl_dh_compute_key)
  		return;
  	}
  	ZEND_FETCH_RESOURCE(pkey, EVP_PKEY *, &key, -1, "OpenSSL key", le_key);

@@ -1,22 +1,24 @@
---- php-5.3.27/ext/mysqli/mysqli_nonapi.c~	2013-11-20 00:19:11.000000000 +0200
-+++ php-5.3.27/ext/mysqli/mysqli_nonapi.c	2013-11-20 00:19:44.725872552 +0200
-@@ -73,7 +73,7 @@
+diff -urNp -x '*.orig' php-5.6.40.org/ext/mysql/php_mysql.c php-5.6.40/ext/mysql/php_mysql.c
+--- php-5.6.40.org/ext/mysql/php_mysql.c	2021-08-23 23:20:26.062396879 +0200
++++ php-5.6.40/ext/mysql/php_mysql.c	2021-08-23 23:20:27.092395795 +0200
+@@ -738,7 +738,7 @@ static void php_mysql_do_connect(INTERNA
+                      E_DEPRECATED,
+                      "The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead");
+ 
+-#if !defined(MYSQL_USE_MYSQLND)
++#if 0 && !defined(MYSQL_USE_MYSQLND)
+ 	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
+ 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+ 						"Headers and client library minor version mismatch. Headers:%d Library:%ld",
+diff -urNp -x '*.orig' php-5.6.40.org/ext/mysqli/mysqli_nonapi.c php-5.6.40/ext/mysqli/mysqli_nonapi.c
+--- php-5.6.40.org/ext/mysqli/mysqli_nonapi.c	2021-08-23 23:20:26.062396879 +0200
++++ php-5.6.40/ext/mysqli/mysqli_nonapi.c	2021-08-23 23:20:27.092395795 +0200
+@@ -74,7 +74,7 @@ void mysqli_common_connect(INTERNAL_FUNC
  	zend_bool			self_alloced = 0;
  
  
 -#if !defined(MYSQL_USE_MYSQLND)
 +#if 0 && !defined(MYSQL_USE_MYSQLND)
  	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
- 		php_error_docref(NULL TSRMLS_CC, E_NOTICE,
- 						"Headers and client library minor version mismatch. Headers:%d Library:%ld",
---- php-5.3.27/ext/mysql/php_mysql.c~	2013-11-20 00:19:11.000000000 +0200
-+++ php-5.3.27/ext/mysql/php_mysql.c	2013-11-20 00:20:01.719956531 +0200
-@@ -704,7 +704,7 @@
- 	zend_bool free_host=0, new_link=0;
- 	long connect_timeout;
- 
--#if !defined(MYSQL_USE_MYSQLND)
-+#if 0 && !defined(MYSQL_USE_MYSQLND)
- 	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
- 		php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+ 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
  						"Headers and client library minor version mismatch. Headers:%d Library:%ld",

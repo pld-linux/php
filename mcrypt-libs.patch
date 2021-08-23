@@ -1,14 +1,15 @@
---- php-5.3.6/ext/mcrypt/config.m4~	2010-01-15 23:02:20.000000000 +0200
-+++ php-5.3.6/ext/mcrypt/config.m4	2011-04-09 16:18:07.634572726 +0300
-@@ -36,7 +36,6 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/mcrypt/config.m4 php-7.1.33/ext/mcrypt/config.m4
+--- php-7.1.33.org/ext/mcrypt/config.m4	2019-10-22 18:59:57.000000000 +0200
++++ php-7.1.33/ext/mcrypt/config.m4	2021-08-23 23:46:54.877961825 +0200
+@@ -36,7 +36,6 @@ if test "$PHP_MCRYPT" != "no"; then
  
-   PHP_CHECK_LIBRARY(mcrypt, mcrypt_module_open, 
+   PHP_CHECK_LIBRARY(mcrypt, mcrypt_module_open,
    [
 -    PHP_ADD_LIBRARY(ltdl,, MCRYPT_SHARED_LIBADD)
      AC_DEFINE(HAVE_LIBMCRYPT,1,[ ])
    ],[
      PHP_CHECK_LIBRARY(mcrypt, mcrypt_module_open,
-@@ -48,7 +47,7 @@
+@@ -48,7 +47,7 @@ if test "$PHP_MCRYPT" != "no"; then
        -L$MCRYPT_DIR/$PHP_LIBDIR
      ])
    ],[

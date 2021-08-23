@@ -1,6 +1,18 @@
---- php-5.3.3/ext/standard/tests/file/fileinode_basic.phpt~	2007-11-05 19:43:21.000000000 +0200
-+++ php-5.3.3/ext/standard/tests/file/fileinode_basic.phpt	2010-07-26 19:31:43.613553760 +0300
-@@ -28,9 +28,9 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/spl/tests/SplFileInfo_getInode_basic.phpt php-7.1.33/ext/spl/tests/SplFileInfo_getInode_basic.phpt
+--- php-7.1.33.org/ext/spl/tests/SplFileInfo_getInode_basic.phpt	2021-08-23 23:46:46.137994907 +0200
++++ php-7.1.33/ext/spl/tests/SplFileInfo_getInode_basic.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -11,6 +11,7 @@ Jacopo Romei <jacopo@sviluppoagile.it>
+ --SKIPIF--
+ <?php
+ if (substr(PHP_OS, 0, 3) == 'WIN') die("skip this test not for Windows platforms");
++if (PHP_INT_SIZE == 4) die("skip this test is for >32bit platform only (inodes overflow there)");
+ ?>
+ --FILE--
+ <?php
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/tests/file/fileinode_basic.phpt php-7.1.33/ext/standard/tests/file/fileinode_basic.phpt
+--- php-7.1.33.org/ext/standard/tests/file/fileinode_basic.phpt	2019-10-22 19:00:00.000000000 +0200
++++ php-7.1.33/ext/standard/tests/file/fileinode_basic.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -28,9 +28,9 @@ unlink (dirname(__FILE__)."/inode.tmp");
  ?>
  --EXPECTF--
  *** Testing fileinode() with file, directory ***
@@ -14,9 +26,10 @@
 +%i
  
  *** Done ***
---- php-5.3.3/ext/standard/tests/file/fileinode_variation.phpt~	2007-11-05 19:43:21.000000000 +0200
-+++ php-5.3.3/ext/standard/tests/file/fileinode_variation.phpt	2010-07-26 19:34:01.610414378 +0300
-@@ -89,24 +89,24 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/tests/file/fileinode_variation.phpt php-7.1.33/ext/standard/tests/file/fileinode_variation.phpt
+--- php-7.1.33.org/ext/standard/tests/file/fileinode_variation.phpt	2019-10-22 19:00:00.000000000 +0200
++++ php-7.1.33/ext/standard/tests/file/fileinode_variation.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -88,24 +88,24 @@ echo "\n*** Done ***";
  --EXPECTF--
  *** Testing fileinode() with files, links and directories ***
  -- Testing with files --
@@ -55,10 +68,11 @@
 +%i
 +%i
  *** Done ***
---- php-5.3.3/ext/standard/tests/file/fileinode_variation1.phpt~	2008-11-26 12:10:19.000000000 +0200
-+++ php-5.3.3/ext/standard/tests/file/fileinode_variation1.phpt	2010-07-26 19:35:31.216291870 +0300
-@@ -42,7 +42,7 @@
- 
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/tests/file/fileinode_variation1.phpt php-7.1.33/ext/standard/tests/file/fileinode_variation1.phpt
+--- php-7.1.33.org/ext/standard/tests/file/fileinode_variation1.phpt	2019-10-22 18:59:59.000000000 +0200
++++ php-7.1.33/ext/standard/tests/file/fileinode_variation1.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -41,7 +41,7 @@ unlink($file_path."/fileinode_variation1
+ ?>
  --EXPECTF--
  *** Testing fileinode() with links ***
 -int(%d)
@@ -67,9 +81,10 @@
 +int(%i)
  
  *** Done ***
---- php-5.3.3/ext/standard/tests/file/filestat.phpt~	2006-11-15 19:27:03.000000000 +0200
-+++ php-5.3.3/ext/standard/tests/file/filestat.phpt	2010-07-26 19:37:10.367060798 +0300
-@@ -30,17 +30,17 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/tests/file/filestat.phpt php-7.1.33/ext/standard/tests/file/filestat.phpt
+--- php-7.1.33.org/ext/standard/tests/file/filestat.phpt	2019-10-22 18:59:59.000000000 +0200
++++ php-7.1.33/ext/standard/tests/file/filestat.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -30,17 +30,17 @@ var_dump(filectime("/no/such/file/or/dir
  echo "Done\n";
  ?>
  --EXPECTF--
@@ -90,9 +105,10 @@
  int(%d)
  int(%d)
  int(%d)
---- php-5.3.3/ext/standard/tests/file/lstat_stat_variation18.phpt~	2010-07-26 19:43:12.000000000 +0300
-+++ php-5.3.3/ext/standard/tests/file/lstat_stat_variation18.phpt	2010-07-26 19:43:14.470984630 +0300
-@@ -66,7 +66,7 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/tests/file/lstat_stat_variation18.phpt php-7.1.33/ext/standard/tests/file/lstat_stat_variation18.phpt
+--- php-7.1.33.org/ext/standard/tests/file/lstat_stat_variation18.phpt	2019-10-22 18:59:59.000000000 +0200
++++ php-7.1.33/ext/standard/tests/file/lstat_stat_variation18.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -65,7 +65,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -101,7 +117,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -92,7 +92,7 @@
+@@ -91,7 +91,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -110,7 +126,7 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
-@@ -122,7 +122,7 @@
+@@ -121,7 +121,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -119,7 +135,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -148,7 +148,7 @@
+@@ -147,7 +147,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -128,9 +144,10 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
---- php-5.3.3/ext/standard/tests/file/lstat_stat_variation19.phpt~	2007-11-05 19:43:21.000000000 +0200
-+++ php-5.3.3/ext/standard/tests/file/lstat_stat_variation19.phpt	2010-07-26 19:44:58.320079730 +0300
-@@ -67,7 +67,7 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/tests/file/lstat_stat_variation19.phpt php-7.1.33/ext/standard/tests/file/lstat_stat_variation19.phpt
+--- php-7.1.33.org/ext/standard/tests/file/lstat_stat_variation19.phpt	2019-10-22 19:00:00.000000000 +0200
++++ php-7.1.33/ext/standard/tests/file/lstat_stat_variation19.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -66,7 +66,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -139,7 +156,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -93,7 +93,7 @@
+@@ -92,7 +92,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -148,7 +165,7 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
-@@ -121,7 +121,7 @@
+@@ -120,7 +120,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -157,7 +174,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -147,7 +147,7 @@
+@@ -146,7 +146,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -166,7 +183,7 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
-@@ -177,7 +177,7 @@
+@@ -176,7 +176,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -175,7 +192,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -203,7 +203,7 @@
+@@ -202,7 +202,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -184,7 +201,7 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
-@@ -231,7 +231,7 @@
+@@ -230,7 +230,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -193,7 +210,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -257,7 +257,7 @@
+@@ -256,7 +256,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -202,9 +219,10 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
---- php-5.3.3/ext/standard/tests/file/lstat_stat_variation20.phpt~	2007-07-26 16:38:24.000000000 +0300
-+++ php-5.3.3/ext/standard/tests/file/lstat_stat_variation20.phpt	2010-07-26 19:46:33.907004377 +0300
-@@ -69,7 +69,7 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/tests/file/lstat_stat_variation20.phpt php-7.1.33/ext/standard/tests/file/lstat_stat_variation20.phpt
+--- php-7.1.33.org/ext/standard/tests/file/lstat_stat_variation20.phpt	2019-10-22 19:00:00.000000000 +0200
++++ php-7.1.33/ext/standard/tests/file/lstat_stat_variation20.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -68,7 +68,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -213,7 +231,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -95,7 +95,7 @@
+@@ -94,7 +94,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -222,7 +240,7 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
-@@ -125,7 +125,7 @@
+@@ -124,7 +124,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -231,7 +249,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -151,7 +151,7 @@
+@@ -150,7 +150,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -240,7 +258,7 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
-@@ -179,7 +179,7 @@
+@@ -178,7 +178,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -249,7 +267,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -205,7 +205,7 @@
+@@ -204,7 +204,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -258,7 +276,7 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
-@@ -233,7 +233,7 @@
+@@ -232,7 +232,7 @@ array(26) {
    [0]=>
    int(%d)
    [1]=>
@@ -267,7 +285,7 @@
    [2]=>
    int(%d)
    [3]=>
-@@ -259,7 +259,7 @@
+@@ -258,7 +258,7 @@ array(26) {
    ["dev"]=>
    int(%d)
    ["ino"]=>
@@ -276,9 +294,10 @@
    ["mode"]=>
    int(%d)
    ["nlink"]=>
---- php-5.3.3/ext/standard/tests/file/tempnam_variation1.phpt~	2008-11-26 12:10:19.000000000 +0200
-+++ php-5.3.3/ext/standard/tests/file/tempnam_variation1.phpt	2010-07-26 20:24:46.505943227 +0300
-@@ -66,51 +66,51 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/tests/file/tempnam_variation1.phpt php-7.1.33/ext/standard/tests/file/tempnam_variation1.phpt
+--- php-7.1.33.org/ext/standard/tests/file/tempnam_variation1.phpt	2019-10-22 18:59:59.000000000 +0200
++++ php-7.1.33/ext/standard/tests/file/tempnam_variation1.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -66,51 +66,51 @@ echo "*** Done ***\n";
  -- Iteration 1 --
  File name is => %s%etempnam_variation1.tmp%s
  File permissions are => 100600
@@ -340,9 +359,10 @@
 +File inode is => %i
  File created in => directory specified
  *** Done ***
---- php-5.3.3/tests/security/open_basedir_fileinode.phpt~	2008-05-09 11:39:44.000000000 +0300
-+++ php-5.3.3/tests/security/open_basedir_fileinode.phpt	2010-07-27 22:51:29.603089549 +0300
-@@ -46,10 +46,10 @@
+diff -urNp -x '*.orig' php-7.1.33.org/tests/security/open_basedir_fileinode.phpt php-7.1.33/tests/security/open_basedir_fileinode.phpt
+--- php-7.1.33.org/tests/security/open_basedir_fileinode.phpt	2019-10-22 18:59:36.000000000 +0200
++++ php-7.1.33/tests/security/open_basedir_fileinode.phpt	2021-08-23 23:46:47.097991082 +0200
+@@ -46,9 +46,9 @@ bool(false)
  
  Warning: fileinode(): open_basedir restriction in effect. File(./../.) is not within the allowed path(s): (.) in %s on line %d
  bool(false)
@@ -357,14 +377,3 @@
 +int(%i)
 +int(%i)
  *** Finished testing open_basedir configuration [fileinode] ***
- 
---- php-5.3.3/ext/spl/tests/SplFileInfo_getInode_basic.phpt~	2010-08-04 16:25:21.000000000 +0300
-+++ php-5.3.3/ext/spl/tests/SplFileInfo_getInode_basic.phpt	2010-08-04 16:28:32.722932851 +0300
-@@ -11,6 +11,7 @@
- --SKIPIF--
- <?php
- if (substr(PHP_OS, 0, 3) == 'WIN') die("skip this test not for Windows platforms");
-+if (PHP_INT_SIZE == 4) die("skip this test is for >32bit platform only (inodes overflow there)");
- ?>
- --FILE--
- <?php

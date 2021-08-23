@@ -1,6 +1,7 @@
---- php-7.0/ext/pcre/config0.m4~	2015-05-24 14:39:04.000000000 +0300
-+++ php-7.0/ext/pcre/config0.m4	2015-05-24 14:53:49.980250297 +0300
-@@ -11,7 +11,7 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/pcre/config0.m4 php-7.1.33/ext/pcre/config0.m4
+--- php-7.1.33.org/ext/pcre/config0.m4	2019-10-22 18:59:47.000000000 +0200
++++ php-7.1.33/ext/pcre/config0.m4	2021-08-23 23:46:42.121344768 +0200
+@@ -11,7 +11,7 @@ PHP_ARG_WITH(pcre-regex,,
  
    if test "$PHP_PCRE_REGEX" != "yes" && test "$PHP_PCRE_REGEX" != "no"; then
      AC_MSG_CHECKING([for PCRE headers location])
@@ -9,7 +10,7 @@
        test -f $i/pcre.h && PCRE_INCDIR=$i
      done
  
-@@ -21,7 +21,7 @@
+@@ -21,7 +21,7 @@ PHP_ARG_WITH(pcre-regex,,
      AC_MSG_RESULT([$PCRE_INCDIR])
  
      AC_MSG_CHECKING([for PCRE library location])
@@ -17,8 +18,8 @@
 +    for j in $PHP_PCRE_REGEX $PHP_PCRE_REGEX/$PHP_LIBDIR /usr/$PHP_LIBDIR; do
        test -f $j/libpcre.a || test -f $j/libpcre.$SHLIB_SUFFIX_NAME && PCRE_LIBDIR=$j
      done
-     
-@@ -43,12 +43,13 @@
+ 
+@@ -43,12 +43,13 @@ PHP_ARG_WITH(pcre-regex,,
        AC_MSG_ERROR([The PCRE extension requires PCRE library version >= 6.6])
      fi
  
@@ -34,7 +35,7 @@
    else
      AC_MSG_CHECKING([for PCRE library to use])
      AC_MSG_RESULT([bundled])
-@@ -61,7 +62,7 @@
+@@ -61,7 +62,7 @@ PHP_ARG_WITH(pcre-regex,,
      				 pcrelib/pcre_version.c pcrelib/pcre_xclass.c \
      				 pcrelib/pcre_jit_compile.c"
      PHP_PCRE_CFLAGS="-DHAVE_CONFIG_H -I@ext_srcdir@/pcrelib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
@@ -43,8 +44,43 @@
      PHP_ADD_BUILD_DIR($ext_builddir/pcrelib)
      PHP_INSTALL_HEADERS([ext/pcre], [php_pcre.h pcrelib/])
      AC_DEFINE(HAVE_BUNDLED_PCRE, 1, [ ])
---- php-7.0/ext/pcre/php_pcre.h~	2015-05-21 17:57:06.000000000 +0300
-+++ php-7.0/ext/pcre/php_pcre.h	2015-05-24 14:56:27.528425546 +0300
+diff -urNp -x '*.orig' php-7.1.33.org/ext/pcre/php_pcre.c php-7.1.33/ext/pcre/php_pcre.c
+--- php-7.1.33.org/ext/pcre/php_pcre.c	2019-10-22 18:59:47.000000000 +0200
++++ php-7.1.33/ext/pcre/php_pcre.c	2021-08-23 23:46:42.121344768 +0200
+@@ -28,6 +28,11 @@
+ 
+ #if HAVE_PCRE || HAVE_BUNDLED_PCRE
+ 
++#if COMPILE_DL_PCRE
++#undef pcre_get_compiled_regex
++PHPAPI pcre* pcre_get_compiled_regex(zend_string *regex, pcre_extra **extra, int *options);
++#endif
++
+ #include "ext/standard/php_string.h"
+ 
+ #define PREG_PATTERN_ORDER			1
+@@ -216,6 +221,10 @@ static PHP_MINIT_FUNCTION(pcre)
+ 	REGISTER_LONG_CONSTANT("PREG_JIT_STACKLIMIT_ERROR", PHP_PCRE_JIT_STACKLIMIT_ERROR, CONST_CS | CONST_PERSISTENT);
+ 	REGISTER_STRING_CONSTANT("PCRE_VERSION", (char *)pcre_version(), CONST_CS | CONST_PERSISTENT);
+ 
++#if COMPILE_DL_PCRE
++	pcre_get_compiled_regex_p = pcre_get_compiled_regex;
++#endif
++
+ 	return SUCCESS;
+ }
+ /* }}} */
+@@ -630,6 +639,7 @@ PHPAPI pcre_cache_entry* pcre_get_compil
+ }
+ /* }}} */
+ 
++
+ /* {{{ pcre_get_compiled_regex
+  */
+ PHPAPI pcre* pcre_get_compiled_regex(zend_string *regex, pcre_extra **extra, int *preg_options)
+diff -urNp -x '*.orig' php-7.1.33.org/ext/pcre/php_pcre.h php-7.1.33/ext/pcre/php_pcre.h
+--- php-7.1.33.org/ext/pcre/php_pcre.h	2019-10-22 18:59:47.000000000 +0200
++++ php-7.1.33/ext/pcre/php_pcre.h	2021-08-23 23:46:42.121344768 +0200
 @@ -34,7 +34,12 @@
  #endif
  
@@ -58,44 +94,12 @@
  PHPAPI pcre* pcre_get_compiled_regex_ex(zend_string *regex, pcre_extra **extra, int *preg_options, int *coptions);
  
  extern zend_module_entry pcre_module_entry;
---- php-5.3.1/ext/pcre/php_pcre.c	2009-11-30 21:10:01.370473754 +0200
-+++ php-5.3.1.pcre/ext/pcre/php_pcre.c	2009-11-30 21:38:01.759684456 +0000
-@@ -27,6 +27,11 @@
- 
- #if HAVE_PCRE || HAVE_BUNDLED_PCRE
- 
-+#if COMPILE_DL_PCRE
-+#undef pcre_get_compiled_regex
-+PHPAPI pcre* pcre_get_compiled_regex(zend_string *regex, pcre_extra **extra, int *options);
-+#endif
-+
- #include "ext/standard/php_string.h"
- 
- #define PREG_PATTERN_ORDER			1
-@@ -153,6 +158,10 @@
- 	REGISTER_LONG_CONSTANT("PREG_BAD_UTF8_OFFSET_ERROR", PHP_PCRE_BAD_UTF8_OFFSET_ERROR, CONST_CS | CONST_PERSISTENT);
- 	REGISTER_STRING_CONSTANT("PCRE_VERSION", (char *)pcre_version(), CONST_CS | CONST_PERSISTENT);
- 
-+#if COMPILE_DL_PCRE
-+	pcre_get_compiled_regex_p = pcre_get_compiled_regex;
-+#endif
-+
- 	return SUCCESS;
- }
- /* }}} */
-@@ -429,6 +438,7 @@
- }
- /* }}} */
- 
-+
- /* {{{ pcre_get_compiled_regex
-  */
- PHPAPI pcre* pcre_get_compiled_regex(char *regex, pcre_extra **extra, int *preg_options TSRMLS_DC)
---- php-5.3.1/ext/standard/browscap.c	2009-06-06 02:40:49.000000000 +0000
-+++ php-5.3.1.pcre/ext/standard/browscap.c	2009-11-30 21:33:00.775241138 +0000
-@@ -31,6 +31,11 @@
- static zval *current_section;
- static char *current_section_name;
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/browscap.c php-7.1.33/ext/standard/browscap.c
+--- php-7.1.33.org/ext/standard/browscap.c	2019-10-22 19:00:02.000000000 +0200
++++ php-7.1.33/ext/standard/browscap.c	2021-08-23 23:46:42.121344768 +0200
+@@ -65,6 +65,11 @@ ZEND_END_MODULE_GLOBALS(browscap)
+ ZEND_DECLARE_MODULE_GLOBALS(browscap)
+ #define BROWSCAP_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(browscap, v)
  
 +#if COMPILE_DL_PCRE
 +// will be visible in here
@@ -105,20 +109,10 @@
  #define DEFAULT_SECTION_NAME "Default Browser Capability Settings"
  
  /* OBJECTS_FIXME: This whole extension needs going through. The use of objects looks pretty broken here */
---- php-5.3.2/sapi/cli/tests/018.phpt~	2008-03-17 16:05:39.000000000 +0200
-+++ php-5.3.2/sapi/cli/tests/018.phpt	2010-03-16 20:41:11.341251246 +0200
-@@ -20,8 +20,6 @@
- --EXPECTF--     
- [PHP Modules]
- %a
--pcre
--%a
- 
- [Zend Modules]
- %aDone
---- php-7.0.0beta3/main/php_ini.c~	2015-08-26 18:50:15.000000000 +0300
-+++ php-7.0.0beta3/main/php_ini.c	2015-08-26 22:33:59.126957396 +0300
-@@ -765,8 +765,8 @@
+diff -urNp -x '*.orig' php-7.1.33.org/main/php_ini.c php-7.1.33/main/php_ini.c
+--- php-7.1.33.org/main/php_ini.c	2021-08-23 23:46:41.154682209 +0200
++++ php-7.1.33/main/php_ini.c	2021-08-23 23:46:42.121344768 +0200
+@@ -771,8 +771,8 @@ int php_shutdown_config(void)
   */
  void php_ini_register_extensions(void)
  {
@@ -128,3 +122,15 @@
  
  	zend_llist_destroy(&extension_lists.engine);
  	zend_llist_destroy(&extension_lists.functions);
+diff -urNp -x '*.orig' php-7.1.33.org/sapi/cli/tests/018.phpt php-7.1.33/sapi/cli/tests/018.phpt
+--- php-7.1.33.org/sapi/cli/tests/018.phpt	2019-10-22 19:00:03.000000000 +0200
++++ php-7.1.33/sapi/cli/tests/018.phpt	2021-08-23 23:46:42.121344768 +0200
+@@ -20,8 +20,6 @@ echo "Done\n";
+ --EXPECTF--
+ [PHP Modules]
+ %a
+-pcre
+-%a
+ 
+ [Zend Modules]
+ %aDone

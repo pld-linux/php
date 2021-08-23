@@ -1,6 +1,32 @@
---- php-7.0/ext/spl/config.m4~	2015-05-21 17:57:06.000000000 +0300
-+++ php-7.0/ext/spl/config.m4	2015-05-23 11:25:19.609715006 +0300
-@@ -2,6 +2,6 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/pdo/pdo.c php-7.1.33/ext/pdo/pdo.c
+--- php-7.1.33.org/ext/pdo/pdo.c	2019-10-22 18:59:48.000000000 +0200
++++ php-7.1.33/ext/pdo/pdo.c	2021-08-23 23:46:39.634688772 +0200
+@@ -117,7 +117,9 @@ const zend_function_entry pdo_functions[
+ 
+ /* {{{ pdo_functions[] */
+ static const zend_module_dep pdo_deps[] = {
++#ifdef HAVE_SPL && !COMPILE_DL_SPL
+ 	ZEND_MOD_REQUIRED("spl")
++#endif
+ 	ZEND_MOD_END
+ };
+ /* }}} */
+diff -urNp -x '*.orig' php-7.1.33.org/ext/phar/Makefile.frag php-7.1.33/ext/phar/Makefile.frag
+--- php-7.1.33.org/ext/phar/Makefile.frag	2019-10-22 18:59:55.000000000 +0200
++++ php-7.1.33/ext/phar/Makefile.frag	2021-08-23 23:46:39.634688772 +0200
+@@ -14,7 +14,7 @@ PHP_PHARCMD_EXECUTABLE = ` \
+ 		$(top_srcdir)/build/shtool echo -n -- "$(top_builddir)/$(SAPI_CLI_PATH) -n"; \
+ 		if test "x$(PHP_MODULES)" != "x"; then \
+ 		$(top_srcdir)/build/shtool echo -n -- " -d extension_dir=$(top_builddir)/modules"; \
+-		for i in bz2 zlib phar; do \
++		for i in pcre spl bz2 zlib phar; do \
+ 			if test -f "$(top_builddir)/modules/$$i.la"; then \
+ 				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
+ 			fi; \
+diff -urNp -x '*.orig' php-7.1.33.org/ext/spl/config.m4 php-7.1.33/ext/spl/config.m4
+--- php-7.1.33.org/ext/spl/config.m4	2019-10-22 18:59:50.000000000 +0200
++++ php-7.1.33/ext/spl/config.m4	2021-08-23 23:46:39.634688772 +0200
+@@ -2,6 +2,6 @@ dnl $Id$
  dnl config.m4 for extension SPL
  
    AC_DEFINE(HAVE_SPL, 1, [Whether you want SPL (Standard PHP Library) support])
@@ -8,9 +34,10 @@
 +  PHP_NEW_EXTENSION(spl, php_spl.c spl_functions.c spl_engine.c spl_iterators.c spl_array.c spl_directory.c spl_exceptions.c spl_observer.c spl_dllist.c spl_heap.c spl_fixedarray.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
    PHP_INSTALL_HEADERS([ext/spl], [php_spl.h spl_array.h spl_directory.h spl_engine.h spl_exceptions.h spl_functions.h spl_iterators.h spl_observer.h spl_dllist.h spl_heap.h spl_fixedarray.h])
    PHP_ADD_EXTENSION_DEP(spl, pcre, true)
---- php-5.3.1/ext/spl/spl_iterators.c~	2009-07-04 20:31:27.000000000 +0000
-+++ php-5.3.1/ext/spl/spl_iterators.c	2009-11-27 16:35:33.729087793 +0000
-@@ -58,7 +58,13 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/spl/spl_iterators.c php-7.1.33/ext/spl/spl_iterators.c
+--- php-7.1.33.org/ext/spl/spl_iterators.c	2019-10-22 18:59:51.000000000 +0200
++++ php-7.1.33/ext/spl/spl_iterators.c	2021-08-23 23:46:39.634688772 +0200
+@@ -60,7 +60,13 @@ PHPAPI zend_class_entry *spl_ce_EmptyIte
  PHPAPI zend_class_entry *spl_ce_AppendIterator;
  PHPAPI zend_class_entry *spl_ce_RegexIterator;
  PHPAPI zend_class_entry *spl_ce_RecursiveRegexIterator;
@@ -24,7 +51,7 @@
  PHPAPI zend_class_entry *spl_ce_RecursiveTreeIterator;
  
  ZEND_BEGIN_ARG_INFO(arginfo_recursive_it_void, 0)
-@@ -3286,6 +3292,10 @@
+@@ -3804,6 +3810,10 @@ PHP_MINIT_FUNCTION(spl_iterators)
  	REGISTER_SPL_STD_CLASS_EX(EmptyIterator, NULL, spl_funcs_EmptyIterator);
  	REGISTER_SPL_ITERATOR(EmptyIterator);
  
@@ -35,9 +62,10 @@
  	REGISTER_SPL_SUB_CLASS_EX(RecursiveTreeIterator, RecursiveIteratorIterator, spl_RecursiveTreeIterator_new, spl_funcs_RecursiveTreeIterator);
  	REGISTER_SPL_CLASS_CONST_LONG(RecursiveTreeIterator, "BYPASS_CURRENT",      RTIT_BYPASS_CURRENT);
  	REGISTER_SPL_CLASS_CONST_LONG(RecursiveTreeIterator, "BYPASS_KEY",          RTIT_BYPASS_KEY);
---- php-5.4.0alpha3/ext/spl/spl_iterators.h~	2011-07-27 11:48:08.000000000 +0300
-+++ php-5.4.0alpha3/ext/spl/spl_iterators.h	2011-08-08 00:12:10.892993117 +0300
-@@ -51,7 +51,12 @@
+diff -urNp -x '*.orig' php-7.1.33.org/ext/spl/spl_iterators.h php-7.1.33/ext/spl/spl_iterators.h
+--- php-7.1.33.org/ext/spl/spl_iterators.h	2019-10-22 18:59:51.000000000 +0200
++++ php-7.1.33/ext/spl/spl_iterators.h	2021-08-23 23:46:39.634688772 +0200
+@@ -51,7 +51,12 @@ extern PHPAPI zend_class_entry *spl_ce_E
  extern PHPAPI zend_class_entry *spl_ce_AppendIterator;
  extern PHPAPI zend_class_entry *spl_ce_RegexIterator;
  extern PHPAPI zend_class_entry *spl_ce_RecursiveRegexIterator;
@@ -50,10 +78,11 @@
  extern PHPAPI zend_class_entry *spl_ce_CallbackFilterIterator;
  extern PHPAPI zend_class_entry *spl_ce_RecursiveCallbackFilterIterator;
  
---- php-7.1.0alpha2/ext/standard/array.c~	2016-07-04 17:52:16.000000000 +0300
-+++ php-7.1.0alpha2/ext/standard/array.c	2016-07-04 18:54:43.937173429 +0300
-@@ -48,6 +48,10 @@
- #include "zend_smart_str.h"
+diff -urNp -x '*.orig' php-7.1.33.org/ext/standard/array.c php-7.1.33/ext/standard/array.c
+--- php-7.1.33.org/ext/standard/array.c	2019-10-22 18:59:57.000000000 +0200
++++ php-7.1.33/ext/standard/array.c	2021-08-23 23:46:39.634688772 +0200
+@@ -50,6 +50,10 @@
+ #include "zend_bitset.h"
  #include "ext/spl/spl_array.h"
  
 +#if COMPILE_DL_SPL
@@ -63,26 +92,3 @@
  /* {{{ defines */
  #define EXTR_OVERWRITE			0
  #define EXTR_SKIP				1
---- php-7.1.0alpha1/ext/pdo/pdo.c~	2016-06-07 23:56:47.000000000 +0300
-+++ php-7.1.0alpha1/ext/pdo/pdo.c	2016-06-13 23:24:51.238259131 +0300
-@@ -117,7 +117,9 @@
- 
- /* {{{ pdo_functions[] */
- static const zend_module_dep pdo_deps[] = {
-+#ifdef HAVE_SPL && !COMPILE_DL_SPL
- 	ZEND_MOD_REQUIRED("spl")
-+#endif
- 	ZEND_MOD_END
- };
- /* }}} */
---- php-5.3.1/ext/phar/Makefile.frag~	2009-07-23 15:48:04.000000000 +0000
-+++ php-5.3.1/ext/phar/Makefile.frag	2009-11-30 16:10:29.687175948 +0000
-@@ -10,7 +10,7 @@
- 		$(top_srcdir)/build/shtool echo -n -- "$(top_builddir)/$(SAPI_CLI_PATH) -n"; \
- 		if test "x$(PHP_MODULES)" != "x"; then \
- 		$(top_srcdir)/build/shtool echo -n -- " -d extension_dir=$(top_builddir)/modules"; \
--		for i in bz2 zlib phar; do \
-+		for i in pcre spl bz2 zlib phar; do \
- 			if test -f "$(top_builddir)/modules/$$i.la"; then \
- 				. $(top_builddir)/modules/$$i.la; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
- 			fi; \

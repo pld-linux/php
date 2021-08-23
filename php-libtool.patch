@@ -1,6 +1,7 @@
---- php-7.1.3/scripts/phpize.in~	2017-03-27 23:35:05.000000000 +0300
-+++ php-7.1.3/scripts/phpize.in	2017-03-27 23:37:32.336520891 +0300
-@@ -6,10 +6,16 @@
+diff -urNp -x '*.orig' php-7.1.33.org/scripts/phpize.in php-7.1.33/scripts/phpize.in
+--- php-7.1.33.org/scripts/phpize.in	2021-08-23 23:46:21.024779883 +0200
++++ php-7.1.33/scripts/phpize.in	2021-08-23 23:46:21.978108040 +0200
+@@ -6,10 +6,16 @@ datarootdir='@datarootdir@'
  exec_prefix="`eval echo @exec_prefix@`"
  phpdir="`eval echo @libdir@`/php/build"
  includedir="`eval echo @includedir@`/php"
@@ -16,11 +17,11 @@
 +    LIBTOOL_FILES="libtool.m4"
 +fi
  FILES="acinclude.m4 Makefile.global config.sub config.guess ltmain.sh run-tests*.php"
- CLEAN_FILES="$FILES *.o *.lo *.la .deps .libs/ build/ modules/ install-sh \
+ CLEAN_FILES="$FILES *.o *.lo *.la .libs/ build/ modules/ install-sh \
  	mkinstalldirs missing config.nice config.sub config.guess configure configure.in \
 @@ -145,8 +151,9 @@ phpize_copy_files()
    test -d build || mkdir build
-  
+ 
    (cd "$phpdir" && cp $FILES_BUILD "$builddir"/build)
 +  (cd "$aclocaldir" && cp $LIBTOOL_FILES "$builddir"/build)
    (cd "$phpdir" && cp $FILES "$builddir")

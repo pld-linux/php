@@ -1,5 +1,22 @@
---- php-7.1.0beta3/sapi/fpm/php-fpm.conf.in~	2016-08-19 09:48:00.000000000 +0300
-+++ php-7.1.0beta3/sapi/fpm/php-fpm.conf.in	2016-08-31 13:59:19.139523160 +0300
+diff -urNp -x '*.orig' php-7.1.33.org/sapi/fpm/Makefile.frag php-7.1.33/sapi/fpm/Makefile.frag
+--- php-7.1.33.org/sapi/fpm/Makefile.frag	2019-10-22 19:00:03.000000000 +0200
++++ php-7.1.33/sapi/fpm/Makefile.frag	2021-08-23 23:46:26.988081764 +0200
+@@ -14,9 +14,9 @@ install-fpm: $(SAPI_FPM_PATH)
+ 		echo "Installing PHP FPM defconfig:     skipping"; \
+ 	else \
+ 		echo "Installing PHP FPM defconfig:     $(INSTALL_ROOT)$(sysconfdir)/" && \
+-		$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d; \
+-		$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf.default; \
+-		$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d/www.conf.default; \
++		$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/fpm.d; \
++		$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf; \
++		$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf; \
+ 	fi
+ 
+ 	@echo "Installing PHP FPM man page:      $(INSTALL_ROOT)$(mandir)/man8/"
+diff -urNp -x '*.orig' php-7.1.33.org/sapi/fpm/php-fpm.conf.in php-7.1.33/sapi/fpm/php-fpm.conf.in
+--- php-7.1.33.org/sapi/fpm/php-fpm.conf.in	2019-10-22 19:00:03.000000000 +0200
++++ php-7.1.33/sapi/fpm/php-fpm.conf.in	2021-08-23 23:46:26.988081764 +0200
 @@ -14,14 +14,14 @@
  ; Pid file
  ; Note: the default prefix is @EXPANDED_LOCALSTATEDIR@
@@ -17,19 +34,32 @@
  
  ; syslog_facility is used to specify what type of program is logging the
  ; message. This lets syslogd specify that messages from different facilities
---- php-5.6.5/sapi/fpm/www.conf.in~	2015-02-04 19:26:16.000000000 +0200
-+++ php-5.6.5/sapi/fpm/www.conf.in	2015-02-04 19:27:25.275218535 +0200
-@@ -32,7 +32,7 @@
- ;                            specific port;
+diff -urNp -x '*.orig' php-7.1.33.org/sapi/fpm/status.html.in php-7.1.33/sapi/fpm/status.html.in
+--- php-7.1.33.org/sapi/fpm/status.html.in	2019-10-22 19:00:03.000000000 +0200
++++ php-7.1.33/sapi/fpm/status.html.in	2021-08-23 23:46:26.988081764 +0200
+@@ -96,7 +96,7 @@
+ 			var sort_index;
+ 			var sort_order;
+ 
+-			doc_url.value = location.protocol + '//' + location.host + "/status?json&full";
++			doc_url.value = location.protocol + '//' + location.host + "/fpm-status?json&full";
+ 
+ 			ths = document.getElementsByTagName("th");
+ 			for (var i=0; i<ths.length; i++) {
+diff -urNp -x '*.orig' php-7.1.33.org/sapi/fpm/www.conf.in php-7.1.33/sapi/fpm/www.conf.in
+--- php-7.1.33.org/sapi/fpm/www.conf.in	2019-10-22 19:00:03.000000000 +0200
++++ php-7.1.33/sapi/fpm/www.conf.in	2021-08-23 23:46:26.988081764 +0200
+@@ -33,7 +33,7 @@ group = @php_fpm_group@
+ ;                            (IPv6 and IPv4-mapped) on a specific port;
  ;   '/path/to/unix/socket' - to listen on a unix socket.
  ; Note: This value is mandatory.
 -listen = 127.0.0.1:9000
 +listen = /var/run/php/@processname@.sock
  
  ; Set listen(2) backlog.
- ; Default Value: 65535 (-1 on FreeBSD and OpenBSD)
-@@ -46,9 +46,9 @@
- ; BSD-derived systems allow connections regardless of permissions. 
+ ; Default Value: 511 (-1 on FreeBSD and OpenBSD)
+@@ -44,9 +44,9 @@ listen = 127.0.0.1:9000
+ ; BSD-derived systems allow connections regardless of permissions.
  ; Default Values: user and group are set as the running user
  ;                 mode is set to 0660
 -;listen.owner = @php_fpm_user@
@@ -41,7 +71,7 @@
  ; When POSIX Access Control Lists are supported you can set them using
  ; these options, value is a comma separated list of user/group names.
  ; When set, listen.owner and listen.group are ignored
-@@ -53,7 +53,7 @@
+@@ -59,7 +59,7 @@ listen = 127.0.0.1:9000
  ; must be separated by a comma. If this value is left blank, connections will be
  ; accepted from any ip address.
  ; Default Value: any
@@ -50,7 +80,7 @@
  
  ; Specify the nice(2) priority to apply to the pool processes (only if set)
  ; The value can vary from -19 (highest priority) to 20 (lower priority)
-@@ -372,7 +372,7 @@
+@@ -388,7 +388,7 @@ pm.max_spare_servers = 3
  ; the current environment.
  ; Default Value: clean env
  ;env[HOSTNAME] = $HOSTNAME
@@ -59,29 +89,3 @@
  ;env[TMP] = /tmp
  ;env[TMPDIR] = /tmp
  ;env[TEMP] = /tmp
---- php-5.3.9/sapi/fpm/status.html.in~	2011-10-08 23:43:12.000000000 +0300
-+++ php-5.3.9/sapi/fpm/status.html.in	2012-01-12 02:19:09.573191879 +0200
-@@ -96,7 +96,7 @@
- 			var sort_index;
- 			var sort_order;
- 
--			doc_url.value = location.protocol + '//' + location.host + "/status?json&full";
-+			doc_url.value = location.protocol + '//' + location.host + "/fpm-status?json&full";
- 
- 			ths = document.getElementsByTagName("th");
- 			for (var i=0; i<ths.length; i++) {
---- php-7.1.3/sapi/fpm/Makefile.frag~	2017-03-14 15:17:50.000000000 +0200
-+++ php-7.1.3/sapi/fpm/Makefile.frag	2017-03-28 09:44:28.799989897 +0300
-@@ -14,9 +14,9 @@
- 		echo "Installing PHP FPM defconfig:     skipping"; \
- 	else \
- 		echo "Installing PHP FPM defconfig:     $(INSTALL_ROOT)$(sysconfdir)/" && \
--		$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d; \
--		$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf.default; \
--		$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.d/www.conf.default; \
-+		$(mkinstalldirs) $(INSTALL_ROOT)$(sysconfdir)/fpm.d; \
-+		$(INSTALL_DATA) sapi/fpm/php-fpm.conf $(INSTALL_ROOT)$(sysconfdir)/php-fpm.conf; \
-+		$(INSTALL_DATA) sapi/fpm/www.conf $(INSTALL_ROOT)$(sysconfdir)/fpm.d/www.conf; \
- 	fi
- 	
- 	@echo "Installing PHP FPM man page:      $(INSTALL_ROOT)$(mandir)/man8/"

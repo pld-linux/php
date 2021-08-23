@@ -1,20 +1,9 @@
---- php-7.0.0RC3/configure.in~	2015-09-26 14:55:35.000000000 +0300
-+++ php-7.0.0RC3/configure.in	2015-09-26 15:13:29.581882625 +0300
-@@ -224,6 +224,9 @@
- dnl check for -R, etc. switch
- PHP_RUNPATH_SWITCH
+diff -urNp -x '*.orig' php-7.0.33.org/Makefile.global php-7.0.33/Makefile.global
+--- php-7.0.33.org/Makefile.global	2018-12-04 18:22:44.000000000 +0100
++++ php-7.0.33/Makefile.global	2021-08-23 23:35:29.816640040 +0200
+@@ -15,8 +15,12 @@ build-modules: $(PHP_MODULES) $(PHP_ZEND
  
-+dnl Always shared
-+PHP_BUILD_SHARED
-+
- dnl Checks for some support/generator progs
- PHP_PROG_AWK
- PHP_PROG_BISON
---- php-5.2.4/Makefile.global~	2007-08-31 19:13:58.000000000 +0300
-+++ php-5.2.4/Makefile.global	2007-08-31 19:19:33.799017413 +0300
-@@ -13,8 +13,12 @@
- 	
- build-modules: $(PHP_MODULES)
+ build-binaries: $(PHP_BINARIES)
  
 -libphp$(PHP_MAJOR_VERSION).la: $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS)
 -	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(EXTRA_CFLAGS) -rpath $(phptempdir) $(EXTRA_LDFLAGS) $(LDFLAGS) $(PHP_RPATHS) $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@
@@ -27,7 +16,7 @@
  	-@$(LIBTOOL) --silent --mode=install cp $@ $(phptempdir)/$@ >/dev/null 2>&1
  
  libs/libphp$(PHP_MAJOR_VERSION).bundle: $(PHP_GLOBAL_OBJS) $(PHP_SAPI_OBJS)
-@@ -25,10 +29,10 @@
+@@ -27,10 +31,10 @@ install: $(all_targets) $(install_target
  install-sapi: $(OVERALL_TARGET)
  	@echo "Installing PHP SAPI module:       $(PHP_SAPI)"
  	-@$(mkinstalldirs) $(INSTALL_ROOT)$(bindir)
@@ -41,19 +30,22 @@
  				break; \
  			fi; \
  		done; \
---- php-7.0.0beta1/sapi/cgi/config9.m4~	2015-07-10 15:11:43.000000000 +0300
-+++ php-7.0.0beta1/sapi/cgi/config9.m4	2015-07-13 16:03:06.900955209 +0300
-@@ -64,7 +64,7 @@
-         BUILD_CGI="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_BINARY_OBJS:.lo=.o) \$(PHP_FASTCGI_OBJS:.lo=.o) \$(PHP_CGI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
-       ;;
-       *)
--        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_FASTCGI_OBJS) \$(PHP_CGI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
-+        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_BINARY_OBJS) \$(PHP_FASTCGI_OBJS) \$(PHP_CGI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
-       ;;
-     esac
+diff -urNp -x '*.orig' php-7.0.33.org/configure.in php-7.0.33/configure.in
+--- php-7.0.33.org/configure.in	2018-12-04 18:22:44.000000000 +0100
++++ php-7.0.33/configure.in	2021-08-23 23:35:29.816640040 +0200
+@@ -224,6 +224,9 @@ PHP_ARG_ENABLE(rpath, whether to enable
+ dnl check for -R, etc. switch
+ PHP_RUNPATH_SWITCH
  
---- php-7.0.0beta1/sapi/cgi/Makefile.frag~	2015-07-10 15:11:43.000000000 +0300
-+++ php-7.0.0beta1/sapi/cgi/Makefile.frag	2015-07-13 16:03:56.810212555 +0300
++dnl Always shared
++PHP_BUILD_SHARED
++
+ dnl Checks for some support/generator progs
+ PHP_PROG_AWK
+ PHP_PROG_BISON
+diff -urNp -x '*.orig' php-7.0.33.org/sapi/cgi/Makefile.frag php-7.0.33/sapi/cgi/Makefile.frag
+--- php-7.0.33.org/sapi/cgi/Makefile.frag	2018-12-04 18:23:01.000000000 +0100
++++ php-7.0.33/sapi/cgi/Makefile.frag	2021-08-23 23:35:29.816640040 +0200
 @@ -1,6 +1,6 @@
  cgi: $(SAPI_CGI_PATH)
  
@@ -62,19 +54,21 @@
  	$(BUILD_CGI)
  
  install-cgi: $(SAPI_CGI_PATH)
---- php-5.4.0alpha2/sapi/cli/config.m4~	2011-06-20 23:27:39.000000000 +0300
-+++ php-5.4.0alpha2/sapi/cli/config.m4	2011-08-01 10:34:01.072624745 +0300
-@@ -31,7 +31,7 @@
-     BUILD_CLI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_BINARY_OBJS) \$(PHP_CLI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -Lnetware -lphp5lib -o \$(SAPI_CLI_PATH)"
-     ;;
-   *)
--    BUILD_CLI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_CLI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CLI_PATH)"
-+    BUILD_CLI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_BINARY_OBJS) \$(PHP_CLI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CLI_PATH)"
-     ;;
-   esac
+diff -urNp -x '*.orig' php-7.0.33.org/sapi/cgi/config9.m4 php-7.0.33/sapi/cgi/config9.m4
+--- php-7.0.33.org/sapi/cgi/config9.m4	2018-12-04 18:23:01.000000000 +0100
++++ php-7.0.33/sapi/cgi/config9.m4	2021-08-23 23:35:29.816640040 +0200
+@@ -64,7 +64,7 @@ if test "$PHP_CGI" != "no"; then
+         BUILD_CGI="\$(CC) \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(NATIVE_RPATHS) \$(PHP_GLOBAL_OBJS:.lo=.o) \$(PHP_BINARY_OBJS:.lo=.o) \$(PHP_FASTCGI_OBJS:.lo=.o) \$(PHP_CGI_OBJS:.lo=.o) \$(PHP_FRAMEWORKS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
+       ;;
+       *)
+-        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_FASTCGI_OBJS) \$(PHP_CGI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
++        BUILD_CGI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_BINARY_OBJS) \$(PHP_FASTCGI_OBJS) \$(PHP_CGI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
+       ;;
+     esac
  
---- php-5.4.0alpha2/sapi/cli/Makefile.frag~	2011-01-24 00:40:35.000000000 +0200
-+++ php-5.4.0alpha2/sapi/cli/Makefile.frag	2011-08-01 12:22:28.627926487 +0300
+diff -urNp -x '*.orig' php-7.0.33.org/sapi/cli/Makefile.frag php-7.0.33/sapi/cli/Makefile.frag
+--- php-7.0.33.org/sapi/cli/Makefile.frag	2018-12-04 18:23:02.000000000 +0100
++++ php-7.0.33/sapi/cli/Makefile.frag	2021-08-23 23:35:29.816640040 +0200
 @@ -1,6 +1,6 @@
  cli: $(SAPI_CLI_PATH)
  
@@ -83,43 +77,21 @@
  	$(BUILD_CLI)
  
  install-cli: $(SAPI_CLI_PATH)
---- php-7.0.0RC3/sapi/phpdbg/Makefile.frag~	2015-09-16 15:49:38.000000000 +0300
-+++ php-7.0.0RC3/sapi/phpdbg/Makefile.frag	2015-09-27 21:24:44.370536565 +0300
-@@ -2,10 +2,10 @@
+diff -urNp -x '*.orig' php-7.0.33.org/sapi/cli/config.m4 php-7.0.33/sapi/cli/config.m4
+--- php-7.0.33.org/sapi/cli/config.m4	2018-12-04 18:23:02.000000000 +0100
++++ php-7.0.33/sapi/cli/config.m4	2021-08-23 23:35:29.816640040 +0200
+@@ -48,7 +48,7 @@ if test "$PHP_CLI" != "no"; then
+     BUILD_CLI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_BINARY_OBJS) \$(PHP_CLI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -Lnetware -lphp7lib -o \$(SAPI_CLI_PATH)"
+     ;;
+   *)
+-    BUILD_CLI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_BINARY_OBJS) \$(PHP_CLI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CLI_PATH)"
++    BUILD_CLI="\$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) libphp_common.la \$(PHP_BINARY_OBJS) \$(PHP_CLI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CLI_PATH)"
+     ;;
+   esac
  
- phpdbg-shared: $(BUILD_SHARED)
- 
--$(BUILD_SHARED): $(PHP_GLOBAL_OBJS) $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
-+$(BUILD_SHARED): libphp_common.la $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
- 	$(BUILD_PHPDBG_SHARED)
- 
--$(BUILD_BINARY): $(PHP_GLOBAL_OBJS) $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
-+$(BUILD_BINARY): libphp_common.la $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
- 	$(BUILD_PHPDBG)
- 
- %.c: %.y
---- php-7.0.0RC3/sapi/phpdbg/config.m4~	2015-09-16 15:49:38.000000000 +0300
-+++ php-7.0.0RC3/sapi/phpdbg/config.m4	2015-09-27 21:25:34.413134698 +0300
-@@ -40,7 +40,7 @@
-   
-   BUILD_PHPDBG="\$(LIBTOOL) --mode=link \
-         \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \
--                \$(PHP_GLOBAL_OBJS) \
-+                libphp_common.la \
-                 \$(PHP_BINARY_OBJS) \
-                 \$(PHP_PHPDBG_OBJS) \
-                 \$(EXTRA_LIBS) \
-@@ -50,7 +50,7 @@
- 
-   BUILD_PHPDBG_SHARED="\$(LIBTOOL) --mode=link \
-         \$(CC) -shared -Wl,-soname,libphpdbg.so -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \
--                \$(PHP_GLOBAL_OBJS) \
-+                libphp_common.la \
-                 \$(PHP_BINARY_OBJS) \
-                 \$(PHP_PHPDBG_OBJS) \
-                 \$(EXTRA_LIBS) \
---- php-7.0.0RC3/sapi/litespeed/Makefile.frag~	2015-09-16 15:49:38.000000000 +0300
-+++ php-7.0.0RC3/sapi/litespeed/Makefile.frag	2015-09-27 21:26:36.783039512 +0300
+diff -urNp -x '*.orig' php-7.0.33.org/sapi/litespeed/Makefile.frag php-7.0.33/sapi/litespeed/Makefile.frag
+--- php-7.0.33.org/sapi/litespeed/Makefile.frag	2018-12-04 18:23:02.000000000 +0100
++++ php-7.0.33/sapi/litespeed/Makefile.frag	2021-08-23 23:35:29.816640040 +0200
 @@ -1,6 +1,6 @@
  litespeed: $(SAPI_LITESPEED_PATH)
  
@@ -128,9 +100,10 @@
  	$(BUILD_LITESPEED)
  
  install-litespeed: $(SAPI_LITESPEED_PATH)
---- php-7.0.0RC3/sapi/litespeed/config.m4~	2015-09-16 15:49:38.000000000 +0300
-+++ php-7.0.0RC3/sapi/litespeed/config.m4	2015-09-27 21:27:36.182790123 +0300
-@@ -17,10 +17,10 @@
+diff -urNp -x '*.orig' php-7.0.33.org/sapi/litespeed/config.m4 php-7.0.33/sapi/litespeed/config.m4
+--- php-7.0.33.org/sapi/litespeed/config.m4	2018-12-04 18:23:02.000000000 +0100
++++ php-7.0.33/sapi/litespeed/config.m4	2021-08-23 23:35:29.816640040 +0200
+@@ -17,10 +17,10 @@ if test "$PHP_LITESPEED" != "no"; then
      ;;
    *cygwin*)
      SAPI_LITESPEED_PATH=sapi/litespeed/php.exe
@@ -143,3 +116,40 @@
      ;;
    esac
  
+diff -urNp -x '*.orig' php-7.0.33.org/sapi/phpdbg/Makefile.frag php-7.0.33/sapi/phpdbg/Makefile.frag
+--- php-7.0.33.org/sapi/phpdbg/Makefile.frag	2018-12-04 18:23:02.000000000 +0100
++++ php-7.0.33/sapi/phpdbg/Makefile.frag	2021-08-23 23:35:29.816640040 +0200
+@@ -2,10 +2,10 @@ phpdbg: $(BUILD_BINARY)
+ 
+ phpdbg-shared: $(BUILD_SHARED)
+ 
+-$(BUILD_SHARED): $(PHP_GLOBAL_OBJS) $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
++$(BUILD_SHARED): libphp_common.la $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
+ 	$(BUILD_PHPDBG_SHARED)
+ 
+-$(BUILD_BINARY): $(PHP_GLOBAL_OBJS) $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
++$(BUILD_BINARY): libphp_common.la $(PHP_BINARY_OBJS) $(PHP_PHPDBG_OBJS)
+ 	$(BUILD_PHPDBG)
+ 
+ %.c: %.y
+diff -urNp -x '*.orig' php-7.0.33.org/sapi/phpdbg/config.m4 php-7.0.33/sapi/phpdbg/config.m4
+--- php-7.0.33.org/sapi/phpdbg/config.m4	2018-12-04 18:23:02.000000000 +0100
++++ php-7.0.33/sapi/phpdbg/config.m4	2021-08-23 23:35:29.816640040 +0200
+@@ -40,7 +40,7 @@ if test "$BUILD_PHPDBG" = "" && test "$P
+   
+   BUILD_PHPDBG="\$(LIBTOOL) --mode=link \
+         \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \
+-                \$(PHP_GLOBAL_OBJS) \
++                libphp_common.la \
+                 \$(PHP_BINARY_OBJS) \
+                 \$(PHP_PHPDBG_OBJS) \
+                 \$(EXTRA_LIBS) \
+@@ -50,7 +50,7 @@ if test "$BUILD_PHPDBG" = "" && test "$P
+ 
+   BUILD_PHPDBG_SHARED="\$(LIBTOOL) --mode=link \
+         \$(CC) -shared -Wl,-soname,libphpdbg.so -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) \$(PHP_RPATHS) \
+-                \$(PHP_GLOBAL_OBJS) \
++                libphp_common.la \
+                 \$(PHP_BINARY_OBJS) \
+                 \$(PHP_PHPDBG_OBJS) \
+                 \$(EXTRA_LIBS) \

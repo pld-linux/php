@@ -1,8 +1,9 @@
---- php-7.0.2/ext/dba/config.m4~	2016-01-11 00:42:48.000000000 +0200
-+++ php-7.0.2/ext/dba/config.m4	2016-01-11 00:43:39.055351157 +0200
-@@ -287,6 +287,14 @@
+diff -urNp -x '*.orig' php-7.0.33.org/ext/dba/config.m4 php-7.0.33/ext/dba/config.m4
+--- php-7.0.33.org/ext/dba/config.m4	2021-08-23 23:36:54.322290784 +0200
++++ php-7.0.33/ext/dba/config.m4	2021-08-23 23:36:55.295634288 +0200
+@@ -326,6 +326,14 @@ if test "$PHP_DB4" != "no"; then
        THIS_PREFIX=$i
-       THIS_INCLUDE=$i/db4/db.h
+       THIS_INCLUDE=$i/include/db5.3/db.h
        break
 +    elif test -f "$i/include/db5.3/db.h"; then
 +      THIS_PREFIX=$i
@@ -15,7 +16,7 @@
      elif test -f "$i/include/db5.1/db.h"; then
        THIS_PREFIX=$i
        THIS_INCLUDE=$i/include/db5.1/db.h
-@@ -376,7 +376,7 @@
+@@ -368,7 +376,7 @@ if test "$PHP_DB4" != "no"; then
        break
      fi
    done
@@ -24,4 +25,3 @@
  fi
  PHP_DBA_STD_RESULT(db4,Berkeley DB4)
  
-

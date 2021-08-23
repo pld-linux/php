@@ -1,14 +1,15 @@
---- php-5.2.0/scripts/php-config.in	2006-12-14 01:11:33.348180526 +0200
-+++ php-5.2.4/scripts/php-config.in	2007-08-31 19:43:04.061307670 +0300
-@@ -2,6 +2,7 @@
- 
+diff -urNp -x '*.orig' php-7.0.33.org/scripts/php-config.in php-7.0.33/scripts/php-config.in
+--- php-7.0.33.org/scripts/php-config.in	2018-12-04 18:23:02.000000000 +0100
++++ php-7.0.33/scripts/php-config.in	2021-08-23 23:36:14.341700815 +0200
+@@ -4,6 +4,7 @@ SED="@SED@"
  prefix="@prefix@"
+ datarootdir="@datarootdir@"
  exec_prefix="@exec_prefix@"
 +sysconfdir='@sysconfdir@'
  version="@PHP_VERSION@"
- version_id="@PHP_VERSION_ID@"
- includedir="@includedir@/php"
-@@ -53,6 +54,8 @@
+ vernum="@PHP_VERSION_ID@"
+ include_dir="@includedir@/php"
+@@ -55,6 +56,8 @@ case "$1" in
    echo $extension_dir;;
  --include-dir)
    echo $include_dir;;
@@ -17,11 +18,11 @@
  --php-binary)
    echo $php_binary;;
  --php-sapis)
-@@ -72,6 +75,7 @@
+@@ -76,6 +79,7 @@ Options:
    --ldflags           [$ldflags]
    --libs              [$libs]
    --extension-dir     [$extension_dir]
 +  --sysconfdir        [$sysconfdir]
    --include-dir       [$include_dir]
+   --man-dir           [$man_dir]
    --php-binary        [$php_binary]
-   --php-sapis         [$php_sapis]

@@ -1,6 +1,6 @@
-diff -urbB php-5.0.5.org/scripts/Makefile.frag php-5.0.5/scripts/Makefile.frag
---- php-5.0.5.org/scripts/Makefile.frag	2005-09-10 21:29:04.884122000 +0200
-+++ php-5.0.5/scripts/Makefile.frag	2005-09-10 21:30:09.333324848 +0200
+diff -urNp -x '*.orig' php-7.0.33.org/scripts/Makefile.frag php-7.0.33/scripts/Makefile.frag
+--- php-7.0.33.org/scripts/Makefile.frag	2018-12-04 18:23:02.000000000 +0100
++++ php-7.0.33/scripts/Makefile.frag	2021-08-23 23:36:04.841475774 +0200
 @@ -4,7 +4,7 @@
  #
  
@@ -10,15 +10,15 @@ diff -urbB php-5.0.5.org/scripts/Makefile.frag php-5.0.5/scripts/Makefile.frag
  
  BUILD_FILES = \
  	scripts/phpize.m4 \
-diff -urbB php-5.0.5.org/scripts/phpize.in php-5.0.5/scripts/phpize.in
---- php-5.0.5.org/scripts/phpize.in	2005-06-15 19:19:41.000000000 +0200
-+++ php-5.0.5/scripts/phpize.in	2005-09-10 21:51:45.523274024 +0200
-@@ -3,7 +3,7 @@
- # Variable declaration
+diff -urNp -x '*.orig' php-7.0.33.org/scripts/phpize.in php-7.0.33/scripts/phpize.in
+--- php-7.0.33.org/scripts/phpize.in	2018-12-04 18:23:02.000000000 +0100
++++ php-7.0.33/scripts/phpize.in	2021-08-23 23:36:04.841475774 +0200
+@@ -4,7 +4,7 @@
  prefix='@prefix@'
+ datarootdir='@datarootdir@'
  exec_prefix="`eval echo @exec_prefix@`"
 -phpdir="`eval echo @libdir@`/build"
 +phpdir="`eval echo @libdir@`/php/build"
  includedir="`eval echo @includedir@`/php"
  builddir="`pwd`"
- 
+ SED="@SED@"

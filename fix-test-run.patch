@@ -1,20 +1,7 @@
---- php-5.4.0alpha2/configure.ac~	2011-08-07 12:43:31.000000000 +0300
-+++ php-5.4.0alpha2/configure.ac	2011-08-07 12:44:11.495394662 +0300
-@@ -1271,6 +1271,11 @@
-   ;;
- esac
- 
-+# shift so that pcre, spl, ... are loaded first
-+PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/xml.la \),\2\1,')
-+PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/spl.la \),\2\1,')
-+PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/pcre.la \),\2\1,')
-+
- PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
- 
- PHP_SUBST(PHP_EXECUTABLE)
---- php-5.5.11/Makefile.global	2014-04-27 15:05:38.963814051 +0300
-+++ php-5.5.11/Makefile.global	2014-04-27 15:09:54.438443707 +0300
-@@ -81,8 +81,15 @@
+diff -urNp -x '*.orig' php-7.2.34.org/Makefile.global php-7.2.34/Makefile.global
+--- php-7.2.34.org/Makefile.global	2021-08-27 22:34:16.728238938 +0200
++++ php-7.2.34/Makefile.global	2021-08-27 22:34:17.704884843 +0200
+@@ -81,8 +81,15 @@ install-headers:
  		done; \
  	fi
  
@@ -31,7 +18,7 @@
  	if test "x$(PHP_MODULES)" != "x"; then \
  		for i in $(PHP_MODULES)""; do \
  			. $$i; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
-@@ -111,7 +118,10 @@
+@@ -111,7 +118,10 @@ test: all
  		TEST_PHP_EXECUTABLE=$(PHP_EXECUTABLE) \
  		TEST_PHP_SRCDIR=$(top_srcdir) \
  		CC="$(CC)" \
@@ -43,3 +30,18 @@
  		TEST_RESULT_EXIT_CODE=$$?; \
  		rm $(top_builddir)/tmp-php.ini; \
  		exit $$TEST_RESULT_EXIT_CODE; \
+diff -urNp -x '*.orig' php-7.2.34.org/configure.ac php-7.2.34/configure.ac
+--- php-7.2.34.org/configure.ac	2021-08-27 22:34:16.738238725 +0200
++++ php-7.2.34/configure.ac	2021-08-27 22:34:17.704884843 +0200
+@@ -1305,6 +1305,11 @@ AC_DEFINE_UNQUOTED(PHP_UNAME,"$PHP_UNAME
+ PHP_OS=`uname | xargs`
+ AC_DEFINE_UNQUOTED(PHP_OS,"$PHP_OS",[uname output])
+ 
++# shift so that pcre, spl, ... are loaded first
++PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/xml.la \),\2\1,')
++PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/spl.la \),\2\1,')
++PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/pcre.la \),\2\1,')
++
+ PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
+ 
+ PHP_SUBST(PHP_EXECUTABLE)

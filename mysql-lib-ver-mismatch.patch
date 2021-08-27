@@ -1,11 +1,12 @@
---- php-5.3.27/ext/mysqli/mysqli_nonapi.c~	2013-11-20 00:19:11.000000000 +0200
-+++ php-5.3.27/ext/mysqli/mysqli_nonapi.c	2013-11-20 00:19:44.725872552 +0200
-@@ -73,7 +73,7 @@
+diff -urNp -x '*.orig' php-7.2.34.org/ext/mysqli/mysqli_nonapi.c php-7.2.34/ext/mysqli/mysqli_nonapi.c
+--- php-7.2.34.org/ext/mysqli/mysqli_nonapi.c	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/mysqli/mysqli_nonapi.c	2021-08-27 22:34:30.637946183 +0200
+@@ -74,7 +74,7 @@ void mysqli_common_connect(INTERNAL_FUNC
  	zend_bool			self_alloced = 0;
  
  
 -#if !defined(MYSQL_USE_MYSQLND)
 +#if 0 && !defined(MYSQL_USE_MYSQLND)
  	if ((MYSQL_VERSION_ID / 100) != (mysql_get_client_version() / 100)) {
- 		php_error_docref(NULL TSRMLS_CC, E_NOTICE,
+ 		php_error_docref(NULL, E_WARNING,
  						"Headers and client library minor version mismatch. Headers:%d Library:%ld",

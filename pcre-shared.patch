@@ -17,7 +17,7 @@
 +    for j in $PHP_PCRE_REGEX $PHP_PCRE_REGEX/$PHP_LIBDIR /usr/$PHP_LIBDIR; do
        test -f $j/libpcre.a || test -f $j/libpcre.$SHLIB_SUFFIX_NAME && PCRE_LIBDIR=$j
      done
-     
+ 
 @@ -52,12 +52,13 @@
      ],[
        -L$PCRE_LIBDIR
@@ -147,7 +147,7 @@
 --- php-5.3.2/sapi/cli/tests/018.phpt~	2008-03-17 16:05:39.000000000 +0200
 +++ php-5.3.2/sapi/cli/tests/018.phpt	2010-03-16 20:41:11.341251246 +0200
 @@ -20,8 +20,6 @@
- --EXPECTF--     
+ --EXPECTF--
  [PHP Modules]
  %a
 -pcre

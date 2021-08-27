@@ -3,10 +3,11 @@ $ php -r 'var_dump(array(get_cfg_var("cfg_file_path"),php_ini_loaded_file()));'
 
 https://github.com/pld-linux/php/commit/762ec2e
 
---- php-7.0.0RC6.orig/main/php_ini.c	2015-11-10 23:58:52.227101032 +0200
-+++ php-7.0.0RC6/main/php_ini.c	2015-11-11 00:01:43.502674750 +0200
-@@ -375,12 +375,19 @@
- }
+diff -urNp -x '*.orig' php-7.2.34.org/main/php_ini.c php-7.2.34/main/php_ini.c
+--- php-7.2.34.org/main/php_ini.c	2020-09-30 07:15:50.000000000 +0200
++++ php-7.2.34/main/php_ini.c	2021-08-24 01:06:57.629953227 +0200
+@@ -415,12 +415,19 @@ static void php_load_zend_extension_cb(v
+ #endif
  /* }}} */
  
 +static int php_csort(const struct dirent **a, const struct dirent **b)
@@ -25,7 +26,7 @@ https://github.com/pld-linux/php/commit/762ec2e
  	int php_ini_scanned_path_len;
  	char *open_basedir;
  	int free_ini_search_path = 0;
-@@ -557,8 +564,26 @@
+@@ -597,8 +604,26 @@ int php_init_config(void)
  				}
  			}
  		}
@@ -53,7 +54,7 @@ https://github.com/pld-linux/php/commit/762ec2e
  		if (!fh.handle.fp) {
  			const char *fmt = "php-%s.ini";
  			char *ini_fname;
-@@ -568,15 +593,8 @@
+@@ -608,15 +633,8 @@ int php_init_config(void)
  			if (fh.handle.fp) {
  				fh.filename = ZSTR_VAL(opened_path);
  			}
@@ -70,7 +71,7 @@ https://github.com/pld-linux/php/commit/762ec2e
  	}
  
  	if (free_ini_search_path) {
-@@ -593,14 +611,28 @@
+@@ -633,14 +651,28 @@ int php_init_config(void)
  
  		{
  			zval tmp;
@@ -100,7 +101,7 @@ https://github.com/pld-linux/php/commit/762ec2e
  			php_ini_opened_path = zend_strndup(Z_STRVAL(tmp), Z_STRLEN(tmp));
  		}
  	}
-@@ -624,13 +656,15 @@
+@@ -664,13 +696,15 @@ int php_init_config(void)
  		zend_llist scanned_ini_list;
  		zend_llist_element *element;
  		int l, total_l = 0;
@@ -117,7 +118,7 @@ https://github.com/pld-linux/php/commit/762ec2e
  		for (debpath = bufpath ; debpath ; debpath=endpath) {
  			endpath = strchr(debpath, DEFAULT_DIR_SEPARATOR);
  			if (endpath) {
-@@ -643,7 +677,7 @@
+@@ -683,7 +717,7 @@ int php_init_config(void)
  			}
  			lenpath = (int)strlen(debpath);
  

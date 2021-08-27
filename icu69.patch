@@ -1,0 +1,84 @@
+--- php-7.2.34/ext/intl/collator/collator_sort.c~	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/intl/collator/collator_sort.c	2021-08-27 22:44:44.636032116 +0200
+@@ -30,6 +30,11 @@
+ typedef zend_long ptrdiff_t;
+ #endif
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /**
+  * Declare 'index' which will point to sort key in sort key
+  * buffer.
+--- php-7.2.34/ext/intl/normalizer/normalizer_normalize.c~	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/intl/normalizer/normalizer_normalize.c	2021-08-27 22:50:28.139941746 +0200
+@@ -25,6 +25,11 @@
+ #include "normalizer_normalize.h"
+ #include "intl_convert.h"
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /* {{{ proto string Normalizer::normalize( string $input [, string $form = FORM_C] )
+  * Normalize a string. }}} */
+ /* {{{ proto string normalizer_normalize( string $input [, string $form = FORM_C] )
+--- php-7.2.34/ext/intl/dateformat/dateformat_attr.c~	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/intl/dateformat/dateformat_attr.c	2021-08-27 22:52:05.242621694 +0200
+@@ -26,6 +26,11 @@
+ #include <unicode/ustring.h>
+ #include <unicode/udat.h>
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /* {{{ proto unicode IntlDateFormatter::getDateType( )
+  * Get formatter datetype. }}} */
+ /* {{{ proto string datefmt_get_datetype( IntlDateFormatter $mf )
+--- php-7.2.34/ext/intl/timezone/timezone_class.cpp~	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/intl/timezone/timezone_class.cpp	2021-08-27 22:52:48.582342940 +0200
+@@ -37,6 +37,11 @@
+ #include <ext/date/php_date.h>
+ }
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /* {{{ Global variables */
+ U_CDECL_BEGIN
+ zend_class_entry *TimeZone_ce_ptr = NULL;
+--- php-7.2.34/ext/intl/timezone/timezone_methods.cpp~	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/intl/timezone/timezone_methods.cpp	2021-08-27 22:53:23.048792982 +0200
+@@ -37,6 +37,11 @@
+ }
+ #include "common/common_enum.h"
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ U_CFUNC PHP_METHOD(IntlTimeZone, __construct)
+ {
+ 	zend_throw_exception( NULL,
+--- php-7.2.34/ext/intl/breakiterator/codepointiterator_internal.cpp~	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/intl/breakiterator/codepointiterator_internal.cpp	2021-08-27 22:54:10.761833238 +0200
+@@ -20,6 +20,11 @@
+ 
+ #include "php.h"
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ //copied from cmemory.h, which is not public
+ typedef union {
+     zend_long    t1;

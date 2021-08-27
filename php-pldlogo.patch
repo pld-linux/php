@@ -35,7 +35,7 @@ diff -urN php-4.2.1RC2.org/ext/standard/info.h php-4.2.1RC2/ext/standard/info.h
  PHP_FUNCTION(phpversion);
 --- php-4.3.0.org/main/logos.h	Sat May 11 20:49:24 2002
 +++ php-4.3.0/main/logos.h	Sat May 11 20:50:32 2002
-@@ -1503,3 +1503,127 @@
+@@ -1503,3 +1503,129 @@
  	 54, 240,   3,  66, 148,   6, 228, 178,  11, 192, 
  	192,   4, 236, 158, 239,   2,  17,  16,   0,  59};
  

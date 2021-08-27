@@ -124,8 +124,8 @@
  ZEND_EXTERN_MODULE_GLOBALS( intl )
  
  /* Sizes required for the strings "variant15" , "extlang11", "private12" etc. */
---- /dev/shm/php-5.3.29/ext/intl/dateformat/dateformat_format.c~	2014-08-13 21:22:50.000000000 +0200
-+++ /dev/shm/php-5.3.29/ext/intl/dateformat/dateformat_format.c	2021-08-27 23:51:40.295564763 +0200
+--- php-5.3.29/ext/intl/dateformat/dateformat_format.c~	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/intl/dateformat/dateformat_format.c	2021-08-27 23:51:40.295564763 +0200
 @@ -29,6 +29,11 @@
  #include "dateformat_data.h"
  #include "ext/date/php_date.h"

@@ -240,6 +240,7 @@ Patch70:	mysqlnd-ssl.patch
 Patch72:	phar-hash-shared.patch
 Patch73:	php-pdo-ssl.patch
 Patch74:	php-icu64.patch
+Patch75:	icu69.patch
 URL:		http://php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2163,6 +2164,7 @@ exit 1
 %patch72 -p1
 %patch73 -p1
 %patch74 -p1
+%patch75 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

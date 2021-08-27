@@ -225,6 +225,7 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	x32.patch
 Patch69:	fpm-conf-split.patch
 Patch70:	php-icu64.patch
+Patch71:	icu69.patch
 URL:		http://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2099,6 +2100,7 @@ exit 1
 %patch66 -p1
 %patch67 -p1
 %patch70 -p1
+%patch71 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

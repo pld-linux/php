@@ -1,0 +1,126 @@
+--- php-7.2.34/ext/intl/collator/collator_sort.c~	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/intl/collator/collator_sort.c	2021-08-27 22:44:44.636032116 +0200
+@@ -30,6 +30,11 @@
+ typedef long ptrdiff_t;
+ #endif
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /**
+  * Declare 'index' which will point to sort key in sort key
+  * buffer.
+--- php-7.2.34/ext/intl/normalizer/normalizer_normalize.c~	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/intl/normalizer/normalizer_normalize.c	2021-08-27 22:50:28.139941746 +0200
+@@ -25,6 +25,11 @@
+ #include "normalizer_normalize.h"
+ #include "intl_convert.h"
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /* {{{ proto string Normalizer::normalize( string $input [, string $form = FORM_C] )
+  * Normalize a string. }}} */
+ /* {{{ proto string normalizer_normalize( string $input [, string $form = FORM_C] )
+--- php-7.2.34/ext/intl/dateformat/dateformat_attr.c~	2020-09-30 07:15:54.000000000 +0200
++++ php-7.2.34/ext/intl/dateformat/dateformat_attr.c	2021-08-27 22:52:05.242621694 +0200
+@@ -26,6 +26,11 @@
+ #include <unicode/udat.h>
+ #include <unicode/ucal.h>
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ static void internal_set_calendar(IntlDateFormatter_object *dfo, char* timezone_id, int timezone_id_len, int calendar, zval* return_value TSRMLS_DC){
+ 	int         timezone_utf16_len = 0;
+ 	UChar*      timezone_utf16  = NULL; /* timezone_id in UTF-16 */
+--- php-5.6.40/ext/intl/collator/collator_compare.c~	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/intl/collator/collator_compare.c	2021-08-27 23:22:52.663489553 +0200
+@@ -24,6 +24,11 @@
+ #include "collator_compare.h"
+ #include "intl_convert.h"
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /* {{{ proto int Collator::compare( string $str1, string $str2 )
+  * Compare two strings. }}} */
+ /* {{{ proto int collator_compare( Collator $coll, string $str1, string $str2 )
+--- php-5.6.40/ext/intl/collator/collator_convert.c~	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/intl/collator/collator_convert.c	2021-08-27 23:23:18.900123085 +0200
+@@ -28,6 +28,11 @@
+ #include <unicode/ustring.h>
+ #include <php.h>
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ #if (PHP_MAJOR_VERSION == 5 && PHP_MINOR_VERSION <= 1)
+ #define CAST_OBJECT_SHOULD_FREE ,0
+ #else
+--- php-5.6.40/ext/intl/collator/collator_locale.c~	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/intl/collator/collator_locale.c	2021-08-27 23:23:58.503409685 +0200
+@@ -26,6 +26,11 @@
+ 
+ #include <zend_API.h>
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /* {{{ proto string Collator::getLocale( int $type )
+  * Gets the locale name of the collator. }}} */
+ /* {{{ proto string collator_get_locale( Collator $coll, int $type )
+--- php-5.6.40/ext/intl/collator/collator_error.c~	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/intl/collator/collator_error.c	2021-08-27 23:25:04.760005650 +0200
+@@ -23,6 +23,11 @@
+ #include "collator_class.h"
+ #include "collator_error.h"
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /* {{{ proto int Collator::getErrorCode( Collator $coll )
+  * Get collator's last error code. }}} */
+ /* {{{ proto int collator_get_error_code( Collator $coll )
+--- php-5.6.40/ext/intl/common/common_error.c~	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/intl/common/common_error.c	2021-08-27 23:26:12.666607596 +0200
+@@ -23,6 +23,11 @@
+ #include "intl_error.h"
+ #include "common_error.h"
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /* {{{ proto int intl_get_error_code()
+  * Get code of the last occurred error.
+  */
+--- php-5.6.40/ext/intl/locale/locale_methods.c~	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/intl/locale/locale_methods.c	2021-08-27 23:27:01.749897995 +0200
+@@ -38,6 +38,11 @@
+ #include "main/php_ini.h"
+ #include "ext/standard/php_smart_str.h"
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ ZEND_EXTERN_MODULE_GLOBALS( intl )
+ 
+ /* Sizes required for the strings "variant15" , "extlang11", "private12" etc. */

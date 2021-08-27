@@ -124,3 +124,17 @@
  ZEND_EXTERN_MODULE_GLOBALS( intl )
  
  /* Sizes required for the strings "variant15" , "extlang11", "private12" etc. */
+--- php-5.4.45/ext/intl/dateformat/dateformat_format.c~	2015-09-01 22:09:37.000000000 +0200
++++ php-5.4.45/ext/intl/dateformat/dateformat_format.c	2021-08-28 01:01:45.592469182 +0200
+@@ -29,6 +29,11 @@
+ #include "dateformat_data.h"
+ #include "ext/date/php_date.h"
+ 
++#if !defined(FALSE)
++#define FALSE 0
++#define TRUE 1
++#endif
++
+ /* {{{ 
+  * Internal function which calls the udat_format
+ */

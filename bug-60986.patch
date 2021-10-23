@@ -1,31 +1,7 @@
---- php/php-src/branches/PHP_5_3/ext/pcre/php_pcre.c	2012/02/06 17:57:47	323095
-+++ php/php-src/branches/PHP_5_3/ext/pcre/php_pcre.c	2012/02/06 18:11:56	323096
-@@ -252,10 +252,10 @@
- 	   back the compiled pattern, otherwise go on and compile it. */
- 	if (zend_hash_find(&PCRE_G(pcre_cache), regex, regex_len+1, (void **)&pce) == SUCCESS) {
- 		/*
--		 * We use a quick pcre_info() check to see whether cache is corrupted, and if it
-+		 * We use a quick pcre_fullinfo() check to see whether cache is corrupted, and if it
- 		 * is, we flush it and compile the pattern from scratch.
- 		 */
--		if (pcre_info(pce->re, NULL, NULL) == PCRE_ERROR_BADMAGIC) {
-+		if (pcre_fullinfo(pce->re, NULL, NULL, NULL) == PCRE_ERROR_BADMAGIC) {
- 			zend_hash_clean(&PCRE_G(pcre_cache));
- 		} else {
- #if HAVE_SETLOCALE
---- php/php-src/branches/PHP_5_3/ext/pcre/php_pcre.def	2012/02/06 17:57:47	323095
-+++ php/php-src/branches/PHP_5_3/ext/pcre/php_pcre.def	2012/02/06 18:11:56	323096
-@@ -4,7 +4,6 @@
- php_pcre_exec
- php_pcre_get_substring
- php_pcre_get_substring_list
--php_pcre_info
- php_pcre_maketables
- php_pcre_study
- php_pcre_version
---- php/php-src/branches/PHP_5_3/ext/pcre/php_pcre.c	2012/02/06 18:11:56	323096
-+++ php/php-src/branches/PHP_5_3/ext/pcre/php_pcre.c	2012/02/06 18:18:53	323097
-@@ -241,6 +241,7 @@
+diff -urNp -x '*.orig' php-5.2.17.org/ext/pcre/php_pcre.c php-5.2.17/ext/pcre/php_pcre.c
+--- php-5.2.17.org/ext/pcre/php_pcre.c	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/ext/pcre/php_pcre.c	2021-10-23 19:12:03.406458393 +0200
+@@ -241,6 +241,7 @@ PHPAPI pcre_cache_entry* pcre_get_compil
  	char				*pattern;
  	int					 do_study = 0;
  	int					 poptions = 0;
@@ -33,12 +9,27 @@
  	unsigned const char *tables = NULL;
  #if HAVE_SETLOCALE
  	char				*locale = setlocale(LC_CTYPE, NULL);
-@@ -255,7 +256,7 @@
- 		 * We use a quick pcre_fullinfo() check to see whether cache is corrupted, and if it
+@@ -253,10 +254,10 @@ PHPAPI pcre_cache_entry* pcre_get_compil
+ 	regex_len = strlen(regex);
+ 	if (zend_hash_find(&PCRE_G(pcre_cache), regex, regex_len+1, (void **)&pce) == SUCCESS) {
+ 		/*
+-		 * We use a quick pcre_info() check to see whether cache is corrupted, and if it
++		 * We use a quick pcre_fullinfo() check to see whether cache is corrupted, and if it
  		 * is, we flush it and compile the pattern from scratch.
  		 */
--		if (pcre_fullinfo(pce->re, NULL, NULL, NULL) == PCRE_ERROR_BADMAGIC) {
+-		if (pcre_info(pce->re, NULL, NULL) == PCRE_ERROR_BADMAGIC) {
 +		if (pcre_fullinfo(pce->re, NULL, PCRE_INFO_CAPTURECOUNT, &count) == PCRE_ERROR_BADMAGIC) {
  			zend_hash_clean(&PCRE_G(pcre_cache));
  		} else {
  #if HAVE_SETLOCALE
+diff -urNp -x '*.orig' php-5.2.17.org/ext/pcre/php_pcre.def php-5.2.17/ext/pcre/php_pcre.def
+--- php-5.2.17.org/ext/pcre/php_pcre.def	2007-02-26 13:38:34.000000000 +0100
++++ php-5.2.17/ext/pcre/php_pcre.def	2021-10-23 19:12:03.406458393 +0200
+@@ -4,7 +4,6 @@ php_pcre_copy_substring
+ php_pcre_exec
+ php_pcre_get_substring
+ php_pcre_get_substring_list
+-php_pcre_info
+ php_pcre_maketables
+ php_pcre_study
+ php_pcre_version

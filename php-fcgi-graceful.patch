@@ -17,11 +17,12 @@ while ($i < 35) {
 echo "end!<br>\n";
 ?>
 
---- php-5.2.5RC2/sapi/cgi/cgi_main.c	2007-11-01 17:23:14.000000000 +0200
-+++ php-5.2.5RC2-graceful/sapi/cgi/cgi_main.c	2007-11-08 00:46:38.999355875 +0200
-@@ -103,6 +103,11 @@
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/cgi_main.c php-5.2.17/sapi/cgi/cgi_main.c
+--- php-5.2.17.org/sapi/cgi/cgi_main.c	2021-10-23 19:05:04.013125101 +0200
++++ php-5.2.17/sapi/cgi/cgi_main.c	2021-10-23 19:05:06.359791768 +0200
+@@ -100,6 +100,11 @@ static void (*php_php_import_environment
   */
- static int parent = 1;
+ static int children = 0;
  
 +#if PHP_FASTCGI
 +/* Socket we are listening on incoming FastCGI connections */
@@ -29,9 +30,9 @@ echo "end!<br>\n";
 +#endif
 +
  /**
-  * Process group
+  * Set to non-zero if we are the parent process
   */
-@@ -1157,6 +1162,22 @@
+@@ -1225,6 +1230,22 @@ void fastcgi_cleanup(int signal)
  }
  #endif
  
@@ -54,7 +55,7 @@ echo "end!<br>\n";
  PHP_INI_BEGIN()
  	STD_PHP_INI_ENTRY("cgi.rfc2616_headers",     "0",  PHP_INI_ALL,    OnUpdateBool,   rfc2616_headers, php_cgi_globals_struct, php_cgi_globals)
  	STD_PHP_INI_ENTRY("cgi.nph",                 "0",  PHP_INI_ALL,    OnUpdateBool,   nph, php_cgi_globals_struct, php_cgi_globals)
-@@ -1275,7 +1296,6 @@
+@@ -1343,7 +1364,6 @@ int main(int argc, char *argv[])
  	int requests = 0;
  	int fastcgi = fcgi_is_fastcgi();
  	char *bindpath = NULL;
@@ -62,7 +63,7 @@ echo "end!<br>\n";
  	fcgi_request request;
  	int repeats = 1;
  	int benchmark = 0;
-@@ -1538,9 +1558,17 @@
+@@ -1632,9 +1652,17 @@ consult the installation file that came
  					parent = 0;
  
  					/* don't catch our signals */

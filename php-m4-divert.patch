@@ -1,8 +1,8 @@
-diff -ur php-5.2.10.org/configure.in php-5.2.10/configure.in
---- php-5.2.10.org/configure.in	2009-06-17 14:22:41.000000000 +0200
-+++ php-5.2.10/configure.in	2009-08-18 12:16:25.317640253 +0200
+diff -urNp -x '*.orig' php-5.2.17.org/configure.in php-5.2.17/configure.in
+--- php-5.2.17.org/configure.in	2021-10-23 19:11:13.929791731 +0200
++++ php-5.2.17/configure.in	2021-10-23 19:11:16.436458398 +0200
 @@ -1,7 +1,7 @@
- ## $Id$ -*- autoconf -*-
+ ## $Id: configure.in 307193 2011-01-06 23:01:19Z iliaa $ -*- autoconf -*-
  dnl ## Process this file with autoconf to produce a configure script.
  
 -divert(1)
@@ -10,17 +10,17 @@ diff -ur php-5.2.10.org/configure.in php-5.2.10/configure.in
  
  dnl ## Diversion 1 is the autoconf + automake setup phase. We also
  dnl ## set the PHP version, deal with platform-specific compile
-@@ -263,7 +263,7 @@
- sinclude(TSRM/tsrm.m4)
+@@ -257,7 +257,7 @@ sinclude(TSRM/tsrm.m4)
  
+ sinclude(main/suhosin_patch.m4)
  
 -divert(2)
 +divert(1002)
  
  dnl ## Diversion 2 is where we set PHP-specific options and come up
  dnl ## with reasonable default values for them. We check for pthreads here
-@@ -302,7 +302,7 @@
-   PTHREADS_FLAGS
+@@ -302,7 +302,7 @@ if test "$PHP_FASTCGI" = "yes" -a "$PHP_
+   sinclude(sapi/cgi/fpm/config.m4)
  fi
  
 -divert(3)
@@ -28,7 +28,7 @@ diff -ur php-5.2.10.org/configure.in php-5.2.10/configure.in
  
  dnl ## In diversion 3 we check for compile-time options to the PHP
  dnl ## core and how to deal with different system dependencies.
-@@ -661,7 +661,7 @@
+@@ -662,7 +662,7 @@ if test "x$php_crypt_r" = "x1"; then
    PHP_CRYPT_R_STYLE
  fi
  
@@ -37,7 +37,7 @@ diff -ur php-5.2.10.org/configure.in php-5.2.10/configure.in
  
  dnl ## In diversion 4 we check user-configurable general settings.
  
-@@ -902,7 +902,7 @@
+@@ -903,7 +903,7 @@ else
    AC_MSG_RESULT([using system default])
  fi
  
@@ -46,18 +46,18 @@ diff -ur php-5.2.10.org/configure.in php-5.2.10/configure.in
  
  dnl ## In diversion 5 we check which extensions should be compiled.
  dnl ## All of these are normally in the extension directories.
-diff -ur php-5.2.10.org/ext/standard/config.m4 php-5.2.10/ext/standard/config.m4
---- php-5.2.10.org/ext/standard/config.m4	2007-07-11 13:56:03.000000000 +0200
-+++ php-5.2.10/ext/standard/config.m4	2009-08-18 12:16:25.317640253 +0200
+diff -urNp -x '*.orig' php-5.2.17.org/ext/standard/config.m4 php-5.2.17/ext/standard/config.m4
+--- php-5.2.17.org/ext/standard/config.m4	2009-11-28 00:41:13.000000000 +0100
++++ php-5.2.17/ext/standard/config.m4	2021-10-23 19:11:16.436458398 +0200
 @@ -1,6 +1,6 @@
- dnl $Id$ -*- autoconf -*-
+ dnl $Id: config.m4 291364 2009-11-27 23:41:13Z rasmus $ -*- autoconf -*-
  
 -divert(3)dnl
 +divert(1003)dnl
  
  dnl
  dnl Check if flush should be called explicitly after buffered io
-@@ -205,7 +205,7 @@
+@@ -205,7 +205,7 @@ dnl
  AC_CHECK_FUNCS(getcwd getwd asinh acosh atanh log1p hypot glob strfmon nice fpclass isinf isnan)
  AC_FUNC_FNMATCH	
  
@@ -66,9 +66,9 @@ diff -ur php-5.2.10.org/ext/standard/config.m4 php-5.2.10/ext/standard/config.m4
  
  dnl
  dnl Check for regex library type
-diff -ur php-5.2.10.org/scripts/phpize.m4 php-5.2.10/scripts/phpize.m4
---- php-5.2.10.org/scripts/phpize.m4	2009-06-02 21:54:22.000000000 +0200
-+++ php-5.2.10/scripts/phpize.m4	2009-08-18 12:16:25.317640253 +0200
+diff -urNp -x '*.orig' php-5.2.17.org/scripts/phpize.m4 php-5.2.17/scripts/phpize.m4
+--- php-5.2.17.org/scripts/phpize.m4	2009-11-27 13:51:41.000000000 +0100
++++ php-5.2.17/scripts/phpize.m4	2021-10-23 19:11:16.436458398 +0200
 @@ -1,6 +1,6 @@
  dnl This file becomes configure.in for self-contained extensions.
  

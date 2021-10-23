@@ -1,7 +1,7 @@
-diff -aur php-5.2.5_p20080206.orig/ext/mysql/php_mysql.c php-5.2.5_p20080206/ext/mysql/php_mysql.c
---- php-5.2.5_p20080206.orig/ext/mysql/php_mysql.c	2008-02-06 14:22:57.652600900 +0100
-+++ php-5.2.5_p20080206/ext/mysql/php_mysql.c	2008-02-06 14:24:40.216655403 +0100
-@@ -360,6 +360,7 @@
+diff -urNp -x '*.orig' php-5.2.17.org/ext/mysql/php_mysql.c php-5.2.17/ext/mysql/php_mysql.c
+--- php-5.2.17.org/ext/mysql/php_mysql.c	2010-08-21 18:19:30.000000000 +0200
++++ php-5.2.17/ext/mysql/php_mysql.c	2021-10-23 19:06:47.816458427 +0200
+@@ -360,6 +360,7 @@ PHP_INI_BEGIN()
  	PHP_INI_ENTRY("mysql.default_port",				NULL,	PHP_INI_ALL,		OnMySQLPort)
  	STD_PHP_INI_ENTRY("mysql.default_socket",		NULL,	PHP_INI_ALL,		OnUpdateStringUnempty,	default_socket,	zend_mysql_globals,		mysql_globals)
  	STD_PHP_INI_ENTRY("mysql.connect_timeout",		"60",	PHP_INI_ALL,		OnUpdateLong,		connect_timeout, 	zend_mysql_globals,		mysql_globals)
@@ -9,7 +9,7 @@ diff -aur php-5.2.5_p20080206.orig/ext/mysql/php_mysql.c php-5.2.5_p20080206/ext
  	STD_PHP_INI_BOOLEAN("mysql.trace_mode",			"0",	PHP_INI_ALL,		OnUpdateLong,		trace_mode, 		zend_mysql_globals,		mysql_globals)
  PHP_INI_END()
  /* }}} */
-@@ -376,6 +377,7 @@
+@@ -376,6 +377,7 @@ static PHP_GINIT_FUNCTION(mysql)
  	mysql_globals->connect_errno = 0;
  	mysql_globals->connect_error = NULL;
  	mysql_globals->connect_timeout = 0;
@@ -17,15 +17,15 @@ diff -aur php-5.2.5_p20080206.orig/ext/mysql/php_mysql.c php-5.2.5_p20080206/ext
  	mysql_globals->trace_mode = 0;
  	mysql_globals->result_allocated = 0;
  }
-@@ -515,6 +517,7 @@
+@@ -515,6 +517,7 @@ static void php_mysql_do_connect(INTERNA
  {
  	char *user=NULL, *passwd=NULL, *host_and_port=NULL, *socket=NULL, *tmp=NULL, *host=NULL;
  	int  user_len, passwd_len, host_len;
 +	char *connect_charset=NULL;
  	char *hashed_details=NULL;
  	int hashed_details_length, port = MYSQL_PORT;
- 	int client_flags = 0;
-@@ -527,6 +530,7 @@
+ 	long client_flags = 0;
+@@ -527,6 +530,7 @@ static void php_mysql_do_connect(INTERNA
  
  
  	connect_timeout = MySG(connect_timeout);
@@ -33,7 +33,7 @@ diff -aur php-5.2.5_p20080206.orig/ext/mysql/php_mysql.c php-5.2.5_p20080206/ext
  
  	socket = MySG(default_socket);
  
-@@ -640,6 +644,9 @@
+@@ -644,6 +648,9 @@ static void php_mysql_do_connect(INTERNA
  				mysql_options(&mysql->conn, MYSQL_OPT_CONNECT_TIMEOUT, (const char *)&connect_timeout);
  			}
  
@@ -43,7 +43,7 @@ diff -aur php-5.2.5_p20080206.orig/ext/mysql/php_mysql.c php-5.2.5_p20080206/ext
  			if (mysql_real_connect(&mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL) {
  #else
  			if (mysql_connect(&mysql->conn, host, user, passwd)==NULL) {
-@@ -684,6 +691,9 @@
+@@ -688,6 +695,9 @@ static void php_mysql_do_connect(INTERNA
  				signal(SIGPIPE, handler);
  #endif /* end mysql_ping */
  #if MYSQL_VERSION_ID > 32199 /* this lets us set the port number */
@@ -53,7 +53,7 @@ diff -aur php-5.2.5_p20080206.orig/ext/mysql/php_mysql.c php-5.2.5_p20080206/ext
  				if (mysql_real_connect(le->ptr, host, user, passwd, NULL, port, socket, client_flags)==NULL) {
  #else
  				if (mysql_connect(le->ptr, host, user, passwd)==NULL) {
-@@ -747,6 +757,9 @@
+@@ -751,6 +761,9 @@ static void php_mysql_do_connect(INTERNA
  			mysql_options(&mysql->conn, MYSQL_OPT_CONNECT_TIMEOUT, (const char *)&connect_timeout);
  		}
  
@@ -63,10 +63,10 @@ diff -aur php-5.2.5_p20080206.orig/ext/mysql/php_mysql.c php-5.2.5_p20080206/ext
  		if (mysql_real_connect(&mysql->conn, host, user, passwd, NULL, port, socket, client_flags)==NULL) {
  #else
  		if (mysql_connect(&mysql->conn, host, user, passwd)==NULL) {
-diff -aur php-5.2.5_p20080206.orig/ext/mysql/php_mysql_structs.h php-5.2.5_p20080206/ext/mysql/php_mysql_structs.h
---- php-5.2.5_p20080206.orig/ext/mysql/php_mysql_structs.h	2008-02-06 14:22:57.510605687 +0100
-+++ php-5.2.5_p20080206/ext/mysql/php_mysql_structs.h	2008-02-06 14:23:27.764590355 +0100
-@@ -103,6 +103,7 @@
+diff -urNp -x '*.orig' php-5.2.17.org/ext/mysql/php_mysql_structs.h php-5.2.17/ext/mysql/php_mysql_structs.h
+--- php-5.2.17.org/ext/mysql/php_mysql_structs.h	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/ext/mysql/php_mysql_structs.h	2021-10-23 19:06:47.816458427 +0200
+@@ -103,6 +103,7 @@ ZEND_BEGIN_MODULE_GLOBALS(mysql)
  	long default_port;
  	char *default_host, *default_user, *default_password;
  	char *default_socket;

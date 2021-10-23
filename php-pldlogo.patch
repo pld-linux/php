@@ -1,8 +1,9 @@
---- php-4.3.3RC3/ext/standard/info.c.orig	2003-06-19 18:43:41.000000000 +0200
-+++ php-4.3.3RC3/ext/standard/info.c	2003-08-16 21:37:18.705836072 +0200
-@@ -518,6 +518,21 @@
- 		PUTS(!sapi_module.phpinfo_as_text?"<br />":"\n");
- 		PUTS(zend_version);
+diff -urNp -x '*.orig' php-5.2.17.org/ext/standard/info.c php-5.2.17/ext/standard/info.c
+--- php-5.2.17.org/ext/standard/info.c	2021-10-23 18:56:50.643125149 +0200
++++ php-5.2.17/ext/standard/info.c	2021-10-23 18:56:53.006458482 +0200
+@@ -667,6 +667,21 @@ PHPAPI void php_print_info(int flag TSRM
+ 			zend_html_puts(zend_version, strlen(zend_version) TSRMLS_CC);
+ 		}
  		php_info_print_box_end();
 +		/* PLD Linux */
 +		php_info_print_box_start(0);
@@ -22,21 +23,24 @@
  		efree(php_uname);
  	}
  
-diff -urN php-4.2.1RC2.org/ext/standard/info.h php-4.2.1RC2/ext/standard/info.h
---- php-4.2.1RC2.org/ext/standard/info.h	Sat May 11 20:49:24 2002
-+++ php-4.2.1RC2/ext/standard/info.h	Sat May 11 20:49:40 2002
+diff -urNp -x '*.orig' php-5.2.17.org/ext/standard/info.h php-5.2.17/ext/standard/info.h
+--- php-5.2.17.org/ext/standard/info.h	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/ext/standard/info.h	2021-10-23 18:56:53.006458482 +0200
 @@ -54,6 +54,7 @@
  #define PHP_EGG_LOGO_GUID	"PHPE9568F36-D428-11d2-A769-00AA001ACF42"
  #define ZEND_LOGO_GUID		"PHPE9568F35-D428-11d2-A769-00AA001ACF42"
  #define PHP_CREDITS_GUID  "PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000"
 +#define PLD_LOGO_GUID	"PHPE9568F40-D428-11d2-A769-00AA001ACF42"
  
+ BEGIN_EXTERN_C()
  PHP_FUNCTION(phpversion);
- PHP_FUNCTION(phpinfo);
---- php-4.3.0.org/main/logos.h	Sat May 11 20:49:24 2002
-+++ php-4.3.0/main/logos.h	Sat May 11 20:50:32 2002
-@@ -1503,1 +1503,127 @@
- 	249, 249, 207, 233,   5,   4,   0,  59 };
+diff -urNp -x '*.orig' php-5.2.17.org/main/logos.h php-5.2.17/main/logos.h
+--- php-5.2.17.org/main/logos.h	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/main/logos.h	2021-10-23 18:56:53.006458482 +0200
+@@ -874,3 +874,129 @@ static const unsigned char php_egg_logo[
+ 	  7,   4, 129,   5,  84, 208,  62, 158, 185, 154, 
+ 	  8, 177,   5,  80, 208, 153, 172,  25, 155, 178, 
+ 	 57, 155, 180,  41, 148,   1,   1,   0,  59,   0 };
 +
 +
 +unsigned char pld_logo[] = {
@@ -163,10 +167,10 @@ diff -urN php-4.2.1RC2.org/ext/standard/info.h php-4.2.1RC2/ext/standard/info.h
 + 	  0,   0, 218,  35,  72, 230, 144,   1,  81,  42,
 + 	  0,   0,   0,   0,  73,  69,  78,  68, 174,  66,
 + 	 96, 130 };
-diff -urN php-4.2.1RC2.org/main/php_logos.c php-4.2.1RC2/main/php_logos.c
---- php-4.2.1RC2.org/main/php_logos.c	Sat May 11 20:49:24 2002
-+++ php-4.2.1RC2/main/php_logos.c	Sat May 11 20:51:05 2002
-@@ -56,6 +56,7 @@
+diff -urNp -x '*.orig' php-5.2.17.org/main/php_logos.c php-5.2.17/main/php_logos.c
+--- php-5.2.17.org/main/php_logos.c	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/main/php_logos.c	2021-10-23 18:56:53.009791815 +0200
+@@ -58,6 +58,7 @@ int php_init_info_logos(void)
  	php_register_info_logo(PHP_LOGO_GUID    , "image/gif", php_logo    , sizeof(php_logo));
  	php_register_info_logo(PHP_EGG_LOGO_GUID, "image/gif", php_egg_logo, sizeof(php_egg_logo));
  	php_register_info_logo(ZEND_LOGO_GUID   , "image/gif", zend_logo   , sizeof(zend_logo));

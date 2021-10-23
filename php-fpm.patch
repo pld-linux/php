@@ -1,10 +1,7 @@
-diff --git a/configure b/configure
-index 2d88ed7..c490abf 100755
-diff --git a/configure.in b/configure.in
-index e181ac9..4424930 100644
---- a/configure.in
-+++ b/configure.in
-@@ -295,6 +295,12 @@ if test "$enable_maintainer_zts" = "yes"; then
+diff -urNp -x '*.orig' php-5.2.17.org/configure.in php-5.2.17/configure.in
+--- php-5.2.17.org/configure.in	2021-10-23 19:09:17.423125073 +0200
++++ php-5.2.17/configure.in	2021-10-23 19:09:19.823125073 +0200
+@@ -295,6 +295,12 @@ if test "$enable_maintainer_zts" = "yes"
    PTHREADS_FLAGS
  fi
  
@@ -17,7 +14,7 @@ index e181ac9..4424930 100644
  divert(3)
  
  dnl ## In diversion 3 we check for compile-time options to the PHP
-@@ -511,6 +517,7 @@ AC_CHECK_FUNCS(
+@@ -510,6 +516,7 @@ AC_CHECK_FUNCS(
  alphasort \
  asctime_r \
  chroot \
@@ -25,7 +22,7 @@ index e181ac9..4424930 100644
  ctime_r \
  cuserid \
  crypt \
-@@ -1253,6 +1260,8 @@ PHP_SUBST_OLD(EXTENSION_DIR)
+@@ -1247,6 +1254,8 @@ PHP_SUBST_OLD(EXTENSION_DIR)
  PHP_SUBST_OLD(EXTRA_LDFLAGS)
  PHP_SUBST_OLD(EXTRA_LDFLAGS_PROGRAM)
  PHP_SUBST_OLD(EXTRA_LIBS)
@@ -34,7 +31,7 @@ index e181ac9..4424930 100644
  PHP_SUBST_OLD(ZEND_EXTRA_LIBS)
  PHP_SUBST_OLD(INCLUDES)
  PHP_SUBST_OLD(EXTRA_INCLUDES)
-@@ -1364,7 +1373,7 @@ case $PHP_SAPI in
+@@ -1343,7 +1352,7 @@ case $PHP_SAPI in
      install_targets="$PHP_INSTALL_CLI_TARGET $install_targets"
      ;;
    *)
@@ -43,132 +40,9 @@ index e181ac9..4424930 100644
      ;;
  esac
  
-diff --git a/libevent/ChangeLog b/libevent/ChangeLog
-new file mode 100644
-index 0000000..c592139
-diff --git a/libevent/Makefile.am b/libevent/Makefile.am
-new file mode 100644
-index 0000000..5ccfd2c
-diff --git a/libevent/Makefile.in b/libevent/Makefile.in
-new file mode 100644
-index 0000000..0600dcc
-diff --git a/libevent/README b/libevent/README
-new file mode 100644
-index 0000000..b065039
-diff --git a/libevent/aclocal.m4 b/libevent/aclocal.m4
-new file mode 100644
-index 0000000..74de4a1
-diff --git a/libevent/autogen.sh b/libevent/autogen.sh
-new file mode 100644
-index 0000000..218dbf4
-diff --git a/libevent/buffer.c b/libevent/buffer.c
-new file mode 100644
-index 0000000..e66080f
-diff --git a/libevent/compat/sys/_time.h b/libevent/compat/sys/_time.h
-new file mode 100644
-index 0000000..8cabb0d
-diff --git a/libevent/compat/sys/queue.h b/libevent/compat/sys/queue.h
-new file mode 100644
-index 0000000..c0956dd
-diff --git a/libevent/config.h.in b/libevent/config.h.in
-new file mode 100644
-index 0000000..d151f87
-diff --git a/libevent/configure b/libevent/configure
-new file mode 100644
-index 0000000..0a74aec
-diff --git a/libevent/configure.in b/libevent/configure.in
-new file mode 100644
-index 0000000..852d3c5
-diff --git a/libevent/depcomp b/libevent/depcomp
-new file mode 100644
-index 0000000..ffcd540
-diff --git a/libevent/devpoll.c b/libevent/devpoll.c
-new file mode 100644
-index 0000000..cbd2730
-diff --git a/libevent/epoll.c b/libevent/epoll.c
-new file mode 100644
-index 0000000..cf3c859
-diff --git a/libevent/epoll_sub.c b/libevent/epoll_sub.c
-new file mode 100644
-index 0000000..431970c
-diff --git a/libevent/evbuffer.c b/libevent/evbuffer.c
-new file mode 100644
-index 0000000..f2179a5
-diff --git a/libevent/event-config.h b/libevent/event-config.h
-new file mode 100644
-index 0000000..0a278b3
-diff --git a/libevent/event-fpm.h b/libevent/event-fpm.h
-new file mode 100644
-index 0000000..8625ca5
-diff --git a/libevent/event-internal.h b/libevent/event-internal.h
-new file mode 100644
-index 0000000..7485f21
-diff --git a/libevent/event.3 b/libevent/event.3
-new file mode 100644
-index 0000000..5b33ec6
-diff --git a/libevent/event.c b/libevent/event.c
-new file mode 100644
-index 0000000..826b7db
-diff --git a/libevent/event.h b/libevent/event.h
-new file mode 100644
-index 0000000..d67ecb5
-diff --git a/libevent/evhttp.h b/libevent/evhttp.h
-new file mode 100644
-index 0000000..0d35f9e
-diff --git a/libevent/evport.c b/libevent/evport.c
-new file mode 100644
-index 0000000..31523b4
-diff --git a/libevent/evsignal.h b/libevent/evsignal.h
-new file mode 100644
-index 0000000..8be9cbd
-diff --git a/libevent/evutil.c b/libevent/evutil.c
-new file mode 100644
-index 0000000..86205b2
-diff --git a/libevent/evutil.h b/libevent/evutil.h
-new file mode 100644
-index 0000000..0a018b8
-diff --git a/libevent/http-internal.h b/libevent/http-internal.h
-new file mode 100644
-index 0000000..bc9a1ed
-diff --git a/libevent/http.c b/libevent/http.c
-new file mode 100644
-index 0000000..1d60fc5
-diff --git a/libevent/install-sh b/libevent/install-sh
-new file mode 100644
-index 0000000..1a83534
-diff --git a/libevent/kqueue.c b/libevent/kqueue.c
-new file mode 100644
-index 0000000..38a1819
-diff --git a/libevent/log.c b/libevent/log.c
-new file mode 100644
-index 0000000..b62a619
-diff --git a/libevent/log.h b/libevent/log.h
-new file mode 100644
-index 0000000..7bc6632
-diff --git a/libevent/min_heap.h b/libevent/min_heap.h
-new file mode 100644
-index 0000000..d47e563
-diff --git a/libevent/missing b/libevent/missing
-new file mode 100644
-index 0000000..09edd88
-diff --git a/libevent/poll.c b/libevent/poll.c
-new file mode 100644
-index 0000000..b67c6ff
-diff --git a/libevent/select.c b/libevent/select.c
-new file mode 100644
-index 0000000..7faafe4
-diff --git a/libevent/signal.c b/libevent/signal.c
-new file mode 100644
-index 0000000..bcaa3f9
-diff --git a/libevent/strlcpy-internal.h b/libevent/strlcpy-internal.h
-new file mode 100644
-index 0000000..22b5f61
-diff --git a/libevent/strlcpy.c b/libevent/strlcpy.c
-new file mode 100644
-index 0000000..a1a413d
-diff --git a/main/php_config.h.in b/main/php_config.h.in
---- a/main/php_config.h.in
-+++ b/main/php_config.h.in
+diff -urNp -x '*.orig' php-5.2.17.org/main/php_config.h.in php-5.2.17/main/php_config.h.in
+--- php-5.2.17.org/main/php_config.h.in	2011-01-07 00:04:47.000000000 +0100
++++ php-5.2.17/main/php_config.h.in	2021-10-23 19:09:19.826458407 +0200
 @@ -170,6 +170,9 @@
  /* Define if you have the chroot function.  */
  #undef HAVE_CHROOT
@@ -217,15 +91,16 @@ diff --git a/main/php_config.h.in b/main/php_config.h.in
  /* Define if system uses EBCDIC */
  #undef CHARSET_EBCDIC
  
---- php-5.2.17/sapi/cgi/Makefile.frag~	2012-02-27 14:44:23.000000000 +0200
-+++ php-5.2.17/sapi/cgi/Makefile.frag	2012-02-27 14:46:13.037731342 +0200
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/Makefile.frag php-5.2.17/sapi/cgi/Makefile.frag
+--- php-5.2.17.org/sapi/cgi/Makefile.frag	2021-10-23 19:09:17.386458407 +0200
++++ php-5.2.17/sapi/cgi/Makefile.frag	2021-10-23 19:09:19.826458407 +0200
 @@ -1,2 +1,2 @@
 -$(SAPI_CGI_PATH): libphp_common.la $(PHP_SAPI_OBJS)
 +$(SAPI_CGI_PATH): libphp_common.la $(PHP_SAPI_OBJS) $(SAPI_EXTRA_DEPS)
  	$(BUILD_CGI)
-diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
---- a/sapi/cgi/cgi_main.c
-+++ b/sapi/cgi/cgi_main.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/cgi_main.c php-5.2.17/sapi/cgi/cgi_main.c
+--- php-5.2.17.org/sapi/cgi/cgi_main.c	2021-10-23 19:09:17.429791741 +0200
++++ php-5.2.17/sapi/cgi/cgi_main.c	2021-10-23 19:09:19.826458407 +0200
 @@ -55,6 +55,9 @@
  #if HAVE_SYS_WAIT_H
  #include <sys/wait.h>
@@ -236,7 +111,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  #include "zend.h"
  #include "zend_extensions.h"
  #include "php_ini.h"
-@@ -83,6 +86,11 @@ int __riscosify_control = __RISCOSIFY_STRICT_UNIX_SPECS;
+@@ -85,6 +88,11 @@ int __riscosify_control = __RISCOSIFY_ST
  #if PHP_FASTCGI
  #include "fastcgi.h"
  
@@ -248,7 +123,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  #ifndef PHP_WIN32
  /* XXX this will need to change later when threaded fastcgi is
     implemented.  shane */
-@@ -115,8 +123,12 @@ static int parent_waiting = 0;
+@@ -122,8 +130,12 @@ static int parent_waiting = 0;
  static pid_t pgroup;
  #endif
  
@@ -261,7 +136,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  #define PHP_MODE_STANDARD	1
  #define PHP_MODE_HIGHLIGHT	2
  #define PHP_MODE_INDENT		3
-@@ -146,6 +158,10 @@ static const opt_struct OPTIONS[] = {
+@@ -153,6 +165,10 @@ static const opt_struct OPTIONS[] = {
  	{'w', 0, "strip"},
  	{'?', 0, "usage"},/* help alias (both '?' and 'usage') */
  	{'v', 0, "version"},
@@ -272,7 +147,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  	{'z', 1, "zend-extension"},
  #if PHP_FASTCGI
   	{'T', 1, "timing"},
-@@ -170,6 +186,7 @@ typedef struct _php_cgi_globals_struct {
+@@ -177,6 +193,7 @@ typedef struct _php_cgi_globals_struct {
  	zend_bool impersonate;
  # endif
  #endif
@@ -280,7 +155,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  } php_cgi_globals_struct;
  
  #ifdef ZTS
-@@ -474,7 +491,28 @@ static int sapi_cgi_read_post(char *buffer, uint count_bytes TSRMLS_DC)
+@@ -481,7 +498,28 @@ static int sapi_cgi_read_post(char *buff
  #if PHP_FASTCGI
  		if (fcgi_is_fastcgi()) {
  			fcgi_request *request = (fcgi_request*) SG(server_context);
@@ -310,7 +185,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  		} else {
  			tmp_read_bytes = read(STDIN_FILENO, buffer + read_bytes, count_bytes - read_bytes);
  		}
-@@ -786,7 +824,12 @@ static void php_cgi_usage(char *argv0)
+@@ -796,7 +834,12 @@ static void php_cgi_usage(char *argv0)
  			   "  -s               Display colour syntax highlighted source.\n"
  			   "  -v               Version number\n"
  			   "  -w               Display source with stripped comments and whitespace.\n"
@@ -324,7 +199,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  #if PHP_FASTCGI
  			   "  -T <count>       Measure execution time of script repeated <count> times.\n"
  #endif
-@@ -1236,6 +1279,7 @@ PHP_INI_BEGIN()
+@@ -1262,6 +1305,7 @@ PHP_INI_BEGIN()
  # ifdef PHP_WIN32
  	STD_PHP_INI_ENTRY("fastcgi.impersonate",     "0",  PHP_INI_SYSTEM, OnUpdateBool,   impersonate, php_cgi_globals_struct, php_cgi_globals)
  # endif
@@ -332,7 +207,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  #endif
  PHP_INI_END()
  
-@@ -1258,6 +1302,7 @@ static void php_cgi_globals_ctor(php_cgi_globals_struct *php_cgi_globals TSRMLS_
+@@ -1284,6 +1328,7 @@ static void php_cgi_globals_ctor(php_cgi
  # ifdef PHP_WIN32
  	php_cgi_globals->impersonate = 0;
  # endif
@@ -340,7 +215,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  #endif
  }
  /* }}} */
-@@ -1290,9 +1335,47 @@ static PHP_MSHUTDOWN_FUNCTION(cgi)
+@@ -1316,9 +1361,47 @@ static PHP_MSHUTDOWN_FUNCTION(cgi)
  static PHP_MINFO_FUNCTION(cgi)
  {
  	DISPLAY_INI_ENTRIES();
@@ -388,7 +263,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  static zend_module_entry cgi_module_entry = {
  	STANDARD_MODULE_HEADER,
  #if PHP_FASTCGI
-@@ -1300,7 +1383,7 @@ static zend_module_entry cgi_module_entry = {
+@@ -1326,7 +1409,7 @@ static zend_module_entry cgi_module_entr
  #else
  	"cgi",
  #endif
@@ -397,15 +272,15 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  	PHP_MINIT(cgi), 
  	PHP_MSHUTDOWN(cgi), 
  	NULL, 
-@@ -1340,6 +1423,7 @@ int main(int argc, char *argv[])
+@@ -1365,6 +1448,7 @@ int main(int argc, char *argv[])
+ 	int fastcgi = fcgi_is_fastcgi();
  	char *bindpath = NULL;
- 	int fcgi_fd = 0;
  	fcgi_request request;
 +	char *fpm_config = NULL;
  	int repeats = 1;
  	int benchmark = 0;
  #if HAVE_GETTIMEOFDAY
-@@ -1460,6 +1544,14 @@ int main(int argc, char *argv[])
+@@ -1502,6 +1586,14 @@ int main(int argc, char *argv[])
  			case 's': /* generate highlighted HTML from source */
  				behavior = PHP_MODE_HIGHLIGHT;
  				break;
@@ -420,7 +295,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  
  		}
  
-@@ -1524,6 +1616,19 @@ consult the installation file that came with this distribution, or visit \n\
+@@ -1566,6 +1658,19 @@ consult the installation file that came
  #endif	/* FORCE_CGI_REDIRECT */
  
  #if PHP_FASTCGI
@@ -440,7 +315,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  	if (bindpath) {
  		fcgi_fd = fcgi_listen(bindpath, 128);
  		if (fcgi_fd < 0) {
-@@ -1538,6 +1643,9 @@ consult the installation file that came with this distribution, or visit \n\
+@@ -1580,6 +1685,9 @@ consult the installation file that came
  	
  	if (fastcgi) {
  		/* How many times to run PHP scripts before dying */
@@ -450,7 +325,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  		if (getenv("PHP_FCGI_MAX_REQUESTS")) {
  			max_requests = atoi(getenv("PHP_FCGI_MAX_REQUESTS"));
  			if (max_requests < 0) {
-@@ -1555,6 +1663,9 @@ consult the installation file that came with this distribution, or visit \n\
+@@ -1597,6 +1705,9 @@ consult the installation file that came
  
  #ifndef PHP_WIN32
  	/* Pre-fork, if required */
@@ -460,7 +335,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  	if (getenv("PHP_FCGI_CHILDREN")) {
  		char * children_str = getenv("PHP_FCGI_CHILDREN");
  		children = atoi(children_str);
-@@ -1704,6 +1815,8 @@ consult the installation file that came with this distribution, or visit \n\
+@@ -1754,6 +1865,8 @@ consult the installation file that came
  #endif
  
  #if PHP_FASTCGI
@@ -469,7 +344,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  		SG(server_context) = (void *) &request;
  #else
  		SG(server_context) = (void *) 1; /* avoid server_context==NULL checks */
-@@ -1711,6 +1824,10 @@ consult the installation file that came with this distribution, or visit \n\
+@@ -1761,6 +1874,10 @@ consult the installation file that came
  		init_request_info(TSRMLS_C);
  		CG(interactive) = 0;
  
@@ -480,7 +355,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  		if (!cgi
  #if PHP_FASTCGI
  			&& !fastcgi
-@@ -1994,6 +2111,10 @@ consult the installation file that came with this distribution, or visit \n\
+@@ -2043,6 +2160,10 @@ consult the installation file that came
  			}
  		}
  
@@ -491,7 +366,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  		switch (behavior) {
  			case PHP_MODE_STANDARD:
  				php_execute_script(&file_handle TSRMLS_CC);
-@@ -2046,6 +2167,10 @@ consult the installation file that came with this distribution, or visit \n\
+@@ -2095,6 +2216,10 @@ consult the installation file that came
  
  #if PHP_FASTCGI
  fastcgi_request_done:
@@ -502,7 +377,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  #endif
  		{
  			char *path_translated;
-@@ -2059,6 +2184,16 @@ fastcgi_request_done:
+@@ -2108,6 +2233,16 @@ fastcgi_request_done:
  				SG(request_info).path_translated = path_translated;
  			}
  
@@ -519,7 +394,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  			php_request_shutdown((void *) 0);
  			if (exit_status == 0) {
  				exit_status = EG(exit_status);
-@@ -2096,15 +2231,20 @@ fastcgi_request_done:
+@@ -2145,15 +2280,20 @@ fastcgi_request_done:
  				if (bindpath) {
  					free(bindpath);
  				}
@@ -544,8 +419,9 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
  #endif
  
  		if (cgi_sapi_module.php_ini_path_override) {
---- php-5.2.17/sapi/cgi/config9.m4~	2012-02-27 14:44:23.000000000 +0200
-+++ php-5.2.17/sapi/cgi/config9.m4	2012-02-27 14:48:07.279580606 +0200
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/config9.m4 php-5.2.17/sapi/cgi/config9.m4
+--- php-5.2.17.org/sapi/cgi/config9.m4	2021-10-23 19:09:17.386458407 +0200
++++ php-5.2.17/sapi/cgi/config9.m4	2021-10-23 19:09:19.826458407 +0200
 @@ -22,6 +22,10 @@ PHP_ARG_ENABLE(path-info-check,,
  [  --disable-path-info-check CGI: If this is disabled, paths such as
                              /info.php/test?a=b will fail to work], yes, no)
@@ -578,7 +454,7 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
      dnl --enable-force-cgi-redirect
      AC_MSG_CHECKING(whether to force Apache CGI redirect)
      if test "$PHP_FORCE_CGI_REDIRECT" = "yes"; then
-@@ -111,10 +111,10 @@
+@@ -93,10 +111,10 @@ if test "$PHP_SAPI" = "default"; then
          BUILD_CGI="echo '\#! .' > php.sym && echo >>php.sym && nm -BCpg \`echo \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) | sed 's/\([A-Za-z0-9_]*\)\.lo/\1.o/g'\` | \$(AWK) '{ if (((\$\$2 == \"T\") || (\$\$2 == \"D\") || (\$\$2 == \"B\")) && (substr(\$\$3,1,1) != \".\")) { print \$\$3 } }' | sort -u >> php.sym && \$(LIBTOOL) --mode=link \$(CC) -export-dynamic \$(CFLAGS_CLEAN) \$(EXTRA_CFLAGS) \$(EXTRA_LDFLAGS_PROGRAM) \$(LDFLAGS) -Wl,-brtl -Wl,-bE:php.sym \$(PHP_RPATHS) \$(PHP_GLOBAL_OBJS) \$(PHP_SAPI_OBJS) \$(EXTRA_LIBS) \$(ZEND_EXTRA_LIBS) -o \$(SAPI_CGI_PATH)"
          ;;
        *darwin*)
@@ -591,9 +467,9 @@ diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
        ;;
      esac
  
-diff --git a/sapi/cgi/fastcgi.c b/sapi/cgi/fastcgi.c
---- a/sapi/cgi/fastcgi.c
-+++ b/sapi/cgi/fastcgi.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fastcgi.c php-5.2.17/sapi/cgi/fastcgi.c
+--- php-5.2.17.org/sapi/cgi/fastcgi.c	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/sapi/cgi/fastcgi.c	2021-10-23 19:09:19.826458407 +0200
 @@ -27,6 +27,11 @@
  #include <stdarg.h>
  #include <errno.h>
@@ -684,7 +560,7 @@ diff --git a/sapi/cgi/fastcgi.c b/sapi/cgi/fastcgi.c
  static int is_port_number(const char *bindpath)
  {
  	while (*bindpath) {
-@@ -458,38 +512,6 @@ int fcgi_listen(const char *path, int backlog)
+@@ -458,38 +512,6 @@ int fcgi_listen(const char *path, int ba
  
  	if (!tcp) {
  		chmod(path, 0777);
@@ -723,7 +599,7 @@ diff --git a/sapi/cgi/fastcgi.c b/sapi/cgi/fastcgi.c
  	}
  
  	if (!is_initialized) {
-@@ -866,7 +888,7 @@ int fcgi_read(fcgi_request *req, char *str, int len)
+@@ -866,7 +888,7 @@ int fcgi_read(fcgi_request *req, char *s
  	return n;
  }
  
@@ -732,7 +608,7 @@ diff --git a/sapi/cgi/fastcgi.c b/sapi/cgi/fastcgi.c
  {
  	if (destroy) {
  		zend_hash_destroy(&req->env);
-@@ -906,6 +928,10 @@ static inline void fcgi_close(fcgi_request *req, int force, int destroy)
+@@ -906,6 +928,10 @@ static inline void fcgi_close(fcgi_reque
  		close(req->fd);
  #endif
  		req->fd = -1;
@@ -743,7 +619,7 @@ diff --git a/sapi/cgi/fastcgi.c b/sapi/cgi/fastcgi.c
  	}
  }
  
-@@ -953,6 +979,10 @@ int fcgi_accept_request(fcgi_request *req)
+@@ -953,6 +979,10 @@ int fcgi_accept_request(fcgi_request *re
  					sa_t sa;
  					socklen_t len = sizeof(sa);
  
@@ -754,7 +630,7 @@ diff --git a/sapi/cgi/fastcgi.c b/sapi/cgi/fastcgi.c
  					FCGI_LOCK(req->listen_socket);
  					req->fd = accept(listen_socket, (struct sockaddr *)&sa, &len);
  					FCGI_UNLOCK(req->listen_socket);
-@@ -988,6 +1018,11 @@ int fcgi_accept_request(fcgi_request *req)
+@@ -988,6 +1018,11 @@ int fcgi_accept_request(fcgi_request *re
  				break;
  #else
  				if (req->fd >= 0) {
@@ -766,9 +642,9 @@ diff --git a/sapi/cgi/fastcgi.c b/sapi/cgi/fastcgi.c
  #if defined(HAVE_SYS_POLL_H) && defined(HAVE_POLL)
  					struct pollfd fds;
  					int ret;
-diff --git a/sapi/cgi/fastcgi.h b/sapi/cgi/fastcgi.h
---- a/sapi/cgi/fastcgi.h
-+++ b/sapi/cgi/fastcgi.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fastcgi.h php-5.2.17/sapi/cgi/fastcgi.h
+--- php-5.2.17.org/sapi/cgi/fastcgi.h	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/sapi/cgi/fastcgi.h	2021-10-23 19:09:19.826458407 +0200
 @@ -114,6 +114,9 @@ typedef struct _fcgi_request {
  int fcgi_init(void);
  void fcgi_shutdown(void);
@@ -779,7 +655,7 @@ diff --git a/sapi/cgi/fastcgi.h b/sapi/cgi/fastcgi.h
  int fcgi_in_shutdown(void);
  int fcgi_listen(const char *path, int backlog);
  void fcgi_init_request(fcgi_request *req, int listen_socket);
-@@ -128,6 +131,8 @@ int fcgi_read(fcgi_request *req, char *str, int len);
+@@ -128,6 +131,8 @@ int fcgi_read(fcgi_request *req, char *s
  int fcgi_write(fcgi_request *req, fcgi_request_type type, const char *str, int len);
  int fcgi_flush(fcgi_request *req, int close);
  
@@ -788,10 +664,9 @@ diff --git a/sapi/cgi/fastcgi.h b/sapi/cgi/fastcgi.h
  #ifdef PHP_WIN32
  void fcgi_impersonate(void);
  #endif
-diff --git a/sapi/cgi/fpm/Makefile.frag b/sapi/cgi/fpm/Makefile.frag
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/Makefile.frag
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/Makefile.frag php-5.2.17/sapi/cgi/fpm/Makefile.frag
+--- php-5.2.17.org/sapi/cgi/fpm/Makefile.frag	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/Makefile.frag	2021-10-23 19:09:19.826458407 +0200
 @@ -0,0 +1,21 @@
 +
 +install-fpm: sapi/cgi/fpm/php-fpm.conf sapi/cgi/fpm/php-fpm
@@ -814,10 +689,9 @@ new file mode 100644
 +$(top_builddir)/libevent/libevent.a: $(top_builddir)/libevent/Makefile
 +	cd $(top_builddir)/libevent && $(MAKE) libevent.a
 +
-diff --git a/sapi/cgi/fpm/acinclude.m4 b/sapi/cgi/fpm/acinclude.m4
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/acinclude.m4
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/acinclude.m4 php-5.2.17/sapi/cgi/fpm/acinclude.m4
+--- php-5.2.17.org/sapi/cgi/fpm/acinclude.m4	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/acinclude.m4	2021-10-23 19:09:19.826458407 +0200
 @@ -0,0 +1,377 @@
 +
 +AC_DEFUN([AC_FPM_CHECK_FUNC],
@@ -1196,10 +1070,9 @@ new file mode 100644
 +		AC_MSG_RESULT([no])
 +	])
 +])
-diff --git a/sapi/cgi/fpm/conf/php-fpm.conf.in b/sapi/cgi/fpm/conf/php-fpm.conf.in
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/conf/php-fpm.conf.in
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/conf/php-fpm.conf.in php-5.2.17/sapi/cgi/fpm/conf/php-fpm.conf.in
+--- php-5.2.17.org/sapi/cgi/fpm/conf/php-fpm.conf.in	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/conf/php-fpm.conf.in	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,156 @@
 +<?xml version="1.0" ?>
 +<configuration>
@@ -1357,10 +1230,9 @@ new file mode 100644
 +	</workers>
 +
 +</configuration>
-diff --git a/sapi/cgi/fpm/config.m4 b/sapi/cgi/fpm/config.m4
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/config.m4
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/config.m4 php-5.2.17/sapi/cgi/fpm/config.m4
+--- php-5.2.17.org/sapi/cgi/fpm/config.m4	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/config.m4	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,117 @@
 +
 +FPM_VERSION="0.5.14"
@@ -1479,11 +1351,9 @@ new file mode 100644
 +PHP_OUTPUT(sapi/cgi/fpm/fpm_autoconf.h)
 +PHP_OUTPUT(sapi/cgi/fpm/php-fpm.conf:sapi/cgi/fpm/conf/php-fpm.conf.in)
 +PHP_OUTPUT(sapi/cgi/fpm/php-fpm:sapi/cgi/fpm/init.d/php-fpm.in)
-diff --git a/sapi/cgi/fpm/fpm.c b/sapi/cgi/fpm/fpm.c
-new file mode 100644
-index 0000000..9db2c9b
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm.c php-5.2.17/sapi/cgi/fpm/fpm.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,84 @@
 +
 +	/* $Id$ */
@@ -1569,10 +1439,9 @@ index 0000000..9db2c9b
 +	return fpm_globals.listening_socket;
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm.h b/sapi/cgi/fpm/fpm.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm.h php-5.2.17/sapi/cgi/fpm/fpm.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,30 @@
 +
 +	/* $Id$ */
@@ -1604,10 +1473,9 @@ new file mode 100644
 +extern int fpm;
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_arrays.h b/sapi/cgi/fpm/fpm_arrays.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_arrays.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_arrays.h php-5.2.17/sapi/cgi/fpm/fpm_arrays.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_arrays.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_arrays.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,110 @@
 +
 +	/* $Id$ */
@@ -1719,10 +1587,9 @@ new file mode 100644
 +}
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_atomic.h b/sapi/cgi/fpm/fpm_atomic.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_atomic.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_atomic.h php-5.2.17/sapi/cgi/fpm/fpm_atomic.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_atomic.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_atomic.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,85 @@
 +
 +	/* $Id$ */
@@ -1809,10 +1676,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_autoconf.h.in b/sapi/cgi/fpm/fpm_autoconf.h.in
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_autoconf.h.in
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_autoconf.h.in php-5.2.17/sapi/cgi/fpm/fpm_autoconf.h.in
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_autoconf.h.in	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_autoconf.h.in	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,9 @@
 +
 +	/* $Id$ */
@@ -1823,10 +1689,9 @@ new file mode 100644
 +#define PHP_FPM_LOG_PATH  "@php_fpm_log_path@"
 +#define PHP_FPM_PID_PATH  "@php_fpm_pid_path@"
 +
-diff --git a/sapi/cgi/fpm/fpm_children.c b/sapi/cgi/fpm/fpm_children.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_children.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_children.c php-5.2.17/sapi/cgi/fpm/fpm_children.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_children.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_children.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,385 @@
 +
 +	/* $Id$ */
@@ -2213,10 +2078,9 @@ new file mode 100644
 +	return 0;
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_children.h b/sapi/cgi/fpm/fpm_children.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_children.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_children.h php-5.2.17/sapi/cgi/fpm/fpm_children.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_children.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_children.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,33 @@
 +
 +	/* $Id$ */
@@ -2251,10 +2115,9 @@ new file mode 100644
 +};
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_cleanup.c b/sapi/cgi/fpm/fpm_cleanup.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_cleanup.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_cleanup.c php-5.2.17/sapi/cgi/fpm/fpm_cleanup.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_cleanup.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_cleanup.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,51 @@
 +
 +	/* $Id$ */
@@ -2307,10 +2170,9 @@ new file mode 100644
 +	fpm_array_free(&cleanups);
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_cleanup.h b/sapi/cgi/fpm/fpm_cleanup.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_cleanup.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_cleanup.h php-5.2.17/sapi/cgi/fpm/fpm_cleanup.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_cleanup.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_cleanup.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,21 @@
 +
 +	/* $Id$ */
@@ -2333,10 +2195,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_clock.c b/sapi/cgi/fpm/fpm_clock.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_clock.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_clock.c php-5.2.17/sapi/cgi/fpm/fpm_clock.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_clock.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_clock.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,115 @@
 +
 +	/* $Id$ */
@@ -2453,10 +2314,9 @@ new file mode 100644
 +}
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_clock.h b/sapi/cgi/fpm/fpm_clock.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_clock.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_clock.h php-5.2.17/sapi/cgi/fpm/fpm_clock.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_clock.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_clock.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,13 @@
 +
 +	/* $Id$ */
@@ -2471,10 +2331,9 @@ new file mode 100644
 +int fpm_clock_get(struct timeval *tv);
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_conf.c b/sapi/cgi/fpm/fpm_conf.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_conf.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_conf.c php-5.2.17/sapi/cgi/fpm/fpm_conf.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_conf.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_conf.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,532 @@
 +
 +	/* $Id$ */
@@ -3008,10 +2867,9 @@ new file mode 100644
 +
 +	return 0;
 +}
-diff --git a/sapi/cgi/fpm/fpm_conf.h b/sapi/cgi/fpm/fpm_conf.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_conf.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_conf.h php-5.2.17/sapi/cgi/fpm/fpm_conf.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_conf.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_conf.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,73 @@
 +
 +	/* $Id$ */
@@ -3086,10 +2944,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_config.h b/sapi/cgi/fpm/fpm_config.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_config.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_config.h php-5.2.17/sapi/cgi/fpm/fpm_config.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_config.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_config.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,39 @@
 +
 +	/* $Id$ */
@@ -3130,10 +2987,9 @@ new file mode 100644
 +#define HAVE_FPM_TRACE 0
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_env.c b/sapi/cgi/fpm/fpm_env.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_env.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_env.c php-5.2.17/sapi/cgi/fpm/fpm_env.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_env.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_env.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,125 @@
 +
 +	/* $Id$ */
@@ -3260,10 +3116,9 @@ new file mode 100644
 +
 +	return 0;
 +}
-diff --git a/sapi/cgi/fpm/fpm_env.h b/sapi/cgi/fpm/fpm_env.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_env.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_env.h php-5.2.17/sapi/cgi/fpm/fpm_env.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_env.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_env.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,24 @@
 +
 +	/* $Id$ */
@@ -3289,10 +3144,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_events.c b/sapi/cgi/fpm/fpm_events.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_events.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_events.c php-5.2.17/sapi/cgi/fpm/fpm_events.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_events.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_events.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,135 @@
 +
 +	/* $Id$ */
@@ -3429,10 +3283,9 @@ new file mode 100644
 +	(*ev->ev_callback)( (int) ev->ev_fd, (short) ev->ev_res, ev->ev_arg);	
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_events.h b/sapi/cgi/fpm/fpm_events.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_events.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_events.h php-5.2.17/sapi/cgi/fpm/fpm_events.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_events.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_events.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,16 @@
 +
 +	/* $Id$ */
@@ -3450,10 +3303,9 @@ new file mode 100644
 +
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_php.c b/sapi/cgi/fpm/fpm_php.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_php.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_php.c php-5.2.17/sapi/cgi/fpm/fpm_php.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_php.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_php.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,190 @@
 +
 +	/* $Id$ */
@@ -3645,10 +3497,9 @@ new file mode 100644
 +
 +	return 0;
 +}
-diff --git a/sapi/cgi/fpm/fpm_php.h b/sapi/cgi/fpm/fpm_php.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_php.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_php.h php-5.2.17/sapi/cgi/fpm/fpm_php.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_php.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_php.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,22 @@
 +
 +	/* $Id$ */
@@ -3672,10 +3523,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_php_trace.c b/sapi/cgi/fpm/fpm_php_trace.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_php_trace.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_php_trace.c php-5.2.17/sapi/cgi/fpm/fpm_php_trace.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_php_trace.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_php_trace.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,171 @@
 +
 +	/* $Id$ */
@@ -3848,10 +3698,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_php_trace.h b/sapi/cgi/fpm/fpm_php_trace.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_php_trace.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_php_trace.h php-5.2.17/sapi/cgi/fpm/fpm_php_trace.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_php_trace.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_php_trace.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,13 @@
 +
 +	/* $Id$ */
@@ -3866,10 +3715,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_process_ctl.c b/sapi/cgi/fpm/fpm_process_ctl.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_process_ctl.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_process_ctl.c php-5.2.17/sapi/cgi/fpm/fpm_process_ctl.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_process_ctl.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_process_ctl.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,354 @@
 +
 +	/* $Id$ */
@@ -4225,10 +4073,9 @@ new file mode 100644
 +	evtimer_add(&heartbeat, &tv);
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_process_ctl.h b/sapi/cgi/fpm/fpm_process_ctl.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_process_ctl.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_process_ctl.h php-5.2.17/sapi/cgi/fpm/fpm_process_ctl.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_process_ctl.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_process_ctl.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,39 @@
 +
 +	/* $Id$ */
@@ -4269,10 +4116,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_request.c b/sapi/cgi/fpm/fpm_request.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_request.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_request.c php-5.2.17/sapi/cgi/fpm/fpm_request.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_request.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_request.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,164 @@
 +
 +	/* $Id$ */
@@ -4438,10 +4284,9 @@ new file mode 100644
 +
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_request.h b/sapi/cgi/fpm/fpm_request.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_request.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_request.h php-5.2.17/sapi/cgi/fpm/fpm_request.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_request.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_request.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,27 @@
 +
 +	/* $Id$ */
@@ -4470,10 +4315,9 @@ new file mode 100644
 +};
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_shm.c b/sapi/cgi/fpm/fpm_shm.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_shm.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_shm.c php-5.2.17/sapi/cgi/fpm/fpm_shm.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_shm.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_shm.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,100 @@
 +
 +	/* $Id$ */
@@ -4575,10 +4419,9 @@ new file mode 100644
 +	return ret;
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_shm.h b/sapi/cgi/fpm/fpm_shm.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_shm.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_shm.h php-5.2.17/sapi/cgi/fpm/fpm_shm.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_shm.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_shm.h	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,22 @@
 +
 +	/* $Id$ */
@@ -4602,10 +4445,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_shm_slots.c b/sapi/cgi/fpm/fpm_shm_slots.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_shm_slots.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_shm_slots.c php-5.2.17/sapi/cgi/fpm/fpm_shm_slots.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_shm_slots.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_shm_slots.c	2021-10-23 19:09:19.829791741 +0200
 @@ -0,0 +1,127 @@
 +
 +	/* $Id$ */
@@ -4734,10 +4576,9 @@ new file mode 100644
 +	s->lock = 0;
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_shm_slots.h b/sapi/cgi/fpm/fpm_shm_slots.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_shm_slots.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_shm_slots.h php-5.2.17/sapi/cgi/fpm/fpm_shm_slots.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_shm_slots.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_shm_slots.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,43 @@
 +
 +	/* $Id$ */
@@ -4782,10 +4623,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_signals.c b/sapi/cgi/fpm/fpm_signals.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_signals.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_signals.c php-5.2.17/sapi/cgi/fpm/fpm_signals.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_signals.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_signals.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,252 @@
 +
 +	/* $Id$ */
@@ -5039,10 +4879,9 @@ new file mode 100644
 +{
 +	return sp[0];
 +}
-diff --git a/sapi/cgi/fpm/fpm_signals.h b/sapi/cgi/fpm/fpm_signals.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_signals.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_signals.h php-5.2.17/sapi/cgi/fpm/fpm_signals.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_signals.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_signals.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,16 @@
 +
 +	/* $Id$ */
@@ -5060,10 +4899,9 @@ new file mode 100644
 +extern const char *fpm_signal_names[NSIG + 1];
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_sockets.c b/sapi/cgi/fpm/fpm_sockets.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_sockets.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_sockets.c php-5.2.17/sapi/cgi/fpm/fpm_sockets.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_sockets.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_sockets.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,427 @@
 +
 +	/* $Id$ */
@@ -5492,10 +5330,9 @@ new file mode 100644
 +
 +	return 0;
 +}
-diff --git a/sapi/cgi/fpm/fpm_sockets.h b/sapi/cgi/fpm/fpm_sockets.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_sockets.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_sockets.h php-5.2.17/sapi/cgi/fpm/fpm_sockets.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_sockets.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_sockets.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,37 @@
 +
 +	/* $Id$ */
@@ -5534,10 +5371,9 @@ new file mode 100644
 +			(unsigned int) ((unsigned char *) &(sin_addr)->s_addr)[3]
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_stdio.c b/sapi/cgi/fpm/fpm_stdio.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_stdio.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_stdio.c php-5.2.17/sapi/cgi/fpm/fpm_stdio.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_stdio.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_stdio.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,286 @@
 +
 +	/* $Id$ */
@@ -5825,10 +5661,9 @@ new file mode 100644
 +
 +	return 0;
 +}
-diff --git a/sapi/cgi/fpm/fpm_stdio.h b/sapi/cgi/fpm/fpm_stdio.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_stdio.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_stdio.h php-5.2.17/sapi/cgi/fpm/fpm_stdio.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_stdio.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_stdio.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,20 @@
 +
 +	/* $Id$ */
@@ -5850,10 +5685,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_str.h b/sapi/cgi/fpm/fpm_str.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_str.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_str.h php-5.2.17/sapi/cgi/fpm/fpm_str.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_str.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_str.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,49 @@
 +
 +	/* $Id$ */
@@ -5904,10 +5738,9 @@ new file mode 100644
 +}
 +
 +#endif
-diff --git a/sapi/cgi/fpm/fpm_trace.c b/sapi/cgi/fpm/fpm_trace.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_trace.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_trace.c php-5.2.17/sapi/cgi/fpm/fpm_trace.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_trace.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_trace.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,46 @@
 +
 +	/* $Id$ */
@@ -5955,10 +5788,9 @@ new file mode 100644
 +	}
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_trace.h b/sapi/cgi/fpm/fpm_trace.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_trace.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_trace.h php-5.2.17/sapi/cgi/fpm/fpm_trace.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_trace.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_trace.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,17 @@
 +
 +	/* $Id$ */
@@ -5977,10 +5809,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_trace_mach.c b/sapi/cgi/fpm/fpm_trace_mach.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_trace_mach.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_trace_mach.c php-5.2.17/sapi/cgi/fpm/fpm_trace_mach.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_trace_mach.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_trace_mach.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,102 @@
 +
 +	/* $Id$ */
@@ -6084,10 +5915,9 @@ new file mode 100644
 +	return 0;
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_trace_pread.c b/sapi/cgi/fpm/fpm_trace_pread.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_trace_pread.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_trace_pread.c php-5.2.17/sapi/cgi/fpm/fpm_trace_pread.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_trace_pread.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_trace_pread.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,67 @@
 +
 +	/* $Id$ */
@@ -6156,10 +5986,9 @@ new file mode 100644
 +	return 0;
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_trace_ptrace.c b/sapi/cgi/fpm/fpm_trace_ptrace.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_trace_ptrace.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_trace_ptrace.c php-5.2.17/sapi/cgi/fpm/fpm_trace_ptrace.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_trace_ptrace.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_trace_ptrace.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,85 @@
 +
 +	/* $Id$ */
@@ -6246,10 +6075,9 @@ new file mode 100644
 +	return 0;
 +}
 +
-diff --git a/sapi/cgi/fpm/fpm_unix.c b/sapi/cgi/fpm/fpm_unix.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_unix.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_unix.c php-5.2.17/sapi/cgi/fpm/fpm_unix.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_unix.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_unix.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,289 @@
 +
 +	/* $Id$ */
@@ -6540,10 +6368,9 @@ new file mode 100644
 +
 +	return 0;
 +}
-diff --git a/sapi/cgi/fpm/fpm_unix.h b/sapi/cgi/fpm/fpm_unix.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_unix.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_unix.h php-5.2.17/sapi/cgi/fpm/fpm_unix.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_unix.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_unix.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,17 @@
 +
 +	/* $Id$ */
@@ -6562,10 +6389,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/fpm_worker_pool.c b/sapi/cgi/fpm/fpm_worker_pool.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_worker_pool.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_worker_pool.c php-5.2.17/sapi/cgi/fpm/fpm_worker_pool.c
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_worker_pool.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_worker_pool.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,69 @@
 +
 +	/* $Id$ */
@@ -6636,10 +6462,9 @@ new file mode 100644
 +
 +	return 0;
 +}
-diff --git a/sapi/cgi/fpm/fpm_worker_pool.h b/sapi/cgi/fpm/fpm_worker_pool.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/fpm_worker_pool.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/fpm_worker_pool.h php-5.2.17/sapi/cgi/fpm/fpm_worker_pool.h
+--- php-5.2.17.org/sapi/cgi/fpm/fpm_worker_pool.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/fpm_worker_pool.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,46 @@
 +
 +	/* $Id$ */
@@ -6687,10 +6512,9 @@ new file mode 100644
 +
 +#endif
 +
-diff --git a/sapi/cgi/fpm/init.d/php-fpm.in b/sapi/cgi/fpm/init.d/php-fpm.in
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/init.d/php-fpm.in
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/init.d/php-fpm.in php-5.2.17/sapi/cgi/fpm/init.d/php-fpm.in
+--- php-5.2.17.org/sapi/cgi/fpm/init.d/php-fpm.in	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/init.d/php-fpm.in	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,139 @@
 +#! /bin/sh
 +
@@ -6831,10 +6655,9 @@ new file mode 100644
 +	;;
 +
 +esac
-diff --git a/sapi/cgi/fpm/xml_config.c b/sapi/cgi/fpm/xml_config.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/xml_config.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/xml_config.c php-5.2.17/sapi/cgi/fpm/xml_config.c
+--- php-5.2.17.org/sapi/cgi/fpm/xml_config.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/xml_config.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,278 @@
 +
 +	/* $Id$ */
@@ -7114,10 +6937,9 @@ new file mode 100644
 +	return 0;
 +}
 +
-diff --git a/sapi/cgi/fpm/xml_config.h b/sapi/cgi/fpm/xml_config.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/xml_config.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/xml_config.h php-5.2.17/sapi/cgi/fpm/xml_config.h
+--- php-5.2.17.org/sapi/cgi/fpm/xml_config.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/xml_config.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,43 @@
 +
 +	/* $Id$ */
@@ -7162,10 +6984,9 @@ new file mode 100644
 +enum { XML_CONF_SCALAR = 1, XML_CONF_SUBSECTION = 2 };
 +
 +#endif
-diff --git a/sapi/cgi/fpm/zlog.c b/sapi/cgi/fpm/zlog.c
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/zlog.c
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/zlog.c php-5.2.17/sapi/cgi/fpm/zlog.c
+--- php-5.2.17.org/sapi/cgi/fpm/zlog.c	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/zlog.c	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,113 @@
 +
 +	/* $Id$ */
@@ -7280,10 +7101,9 @@ new file mode 100644
 +
 +	write(zlog_fd > -1 ? zlog_fd : STDERR_FILENO, buf, len);
 +}
-diff --git a/sapi/cgi/fpm/zlog.h b/sapi/cgi/fpm/zlog.h
-new file mode 100644
---- /dev/null
-+++ b/sapi/cgi/fpm/zlog.h
+diff -urNp -x '*.orig' php-5.2.17.org/sapi/cgi/fpm/zlog.h php-5.2.17/sapi/cgi/fpm/zlog.h
+--- php-5.2.17.org/sapi/cgi/fpm/zlog.h	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/sapi/cgi/fpm/zlog.h	2021-10-23 19:09:19.833125073 +0200
 @@ -0,0 +1,34 @@
 +
 +	/* $Id$ */

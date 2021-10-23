@@ -1,5 +1,6 @@
---- php-5.2.0/ext/standard/mail.c	2006-12-01 14:20:27.881416250 +0100
-+++ php-5.2.4/ext/standard/mail.c	2007-08-31 19:25:50.777713042 +0300
+diff -urNp -x '*.orig' php-5.2.17.org/ext/standard/mail.c php-5.2.17/ext/standard/mail.c
+--- php-5.2.17.org/ext/standard/mail.c	2010-07-19 15:38:53.000000000 +0200
++++ php-5.2.17/ext/standard/mail.c	2021-10-23 18:57:39.619791815 +0200
 @@ -21,6 +21,8 @@
  #include <stdlib.h>
  #include <ctype.h>
@@ -9,8 +10,8 @@
  #include "php.h"
  #include "ext/standard/info.h"
  
-@@ -35,6 +37,8 @@
- #include "php_ini.h"
+@@ -42,6 +44,8 @@
+ #include "php_string.h"
  #include "safe_mode.h"
  #include "exec.h"
 +#include "zend_operators.h"
@@ -18,8 +19,8 @@
  
  #ifdef PHP_WIN32
  #include "win32/sendmail.h"
-@@ -107,6 +111,18 @@
- 		return;
+@@ -131,6 +135,18 @@ PHP_FUNCTION(mail)
+ 		MAIL_ASCIIZ_CHECK(extra_cmd, extra_cmd_len);
  	}
  
 +    /* search for To: and Subject: headers which should be specified in proper mail() parameters, not in additional headers */
@@ -37,7 +38,7 @@
  	if (to_len > 0) {
  		to_r = estrndup(to, to_len);
  		for (; to_len; to_len--) {
-@@ -231,8 +247,42 @@
+@@ -276,8 +292,42 @@ PHPAPI int php_mail(char *to, char *subj
  			return 0;
  		}
  #endif

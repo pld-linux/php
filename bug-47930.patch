@@ -25,17 +25,18 @@ https://bugs.php.net/bug.php?id=47930
 This patch backports it.
 Index: branches/PHP_5_3/ext/filter/filter.c
 ===================================================================
---- branches/PHP_5_3/ext/filter/filter.c	(revision 279521)
-+++ branches/PHP_5_3/ext/filter/filter.c	(revision 279522)
-@@ -76,6 +76,7 @@
+diff -urNp -x '*.orig' php-5.2.17.org/ext/filter/filter.c php-5.2.17/ext/filter/filter.c
+--- php-5.2.17.org/ext/filter/filter.c	2021-10-23 19:13:24.436458386 +0200
++++ php-5.2.17/ext/filter/filter.c	2021-10-23 19:13:27.149791720 +0200
+@@ -76,6 +76,7 @@ filter_list_entry filter_list[] = {
  #endif
  
  static unsigned int php_sapi_filter(int arg, char *var, char **val, unsigned int val_len, unsigned int *new_val_len TSRMLS_DC);
 +static unsigned int php_sapi_filter_init(TSRMLS_D);
  
- /* {{{ arginfo */
- ZEND_BEGIN_ARG_INFO_EX(arginfo_filter_input, 0, 0, 2)
-@@ -270,7 +271,7 @@
+ /* {{{ filter_functions[]
+  */
+@@ -233,7 +234,7 @@ PHP_MINIT_FUNCTION(filter)
  	REGISTER_LONG_CONSTANT("FILTER_FLAG_NO_RES_RANGE", FILTER_FLAG_NO_RES_RANGE, CONST_CS | CONST_PERSISTENT);
  	REGISTER_LONG_CONSTANT("FILTER_FLAG_NO_PRIV_RANGE", FILTER_FLAG_NO_PRIV_RANGE, CONST_CS | CONST_PERSISTENT);
  
@@ -44,7 +45,7 @@ Index: branches/PHP_5_3/ext/filter/filter.c
  
  	return SUCCESS;
  }
-@@ -339,6 +340,17 @@
+@@ -302,6 +303,17 @@ static filter_list_entry php_find_filter
  }
  /* }}} */
  
@@ -62,19 +63,10 @@ Index: branches/PHP_5_3/ext/filter/filter.c
  static void php_zval_filter(zval **value, long filter, long flags, zval *options, char* charset, zend_bool copy TSRMLS_DC) /* {{{ */
  {
  	filter_list_entry  filter_func;
-
-Property changes on: branches/PHP_5_3/ext/filter/filter.c
-___________________________________________________________________
-Modified: cvs2svn:cvs-rev
-## -1 +1 ##
--1.52.2.39.2.15
-+1.52.2.39.2.16
-\ No newline at end of property
-Index: branches/PHP_5_3/main/SAPI.c
-===================================================================
---- branches/PHP_5_3/main/SAPI.c	(revision 279521)
-+++ branches/PHP_5_3/main/SAPI.c	(revision 279522)
-@@ -326,6 +326,9 @@
+diff -urNp -x '*.orig' php-5.2.17.org/main/SAPI.c php-5.2.17/main/SAPI.c
+--- php-5.2.17.org/main/SAPI.c	2021-10-23 19:13:24.446458386 +0200
++++ php-5.2.17/main/SAPI.c	2021-10-23 19:13:27.149791720 +0200
+@@ -323,6 +323,9 @@ SAPI_API void sapi_activate_headers_only
  			sapi_module.activate(TSRMLS_C);
  		}
  	}
@@ -84,7 +76,7 @@ Index: branches/PHP_5_3/main/SAPI.c
  }
  
  /*
-@@ -392,6 +395,9 @@
+@@ -389,6 +392,9 @@ SAPI_API void sapi_activate(TSRMLS_D)
  			sapi_module.activate(TSRMLS_C);
  		}
  	}
@@ -94,7 +86,7 @@ Index: branches/PHP_5_3/main/SAPI.c
  }
  
  
-@@ -925,13 +931,14 @@
+@@ -884,13 +890,14 @@ SAPI_API int sapi_register_treat_data(vo
  	return SUCCESS;
  }
  
@@ -110,19 +102,10 @@ Index: branches/PHP_5_3/main/SAPI.c
  	return SUCCESS;
  }
  
-
-Property changes on: branches/PHP_5_3/main/SAPI.c
-___________________________________________________________________
-Modified: cvs2svn:cvs-rev
-## -1 +1 ##
--1.202.2.7.2.15.2.6
-+1.202.2.7.2.15.2.7
-\ No newline at end of property
-Index: branches/PHP_5_3/main/SAPI.h
-===================================================================
---- branches/PHP_5_3/main/SAPI.h	(revision 279521)
-+++ branches/PHP_5_3/main/SAPI.h	(revision 279522)
-@@ -192,7 +192,7 @@
+diff -urNp -x '*.orig' php-5.2.17.org/main/SAPI.h php-5.2.17/main/SAPI.h
+--- php-5.2.17.org/main/SAPI.h	2010-03-18 23:37:25.000000000 +0100
++++ php-5.2.17/main/SAPI.h	2021-10-23 19:13:27.149791720 +0200
+@@ -188,7 +188,7 @@ SAPI_API int sapi_register_post_entry(sa
  SAPI_API void sapi_unregister_post_entry(sapi_post_entry *post_entry TSRMLS_DC);
  SAPI_API int sapi_register_default_post_reader(void (*default_post_reader)(TSRMLS_D));
  SAPI_API int sapi_register_treat_data(void (*treat_data)(int arg, char *str, zval *destArray TSRMLS_DC));
@@ -131,7 +114,7 @@ Index: branches/PHP_5_3/main/SAPI.h
  
  SAPI_API int sapi_flush(TSRMLS_D);
  SAPI_API struct stat *sapi_get_stat(TSRMLS_D);
-@@ -259,6 +259,7 @@
+@@ -259,6 +259,7 @@ struct _sapi_module_struct {
  	int phpinfo_as_text;
  
  	char *ini_entries;
@@ -139,19 +122,10 @@ Index: branches/PHP_5_3/main/SAPI.h
  };
  
  
-
-Property changes on: branches/PHP_5_3/main/SAPI.h
-___________________________________________________________________
-Modified: cvs2svn:cvs-rev
-## -1 +1 ##
--1.114.2.1.2.3.2.7
-+1.114.2.1.2.3.2.8
-\ No newline at end of property
-Index: branches/PHP_5_3/main/php_content_types.c
-===================================================================
---- branches/PHP_5_3/main/php_content_types.c	(revision 279521)
-+++ branches/PHP_5_3/main/php_content_types.c	(revision 279522)
-@@ -75,7 +75,7 @@
+diff -urNp -x '*.orig' php-5.2.17.org/main/php_content_types.c php-5.2.17/main/php_content_types.c
+--- php-5.2.17.org/main/php_content_types.c	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/main/php_content_types.c	2021-10-23 19:13:27.149791720 +0200
+@@ -75,7 +75,7 @@ int php_startup_sapi_content_types(TSRML
  {
  	sapi_register_default_post_reader(php_default_post_reader);
  	sapi_register_treat_data(php_default_treat_data);
@@ -160,11 +134,3 @@ Index: branches/PHP_5_3/main/php_content_types.c
  	return SUCCESS;
  }
  /* }}} */
-
-Property changes on: branches/PHP_5_3/main/php_content_types.c
-___________________________________________________________________
-Modified: cvs2svn:cvs-rev
-## -1 +1 ##
--1.32.2.1.2.4.2.2
-+1.32.2.1.2.4.2.3
-\ No newline at end of property

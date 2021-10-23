@@ -4,11 +4,10 @@ Date:   Mon Jun 23 00:19:37 2014 -0700
 
     Fix bug #67498 - phpinfo() Type Confusion Information Leak Vulnerability
 
-diff --git a/ext/standard/info.c b/ext/standard/info.c
-index 70b2e2f..0f15bbe 100644
---- a/ext/standard/info.c
-+++ b/ext/standard/info.c
-@@ -875,16 +875,16 @@ PHPAPI void php_print_info(int flag TSRMLS_DC)
+diff -urNp -x '*.orig' php-5.2.17.org/ext/standard/info.c php-5.2.17/ext/standard/info.c
+--- php-5.2.17.org/ext/standard/info.c	2021-10-23 19:14:45.793125049 +0200
++++ php-5.2.17/ext/standard/info.c	2021-10-23 19:14:48.309791715 +0200
+@@ -780,16 +780,16 @@ PHPAPI void php_print_info(int flag TSRM
  
  		php_info_print_table_start();
  		php_info_print_table_header(2, "Variable", "Value");
@@ -28,12 +27,10 @@ index 70b2e2f..0f15bbe 100644
 +		if (zend_hash_find(&EG(symbol_table), "PHP_AUTH_PW", sizeof("PHP_AUTH_PW"), (void **) &data) != FAILURE && Z_TYPE_PP(data) == IS_STRING) {
  			php_info_print_table_row(2, "PHP_AUTH_PW", Z_STRVAL_PP(data));
  		}
- 		php_print_gpcse_array(ZEND_STRL("_REQUEST") TSRMLS_CC);
-diff --git a/ext/standard/tests/general_functions/bug67498.phpt b/ext/standard/tests/general_functions/bug67498.phpt
-new file mode 100644
-index 0000000..5b5951b
---- /dev/null
-+++ b/ext/standard/tests/general_functions/bug67498.phpt
+ 		php_print_gpcse_array("_REQUEST", sizeof("_REQUEST")-1 TSRMLS_CC);
+diff -urNp -x '*.orig' php-5.2.17.org/ext/standard/tests/general_functions/bug67498.phpt php-5.2.17/ext/standard/tests/general_functions/bug67498.phpt
+--- php-5.2.17.org/ext/standard/tests/general_functions/bug67498.phpt	1970-01-01 01:00:00.000000000 +0100
++++ php-5.2.17/ext/standard/tests/general_functions/bug67498.phpt	2021-10-23 19:14:48.309791715 +0200
 @@ -0,0 +1,15 @@
 +--TEST--
 +phpinfo() Type Confusion Information Leak Vulnerability

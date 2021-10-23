@@ -1936,7 +1936,7 @@ done
 
 # mysql default charset for mysql/mysql/pdo-mysql extensions
 %patch36 -p1
-%patch37 -p0
+%patch37 -p1
 %patch38 -p0
 
 %patch39 -p1
@@ -1966,10 +1966,10 @@ done
 %patch57 -p1
 %patch58 -p4
 %patch59 -p1
-%patch60 -p4
+%patch60 -p1
 %patch61 -p1
 %{?with_system_libzip:%patch65 -p1}
-%patch66 -p2
+%patch66 -p1
 %patch67 -p1
 %patch69 -p4
 %patch70 -p1
@@ -2468,7 +2468,7 @@ for fn in ltmain.sh config/ltmain.sh build-aux/ltmain.sh; do
 done
 sed -i -e '/^phpdir/ s,/php/build,/%{name}/build,' $RPM_BUILD_ROOT%{_bindir}/phpize
 
-# as a result of ext/pcre/pcrelib removal in %%prep, ext/pcre/php_pcre.h
+# as a result of ext/pcre/pcrelib removal in prep, ext/pcre/php_pcre.h
 # isn't installed by install-headers make target, we do it manually here.
 # this header file is required by e.g. filter PECL extension
 install -D ext/pcre/php_pcre.h $RPM_BUILD_ROOT%{_includedir}/php/ext/pcre/php_pcre.h

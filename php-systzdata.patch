@@ -51,13 +51,13 @@ diff -up ./ext/date/config0.m4.systzdata ./ext/date/config0.m4
 +   fi
 +fi
 +
- PHP_DATE_CFLAGS="-I@ext_builddir@/lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -DHAVE_TIMELIB_CONFIG_H=1"
- timelib_sources="lib/astro.c lib/dow.c lib/parse_date.c lib/parse_tz.c
+ PHP_DATE_CFLAGS="-Wno-implicit-fallthrough -I@ext_builddir@/lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -DHAVE_TIMELIB_CONFIG_H=1"
+ timelib_sources="lib/astro.c lib/dow.c lib/parse_date.c lib/parse_tz.c lib/parse_posix.c
                   lib/timelib.c lib/tm2unixtime.c lib/unixtime2tm.c lib/parse_iso_intervals.c lib/interval.c"
 diff -up ./ext/date/lib/parse_tz.c.systzdata ./ext/date/lib/parse_tz.c
 --- ./ext/date/lib/parse_tz.c.systzdata	2021-08-10 11:35:28.000000000 +0200
 +++ ./ext/date/lib/parse_tz.c	2021-08-10 12:12:13.191605207 +0200
-@@ -26,8 +26,21 @@
+@@ -26,9 +26,22 @@
  #include "timelib.h"
  #include "timelib_private.h"
  
@@ -72,6 +72,7 @@ diff -up ./ext/date/lib/parse_tz.c.systzdata ./ext/date/lib/parse_tz.c
 +
 +#else
  #define TIMELIB_SUPPORTS_V2DATA
+ #define TIMELIB_SUPPORT_SLIM_FILE
  #include "timezonedb.h"
 +#endif
 +
@@ -622,8 +623,8 @@ diff -up ./ext/date/lib/parse_tz.c.systzdata ./ext/date/lib/parse_tz.c
  
  		version = read_preamble(&tzf, tmp, &type);
 @@ -563,11 +1067,36 @@ timelib_tzinfo *timelib_parse_tzfile(con
+ 			return NULL;
  		}
- 		skip_posix_string(&tzf, tmp);
  
 +#ifdef HAVE_SYSTEM_TZDATA
 +		if (memmap) {

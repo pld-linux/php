@@ -1,7 +1,7 @@
 --- php-5.3.27/ext/mysqli/mysqli_nonapi.c~	2013-11-20 00:19:11.000000000 +0200
 +++ php-5.3.27/ext/mysqli/mysqli_nonapi.c	2013-11-20 00:19:44.725872552 +0200
 @@ -73,7 +73,7 @@
-	zend_bool			self_alloced = 0;
+	bool			self_alloced = 0;
 
 
 -#if !defined(MYSQL_USE_MYSQLND)

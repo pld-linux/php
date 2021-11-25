@@ -37,16 +37,16 @@
 @@ -225,7 +237,7 @@
  ; Development Value: Off
  ; Production Value: Off
- ; http://php.net/short-open-tag
+ ; https://php.net/short-open-tag
 -short_open_tag = Off
 +short_open_tag = On
  
  ; The number of significant digits displayed in floating point numbers.
- ; http://php.net/precision
+ ; https://php.net/precision
 @@ -360,7 +372,7 @@
  ; threat in any way, but it makes it possible to determine whether you use PHP
  ; on your server or not.
- ; http://php.net/expose-php
+ ; https://php.net/expose-php
 -expose_php = On
 +expose_php = Off
  
@@ -55,7 +55,7 @@
 @@ -744,9 +756,7 @@
  
  ; Directory in which the loadable extensions (modules) reside.
- ; http://php.net/extension-dir
+ ; https://php.net/extension-dir
 -;extension_dir = "./"
 -; On windows:
 -;extension_dir = "ext"
@@ -64,14 +64,14 @@
  ; Directory where the temporary files should be placed.
  ; Defaults to the system default (see sys_get_temp_dir)
 @@ -758,64 +768,6 @@
- ; http://php.net/enable-dl
+ ; https://php.net/enable-dl
  enable_dl = Off
  
 -; cgi.force_redirect is necessary to provide security running PHP as a CGI under
 -; most web servers.  Left undefined, PHP turns this on by default.  You can
 -; turn it off here AT YOUR OWN RISK
 -; **You CAN safely turn this off for IIS, in fact, you MUST.**
--; http://php.net/cgi.force-redirect
+-; https://php.net/cgi.force-redirect
 -;cgi.force_redirect = 1
 -
 -; if cgi.nph is enabled it will force cgi to always sent Status: 200 with
@@ -82,7 +82,7 @@
 -; (iPlanet) web servers, you MAY need to set an environment variable name that PHP
 -; will look for to know it is OK to continue execution.  Setting this variable MAY
 -; cause security issues, KNOW WHAT YOU ARE DOING FIRST.
--; http://php.net/cgi.redirect-status-env
+-; https://php.net/cgi.redirect-status-env
 -;cgi.redirect_status_env =
 -
 -; cgi.fix_pathinfo provides *real* PATH_INFO/PATH_TRANSLATED support for CGI.  PHP's
@@ -91,7 +91,7 @@
 -; this to 1 will cause PHP CGI to fix its paths to conform to the spec.  A setting
 -; of zero causes PHP to behave as before.  Default is 1.  You should fix your scripts
 -; to use SCRIPT_FILENAME rather than PATH_TRANSLATED.
--; http://php.net/cgi.fix-pathinfo
+-; https://php.net/cgi.fix-pathinfo
 -;cgi.fix_pathinfo=1
 -
 -; if cgi.discard_path is enabled, the PHP CGI binary can safely be placed outside
@@ -103,7 +103,7 @@
 -; security context that the request runs under.  mod_fastcgi under Apache
 -; does not currently support this feature (03/17/2002)
 -; Set to 1 if running under IIS.  Default is zero.
--; http://php.net/fastcgi.impersonate
+-; https://php.net/fastcgi.impersonate
 -;fastcgi.impersonate = 1
 -
 -; Disable logging through FastCGI connection. PHP's default behavior is to enable
@@ -115,14 +115,14 @@
 -; is supported by Apache. When this option is set to 1, PHP will send
 -; RFC2616 compliant header.
 -; Default is zero.
--; http://php.net/cgi.rfc2616-headers
+-; https://php.net/cgi.rfc2616-headers
 -;cgi.rfc2616_headers = 0
 -
 -; cgi.check_shebang_line controls whether CGI PHP checks for line starting with #!
 -; (shebang) at the top of the running script. This line might be needed if the
 -; script support running both as stand-alone script and via PHP CGI<. PHP in CGI
 -; mode skips this line and ignores its content if this directive is turned on.
--; http://php.net/cgi.check-shebang-line
+-; https://php.net/cgi.check-shebang-line
 -;cgi.check_shebang_line=1
 -
  ;;;;;;;;;;;;;;;;
@@ -160,7 +160,7 @@
 -;extension=shmop
 -
 -; The MIBS data available in the PHP distribution must be installed.
--; See http://www.php.net/manual/en/snmp.installation.php
+-; See https://www.php.net/manual/en/snmp.installation.php
 -;extension=snmp
 -
 -;extension=soap
@@ -179,13 +179,13 @@
  
  [Date]
  ; Defines the default timezone used by the date functions
--; http://php.net/date.timezone
+-; https://php.net/date.timezone
 -;date.timezone =
-+; http://php.net/date.timezone.
++; https://php.net/date.timezone
 +;
 +; NOTE: In PLD Linux the /etc/php/conf.d/timezone.ini is used to set timezone
  
- ; http://php.net/date.default-latitude
+ ; https://php.net/date.default-latitude
  ;date.default_latitude = 31.7667
 @@ -970,19 +884,19 @@
  ; Use of this INI entry is deprecated, use global input_encoding instead.
@@ -213,7 +213,7 @@
 @@ -1360,7 +1274,7 @@
  
  [browscap]
- ; http://php.net/browscap
+ ; https://php.net/browscap
 -;browscap = extra/browscap.ini
 +;browscap = /usr/share/browscap/php_browscap.ini
  
@@ -222,7 +222,7 @@
 @@ -1747,7 +1661,7 @@
  
  ; Sets the directory name where SOAP extension will put cache files.
- ; http://php.net/soap.wsdl-cache-dir
+ ; https://php.net/soap.wsdl-cache-dir
 -soap.wsdl_cache_dir="/tmp"
 +soap.wsdl_cache_dir="/var/cache/php"
  
@@ -370,12 +370,12 @@
 -
 -; Specifies a PHP script that is going to be compiled and executed at server
 -; start-up.
--; http://php.net/opcache.preload
+-; https://php.net/opcache.preload
 -;opcache.preload=
 -
 -; Preloading code as root is not allowed for security reasons. This directive
 -; facilitates to let the preloading to be run as another user.
--; http://php.net/opcache.preload_user
+-; https://php.net/opcache.preload_user
 -;opcache.preload_user=
 -
 -; Prevents caching files that are less than this number of seconds old. It

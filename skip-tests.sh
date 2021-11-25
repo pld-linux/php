@@ -17,8 +17,6 @@ mv ext/filter/tests/bug52209.phpt{,.skip}
 mv ext/gd/tests/bug43073.phpt{,.skip}
 # Bug #48801 (Problem with imagettfbbox)
 mv ext/gd/tests/bug48801.phpt{,.skip}
-# PDO Common: PDORow + get_parent_class()
-$x8664 mv ext/pdo/tests/pdo_035.phpt{,.skip}
 # Bug #47415 PDO_Firebird segfaults when passing lowercased column name to bindColumn()
 mv ext/pdo_firebird/tests/bug_47415.phpt{,.skip}
 # PDO_Firebird: bug 48877 The "bindValue" and "bindParam" do not work for PDO Firebird if we use named parameters (:parameter).

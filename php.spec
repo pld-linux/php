@@ -138,7 +138,7 @@
 %endif
 
 %define		orgname	php
-%define		ver_suffix 80
+%define		ver_suffix 81
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -147,7 +147,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.0.12
+Version:	8.1.0
 Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -156,7 +156,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	2c42ee6263c9fe01463924a063b0934f
+# Source0-md5:	552bc63901c6a1bad195e6a47be3c341
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -174,7 +174,6 @@ Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
-Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 Patch14:	%{orgname}-no_pear_install.patch
@@ -200,7 +199,6 @@ Patch67:	mysql-lib-ver-mismatch.patch
 # https://bugs.php.net/bug.php?id=68344
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
-Patch72:	openssl.patch
 URL:		http://php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -281,7 +279,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20200930
+%define		php_api_version		20210902
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20170320
@@ -295,7 +293,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.19.4
+%define		zipver		1.19.5
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
@@ -1865,7 +1863,6 @@ cp -p php.ini-production php.ini
 %patch4 -p1
 
 %patch7 -p1 -b .sapi-ini-file
-%patch9 -p1
 %patch10 -p1 -b .ini
 %patch14 -p1
 %patch18 -p1
@@ -1891,7 +1888,6 @@ cp -p php.ini-production php.ini
 %patch67 -p1 -b .mysql-lib-ver-mismatch
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch71 -p1 -b .libdb-info
-%patch72 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \
@@ -3242,7 +3238,6 @@ fi
 %{php_data_dir}/tests/php/run-test
 %{php_data_dir}/tests/php/security
 %{php_data_dir}/tests/php/strings
-%{php_data_dir}/tests/php/quicktester.inc
 %attr(755,root,root) %{php_data_dir}/tests/php/run-tests.php
 
 %if %{with tidy}

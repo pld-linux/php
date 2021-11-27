@@ -85,6 +85,7 @@
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	mm		# without mm support for session storage
 %bcond_without	system_gd	# system gd
+%bcond_without	avif		# Without AVIF support in GD extension (imagecreatefromavif and imageavif)
 %bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
 
 %define	apxs2		/usr/sbin/apxs
@@ -225,6 +226,7 @@ BuildRequires:	gmp-devel >= 4.2
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_fpm:BuildRequires:	libapparmor-devel}
 %{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
+%{?with_avif:BuildRequires:	libavif-devel >= 0.8.2}
 %{?with_ffi:BuildRequires:	libffi-devel}
 %{?with_intl:BuildRequires:	libicu-devel >= 50.1}
 BuildRequires:	libjpeg-devel
@@ -233,7 +235,7 @@ BuildRequires:	libpng-devel >= 1.0.8
 %{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %{?with_intl:BuildRequires:	libstdc++-devel}
 BuildRequires:	libtool >= 2:2.4.6
-%{?with_webp:BuildRequires:	libwebp-devel}
+%{?with_webp:BuildRequires:	libwebp-devel >= 0.2.0}
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
 %{?with_zip:BuildRequires:	libzip-devel >= 1.3.1}
@@ -245,7 +247,7 @@ BuildRequires:	libxml2-devel >= 1:2.7.6-4
 BuildRequires: oniguruma-devel
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
-BuildRequires:	openssl-devel >= 1.0.1
+BuildRequires:	openssl-devel >= 1.0.2
 %endif
 %{?with_oci:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
@@ -258,7 +260,7 @@ BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.566
 BuildRequires:	sed >= 4.0
 %if %{with sqlite3} || %{with pdo_sqlite}
-BuildRequires:	sqlite3-devel >= 3.7.4
+BuildRequires:	sqlite3-devel >= 3.7.7
 %endif
 %{?with_systemtap:BuildRequires:	systemtap-sdt-devel}
 BuildRequires:	tar >= 1:1.22
@@ -2199,6 +2201,7 @@ for sapi in $sapis; do
 	%{__enable_disable pcntl pcntl shared} \
 	%{__enable_disable pdo pdo shared} \
 	--enable-xmlwriter=shared \
+	%{?with_avif:--with-avif} \
 %if %{with fpm}
 	--with-fpm-user=http \
 	--with-fpm-group=http \

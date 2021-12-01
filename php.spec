@@ -475,6 +475,7 @@ Obsoletes:	php71-program
 Obsoletes:	php72-program
 Obsoletes:	php73-program
 Obsoletes:	php80-program
+Obsoletes:	php81-program
 
 %description program
 Package providing /usr/bin/php symlink to PHP CLI.
@@ -633,6 +634,7 @@ Obsoletes:	php70-devel
 Obsoletes:	php71-devel
 Obsoletes:	php73-devel
 Obsoletes:	php80-devel
+Obsoletes:	php81-devel
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.

@@ -992,3 +992,41 @@ diff -ruNp php-5.3.29.orig/ext/openssl/xp_ssl.c php-5.3.29/ext/openssl/xp_ssl.c
  	REGISTER_LONG_CONSTANT("OPENSSL_NO_PADDING", RSA_NO_PADDING, CONST_CS|CONST_PERSISTENT);
  	REGISTER_LONG_CONSTANT("OPENSSL_PKCS1_OAEP_PADDING", RSA_PKCS1_OAEP_PADDING, CONST_CS|CONST_PERSISTENT);
  
+--- php-5.5.38.org/ext/openssl/xp_ssl.c	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/openssl/xp_ssl.c	2022-01-20 17:50:46.176594447 +0100
+@@ -473,7 +473,7 @@ static inline int php_openssl_setup_cryp
+ #endif
+ 		case STREAM_CRYPTO_METHOD_TLS_CLIENT:
+ 			sslsock->is_client = 1;
+-			method = TLSv1_client_method();
++			method = TLS_client_method();
+ 			break;
+ 		case STREAM_CRYPTO_METHOD_SSLv23_SERVER:
+ 			sslsock->is_client = 0;
+@@ -499,7 +499,7 @@ static inline int php_openssl_setup_cryp
+ #endif
+ 		case STREAM_CRYPTO_METHOD_TLS_SERVER:
+ 			sslsock->is_client = 0;
+-			method = TLSv1_server_method();
++			method = TLS_server_method();
+ 			break;
+ 		default:
+ 			return -1;
+@@ -1076,7 +1076,7 @@ php_stream *php_openssl_ssl_socket_facto
+ 	
+ 	if (strncmp(proto, "ssl", protolen) == 0) {
+ 		sslsock->enable_on_connect = 1;
+-		sslsock->method = STREAM_CRYPTO_METHOD_SSLv23_CLIENT;
++		sslsock->method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+ 	} else if (strncmp(proto, "sslv2", protolen) == 0) {
+ #ifdef OPENSSL_NO_SSL2
+ 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "SSLv2 support is not compiled into the OpenSSL library PHP is linked against");
+@@ -1087,7 +1087,7 @@ php_stream *php_openssl_ssl_socket_facto
+ #endif
+ 	} else if (strncmp(proto, "sslv3", protolen) == 0) {
+ 		sslsock->enable_on_connect = 1;
+-		sslsock->method = STREAM_CRYPTO_METHOD_SSLv3_CLIENT;
++		sslsock->method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+ 	} else if (strncmp(proto, "tls", protolen) == 0) {
+ 		sslsock->enable_on_connect = 1;
+ 		sslsock->method = STREAM_CRYPTO_METHOD_TLS_CLIENT;

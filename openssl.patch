@@ -10,3 +10,27 @@
  	REGISTER_LONG_CONSTANT("OPENSSL_NO_PADDING", RSA_NO_PADDING, CONST_CS|CONST_PERSISTENT);
  	REGISTER_LONG_CONSTANT("OPENSSL_PKCS1_OAEP_PADDING", RSA_PKCS1_OAEP_PADDING, CONST_CS|CONST_PERSISTENT);
  
+--- php-7.0.33/ext/openssl/xp_ssl.c~	2018-12-04 18:22:59.000000000 +0100
++++ php-7.0.33/ext/openssl/xp_ssl.c	2022-03-29 16:07:39.443215599 +0200
+@@ -1268,6 +1268,10 @@ static int set_server_specific_opts(php_
+ 	zval *zv;
+ 	long ssl_ctx_options = SSL_CTX_get_options(ctx);
+ 
++#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
++	ssl_ctx_options |= SSL_OP_IGNORE_UNEXPECTED_EOF;
++#endif
++
+ #if defined(HAVE_ECDH) && (OPENSSL_VERSION_NUMBER < 0x10100000L || defined (LIBRESSL_VERSION_NUMBER))
+ 	if (set_server_ecdh_curve(stream, ctx) == FAILURE) {
+ 		return FAILURE;
+@@ -1558,6 +1562,10 @@ int php_openssl_setup_crypto(php_stream
+ 		return FAILURE;
+ 	}
+ 
++#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
++	ssl_ctx_options |= SSL_OP_IGNORE_UNEXPECTED_EOF;
++#endif
++
+ #if OPENSSL_VERSION_NUMBER >= 0x0090806fL
+ 	if (GET_VER_OPT("no_ticket") && zend_is_true(val)) {
+ 		ssl_ctx_options |= SSL_OP_NO_TICKET;

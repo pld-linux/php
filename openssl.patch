@@ -57,3 +57,27 @@ diff -urNp -x '*.orig' php-7.1.33.org/main/streams/php_stream_transport.h php-7.
  	STREAM_CRYPTO_METHOD_TLS_ANY_SERVER = ((1 << 3) | (1 << 4) | (1 << 5)),
  	STREAM_CRYPTO_METHOD_ANY_SERVER = ((1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5))
  } php_stream_xport_crypt_method_t;
+--- php-7.2.34/ext/openssl/xp_ssl.c.orig	2020-09-30 07:15:53.000000000 +0200
++++ php-7.2.34/ext/openssl/xp_ssl.c	2022-03-29 15:28:35.726548949 +0200
+@@ -1014,6 +1014,10 @@ static int php_openssl_get_crypto_method
+ {
+ 	int ssl_ctx_options = SSL_OP_ALL;
+ 
++#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
++	ssl_ctx_options |= SSL_OP_IGNORE_UNEXPECTED_EOF;
++#endif
++
+ #ifdef SSL_OP_NO_SSLv2
+ 	ssl_ctx_options |= SSL_OP_NO_SSLv2;
+ #endif
+@@ -1261,6 +1265,10 @@ static int php_openssl_set_server_specif
+ 	zval *zv;
+ 	long ssl_ctx_options = SSL_CTX_get_options(ctx);
+ 
++#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
++	ssl_ctx_options |= SSL_OP_IGNORE_UNEXPECTED_EOF;
++#endif
++
+ #if defined(HAVE_ECDH) && PHP_OPENSSL_API_VERSION < 0x10100
+ 	if (set_server_ecdh_curve(stream, ctx) == FAILURE) {
+ 		return FAILURE;

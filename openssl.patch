@@ -10,3 +10,27 @@
  	REGISTER_LONG_CONSTANT("OPENSSL_NO_PADDING", RSA_NO_PADDING, CONST_CS|CONST_PERSISTENT);
  	REGISTER_LONG_CONSTANT("OPENSSL_PKCS1_OAEP_PADDING", RSA_PKCS1_OAEP_PADDING, CONST_CS|CONST_PERSISTENT);
  
+--- php-7.2.34/ext/openssl/xp_ssl.c.orig	2020-09-30 07:15:53.000000000 +0200
++++ php-7.2.34/ext/openssl/xp_ssl.c	2022-03-29 15:28:35.726548949 +0200
+@@ -1014,6 +1014,10 @@ static int php_openssl_get_crypto_method
+ {
+ 	int ssl_ctx_options = SSL_OP_ALL;
+ 
++#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
++	ssl_ctx_options |= SSL_OP_IGNORE_UNEXPECTED_EOF;
++#endif
++
+ #ifdef SSL_OP_NO_SSLv2
+ 	ssl_ctx_options |= SSL_OP_NO_SSLv2;
+ #endif
+@@ -1261,6 +1265,10 @@ static int php_openssl_set_server_specif
+ 	zval *zv;
+ 	long ssl_ctx_options = SSL_CTX_get_options(ctx);
+ 
++#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
++	ssl_ctx_options |= SSL_OP_IGNORE_UNEXPECTED_EOF;
++#endif
++
+ #if defined(HAVE_ECDH) && PHP_OPENSSL_API_VERSION < 0x10100
+ 	if (php_openssl_set_server_ecdh_curve(stream, ctx) == FAILURE) {
+ 		return FAILURE;

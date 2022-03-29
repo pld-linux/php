@@ -1009,3 +1009,16 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	} else if (strncmp(proto, "tls", protolen) == 0) {
  		sslsock->enable_on_connect = 1;
  		sslsock->method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+--- php-5.5.38/ext/openssl/xp_ssl.c~	2022-03-29 16:25:01.000000000 +0200
++++ php-5.5.38/ext/openssl/xp_ssl.c	2022-03-29 16:27:12.643215607 +0200
+@@ -445,6 +445,10 @@ static inline int php_openssl_setup_cryp
+ 		}
+ 	}
+ 
++#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
++	ssl_ctx_options |= SSL_OP_IGNORE_UNEXPECTED_EOF;
++#endif
++
+ 	/* need to do slightly different things, based on client/server method,
+ 	 * so lets remember which method was selected */
+ 

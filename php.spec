@@ -148,7 +148,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.1.3
+Version:	8.1.4
 Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -157,7 +157,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	495972570d055fef1255e296051a13a5
+# Source0-md5:	6473a944378c59080bcd837552dcaf3f
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -174,6 +174,8 @@ Patch1:		%{orgname}-pldlogo.patch
 Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
+# https://bugs.php.net/bug.php?id=79589
+Patch5:		openssl.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
@@ -1865,6 +1867,7 @@ cp -p php.ini-production php.ini
 #%patch2 -p1 -b .mail
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %patch7 -p1 -b .sapi-ini-file
 %patch10 -p1 -b .ini

@@ -1016,3 +1016,16 @@ diff -ur php-5.4.45/ext/openssl.org/openssl.c php-5.4.45/ext/openssl/openssl.c
  	REGISTER_LONG_CONSTANT("OPENSSL_NO_PADDING", RSA_NO_PADDING, CONST_CS|CONST_PERSISTENT);
  	REGISTER_LONG_CONSTANT("OPENSSL_PKCS1_OAEP_PADDING", RSA_PKCS1_OAEP_PADDING, CONST_CS|CONST_PERSISTENT);
  
+--- php-5.5.38/ext/openssl/xp_ssl.c~	2022-03-29 16:25:01.000000000 +0200
++++ php-5.5.38/ext/openssl/xp_ssl.c	2022-03-29 16:27:12.643215607 +0200
+@@ -445,6 +445,10 @@ static inline int php_openssl_setup_cryp
+ 		}
+ 	}
+ 
++#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
++	ssl_ctx_options |= SSL_OP_IGNORE_UNEXPECTED_EOF;
++#endif
++
+ 	/* need to do slightly different things, based on client/server method,
+ 	 * so lets remember which method was selected */
+ 

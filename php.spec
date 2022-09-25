@@ -14,79 +14,79 @@
 %bcond_without	alternatives	# use alternatives system to select default phar and php-fpm
 %bcond_with	default_php	# build this PHP as default PHP in system (disables alternatives)
 # - General options:
-%bcond_with	embed		# disable building Embedded API
-%bcond_with	gcov		# Enable Code coverage reporting
-%bcond_without	kerberos5	# without Kerberos5 support
+%bcond_with	embed		# Embedded API
+%bcond_with	gcov		# Code coverage reporting
+%bcond_without	kerberos5	# Kerberos5 support
 %bcond_with	systemtap	# systemtap/DTrace support
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	zts		# Zend Thread Safety
 %bcond_with	debug		# Zend Debug Build
 # - SAPI
-%bcond_without	apache2		# disable building Apache 2.x SAPI
-%bcond_without	cgi		# disable CGI/FCGI SAPI
-%bcond_without	fpm		# disable FPM SAPI
-%bcond_without	litespeed	# build litespeed SAPI
-%bcond_without	phpdbg		# disable phpdbg SAPI
+%bcond_without	apache2		# building Apache 2.x SAPI
+%bcond_without	cgi		# CGI/FCGI SAPI
+%bcond_without	fpm		# FPM SAPI
+%bcond_without	litespeed	# litespeed SAPI
+%bcond_without	phpdbg		# phpdbg SAPI
 # - Extensions
-%bcond_without	bcmath		# without bcmath extension module
-%bcond_without	bzip2		# without bz2 extension module
-%bcond_without	calendar	# without calendar extension module
-%bcond_without	ctype		# without ctype extension module
-%bcond_without	curl		# without CURL extension module
-%bcond_without	dba		# without DBA extension module
-%bcond_without	dom		# without DOM extension module
-%bcond_without	enchant		# without Enchant extension module
-%bcond_without	exif		# without EXIF extension module
-%bcond_without	ffi		# without FFI extension module
-%bcond_without	fileinfo	# without fileinfo extension module
-%bcond_without	filter		# without filter extension module
-%bcond_without	ftp		# without FTP extension module
-%bcond_without	gd		# without GD extension module
-%bcond_without	gettext		# without gettext extension module
-%bcond_without	gmp		# without gmp extension module
-%bcond_without	iconv		# without iconv extension module
-%bcond_without	imap		# without IMAP extension module
-%bcond_without	intl		# without Intl extension module
-%bcond_without	ldap		# without LDAP extension module
-%bcond_without	mbstring	# without mbstring extension module
-%bcond_without	mhash		# without mhash extension (supported by hash extension)
-%bcond_without	mysqli		# without mysqli support (Requires mysql >= 4.1)
-%bcond_without	mysqlnd		# without mysqlnd support in mysql related extensions
-%bcond_with	oci		# with Oracle oci8 extension module	(BR: proprietary libs)
-%bcond_without	odbc		# without ODBC extension module
-%bcond_without	opcache		# without Enable Zend OPcache extension support
-%bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
-%bcond_without	pcntl		# without pcntl extension module
+%bcond_without	bcmath		# bcmath extension module
+%bcond_without	bzip2		# bz2 extension module
+%bcond_without	calendar	# calendar extension module
+%bcond_without	ctype		# ctype extension module
+%bcond_without	curl		# CURL extension module
+%bcond_without	dba		# DBA extension module
+%bcond_without	dom		# DOM extension module
+%bcond_without	enchant		# Enchant extension module
+%bcond_without	exif		# EXIF extension module
+%bcond_without	ffi		# FFI extension module
+%bcond_without	fileinfo	# fileinfo extension module
+%bcond_without	filter		# filter extension module
+%bcond_without	ftp		# FTP extension module
+%bcond_without	gd		# GD extension module
+%bcond_without	gettext		# gettext extension module
+%bcond_without	gmp		# gmp extension module
+%bcond_without	iconv		# iconv extension module
+%bcond_without	imap		# IMAP extension module
+%bcond_without	intl		# Intl extension module
+%bcond_without	ldap		# LDAP extension module
+%bcond_without	mbstring	# mbstring extension module
+%bcond_without	mhash		# mhash extension (supported by hash extension)
+%bcond_without	mysqli		# mysqli support (Requires mysql >= 4.1)
+%bcond_without	mysqlnd		# mysqlnd support in mysql related extensions
+%bcond_with	oci		# Oracle oci8 extension module (BR: proprietary libs)
+%bcond_without	odbc		# ODBC extension module
+%bcond_without	opcache		# Enable Zend OPcache extension support
+%bcond_without	openssl		# OpenSSL support and OpenSSL extension (module)
+%bcond_without	pcntl		# pcntl extension module
 %bcond_without	pcre_jit	# PCRE JIT
-%bcond_without	pdo		# without PDO extension module
-%bcond_without	pdo_dblib	# without PDO dblib extension module
-%bcond_without	pdo_firebird	# without PDO Firebird extension module
-%bcond_without	pdo_mysql	# without PDO MySQL extension module
+%bcond_without	pdo		# PDO extension module
+%bcond_without	pdo_dblib	# PDO dblib extension module
+%bcond_without	pdo_firebird	# PDO Firebird extension module
+%bcond_without	pdo_mysql	# PDO MySQL extension module
 %bcond_without	pdo_oci	# without PDO oci extension module
-%bcond_without	pdo_odbc	# without PDO ODBC extension module
-%bcond_without	pdo_pgsql	# without PDO pgsql extension module
-%bcond_without	pdo_sqlite	# without PDO SQLite extension module
-%bcond_without	pgsql		# without PostgreSQL extension module
-%bcond_without	phar		# without Phar extension module
-%bcond_without	posix		# without POSIX extension module
-%bcond_without	pspell		# without pspell extension module
-%bcond_without	readline	# without readline extension module
-%bcond_without	session		# without session extension module
-%bcond_without	snmp		# without SNMP extension module
-%bcond_without	sodium		# without sodium extension module
-%bcond_without	sqlite2		# without SQLite extension module
-%bcond_without	sqlite3		# without SQLite3 extension module
-%bcond_without	tidy		# without Tidy extension module
-%bcond_without	xsl			# without xsl extension module
-%bcond_without	zip			# without zip extension module
+%bcond_without	pdo_odbc	# PDO ODBC extension module
+%bcond_without	pdo_pgsql	# PDO pgsql extension module
+%bcond_without	pdo_sqlite	# PDO SQLite extension module
+%bcond_without	pgsql		# PostgreSQL extension module
+%bcond_without	phar		# Phar extension module
+%bcond_without	posix		# POSIX extension module
+%bcond_without	pspell		# pspell extension module
+%bcond_without	readline	# readline extension module
+%bcond_without	session		# session extension module
+%bcond_without	snmp		# SNMP extension module
+%bcond_without	sodium		# sodium extension module
+%bcond_without	sqlite2		# SQLite extension module
+%bcond_without	sqlite3		# SQLite3 extension module
+%bcond_without	tidy		# Tidy extension module
+%bcond_without	xsl		# xsl extension module
+%bcond_without	zip		# zip extension module
 # extensions options
 %bcond_without	argon2		# argon2 password hashing
-%bcond_without	instantclient	# build Oracle oci8 extension module against oracle-instantclient package
+%bcond_without	instantclient	# Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
-%bcond_with	mm		# without mm support for session storage
-%bcond_without	system_gd	# system gd
-%bcond_without	avif		# Without AVIF support in GD extension (imagecreatefromavif and imageavif)
-%bcond_without	webp		# Without WebP support in GD extension (imagecreatefromwebp)
+%bcond_with	mm		# mm support for session storage
+%bcond_without	system_gd	# system gd library
+%bcond_without	avif		# AVIF support in GD extension (imagecreatefromavif and imageavif)
+%bcond_without	webp		# WebP support in GD extension (imagecreatefromwebp)
 
 %define	apxs2		/usr/sbin/apxs
 

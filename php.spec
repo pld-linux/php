@@ -203,7 +203,7 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
 Patch72:	openssl.patch
-URL:		http://php.net/
+URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.59
@@ -464,18 +464,18 @@ Summary(pl.UTF-8):	Dowiązanie symboliczne /usr/bin/php
 Group:		Development/Languages/PHP
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Obsoletes:	php-program < 4:5.3.28-7
-Obsoletes:	php4-program
-Obsoletes:	php52-program
-Obsoletes:	php53-program
-Obsoletes:	php54-program
-Obsoletes:	php55-program
-Obsoletes:	php56-program
-Obsoletes:	php70-program
-Obsoletes:	php71-program
-Obsoletes:	php72-program
-Obsoletes:	php73-program
-Obsoletes:	php80-program
-Obsoletes:	php81-program
+Obsoletes:	php4-program < 3:5
+Obsoletes:	php52-program < 4:5.3
+Obsoletes:	php53-program < 4:5.4
+Obsoletes:	php54-program < 4:5.5
+Obsoletes:	php55-program < 4:5.6
+Obsoletes:	php56-program < 4:7
+Obsoletes:	php70-program < 4:7.1
+Obsoletes:	php71-program < 4:7.2
+Obsoletes:	php72-program < 4:7.3
+Obsoletes:	php73-program < 4:7.4
+Obsoletes:	php80-program < 4:8.1
+Obsoletes:	php81-program < 4:8.2
 
 %description program
 Package providing /usr/bin/php symlink to PHP CLI.
@@ -623,18 +623,19 @@ Requires:	pcre2-8-devel >= 10.30
 Requires:	shtool
 Provides:	php-devel = %{epoch}:%{version}-%{release}
 Obsoletes:	php-devel
-Obsoletes:	php-pear-devel
-Obsoletes:	php4-devel
-Obsoletes:	php52-devel
-Obsoletes:	php53-devel
-Obsoletes:	php54-devel
-Obsoletes:	php55-devel
-Obsoletes:	php56-devel
-Obsoletes:	php70-devel
-Obsoletes:	php71-devel
-Obsoletes:	php73-devel
-Obsoletes:	php80-devel
-Obsoletes:	php81-devel
+Obsoletes:	php-pear-devel < 3:4.3.0-1
+Obsoletes:	php4-devel < 3:5
+Obsoletes:	php52-devel < 4:5.3
+Obsoletes:	php53-devel < 4:5.4
+Obsoletes:	php54-devel < 4:5.5
+Obsoletes:	php55-devel < 4:5.6
+Obsoletes:	php56-devel < 4:7
+Obsoletes:	php70-devel < 4:7.1
+Obsoletes:	php71-devel < 4:7.2
+Obsoletes:	php72-devel < 4:7.3
+Obsoletes:	php73-devel < 4:7.4
+Obsoletes:	php80-devel < 4:8.0
+Obsoletes:	php81-devel < 4:8.2
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.
@@ -893,7 +894,7 @@ Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(filter)
 Obsoletes:	php-filter < 4:5.3.28-7
-Obsoletes:	php-pecl-filter
+Obsoletes:	php-pecl-filter < 0.12
 
 %description filter
 We all know that you should always check input variables, but PHP does
@@ -1265,7 +1266,7 @@ Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}(PDO_API) = %{php_pdo_api_version}
 Provides:	php(pdo)
 Obsoletes:	php-pdo < 4:5.3.28-7
-Obsoletes:	php-pecl-PDO
+Obsoletes:	php-pecl-PDO < 1.1
 
 %description pdo
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1302,7 +1303,7 @@ Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-firebird)
 Provides:	php(pdo_firebird)
 Obsoletes:	php-pdo-firebird < 4:5.3.28-7
-Obsoletes:	php-pecl-PDO_FIREBIRD
+Obsoletes:	php-pecl-PDO_FIREBIRD < 0.3
 
 %description pdo-firebird
 This is a dynamic shared object (DSO) for PHP that will add PDO
@@ -1323,7 +1324,7 @@ Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-mysql)
 Provides:	php(pdo_mysql)
 Obsoletes:	php-pdo-mysql < 4:5.3.28-7
-Obsoletes:	php-pecl-PDO_MYSQL
+Obsoletes:	php-pecl-PDO_MYSQL < 1.1
 
 %description pdo-mysql
 This is a dynamic shared object (DSO) for PHP that will add PDO MySQL
@@ -1343,7 +1344,7 @@ URL:		http://php.net/manual/en/ref.pdo-oci.php
 Provides:	php(pdo-oci)
 Provides:	php(pdo_oci)
 Obsoletes:	php-pdo-oci < 4:5.3.28-7
-Obsoletes:	php-pecl-PDO_OCI
+Obsoletes:	php-pecl-PDO_OCI < 1.1
 
 %description pdo-oci
 This is a dynamic shared object (DSO) for PHP that will add PDO Oracle
@@ -1363,7 +1364,7 @@ Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-odbc)
 Provides:	php(pdo_odbc)
 Obsoletes:	php-pdo-odbc < 4:5.3.28-7
-Obsoletes:	php-pecl-PDO_ODBC
+Obsoletes:	php-pecl-PDO_ODBC < 1.1
 
 %description pdo-odbc
 This is a dynamic shared object (DSO) for PHP that will add PDO ODBC
@@ -1403,7 +1404,7 @@ Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-sqlite)
 Provides:	php(pdo_sqlite)
 Obsoletes:	php-pdo-sqlite < 4:5.3.28-7
-Obsoletes:	php-pecl-PDO_SQLITE
+Obsoletes:	php-pecl-PDO_SQLITE < 1.1
 
 %description pdo-sqlite
 This is a dynamic shared object (DSO) for PHP that will add PDO SQLite
@@ -1811,7 +1812,7 @@ Group:		Libraries
 URL:		http://php.net/manual/en/book.xmlwriter.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xmlwriter)
-Obsoletes:	php-pecl-xmlwriter
+Obsoletes:	php-pecl-xmlwriter < 2.1
 Obsoletes:	php-xmlwriter < 4:5.3.28-7
 
 %description xmlwriter

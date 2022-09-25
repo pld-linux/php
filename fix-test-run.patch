@@ -10,9 +10,9 @@
  PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
  
  PHP_SUBST(PHP_FASTCGI_OBJS)
---- php-5.5.11/build/Makefile.global	2014-04-27 15:05:38.963814051 +0300
-+++ php-5.5.11/build/Makefile.global	2014-04-27 15:09:54.438443707 +0300
-@@ -81,8 +81,15 @@
+--- php-8.1.10/build/Makefile.global.orig	2022-09-25 19:52:15.520810107 +0200
++++ php-8.1.10/build/Makefile.global	2022-09-25 19:54:52.676625388 +0200
+@@ -81,8 +81,15 @@ install-headers:
  		done; \
  	fi
  
@@ -28,8 +28,8 @@
 +	fi; \
  	if test "x$(PHP_MODULES)" != "x"; then \
  		for i in $(PHP_MODULES)""; do \
- 			. $$i; $(top_srcdir)/build/shtool echo -n -- " -d extension=$$dlname"; \
-@@ -111,7 +118,9 @@
+ 			. $$i; \
+@@ -114,7 +121,9 @@ test: all
  		TEST_PHP_EXECUTABLE=$(PHP_EXECUTABLE) \
  		TEST_PHP_SRCDIR=$(top_srcdir) \
  		CC="$(CC)" \

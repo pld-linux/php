@@ -139,8 +139,10 @@
 %endif
 
 %define		orgname	php
-%define		ver_suffix 81
+%define		ver_suffix 82
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
+%define		subver	RC2
+%define		rel		1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -148,16 +150,17 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.1.10
-Release:	1
+Version:	8.2.0
+Release:	0.%{subver}.%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	5f14b7827d825f4c698402b111735edb
+#Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://downloads.php.net/~sergey/php-%{version}%{subver}.tar.xz
+# Source0-md5:	c171f249a43872d30006bbffd8469648
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -283,7 +286,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20210902
+%define		php_api_version		20220829
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20170320
@@ -297,7 +300,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.19.5
+%define		zipver		1.21.0
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
@@ -475,6 +478,7 @@ Obsoletes:	php72-program < 4:7.3
 Obsoletes:	php73-program < 4:7.4
 Obsoletes:	php74-program < 4:8
 Obsoletes:	php80-program < 4:8.1
+Obsoletes:	php81-program < 4:8.2
 
 %description program
 Package providing /usr/bin/php symlink to PHP CLI.
@@ -635,6 +639,7 @@ Obsoletes:	php72-devel < 4:7.3
 Obsoletes:	php73-devel < 4:7.4
 Obsoletes:	php74-devel < 4:8
 Obsoletes:	php80-devel < 4:8.1
+Obsoletes:	php81-devel < 4:8.2
 
 %description devel
 The php-devel package lets you compile dynamic extensions to PHP.
@@ -1868,7 +1873,7 @@ cp -p php.ini-production php.ini
 #%patch2 -p1 -b .mail
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
+#%patch5 -p1 resolved upstream?
 
 %patch7 -p1 -b .sapi-ini-file
 %patch10 -p1 -b .ini

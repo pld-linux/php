@@ -1,5 +1,5 @@
---- php-8.0.1/php.ini~	2021-02-04 11:05:51.000000000 +0200
-+++ php-8.0.1/php.ini	2021-02-04 11:08:35.715925882 +0200
+--- php-8.2.0RC2/php.ini~	2022-09-29 01:16:25.000000000 +0300
++++ php-8.2.0RC2/php.ini	2022-09-29 01:18:21.454421061 +0300
 @@ -82,8 +82,19 @@
  ; much more verbose when it comes to errors. We recommend using the
  ; development version only in development environments, as errors shown to
@@ -128,8 +128,8 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -871,45 +871,7 @@
- ;   extension folders as well as the separate PECL DLL download (PHP 5+).
+@@ -863,46 +863,7 @@
+ ;   extension folders as well as the separate PECL DLL download.
  ;   Be sure to appropriately set the extension_dir directive.
  ;
 -;extension=bz2
@@ -169,6 +169,7 @@
 -;extension=sqlite3
 -;extension=tidy
 -;extension=xsl
+-;extension=zip
 -
 -;zend_extension=opcache
 +; In PLD Linux you can install appropriate php80-<extension> or php80-pecl-<extension> package.

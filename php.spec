@@ -300,7 +300,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.19.5
+%define		zipver		1.21.0
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 

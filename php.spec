@@ -1871,7 +1871,7 @@ cp -p php.ini-production php.ini
 #%patch2 -p1 -b .mail
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
+#%patch5 -p1 resolved upstream?
 
 %patch7 -p1 -b .sapi-ini-file
 %patch10 -p1 -b .ini

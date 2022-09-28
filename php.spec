@@ -286,7 +286,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20210902
+%define		php_api_version		20220829
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20170320

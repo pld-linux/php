@@ -1,10 +1,10 @@
---- php-7.0/ext/session/mod_files.c~	2015-05-21 17:57:06.000000000 +0300
-+++ php-7.0/ext/session/mod_files.c	2015-05-23 11:18:54.466402493 +0300
-@@ -286,7 +286,6 @@
+--- php-8.2.0RC2/ext/session/mod_files.c~	2022-09-14 12:42:49.000000000 +0300
++++ php-8.2.0RC2/ext/session/mod_files.c	2022-09-29 01:26:03.341783642 +0300
+@@ -287,7 +287,6 @@
  
- 	dir = opendir(dirname);
+ 	dir = opendir(ZSTR_VAL(dirname));
  	if (!dir) {
--		php_error_docref(NULL, E_NOTICE, "ps_files_cleanup_dir: opendir(%s) failed: %s (%d)", dirname, strerror(errno), errno);
+-		php_error_docref(NULL, E_NOTICE, "ps_files_cleanup_dir: opendir(%s) failed: %s (%d)", ZSTR_VAL(dirname), strerror(errno), errno);
  		return (0);
  	}
  

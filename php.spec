@@ -149,7 +149,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	7.4.30
+Version:	7.4.32
 Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -157,8 +157,8 @@ Epoch:		4
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	c373c0ea292e8a1d3e87a1153ee64199
+Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	9fae22a9dc7f3e9fe26dd2f8dc94d03e
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -3045,7 +3045,7 @@ fi
 %if %{with pdo_oci}
 %files oci8
 %defattr(644,root,root,755)
-%doc ext/oci8/{CREDITS,README}
+%doc ext/oci8/{CREDITS,README.md}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_oci8.ini
 %attr(755,root,root) %{php_extensiondir}/oci8.so
 %endif

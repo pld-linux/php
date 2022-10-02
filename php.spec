@@ -1,7 +1,5 @@
 # NOTES
 # - mysqlnd driver doesn't support reconnect: https://bugs.php.net/bug.php?id=52561
-# TODO 7.3:
-# - branch php-7.2 and merge dev-7.3 into head once official announcement ready
 # TODO 7.2:
 # - https://github.com/php/php-src/blob/php-7.2.0/UPGRADING
 # TODO 5.6:
@@ -157,15 +155,14 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.3.33
-Release:	2
+Release:	3
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-#Source0:	https://downloads.php.net/~cmb/php-%{version}%{subver}.tar.xz
-Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 # Source0-md5:	eeabb2140c04da85c86389197421f890
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf

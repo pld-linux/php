@@ -141,7 +141,7 @@
 %define		orgname	php
 %define		ver_suffix 82
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
-%define		subver	RC6
+%define		subver	RC7
 %define		rel		1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -159,8 +159,8 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-Source0:	https://downloads.php.net/~sergey/php-%{version}%{subver}.tar.xz
-# Source0-md5:	ed5a590d7f660fb15f663ef7da9eb688
+Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
+# Source0-md5:	a690678f9cfb4397b7d4831f2178e64f
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

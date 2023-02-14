@@ -17,9 +17,9 @@
  
  ; syslog_facility is used to specify what type of program is logging the
  ; message. This lets syslogd specify that messages from different facilities
---- php-5.6.5/sapi/fpm/www.conf.in~	2015-02-04 19:26:16.000000000 +0200
-+++ php-5.6.5/sapi/fpm/www.conf.in	2015-02-04 19:27:25.275218535 +0200
-@@ -32,7 +32,7 @@
+--- php-8.1.16/sapi/fpm/www.conf.in.orig	2023-02-14 17:52:01.279606000 +0100
++++ php-8.1.16/sapi/fpm/www.conf.in	2023-02-14 20:54:03.101049306 +0100
+@@ -38,7 +38,7 @@ group = @php_fpm_group@
  ;                            (IPv6 and IPv4-mapped) on a specific port;
  ;   '/path/to/unix/socket' - to listen on a unix socket.
  ; Note: This value is mandatory.
@@ -28,20 +28,20 @@
  
  ; Set listen(2) backlog.
  ; Default Value: 511 (-1 on FreeBSD and OpenBSD)
-@@ -46,9 +46,9 @@
+@@ -50,9 +50,9 @@ listen = 127.0.0.1:9000
  ; and group can be specified either by name or by their numeric IDs.
- ; Default Values: user and group are set as the running user
- ;                 mode is set to 0660
+ ; Default Values: Owner is set to the master process running user. If the group
+ ;                 is not set, the owner's group is used. Mode is set to 0660.
 -;listen.owner = @php_fpm_user@
 -;listen.group = @php_fpm_group@
 -;listen.mode = 0660
 +listen.owner = root
 +listen.group = @php_fpm_group@
 +listen.mode = 0660
+ 
  ; When POSIX Access Control Lists are supported you can set them using
  ; these options, value is a comma separated list of user/group names.
- ; When set, listen.owner and listen.group are ignored
-@@ -53,7 +53,7 @@
+@@ -66,7 +66,7 @@ listen = 127.0.0.1:9000
  ; must be separated by a comma. If this value is left blank, connections will be
  ; accepted from any ip address.
  ; Default Value: any
@@ -50,7 +50,7 @@
  
  ; Specify the nice(2) priority to apply to the pool processes (only if set)
  ; The value can vary from -19 (highest priority) to 20 (lower priority)
-@@ -372,7 +372,7 @@
+@@ -438,7 +438,7 @@ pm.max_spare_servers = 3
  ; the current environment.
  ; Default Value: clean env
  ;env[HOSTNAME] = $HOSTNAME

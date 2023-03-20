@@ -5,6 +5,6 @@
  	dir = opendir(ZSTR_VAL(dirname));
  	if (!dir) {
 -		php_error_docref(NULL, E_NOTICE, "ps_files_cleanup_dir: opendir(%s) failed: %s (%d)", ZSTR_VAL(dirname), strerror(errno), errno);
- 		return (0);
+ 		return -1;
  	}
  

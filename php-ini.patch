@@ -241,7 +241,7 @@
  
  ; (time to live) Sets the number of second while cached file will be used
  ; instead of original one.
-@@ -1674,160 +1674,6 @@
+@@ -1674,165 +1674,6 @@
  [dba]
  ;dba.default_handler=
  
@@ -368,8 +368,13 @@
 -;opcache.file_cache_fallback=1
 -
 -; Enables or disables copying of PHP code (text segment) into HUGE PAGES.
--; This should improve performance, but requires appropriate OS configuration.
--;opcache.huge_code_pages=1
+-; Under certain circumstances (if only a single global PHP process is
+-; started from which all others fork), this can increase performance
+-; by a tiny amount because TLB misses are reduced.  On the other hand, this
+-; delays PHP startup, increases memory usage and degrades performance
+-; under memory pressure - use with care.
+-; Requires appropriate OS configuration.
+-;opcache.huge_code_pages=0
 -
 -; Validate cached file permissions.
 -;opcache.validate_permission=0

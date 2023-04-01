@@ -212,11 +212,12 @@ BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison >= 3.0.0
 BuildRequires:	bzip2-devel >= 1.0.0
-%{?with_curl:BuildRequires:	curl-devel >= 7.15.5}
+%{?with_opcache:BuildRequires:	capstone-devel >= 3.0.0}
+%{?with_curl:BuildRequires:	curl-devel >= 7.29.0}
 BuildRequires:	cyrus-sasl-devel >= 2
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
-%{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
+%{?with_enchant:BuildRequires:	enchant2-devel}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
@@ -232,7 +233,7 @@ BuildRequires:	gmp-devel >= 4.2
 %{?with_fpm:BuildRequires:	libapparmor-devel}
 %{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
 %{?with_avif:BuildRequires:	libavif-devel >= 0.8.2}
-%{?with_ffi:BuildRequires:	libffi-devel}
+%{?with_ffi:BuildRequires:	libffi-devel >= 7:3.0.11}
 %{?with_intl:BuildRequires:	libicu-devel >= 50.1}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
@@ -241,9 +242,9 @@ BuildRequires:	libpng-devel >= 1.0.8
 %{?with_intl:BuildRequires:	libstdc++-devel}
 BuildRequires:	libtool >= 2:2.4.6
 %{?with_webp:BuildRequires:	libwebp-devel >= 0.2.0}
-BuildRequires:	libxml2-devel >= 1:2.7.6-4
+BuildRequires:	libxml2-devel >= 1:2.9.0
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
-%{?with_zip:BuildRequires:	libzip-devel >= 1.3.1}
+%{?with_zip:BuildRequires:	libzip-devel >= 1.7.1}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
@@ -750,7 +751,7 @@ Summary(pl.UTF-8):	Moduł curl dla PHP
 Group:		Libraries
 URL:		http://php.net/manual/en/book.curl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	curl-libs >= 7.12.0
+Requires:	curl-libs >= 7.29.0
 Provides:	php(curl)
 Obsoletes:	php-curl < 4:5.3.28-7
 
@@ -1836,7 +1837,7 @@ Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
 URL:		http://php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	libzip >= 1.3.1
+Requires:	libzip >= 1.7.1
 Provides:	php(zip) = %{zipver}
 Obsoletes:	php-pecl-zip < %{zipver}
 Obsoletes:	php-zip < 4:5.3.28-7

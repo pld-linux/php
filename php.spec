@@ -123,8 +123,8 @@
 %undefine	with_pdo_oci
 %endif
 
-%ifnarch %{ix86} %{x8664} x32
-# unsupported, see sapi/cgi/fpm/fpm_atomic.h
+%ifnarch %{ix86} %{x8664} x32 %{arm} aarch64 sparcv9 sparc64
+# unsupported, see sapi/fpm/fpm/fpm_atomic.h
 %undefine	with_fpm
 %endif
 

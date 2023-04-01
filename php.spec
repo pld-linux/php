@@ -262,7 +262,7 @@ BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
-BuildRequires:	rpm-build >= 4.4.0
+BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.566
 BuildRequires:	sed >= 4.0
 %if %{with sqlite3} || %{with pdo_sqlite}

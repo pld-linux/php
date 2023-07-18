@@ -491,7 +491,7 @@ Pakiet dostarczający dowiązanie symboliczne /usr/bin/php do PHP CLI.
 Summary:	PHP FastCGI Process Manager
 Summary(pl.UTF-8):	PHP FastCGI Process Manager - zarządca procesów FastCGI
 Group:		Development/Languages/PHP
-URL:		http://php-fpm.org/
+URL:		https://php-fpm.org/
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
@@ -679,7 +679,7 @@ oracle, встановіть цей пакет для компіляції ок�
 Summary:	bcmath extension module for PHP
 Summary(pl.UTF-8):	Moduł bcmath dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.bc.php
+URL:		https://www.php.net/manual/en/book.bc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(bcmath)
 Obsoletes:	php-bcmath < 4:5.3.28-7
@@ -696,7 +696,7 @@ matematycznych takich jak w programie bc.
 Summary:	Bzip2 extension module for PHP
 Summary(pl.UTF-8):	Moduł bzip2 dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.bzip2.php
+URL:		https://www.php.net/manual/en/book.bzip2.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	bzip2-libs >= 1.0.0
 Provides:	php(bz2) = %{bz2ver}
@@ -717,7 +717,7 @@ Moduł PHP umożliwiający używanie kompresji bzip2.
 Summary:	Calendar extension module for PHP
 Summary(pl.UTF-8):	Moduł funkcji kalendarza dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.calendar.php
+URL:		https://www.php.net/manual/en/book.calendar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(calendar)
 Obsoletes:	php-calendar < 4:5.3.28-7
@@ -733,7 +733,7 @@ Moduł PHP dodający wsparcie dla kalendarza.
 Summary:	ctype extension module for PHP
 Summary(pl.UTF-8):	Moduł ctype dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.ctype.php
+URL:		https://www.php.net/manual/en/book.ctype.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ctype)
 Obsoletes:	php-ctype < 4:5.3.28-7
@@ -749,7 +749,7 @@ Moduł PHP umożliwiający korzystanie z funkcji ctype.
 Summary:	curl extension module for PHP
 Summary(pl.UTF-8):	Moduł curl dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.curl.php
+URL:		https://www.php.net/manual/en/book.curl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	curl-libs >= 7.29.0
 Provides:	php(curl)
@@ -766,7 +766,7 @@ Moduł PHP umożliwiający korzystanie z biblioteki curl.
 Summary:	DBA extension module for PHP
 Summary(pl.UTF-8):	Moduł DBA dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.dba.php
+URL:		https://www.php.net/manual/en/book.dba.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dba)
 Obsoletes:	php-dba < 4:5.3.28-7
@@ -785,7 +785,7 @@ Moduł dla PHP dodający obsługę dla baz danych opartych na plikach
 Summary:	DOM extension module for PHP
 Summary(pl.UTF-8):	Moduł DOM dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.dom.php
+URL:		https://www.php.net/manual/en/book.dom.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(dom)
 # it has some compatibility functions
@@ -805,7 +805,7 @@ Moduł PHP dodający nową obsługę DOM.
 Summary:	libenchant binder
 Summary(pl.UTF-8):	dowiązania biblioteki libenchant
 Group:		Libraries
-URL:		http://php.net/manual/en/book.enchant.php
+URL:		https://www.php.net/manual/en/book.enchant.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(enchant) = %{enchantver}
 Obsoletes:	php-enchant < 4:5.3.28-7
@@ -835,7 +835,7 @@ ujednolicone API dla wielu narzędzi sprawdzających pisownię:
 Summary:	exif extension module for PHP
 Summary(pl.UTF-8):	Moduł exif dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.exif.php
+URL:		https://www.php.net/manual/en/book.exif.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(exif)
 Obsoletes:	php-exif < 4:5.3.28-7
@@ -867,12 +867,12 @@ funkcje z dowolnych bibliotek współdzielonych i wywoływać je.
 Summary:	libmagic bindings
 Summary(pl.UTF-8):	Wiązania do libmagic
 Group:		Libraries
-URL:		http://php.net/manual/en/book.fileinfo.php
+URL:		https://www.php.net/manual/en/book.fileinfo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(fileinfo) = %{fileinfover}
 Obsoletes:	php-fileinfo < 4:5.3.28-7
-Obsoletes:	php-mime_magic
+Obsoletes:	php-mime_magic < 4:5.3
 Obsoletes:	php-pecl-fileinfo < %{fileinfover}
 
 %description fileinfo
@@ -894,7 +894,7 @@ pliku oraz kodowania plików tekstowych.
 Summary:	Extension for safely dealing with input parameters
 Summary(pl.UTF-8):	Rozszerzenie do bezpiecznej obsługi danych wejściowych
 Group:		Libraries
-URL:		http://php.net/manual/en/book.filter.php
+URL:		https://www.php.net/manual/en/book.filter.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Provides:	php(filter)
@@ -919,7 +919,7 @@ mogą bezpiecznie używać do dostępu do danych.
 Summary:	FTP extension module for PHP
 Summary(pl.UTF-8):	Moduł FTP dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.ftp.php
+URL:		https://www.php.net/manual/en/book.ftp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ftp)
 Obsoletes:	php-ftp < 4:5.3.28-7
@@ -935,7 +935,7 @@ Moduł PHP dodający obsługę protokołu FTP.
 Summary:	GD extension module for PHP
 Summary(pl.UTF-8):	Moduł GD dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.image.php
+URL:		https://www.php.net/manual/en/book.image.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %if %{with system_gd}
 Requires:	gd >= 2.1
@@ -956,7 +956,7 @@ tworzenie i obróbkę obrazków.
 Summary:	gettext extension module for PHP
 Summary(pl.UTF-8):	Moduł gettext dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.gettext.php
+URL:		https://www.php.net/manual/en/book.gettext.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(gettext)
 Obsoletes:	php-gettext < 4:5.3.28-7
@@ -972,7 +972,7 @@ Moduł PHP dodający obsługę lokalizacji przez gettext.
 Summary:	gmp extension module for PHP
 Summary(pl.UTF-8):	Moduł gmp dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.gmp.php
+URL:		https://www.php.net/manual/en/book.gmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	gmp >= 4.2
 Provides:	php(gmp)
@@ -990,7 +990,7 @@ liczbach o dowolnej długości.
 Summary:	iconv extension module for PHP
 Summary(pl.UTF-8):	Moduł iconv dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.iconv.php
+URL:		https://www.php.net/manual/en/book.iconv.php
 Requires:	%{_libdir}/gconv
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	iconv
@@ -1009,7 +1009,7 @@ Summary:	IMAP extension module for PHP
 Summary(pl.UTF-8):	Moduł IMAP dla PHP
 Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam IMAP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.imap.php
+URL:		https://www.php.net/manual/en/book.imap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
 Requires:	imap-lib >= 1:2007e-2
@@ -1030,7 +1030,7 @@ Um módulo para aplicações PHP que usam IMAP.
 Summary:	Internationalization extension (ICU wrapper)
 Summary(pl.UTF-8):	Rozszerzenie do internacjonalizacji (interfejs do ICU)
 Group:		Libraries
-URL:		http://php.net/intl
+URL:		https://www.php.net/intl
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(intl) = %{intlver}
 Obsoletes:	php-intl < 4:5.3.28-7
@@ -1052,7 +1052,7 @@ daty/czasu/walut.
 Summary:	PHP C extension for JSON serialization
 Summary(pl.UTF-8):	Rozszerzenie C PHP dla serializacji JSON
 Group:		Libraries
-URL:		http://php.net/manual/en/book.json.php
+URL:		https://www.php.net/manual/en/book.json.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(json) = %{jsonver}
 Obsoletes:	php-json < 4:5.3.28-7
@@ -1071,7 +1071,7 @@ Summary:	LDAP extension module for PHP
 Summary(pl.UTF-8):	Moduł LDAP dla PHP
 Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam LDAP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.ldap.php
+URL:		https://www.php.net/manual/en/book.ldap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(ldap)
 Obsoletes:	php-ldap < 4:5.3.28-7
@@ -1090,7 +1090,7 @@ Um módulo para aplicações PHP que usam LDAP.
 Summary:	mbstring extension module for PHP
 Summary(pl.UTF-8):	Moduł mbstring dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.mbstring.php
+URL:		https://www.php.net/manual/en/book.mbstring.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mbstring)
 Obsoletes:	php-mbstring < 4:5.3.28-7
@@ -1106,7 +1106,7 @@ Moduł PHP dodający obsługę ciągów znaków wielobajtowych.
 Summary:	MySQLi module for PHP
 Summary(pl.UTF-8):	Moduł MySQLi dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.mysqli.php
+URL:		https://www.php.net/manual/en/book.mysqli.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
@@ -1128,7 +1128,7 @@ MySQL w wersji 4.1 i nowszych.
 Summary:	MySQL Native Client Driver for PHP
 Summary(pl.UTF-8):	Sterownik natywnego klienta MySQL dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.mysqlnd.php
+URL:		https://www.php.net/manual/en/book.mysqlnd.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(mysqlnd)
 Obsoletes:	php-mysqlnd < 4:5.3.28-7
@@ -1166,7 +1166,7 @@ tym sterowniku - tylko raz.
 Summary:	Oracle 8+ database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych Oracle 8+ dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.oci8.php
+URL:		https://www.php.net/manual/en/book.oci8.php
 %{?requires_php_extension}
 Provides:	php(oci8)
 Obsoletes:	php-oci8 < 4:5.3.28-7
@@ -1186,7 +1186,7 @@ Summary:	ODBC extension module for PHP
 Summary(pl.UTF-8):	Moduł ODBC dla PHP
 Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam bases de dados ODBC
 Group:		Libraries
-URL:		http://php.net/manual/en/book.uodbc.php
+URL:		https://www.php.net/manual/en/book.uodbc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	unixODBC >= 2.1.1-3
 Provides:	php(odbc)
@@ -1231,7 +1231,7 @@ czyniąc wykonywanie kodu szybszym.
 Summary:	OpenSSL extension module for PHP
 Summary(pl.UTF-8):	Moduł OpenSSL dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.openssl.php
+URL:		https://www.php.net/manual/en/book.openssl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(openssl)
 Obsoletes:	php-openssl < 4:5.3.28-7
@@ -1247,7 +1247,7 @@ Moduł PHP umożliwiający korzystanie z biblioteki OpenSSL.
 Summary:	Process Control extension module for PHP
 Summary(pl.UTF-8):	Moduł Process Control dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.pcntl.php
+URL:		https://www.php.net/manual/en/book.pcntl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pcntl)
 Obsoletes:	php-pcntl < 4:5.3.28-7
@@ -1265,7 +1265,7 @@ Obsługuje funkcje takie jak fork(), waitpid(), signal() i podobne.
 Summary:	PHP Data Objects (PDO)
 Summary(pl.UTF-8):	Obsługa PHP Data Objects (PDO)
 Group:		Libraries
-URL:		http://php.net/manual/en/book.pdo.php
+URL:		https://www.php.net/manual/en/book.pdo.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	%{name}(PDO_API) = %{php_pdo_api_version}
@@ -1284,7 +1284,7 @@ Moduł PHP dodający obsługę PDO (PHP Data Objects).
 Summary:	PHP Data Objects (PDO) FreeTDS support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą FreeTDS
 Group:		Libraries
-URL:		http://php.net/manual/en/ref.pdo-dblib.php
+URL:		https://www.php.net/manual/en/ref.pdo-dblib.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo_dblib)
@@ -1302,7 +1302,7 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) Firebird support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą Firebirda
 Group:		Libraries
-URL:		http://php.net/manual/en/ref.pdo-firebird.php
+URL:		https://www.php.net/manual/en/ref.pdo-firebird.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-firebird)
@@ -1322,7 +1322,7 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) MySQL support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą MySQL-a
 Group:		Libraries
-URL:		http://php.net/manual/en/ref.pdo-mysql.php
+URL:		https://www.php.net/manual/en/ref.pdo-mysql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 %{?with_mysqlnd:Requires:	%{name}-mysqlnd = %{epoch}:%{version}-%{release}}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
@@ -1343,7 +1343,7 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) Oracle support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą Oracle'a
 Group:		Libraries
-URL:		http://php.net/manual/en/ref.pdo-oci.php
+URL:		https://www.php.net/manual/en/ref.pdo-oci.php
 %{?requires_php_extension}
 %{?requires_php_pdo_module}
 Provides:	php(pdo-oci)
@@ -1363,7 +1363,7 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) ODBC support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą ODBC
 Group:		Libraries
-URL:		http://php.net/manual/en/ref.pdo-odbc.php
+URL:		https://www.php.net/manual/en/ref.pdo-odbc.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-odbc)
@@ -1383,7 +1383,7 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) PostgreSQL support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą PostgreSQL-a
 Group:		Libraries
-URL:		http://php.net/manual/en/ref.pdo-pgsql.php
+URL:		https://www.php.net/manual/en/ref.pdo-pgsql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-pgsql)
@@ -1403,7 +1403,7 @@ interfejsu PDO.
 Summary:	PHP Data Objects (PDO) SQLite support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą SQLite
 Group:		Libraries
-URL:		http://php.net/manual/en/ref.pdo-sqlite.php
+URL:		https://www.php.net/manual/en/ref.pdo-sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
 Provides:	php(pdo-sqlite)
@@ -1423,7 +1423,7 @@ interfejsu PDO.
 Summary:	PostgreSQL database module for PHP
 Summary(pl.UTF-8):	Moduł bazy danych PostgreSQL dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.pgsql.php
+URL:		https://www.php.net/manual/en/book.pgsql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pgsql)
 Obsoletes:	php-pgsql < 4:5.3.28-7
@@ -1442,7 +1442,7 @@ Um módulo para aplicações PHP que usam bancos de dados postgresql.
 Summary:	Phar archive module for PHP
 Summary(pl.UTF-8):	Moduł phar dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.phar.php
+URL:		https://www.php.net/manual/en/book.phar.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-hash = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
@@ -1466,7 +1466,7 @@ Moduł PHP umożliwiający dostęp do achiwów .phar.
 Summary:	POSIX extension module for PHP
 Summary(pl.UTF-8):	Moduł POSIX dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.posix.php
+URL:		https://www.php.net/manual/en/book.posix.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(posix)
 Obsoletes:	php-posix < 4:5.3.28-7
@@ -1482,7 +1482,7 @@ Moduł PHP umożliwiający korzystanie z funkcji POSIX.
 Summary:	pspell extension module for PHP
 Summary(pl.UTF-8):	Moduł pspell dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.pspell.php
+URL:		https://www.php.net/manual/en/book.pspell.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(pspell)
 Obsoletes:	php-pspell < 4:5.3.28-7
@@ -1500,7 +1500,7 @@ sprawdzanie pisowni słowa i sugerowanie poprawek.
 Summary:	readline extension module for PHP
 Summary(pl.UTF-8):	Moduł readline dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.readline.php
+URL:		https://www.php.net/manual/en/book.readline.php
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Provides:	php(readline)
 Obsoletes:	php-readline < 4:5.3.28-7
@@ -1516,6 +1516,7 @@ Moduł PHP dodający obsługę funkcji readline (tylko do SAPI cli i cgi).
 Summary:	session extension module for PHP
 Summary(pl.UTF-8):	Moduł session dla PHP
 Group:		Libraries
+URL:		https://www.php.net/manual/en/book.session.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Suggests:	%{name}-hash = %{epoch}:%{version}-%{release}
@@ -1534,7 +1535,7 @@ Moduł PHP dodający obsługę sesji.
 Summary:	Shared Memory Operations extension module for PHP
 Summary(pl.UTF-8):	Moduł shmop dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.shmop.php
+URL:		https://www.php.net/manual/en/book.shmop.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(shmop)
 Obsoletes:	php-shmop < 4:5.3.28-7
@@ -1550,7 +1551,7 @@ Moduł PHP umożliwiający korzystanie z pamięci dzielonej.
 Summary:	Simple XML extension module for PHP
 Summary(pl.UTF-8):	Moduł prostego rozszerzenia XML dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.simplexml.php
+URL:		https://www.php.net/manual/en/book.simplexml.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
 Provides:	php(simplexml)
@@ -1567,7 +1568,7 @@ Moduł PHP dodający obsługę prostego XML-a.
 Summary:	SNMP extension module for PHP
 Summary(pl.UTF-8):	Moduł SNMP dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.snmp.php
+URL:		https://www.php.net/manual/en/book.snmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-sockets = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
@@ -1585,7 +1586,7 @@ Moduł PHP dodający obsługę SNMP.
 Summary:	soap extension module for PHP
 Summary(pl.UTF-8):	Moduł soap dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.soap.php
+URL:		https://www.php.net/manual/en/book.soap.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(soap)
 Obsoletes:	php-soap < 4:5.3.28-7
@@ -1601,7 +1602,7 @@ Moduł PHP dodający obsługę SOAP/WSDL.
 Summary:	sockets extension module for PHP
 Summary(pl.UTF-8):	Moduł socket dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.sockets.php
+URL:		https://www.php.net/manual/en/book.sockets.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sockets)
 Obsoletes:	php-sockets < 4:5.3.28-7
@@ -1631,7 +1632,7 @@ Proste, niskopoziomowe rozszerzenie PHP wykorzystując libsodium.
 Summary:	SQLite3 extension module for PHP
 Summary(pl.UTF-8):	Moduł SQLite3 dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.sqlite3.php
+URL:		https://www.php.net/manual/en/book.sqlite3.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sqlite3) = %{sqlite3ver}
 Obsoletes:	php-sqlite3 < 4:5.3.28-7
@@ -1660,7 +1661,7 @@ dysku.
 Summary:	SysV msg extension module for PHP
 Summary(pl.UTF-8):	Moduł SysV msg dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.sem.php
+URL:		https://www.php.net/manual/en/book.sem.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvmsg)
 Obsoletes:	php-sysvmsg < 4:5.3.28-7
@@ -1676,7 +1677,7 @@ Moduł PHP umożliwiający korzystanie z kolejek komunikatów SysV.
 Summary:	SysV sem extension module for PHP
 Summary(pl.UTF-8):	Moduł SysV sem dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.sem.php
+URL:		https://www.php.net/manual/en/book.sem.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvsem)
 Obsoletes:	php-sysvsem < 4:5.3.28-7
@@ -1692,7 +1693,7 @@ Moduł PHP umożliwiający korzystanie z semaforów SysV.
 Summary:	SysV shm extension module for PHP
 Summary(pl.UTF-8):	Moduł SysV shm dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.sem.php
+URL:		https://www.php.net/manual/en/book.sem.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(sysvshm)
 Obsoletes:	php-sysvshm < 4:5.3.28-7
@@ -1722,7 +1723,7 @@ Ten pakiet zawiera pliki testów jednostkowych dla PHP i rozszerzeń.
 Summary:	Tidy extension module for PHP
 Summary(pl.UTF-8):	Moduł Tidy dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.tidy.php
+URL:		https://www.php.net/manual/en/book.tidy.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	tidy
 Provides:	php(tidy)
@@ -1739,7 +1740,7 @@ Moduł PHP umożliwiający korzystanie z tidy.
 Summary:	tokenizer extension module for PHP
 Summary(pl.UTF-8):	Moduł rozszerzenia tokenizer dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.tokenizer.php
+URL:		https://www.php.net/manual/en/book.tokenizer.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(tokenizer)
 Obsoletes:	php-tokenizer < 4:5.3.28-7
@@ -1755,7 +1756,7 @@ Moduł PHP dodający obsługę tokenizera do PHP.
 Summary:	XML extension module for PHP
 Summary(pl.UTF-8):	Moduł XML dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.xml.php
+URL:		https://www.php.net/manual/en/book.xml.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xml)
 Obsoletes:	php-xml < 4:5.3.28-7
@@ -1774,7 +1775,7 @@ następnie definiować procedury obsługi dla różnych zdarzeń XML.
 Summary:	XML Reader extension module for PHP
 Summary(pl.UTF-8):	Moduł XML Reader dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.xmlreader.php
+URL:		https://www.php.net/manual/en/book.xmlreader.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
 Provides:	php(xmlreader)
@@ -1795,7 +1796,7 @@ zatrzymujący się na każdym węźle po drodze.
 Summary:	Fast, non-cached, forward-only means to write XML data
 Summary(pl.UTF-8):	Szybka, nie cachowana metoda zapisu danych w formacie XML
 Group:		Libraries
-URL:		http://php.net/manual/en/book.xmlwriter.php
+URL:		https://www.php.net/manual/en/book.xmlwriter.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(xmlwriter)
 Obsoletes:	php-pecl-xmlwriter < 2.1
@@ -1815,7 +1816,7 @@ plików zawierających dane XML.
 Summary:	xsl extension module for PHP
 Summary(pl.UTF-8):	Moduł xsl dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.xsl.php
+URL:		https://www.php.net/manual/en/book.xsl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-dom = %{epoch}:%{version}-%{release}
 Requires:	libxslt >= 1.1.0
@@ -1835,7 +1836,7 @@ Moduł PHP dodający nową obsługę XSLT (przy użyciu libxslt).
 Summary:	Zip management extension
 Summary(pl.UTF-8):	Zarządzanie archiwami zip
 Group:		Libraries
-URL:		http://php.net/manual/en/book.zip.php
+URL:		https://www.php.net/manual/en/book.zip.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	libzip >= 1.7.1
 Provides:	php(zip) = %{zipver}
@@ -1853,7 +1854,7 @@ odczyt archiwów zip.
 Summary:	Zlib extension module for PHP
 Summary(pl.UTF-8):	Moduł zlib dla PHP
 Group:		Libraries
-URL:		http://php.net/manual/en/book.zlib.php
+URL:		https://www.php.net/manual/en/book.zlib.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Provides:	php(zlib)
 Obsoletes:	php-zlib < 4:5.3.28-7
@@ -1903,7 +1904,7 @@ cp -p php.ini-production php.ini
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch71 -p1 -b .libdb-info
 
-sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
+%{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \
       ext/ext_skel.php \
       run-tests.php
 
@@ -1923,8 +1924,6 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/gd/libgd
 #%{__rm} -r ext/mbstring/libmbfl
 #%{__rm} -r ext/pcre/pcre2lib
-#%{__rm} -r ext/soap/interop
-#%{__rm} -r ext/zip/lib
 %{__rm} ext/date/lib/timezonedb.h
 
 cp -pf Zend/LICENSE{,.Zend}

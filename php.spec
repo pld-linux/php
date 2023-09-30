@@ -150,7 +150,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.2.10
+Version:	8.2.11
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -159,7 +159,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	7cf41ae950f76e031599129f7cac6719
+# Source0-md5:	8e7f61ff53fd36be68643080c5114df9
 #Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
@@ -1905,8 +1905,8 @@ cp -p php.ini-production php.ini
 %patch71 -p1 -b .libdb-info
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \
-      ext/ext_skel.php \
-      run-tests.php
+	ext/ext_skel.php \
+	run-tests.php
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

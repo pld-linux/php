@@ -206,6 +206,7 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
 Patch72:	libtool-tag.patch
+Patch73:	missing-includes.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1905,6 +1906,7 @@ cp -p php.ini-production php.ini
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch71 -p1 -b .libdb-info
 %patch72 -p1
+%patch73 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \
 	ext/ext_skel.php \

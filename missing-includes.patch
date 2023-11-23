@@ -1,0 +1,22 @@
+diff -ur php-8.2.12.orig/ext/dom/document.c php-8.2.12/ext/dom/document.c
+--- php-8.2.12.orig/ext/dom/document.c	2023-10-24 21:22:16.000000000 +0200
++++ php-8.2.12/ext/dom/document.c	2023-11-23 21:35:57.407063192 +0100
+@@ -23,6 +23,7 @@
+ #if defined(HAVE_LIBXML) && defined(HAVE_DOM)
+ #include "php_dom.h"
+ #include <libxml/SAX.h>
++#include <libxml/xmlsave.h>
+ #ifdef LIBXML_SCHEMAS_ENABLED
+ #include <libxml/relaxng.h>
+ #include <libxml/xmlschemas.h>
+diff -ur php-8.2.12.orig/ext/libxml/php_libxml.h php-8.2.12/ext/libxml/php_libxml.h
+--- php-8.2.12.orig/ext/libxml/php_libxml.h	2023-10-24 21:22:16.000000000 +0200
++++ php-8.2.12/ext/libxml/php_libxml.h	2023-11-23 21:35:57.407063192 +0100
+@@ -34,6 +34,7 @@
+ #endif
+ 
+ #include "zend_smart_str.h"
++#include <libxml/parser.h>
+ #include <libxml/tree.h>
+ 
+ #define LIBXML_SAVE_NOEMPTYTAG 1<<2

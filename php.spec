@@ -142,7 +142,7 @@
 %define		ver_suffix	82
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		2
+%define		rel		1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -150,7 +150,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.2.13
+Version:	8.2.14
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -159,7 +159,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	ae204ece3b5e3d1114e0b2bb1a6343b1
+# Source0-md5:	bf1f3d561a5a1a9b5acb0f74c5db84b3
 #Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
@@ -206,7 +206,6 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
 Patch72:	libtool-tag.patch
-Patch73:	missing-includes.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1906,7 +1905,6 @@ cp -p php.ini-production php.ini
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch71 -p1 -b .libdb-info
 %patch72 -p1
-%patch73 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \
 	ext/ext_skel.php \

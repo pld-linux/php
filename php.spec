@@ -142,7 +142,7 @@
 %define		ver_suffix	82
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		1
+%define		rel		2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2268,6 +2268,7 @@ for sapi in $sapis; do
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \
 	--with-tcadb=/usr \
+	--with-external-libcrypt \
 	--with-external-pcre \
 	%{__with_without pcre_jit pcre-jit} \
 	%{__enable_disable filter filter shared} \

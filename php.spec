@@ -149,7 +149,7 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.1.19
-Release:	3
+Release:	4
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -2267,6 +2267,7 @@ for sapi in $sapis; do
 	%{?with_openssl:--with-openssl=shared} \
 	%{?with_kerberos5:--with-kerberos} \
 	--with-tcadb=/usr \
+	--with-external-libcrypt \
 	--with-external-pcre \
 	%{__with_without pcre_jit pcre-jit} \
 	%{__enable_disable filter filter shared} \

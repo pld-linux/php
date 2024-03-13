@@ -1,0 +1,87 @@
+--- php-5.6.40/configure.in~	2024-03-13 20:25:10.000000000 +0100
++++ php-5.6.40/configure.in	2024-03-13 20:36:57.496650674 +0100
+@@ -610,7 +610,6 @@ asctime_r \
+ chroot \
+ ctime_r \
+ cuserid \
+-crypt \
+ flock \
+ ftok \
+ funopen \
+@@ -689,6 +688,11 @@ asprintf \
+ nanosleep \
+ )
+ 
++AC_SEARCH_LIBS([crypt], [crypt], [
++               LIBS="$LIBS -lcrypt"
++               AC_DEFINE(HAVE_CRYPT, 1, [ ])
++               ])
++
+ dnl Some systems (like OpenSolaris) do not have nanosleep in libc
+ PHP_CHECK_FUNC_LIB(nanosleep, rt)
+ 
+@@ -757,7 +761,7 @@ PHP_TIME_R_TYPE
+ PHP_READDIR_R_TYPE
+ PHP_CHECK_IN_ADDR_T
+ 
+-AC_CHECK_FUNCS(crypt_r, [ php_crypt_r="1" ], [ php_crypt_r="0" ])
++AC_SEARCH_LIBS(crypt_r, crypt, [ php_crypt_r="1" ], [ php_crypt_r="0" ])
+ if test "x$php_crypt_r" = "x1"; then
+   PHP_CRYPT_R_STYLE
+ fi
+--- php-5.6.40/ext/standard/config.m4~	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/standard/config.m4	2024-03-13 21:03:19.596650607 +0100
+@@ -69,6 +69,8 @@ AC_CACHE_CHECK(for standard DES crypt, a
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char *encrypted = crypt("rasmuslerdorf","rl");
+@@ -94,6 +96,8 @@ AC_CACHE_CHECK(for extended DES crypt, a
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char *encrypted = crypt("rasmuslerdorf","_J9..rasm");
+@@ -119,6 +123,8 @@ AC_TRY_RUN([
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[15], answer[40];
+@@ -154,6 +160,8 @@ AC_TRY_RUN([
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[30], answer[70];
+@@ -186,6 +194,8 @@ AC_TRY_RUN([
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[21], answer[21+86];
+@@ -217,6 +227,8 @@ AC_TRY_RUN([
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[21], answer[21+43];

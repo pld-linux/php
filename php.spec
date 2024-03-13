@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	23
+%define		rel	24
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -198,6 +198,7 @@ Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 Patch12:	openssl.patch
+Patch13:	crypt.patch
 Patch14:	%{orgname}-no_pear_install.patch
 Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
@@ -2108,7 +2109,7 @@ cp -p php.ini-production php.ini
 %patch10 -p1
 
 %patch12 -p1
-
+%patch13 -p1
 %patch14 -p1
 %patch17 -p1
 %patch18 -p1
@@ -2691,6 +2692,9 @@ chmod +x run-tests.sh
 # Run tests, using the CLI SAPI
 cp -pf php_config.h.cli main/php_config.h
 cp -pf Makefile.cli Makefile
+
+# check if php is using system crypt()
+[ "$(./sapi/cli/php -r "echo crypt('test', '\$y\$j9T\$0123456789012345678901');")" == '$y$j9T$0123456789012345678901$QL0ChzHK2m7dGOwWHcpmRAp6FaInfsIzIDF4mVQdIFA' ] || exit 1
 
 ./run-tests.sh -w failed.log -s tests.log || {
 rc=$?

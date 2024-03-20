@@ -149,7 +149,7 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.1.19
-Release:	4
+Release:	5
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -176,6 +176,8 @@ Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
 # https://bugs.php.net/bug.php?id=79589
 Patch5:		openssl.patch
+# https://github.com/php/php-src/issues/9910
+Patch6:		opcache-nokill-perm.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
@@ -1872,7 +1874,7 @@ cp -p php.ini-production php.ini
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-
+%patch6 -p1
 %patch7 -p1 -b .sapi-ini-file
 %patch10 -p1 -b .ini
 %patch14 -p1

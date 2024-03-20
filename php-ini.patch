@@ -241,7 +241,7 @@
  
  ; (time to live) Sets the number of second while cached file will be used
  ; instead of original one.
-@@ -1674,165 +1674,6 @@
+@@ -1673,161 +1673,6 @@ ldap.max_links = -1
  [dba]
  ;dba.default_handler=
  
@@ -312,10 +312,6 @@
 -; Allows exclusion of large files from being cached. By default all files
 -; are cached.
 -;opcache.max_file_size=0
--
--; Check the cache checksum each N requests.
--; The default value of "0" means that the checks are disabled.
--;opcache.consistency_checks=0
 -
 -; How long to wait (in seconds) for a scheduled restart to begin if the cache
 -; is not being accessed.
@@ -407,3 +403,4 @@
  [curl]
  ; A default value for the CURLOPT_CAINFO option. This is required to be an
  ; absolute path.
+

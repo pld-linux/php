@@ -139,10 +139,10 @@
 %endif
 
 %define		orgname		php
-%define		ver_suffix	82
+%define		ver_suffix	83
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		2
+%define		rel		1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -150,7 +150,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.2.17
+Version:	8.3.4
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -159,7 +159,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	6d7f56031948ff9da9739fe5a712baf3
+# Source0-md5:	598f9d78cbf4bbe4dc1c008a43459e61
 #Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
@@ -289,7 +289,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20220829
+%define		php_api_version		20230831
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20170320
@@ -303,7 +303,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.21.1
+%define		zipver		1.22.3
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
@@ -2200,6 +2200,7 @@ for sapi in $sapis; do
 	--enable-option-checking=fatal \
 	%{__enable_disable bcmath bcmath shared} \
 	%{__enable_disable calendar calendar shared} \
+	%{?with_opcache:--with-capstone} \
 	%{__enable_disable ctype ctype shared} \
 	%{__enable_disable dba dba shared} \
 	%{__enable_disable dom dom shared} \

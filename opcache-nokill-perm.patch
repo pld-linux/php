@@ -1,0 +1,24 @@
+--- php-8.2.17/ext/opcache/ZendAccelerator.c~	2024-03-12 15:26:30.000000000 +0100
++++ php-8.2.17/ext/opcache/ZendAccelerator.c	2024-03-20 11:45:08.979946189 +0100
+@@ -852,6 +852,10 @@ static inline void kill_all_lockers(stru
+ 					/* Process died before the signal was sent */
+ 					success = true;
+ 					zend_accel_error(ACCEL_LOG_WARNING, "Process %d died before SIGKILL was sent", mem_usage_check->l_pid);
++				} else if (errno == EPERM) {
++					/* We have no permission to kill the other process, so no point in trying */
++					success = true;
++					zend_accel_error(ACCEL_LOG_WARNING, "No permission to kill locker %d: %s. Assuming success.", mem_usage_check->l_pid, strerror(errno));
+ 				} else if (errno != 0) {
+ 					zend_accel_error(ACCEL_LOG_WARNING, "Failed to send SIGKILL to locker %d: %s", mem_usage_check->l_pid, strerror(errno));
+ 				}
+@@ -864,6 +868,10 @@ static inline void kill_all_lockers(stru
+ 					/* successfully killed locker, process no longer exists  */
+ 					success = true;
+ 					zend_accel_error(ACCEL_LOG_WARNING, "Killed locker %d", mem_usage_check->l_pid);
++				} else if (errno == EPERM) {
++					/* We have no permission to kill the other process, so no point in trying */
++					success = true;
++					zend_accel_error(ACCEL_LOG_WARNING, "No permission to kill locker %d again: %s. Assuming success.", mem_usage_check->l_pid, strerror(errno));
+ 				} else if (errno != 0) {
+ 					zend_accel_error(ACCEL_LOG_WARNING, "Failed to check locker %d: %s", mem_usage_check->l_pid, strerror(errno));
+ 				}

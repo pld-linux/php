@@ -142,7 +142,7 @@
 %define		ver_suffix	82
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		1
+%define		rel		2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -179,6 +179,8 @@ Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
 # https://bugs.php.net/bug.php?id=79589
 Patch5:		openssl.patch
+# https://github.com/php/php-src/issues/9910
+Patch6:		opcache-nokill-perm.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
@@ -1876,7 +1878,7 @@ cp -p php.ini-production php.ini
 %patch3 -p1
 %patch4 -p1
 #%patch5 -p1 resolved upstream?
-
+%patch6 -p1
 %patch7 -p1 -b .sapi-ini-file
 %patch10 -p1 -b .ini
 %patch14 -p1

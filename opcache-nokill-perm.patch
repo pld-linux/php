@@ -1,0 +1,15 @@
+--- php-7.4.33/ext/opcache/ZendAccelerator.c~	2022-10-31 11:36:06.000000000 +0100
++++ php-7.4.33/ext/opcache/ZendAccelerator.c	2024-03-20 11:15:28.896613056 +0100
+@@ -797,7 +797,11 @@ static inline void kill_all_lockers(stru
+ 					/* successfully killed locker, process no longer exists  */
+ 					success = 1;
+ 					zend_accel_error(ACCEL_LOG_WARNING, "Killed locker %d", mem_usage_check->l_pid);
+-				}
++                                } else if (errno == EPERM) {
++                                        /* we have no permission to kill the other process, so no point in trying */
++                                        success = 1;
++                                        zend_accel_error(ACCEL_LOG_WARNING, "No permission to kill Process %d", mem_usage_check->l_pid);
++                                }
+ 				break;
+ 			}
+ 			usleep(10000);

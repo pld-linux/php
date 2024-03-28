@@ -137,7 +137,7 @@
 -; - Many DLL files are located in the ext/
 -;   extension folders as well as the separate PECL DLL download.
 -;   Be sure to appropriately set the extension_dir directive.
-+; In PLD Linux you can install appropriate php82-<extension> or php82-pecl-<extension> package.
++; In PLD Linux you can install appropriate php83-<extension> or php83-pecl-<extension> package.
  ;
 -;extension=bz2
 -

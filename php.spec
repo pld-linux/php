@@ -2126,11 +2126,6 @@ export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags}"
 export CXXFLAGS="%{rpmcxxflags} -fPIC -DPIC"
 export CFLAGS="%{rpmcflags} -fPIC -DPIC"
 
-%if %{with intl}
-# icu 59+ C++ API requires C++ >= 11
-CXXFLAGS="$CXXFLAGS -std=c++11"
-%endif
-
 sapis="
 cli
 %if %{with cgi}

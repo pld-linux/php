@@ -204,6 +204,7 @@ Patch15:	charset.patch
 Patch16:	mysql-auth.patch
 Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
+Patch19:	%{orgname}-ac.patch
 Patch21:	%{orgname}-dba-link.patch
 Patch22:	%{orgname}-both-apxs.patch
 Patch23:	%{orgname}-builddir.patch
@@ -2117,6 +2118,7 @@ cp -p php.ini-production php.ini
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
+%patch19 -p1
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1

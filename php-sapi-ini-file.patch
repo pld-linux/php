@@ -1,12 +1,6 @@
-to test which is main php.ini:
-$ php -r 'var_dump(array(get_cfg_var("cfg_file_path"),php_ini_loaded_file()));'
-
-https://github.com/pld-linux/php/commit/762ec2e
-
-diff -urNp -x '*.orig' php-7.2.34.org/main/php_ini.c php-7.2.34/main/php_ini.c
---- php-7.2.34.org/main/php_ini.c	2020-09-30 07:15:50.000000000 +0200
-+++ php-7.2.34/main/php_ini.c	2021-08-24 01:06:57.629953227 +0200
-@@ -415,12 +415,19 @@ static void php_load_zend_extension_cb(v
+--- php-7.1.33.org/main/php_ini.c	2019-10-22 19:00:03.000000000 +0200
++++ php-7.1.33.new/main/php_ini.c	2024-06-13 19:13:23.976364417 +0200
+@@ -377,12 +377,19 @@ static void php_load_zend_extension_cb(v
  #endif
  /* }}} */
  
@@ -26,7 +20,7 @@ diff -urNp -x '*.orig' php-7.2.34.org/main/php_ini.c php-7.2.34/main/php_ini.c
  	int php_ini_scanned_path_len;
  	char *open_basedir;
  	int free_ini_search_path = 0;
-@@ -597,8 +604,26 @@ int php_init_config(void)
+@@ -559,8 +566,28 @@ int php_init_config(void)
  				}
  			}
  		}
@@ -35,7 +29,8 @@ diff -urNp -x '*.orig' php-7.2.34.org/main/php_ini.c php-7.2.34/main/php_ini.c
 +			fh.handle.fp = php_fopen_with_path("php.ini", "r", php_ini_search_path, &opened_path);
 +			if (fh.handle.fp) {
 +				fh.filename = ZSTR_VAL(opened_path);
-+
+ 
+-		/* Otherwise search for php-%sapi-module-name%.ini file in search path */
 +				// parse the ini file now
 +				PG(open_basedir) = open_basedir;
 +				fh.type = ZEND_HANDLE_FP;
@@ -43,18 +38,19 @@ diff -urNp -x '*.orig' php-7.2.34.org/main/php_ini.c php-7.2.34/main/php_ini.c
 +				open_basedir = PG(open_basedir);
 +				PG(open_basedir) = NULL;
 +				fh.handle.fp = NULL;
-+
 +				php_ini_loaded_file = estrdup(fh.filename);
 +				fh.filename = NULL;
++				// opened_path no longer needed as we will use php_ini_loaded_file
++				zend_string_release(opened_path);
++				opened_path = NULL;
 +			}
 +		}
- 
--		/* Otherwise search for php-%sapi-module-name%.ini file in search path */
++
 +		/* Also search for php-%sapi-module-name%.ini file in search path */
  		if (!fh.handle.fp) {
  			const char *fmt = "php-%s.ini";
  			char *ini_fname;
-@@ -608,15 +633,8 @@ int php_init_config(void)
+@@ -570,15 +597,8 @@ int php_init_config(void)
  			if (fh.handle.fp) {
  				fh.filename = ZSTR_VAL(opened_path);
  			}
@@ -71,7 +67,7 @@ diff -urNp -x '*.orig' php-7.2.34.org/main/php_ini.c php-7.2.34/main/php_ini.c
  	}
  
  	if (free_ini_search_path) {
-@@ -633,14 +651,28 @@ int php_init_config(void)
+@@ -595,14 +615,30 @@ int php_init_config(void)
  
  		{
  			zval tmp;
@@ -80,28 +76,29 @@ diff -urNp -x '*.orig' php-7.2.34.org/main/php_ini.c php-7.2.34/main/php_ini.c
 +			// test with:
 +			// php -r 'var_dump(array(get_cfg_var("cfg_file_path"),php_ini_loaded_file()));'
 +			if (php_ini_loaded_file) {
-+				if (fh.filename) {
-+					efree((char *)fh.filename);
-+				}
 +				fh.filename = php_ini_loaded_file;
 +			}
  
  			ZVAL_NEW_STR(&tmp, zend_string_init(fh.filename, strlen(fh.filename), 1));
  			zend_hash_str_update(&configuration_hash, "cfg_file_path", sizeof("cfg_file_path")-1, &tmp);
- 			if (opened_path) {
- 				zend_string_release(opened_path);
--			} else {
++
++			if (php_ini_loaded_file) {
++				// free our fh.filename main ini duplicate
++				efree((char *)php_ini_loaded_file);
 +			}
 +
-+			if (fh.filename) {
+ 			if (opened_path) {
++				// free php_fopen_with_path allocated area
+ 				zend_string_release(opened_path);
+ 			} else {
++				// free expand_filepath allocated area
  				efree((char *)fh.filename);
-+				fh.filename = NULL;
  			}
 +
  			php_ini_opened_path = zend_strndup(Z_STRVAL(tmp), Z_STRLEN(tmp));
  		}
  	}
-@@ -664,13 +696,15 @@ int php_init_config(void)
+@@ -626,13 +662,15 @@ int php_init_config(void)
  		zend_llist scanned_ini_list;
  		zend_llist_element *element;
  		int l, total_l = 0;
@@ -118,7 +115,7 @@ diff -urNp -x '*.orig' php-7.2.34.org/main/php_ini.c php-7.2.34/main/php_ini.c
  		for (debpath = bufpath ; debpath ; debpath=endpath) {
  			endpath = strchr(debpath, DEFAULT_DIR_SEPARATOR);
  			if (endpath) {
-@@ -683,7 +717,7 @@ int php_init_config(void)
+@@ -645,7 +683,7 @@ int php_init_config(void)
  			}
  			lenpath = (int)strlen(debpath);
  

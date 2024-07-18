@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.4.33
-Release:	6
+Release:	7
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -181,6 +181,7 @@ Patch9:		libtool-tag.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 Patch12:	crypt.patch
+Patch13:	curl.patch
 Patch14:	%{orgname}-no_pear_install.patch
 Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
@@ -1898,7 +1899,7 @@ cp -p php.ini-production php.ini
 %patch10 -p1
 
 %patch12 -p1
-
+%patch13 -p1
 %patch14 -p1
 %patch17 -p1
 %patch18 -p1

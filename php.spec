@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	27
+%define		rel	28
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -205,6 +205,7 @@ Patch16:	mysql-auth.patch
 Patch17:	%{orgname}-readline.patch
 Patch18:	%{orgname}-nohttpd.patch
 Patch19:	%{orgname}-ac.patch
+Patch20:	curl.patch
 Patch21:	%{orgname}-dba-link.patch
 Patch22:	%{orgname}-both-apxs.patch
 Patch23:	%{orgname}-builddir.patch
@@ -2119,6 +2120,7 @@ cp -p php.ini-production php.ini
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
+%patch20 -p1
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1

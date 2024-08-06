@@ -1,0 +1,205 @@
+commit 0a39890c967aa57225bb6bdf4821aff7a3a3c082
+Author: Niels Dossche <7771979+nielsdos@users.noreply.github.com>
+Date:   Fri Dec 1 18:03:35 2023 +0100
+
+    Fix libxml2 2.12 build due to API breaks
+    
+    See https://github.com/php/php-src/actions/runs/7062192818/job/19225478601
+
+diff --git a/ext/libxml/libxml.c b/ext/libxml/libxml.c
+index 22eb1901b8..1de693892b 100644
+--- a/ext/libxml/libxml.c
++++ b/ext/libxml/libxml.c
+@@ -472,7 +472,11 @@ static void _php_libxml_free_error(void *ptr)
+ 	xmlResetError((xmlErrorPtr) ptr);
+ }
+ 
+-static void _php_list_set_error_structure(xmlErrorPtr error, const char *msg)
++#if LIBXML_VERSION >= 21200
++static void _php_list_set_error_structure(const xmlError *error, const char *msg)
++#else
++static void _php_list_set_error_structure(xmlError *error, const char *msg)
++#endif
+ {
+ 	xmlError error_copy;
+ 	int ret;
+@@ -725,7 +729,11 @@ PHP_LIBXML_API void php_libxml_ctx_warning(void *ctx, const char *msg, ...)
+ 	va_end(args);
+ }
+ 
++#if LIBXML_VERSION >= 21200
++PHP_LIBXML_API void php_libxml_structured_error_handler(void *userData, const xmlError *error)
++#else
+ PHP_LIBXML_API void php_libxml_structured_error_handler(void *userData, xmlErrorPtr error)
++#endif
+ {
+ 	_php_list_set_error_structure(error, NULL);
+ 
+@@ -957,11 +965,9 @@ PHP_FUNCTION(libxml_use_internal_errors)
+ /* {{{ Retrieve last error from libxml */
+ PHP_FUNCTION(libxml_get_last_error)
+ {
+-	xmlErrorPtr error;
+-
+ 	ZEND_PARSE_PARAMETERS_NONE();
+ 
+-	error = xmlGetLastError();
++	const xmlError *error = xmlGetLastError();
+ 
+ 	if (error) {
+ 		object_init_ex(return_value, libxmlerror_class_entry);
+diff --git a/ext/soap/php_sdl.c b/ext/soap/php_sdl.c
+index 749f5a5685..b731114775 100644
+--- a/ext/soap/php_sdl.c
++++ b/ext/soap/php_sdl.c
+@@ -332,7 +332,7 @@ static void load_wsdl_ex(zval *this_ptr, char *struri, sdlCtx *ctx, int include)
+ 	sdl_restore_uri_credentials(ctx);
+ 
+ 	if (!wsdl) {
+-		xmlErrorPtr xmlErrorPtr = xmlGetLastError();
++		const xmlError *xmlErrorPtr = xmlGetLastError();
+ 
+ 		if (xmlErrorPtr) {
+ 			soap_error2(E_ERROR, "Parsing WSDL: Couldn't load from '%s' : %s", struri, xmlErrorPtr->message);
+commit 4fe821311cafb18ca8bdf20b9d796c48a13ba552
+Author: Niels Dossche <7771979+nielsdos@users.noreply.github.com>
+Date:   Thu Jul 4 06:29:50 2024 -0700
+
+    Backport libxml2 2.13.2 fixes (#14816)
+    
+    Backproted from https://github.com/php/php-src/pull/14789
+
+diff --git a/ext/dom/document.c b/ext/dom/document.c
+index 38af4ca27c..516ffffae8 100644
+--- a/ext/dom/document.c
++++ b/ext/dom/document.c
+@@ -1292,11 +1292,13 @@ static xmlDocPtr dom_document_parser(zval *id, int mode, char *source, size_t so
+ 	if (keep_blanks == 0 && ! (options & XML_PARSE_NOBLANKS)) {
+ 		options |= XML_PARSE_NOBLANKS;
+ 	}
++	if (recover) {
++		options |= XML_PARSE_RECOVER;
++	}
+ 
+ 	php_libxml_sanitize_parse_ctxt_options(ctxt);
+ 	xmlCtxtUseOptions(ctxt, options);
+ 
+-	ctxt->recovery = recover;
+ 	if (recover) {
+ 		old_error_reporting = EG(error_reporting);
+ 		EG(error_reporting) = old_error_reporting | E_WARNING;
+@@ -1306,7 +1308,7 @@ static xmlDocPtr dom_document_parser(zval *id, int mode, char *source, size_t so
+ 
+ 	if (ctxt->wellFormed || recover) {
+ 		ret = ctxt->myDoc;
+-		if (ctxt->recovery) {
++		if (recover) {
+ 			EG(error_reporting) = old_error_reporting;
+ 		}
+ 		/* If loading from memory, set the base reference uri for the document */
+diff --git a/ext/libxml/libxml.c b/ext/libxml/libxml.c
+index 1de693892b..5f9749ffed 100644
+--- a/ext/libxml/libxml.c
++++ b/ext/libxml/libxml.c
+@@ -419,8 +419,10 @@ php_libxml_input_buffer_create_filename(const char *URI, xmlCharEncoding enc)
+ static xmlOutputBufferPtr
+ php_libxml_output_buffer_create_filename(const char *URI,
+                               xmlCharEncodingHandlerPtr encoder,
+-                              int compression ATTRIBUTE_UNUSED)
++                              int compression)
+ {
++	ZEND_IGNORE_VALUE(compression);
++
+ 	xmlOutputBufferPtr ret;
+ 	xmlURIPtr puri;
+ 	void *context = NULL;
+diff --git a/ext/soap/php_encoding.c b/ext/soap/php_encoding.c
+index c52677b6c6..82b21d1588 100644
+--- a/ext/soap/php_encoding.c
++++ b/ext/soap/php_encoding.c
+@@ -3374,7 +3374,6 @@ xmlNsPtr encode_add_ns(xmlNodePtr node, const char* ns)
+ 		} else {
+ 			smart_str prefix = {0};
+ 			int num = ++SOAP_GLOBAL(cur_uniq_ns);
+-			xmlChar *enc_ns;
+ 
+ 			while (1) {
+ 				smart_str_appendl(&prefix, "ns", 2);
+@@ -3388,9 +3387,15 @@ xmlNsPtr encode_add_ns(xmlNodePtr node, const char* ns)
+ 				num = ++SOAP_GLOBAL(cur_uniq_ns);
+ 			}
+ 
+-			enc_ns = xmlEncodeSpecialChars(node->doc, BAD_CAST(ns));
++			/* Starting with libxml 2.13, we don't have to do this workaround anymore, otherwise we get double-encoded
++			 * entities. See libxml2 commit f506ec66547ef9bac97a2bf306d368ecea8c0c9e. */
++#if LIBXML_VERSION < 21300
++			xmlChar *enc_ns = xmlEncodeSpecialChars(node->doc, BAD_CAST(ns));
+ 			xmlns = xmlNewNs(node->doc->children, enc_ns, BAD_CAST(prefix.s ? ZSTR_VAL(prefix.s) : ""));
+ 			xmlFree(enc_ns);
++#else
++			xmlns = xmlNewNs(node->doc->children, BAD_CAST(ns), BAD_CAST(prefix.s ? ZSTR_VAL(prefix.s) : ""));
++#endif
+ 			smart_str_free(&prefix);
+ 		}
+ 	}
+diff --git a/ext/soap/php_xml.c b/ext/soap/php_xml.c
+index 3ff7aa055f..20fd91ac4b 100644
+--- a/ext/soap/php_xml.c
++++ b/ext/soap/php_xml.c
+@@ -92,13 +92,16 @@ xmlDocPtr soap_xmlParseFile(const char *filename)
+ 		bool old;
+ 
+ 		php_libxml_sanitize_parse_ctxt_options(ctxt);
++		/* TODO: In libxml2 2.14.0 change this to the new options API so we don't rely on deprecated APIs. */
++		
+ 		ctxt->keepBlanks = 0;
++		ctxt->options |= XML_PARSE_HUGE;
++		
+ 		ctxt->sax->ignorableWhitespace = soap_ignorableWhitespace;
+ 		ctxt->sax->comment = soap_Comment;
+ 		ctxt->sax->warning = NULL;
+ 		ctxt->sax->error = NULL;
+ 		/*ctxt->sax->fatalError = NULL;*/
+-		ctxt->options |= XML_PARSE_HUGE;
+ 		old = php_libxml_disable_entity_loader(1);
+ 		xmlParseDocument(ctxt);
+ 		php_libxml_disable_entity_loader(old);
+@@ -146,7 +149,10 @@ xmlDocPtr soap_xmlParseMemory(const void *buf, size_t buf_size)
+ 		ctxt->sax->warning = NULL;
+ 		ctxt->sax->error = NULL;
+ 		/*ctxt->sax->fatalError = NULL;*/
++		/* TODO: In libxml2 2.14.0 change this to the new options API so we don't rely on deprecated APIs. */
++		
+ 		ctxt->options |= XML_PARSE_HUGE;
++		
+ 		old = php_libxml_disable_entity_loader(1);
+ 		xmlParseDocument(ctxt);
+ 		php_libxml_disable_entity_loader(old);
+diff --git a/ext/xml/compat.c b/ext/xml/compat.c
+index 5c41e7d2f5..7b463ebb51 100644
+--- a/ext/xml/compat.c
++++ b/ext/xml/compat.c
+@@ -714,8 +714,7 @@ XML_GetCurrentByteCount(XML_Parser parser)
+ {
+ 	/* WARNING: this is identical to ByteIndex; it should probably
+ 	 * be different */
+-	return parser->parser->input->consumed +
+-			(parser->parser->input->cur - parser->parser->input->base);
++	return XML_GetCurrentByteIndex(parser);
+ }
+ 
+ PHP_XML_API const XML_Char *XML_ExpatVersion(void)
+diff --git a/ext/xmlwriter/php_xmlwriter.c b/ext/xmlwriter/php_xmlwriter.c
+index df5bbe3555..d7ac7387b8 100644
+--- a/ext/xmlwriter/php_xmlwriter.c
++++ b/ext/xmlwriter/php_xmlwriter.c
+@@ -1004,7 +1004,8 @@ static void php_xmlwriter_flush(INTERNAL_FUNCTION_PARAMETERS, int force_string)
+ 		}
+ 		output_bytes = xmlTextWriterFlush(ptr);
+ 		if (buffer) {
+-			RETVAL_STRING((char *) buffer->content);
++			const xmlChar *content = xmlBufferContent(buffer);
++			RETVAL_STRING((const char *) content);
+ 			if (empty) {
+ 				xmlBufferEmpty(buffer);
+ 			}

@@ -148,8 +148,8 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.1.19
-Release:	7
+Version:	8.1.29
+Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -157,7 +157,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	7a06e016b0af0af215a0d3a18f06e29d
+# Source0-md5:	eee68a22dde7e8024e1d528131a2c922
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -180,7 +180,7 @@ Patch5:		openssl.patch
 Patch6:		opcache-nokill-perm.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 Patch8:		curl.patch
-
+Patch9:		libxml.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 Patch14:	%{orgname}-no_pear_install.patch
@@ -206,7 +206,6 @@ Patch67:	mysql-lib-ver-mismatch.patch
 # https://bugs.php.net/bug.php?id=68344
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
-Patch72:	missing-includes.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1880,7 +1879,7 @@ cp -p php.ini-production php.ini
 %patch6 -p1
 %patch7 -p1 -b .sapi-ini-file
 %patch8 -p1
-
+%patch9 -p1
 %patch10 -p1 -b .ini
 %patch14 -p1
 %patch18 -p1
@@ -1906,7 +1905,6 @@ cp -p php.ini-production php.ini
 %patch67 -p1 -b .mysql-lib-ver-mismatch
 #%patch68 -p1 DROP or update to 7.0 APIs
 %patch71 -p1 -b .libdb-info
-%patch72 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

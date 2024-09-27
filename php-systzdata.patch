@@ -52,9 +52,9 @@ diff -up php-8.0.0beta3/ext/date/config0.m4.systzdata php-8.0.0beta3/ext/date/co
 +   fi
 +fi
 +
- PHP_DATE_CFLAGS="-Wno-implicit-fallthrough -I@ext_builddir@/lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -DHAVE_TIMELIB_CONFIG_H=1"
- timelib_sources="lib/astro.c lib/dow.c lib/parse_date.c lib/parse_tz.c lib/parse_posix.c
-                  lib/timelib.c lib/tm2unixtime.c lib/unixtime2tm.c lib/parse_iso_intervals.c lib/interval.c"
+ AX_CHECK_COMPILE_FLAG([-Wno-implicit-fallthrough],
+   [PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -Wno-implicit-fallthrough"],,
+   [-Werror])
 diff -up php-8.0.0beta3/ext/date/lib/parse_tz.c.systzdata php-8.0.0beta3/ext/date/lib/parse_tz.c
 --- php-8.0.0beta3/ext/date/lib/parse_tz.c.systzdata	2020-09-01 19:13:26.000000000 +0200
 +++ php-8.0.0beta3/ext/date/lib/parse_tz.c	2020-09-02 08:07:51.039979873 +0200

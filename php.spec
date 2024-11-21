@@ -174,11 +174,8 @@ Source13:	dep-tests.sh
 Source14:	skip-tests.sh
 Patch0:		%{orgname}-shared.patch
 Patch1:		%{orgname}-pldlogo.patch
-Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
-# https://bugs.php.net/bug.php?id=79589
-Patch5:		openssl.patch
 # https://github.com/php/php-src/issues/9910
 Patch6:		opcache-nokill-perm.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
@@ -205,8 +202,6 @@ Patch59:	%{orgname}-systzdata.patch
 Patch60:	%{orgname}-oracle-instantclient.patch
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
-# https://bugs.php.net/bug.php?id=68344
-Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
@@ -1875,10 +1870,8 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 cp -p php.ini-production php.ini
 %patch0 -p1
 %patch1 -p1
-#%patch2 -p1 -b .mail
 %patch3 -p1
 %patch4 -p1
-#%patch5 -p1 resolved upstream?
 %patch6 -p1
 %patch7 -p1 -b .sapi-ini-file
 
@@ -1905,7 +1898,6 @@ cp -p php.ini-production php.ini
 %endif
 %patch66 -p1
 %patch67 -p1 -b .mysql-lib-ver-mismatch
-#%patch68 -p1 DROP or update to 7.0 APIs
 %patch71 -p1 -b .libdb-info
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \

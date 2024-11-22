@@ -128,10 +128,10 @@
 %endif
 
 %define		orgname		php
-%define		ver_suffix	83
+%define		ver_suffix	84
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		0.1
+%define		rel		1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2058,8 +2058,7 @@ for sapi in $sapis; do
 		sapi_args='--enable-embed'
 		;;
 	apxs2)
-		ver=$(rpm -q --qf '%{V}' apache-devel)
-		sapi_args="--with-apxs2=%{apxs2} --with-apache-version=$ver"
+		sapi_args="--with-apxs2=%{apxs2}"
 	;;
 	litespeed)
 		sapi_args='--enable-litespeed'

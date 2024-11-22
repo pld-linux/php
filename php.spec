@@ -16,7 +16,6 @@
 # - General options:
 %bcond_with	embed		# Embedded API
 %bcond_with	gcov		# Code coverage reporting
-%bcond_without	kerberos5	# Kerberos5 support
 %bcond_with	systemtap	# systemtap/DTrace support
 %bcond_with	tests		# default off; test process very often hangs on builders, approx run time 45m; perform "make test"
 %bcond_with	zts		# Zend Thread Safety
@@ -45,14 +44,12 @@
 %bcond_without	gettext		# gettext extension module
 %bcond_without	gmp		# gmp extension module
 %bcond_without	iconv		# iconv extension module
-%bcond_without	imap		# IMAP extension module
 %bcond_without	intl		# Intl extension module
 %bcond_without	ldap		# LDAP extension module
 %bcond_without	mbstring	# mbstring extension module
 %bcond_without	mhash		# mhash extension (supported by hash extension)
 %bcond_without	mysqli		# mysqli support (Requires mysql >= 4.1)
 %bcond_without	mysqlnd		# mysqlnd support in mysql related extensions
-%bcond_with	oci		# Oracle oci8 extension module (BR: proprietary libs)
 %bcond_without	odbc		# ODBC extension module
 %bcond_without	opcache		# Enable Zend OPcache extension support
 %bcond_without	openssl		# OpenSSL support and OpenSSL extension (module)
@@ -62,14 +59,12 @@
 %bcond_without	pdo_dblib	# PDO dblib extension module
 %bcond_without	pdo_firebird	# PDO Firebird extension module
 %bcond_without	pdo_mysql	# PDO MySQL extension module
-%bcond_without	pdo_oci	# without PDO oci extension module
 %bcond_without	pdo_odbc	# PDO ODBC extension module
 %bcond_without	pdo_pgsql	# PDO pgsql extension module
 %bcond_without	pdo_sqlite	# PDO SQLite extension module
 %bcond_without	pgsql		# PostgreSQL extension module
 %bcond_without	phar		# Phar extension module
 %bcond_without	posix		# POSIX extension module
-%bcond_without	pspell		# pspell extension module
 %bcond_without	readline	# readline extension module
 %bcond_without	session		# session extension module
 %bcond_without	snmp		# SNMP extension module
@@ -81,7 +76,6 @@
 %bcond_without	zip		# zip extension module
 # extensions options
 %bcond_without	argon2		# argon2 password hashing
-%bcond_without	instantclient	# Oracle oci8 extension module against oracle-instantclient package
 %bcond_with	interbase_inst	# use InterBase install., not Firebird	(BR: proprietary libs)
 %bcond_with	mm		# mm support for session storage
 %bcond_without	system_gd	# system gd library
@@ -119,10 +113,6 @@
 %undefine	with_pdo_pgsql
 %endif
 
-%if %{without oci}
-%undefine	with_pdo_oci
-%endif
-
 %ifnarch %{ix86} %{x8664} x32 %{arm} aarch64 sparcv9 sparc64
 # unsupported, see sapi/fpm/fpm/fpm_atomic.h
 %undefine	with_fpm
@@ -132,7 +122,6 @@
 %undefine	with_pdo_dblib
 %undefine	with_pdo_firebird
 %undefine	with_pdo_mysql
-%undefine	with_pdo_oci
 %undefine	with_pdo_odbc
 %undefine	with_pdo_pgsql
 %undefine	with_pdo_sqlite
@@ -142,7 +131,7 @@
 %define		ver_suffix	83
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		1
+%define		rel		0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -150,7 +139,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.3.14
+Version:	8.4.1
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -159,7 +148,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	875b31ca3db480fa87d19fe6651b07ad
+# Source0-md5:	9ac29cee258312cd969de2a2fb307aed
 #Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
@@ -183,7 +172,7 @@ Patch7:		%{orgname}-sapi-ini-file.patch
 Patch10:	%{orgname}-ini.patch
 Patch11:	embed.patch
 Patch14:	%{orgname}-no_pear_install.patch
-Patch18:	%{orgname}-nohttpd.patch
+
 Patch21:	%{orgname}-dba-link.patch
 Patch22:	%{orgname}-both-apxs.patch
 Patch23:	%{orgname}-builddir.patch
@@ -199,13 +188,12 @@ Patch44:	%{orgname}-include_path.patch
 Patch50:	extension-shared-optional-dep.patch
 Patch53:	fix-test-run.patch
 Patch59:	%{orgname}-systzdata.patch
-Patch60:	%{orgname}-oracle-instantclient.patch
+
 Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 Patch71:	libdb-info.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
-%{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison >= 3.0.0
@@ -225,8 +213,6 @@ BuildRequires:	gd-devel >= 2.1
 %endif
 BuildRequires:	gdbm-devel
 BuildRequires:	gmp-devel >= 4.2
-%{?with_kerberos5:BuildRequires:	heimdal-devel}
-%{?with_imap:BuildRequires:	imap-devel >= 1:2007e-2}
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_fpm:BuildRequires:	libapparmor-devel}
 %{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
@@ -253,7 +239,6 @@ BuildRequires: oniguruma-devel
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 1.0.2
 %endif
-%{?with_oci:%{?with_instantclient:BuildRequires:	oracle-instantclient-devel}}
 BuildRequires:	pam-devel
 BuildRequires:	pcre2-8-devel >= 10.30
 BuildRequires:	pkgconfig
@@ -274,7 +259,7 @@ BuildRequires:	tokyocabinet-devel
 BuildRequires:	xz
 BuildRequires:	zlib-devel >= 1.2.0.4
 %if %{with apache2}
-BuildRequires:	apache-devel >= 2.0.52-2
+BuildRequires:	apache-devel >= 2.4.0
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
 %endif
@@ -285,10 +270,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20230831
+%define		php_api_version		20240924
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
-%define		php_pdo_api_version	20170320
+%define		php_pdo_api_version	20240423
 
 # Extension versions
 %define		bz2ver		%{version}
@@ -299,7 +284,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.22.3
+%define		zipver		1.22.4
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
@@ -308,11 +293,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %if %{with gcov}
 %undefine	with_ccache
-%endif
-
-%if %{with oci}
-# ORACLE_HOME is required for oci8 ext to build
-%define _preserve_env %_preserve_env_base ORACLE_HOME
 %endif
 
 %description
@@ -1002,28 +982,6 @@ support.
 %description iconv -l pl.UTF-8
 Moduł PHP dodający obsługę iconv.
 
-%package imap
-Summary:	IMAP extension module for PHP
-Summary(pl.UTF-8):	Moduł IMAP dla PHP
-Summary(pt_BR.UTF-8):	Um módulo para aplicações PHP que usam IMAP
-Group:		Libraries
-URL:		https://www.php.net/manual/en/book.imap.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Requires:	imap-lib >= 1:2007e-2
-Provides:	php(imap)
-Obsoletes:	php-imap < 4:5.3.28-7
-
-%description imap
-This is a dynamic shared object (DSO) for PHP that will add IMAP
-support.
-
-%description imap -l pl.UTF-8
-Moduł PHP dodający obsługę skrzynek IMAP.
-
-%description imap -l pt_BR.UTF-8
-Um módulo para aplicações PHP que usam IMAP.
-
 %package intl
 Summary:	Internationalization extension (ICU wrapper)
 Summary(pl.UTF-8):	Rozszerzenie do internacjonalizacji (interfejs do ICU)
@@ -1159,25 +1117,6 @@ biblioteka kliencka MySQL, a pamięć zawsze wykorzystuje efektywniej.
 Przykładem tego może być fakt, że w przypadku biblioteki klienckiej
 każdy wiersz jest przechowywany w pamięci dwukrotnie, natomiast przy
 tym sterowniku - tylko raz.
-
-%package oci8
-Summary:	Oracle 8+ database module for PHP
-Summary(pl.UTF-8):	Moduł bazy danych Oracle 8+ dla PHP
-Group:		Libraries
-URL:		https://www.php.net/manual/en/book.oci8.php
-%{?requires_php_extension}
-Provides:	php(oci8)
-Obsoletes:	php-oci8 < 4:5.3.28-7
-# withdrawn module of similar functionality but different API
-Obsoletes:	php-oracle < 4:5.1.0
-
-%description oci8
-This is a dynamic shared object (DSO) for PHP that will add Oracle 7,
-8, 9 and 10 database support through Oracle8 Call-Interface (OCI8).
-
-%description oci8 -l pl.UTF-8
-Moduł PHP umożliwiający dostęp do bazy danych Oracle 7, 8, 9 i 10
-poprzez interfejs Oracle8 Call-Interface (OCI8).
 
 %package odbc
 Summary:	ODBC extension module for PHP
@@ -1337,26 +1276,6 @@ support.
 Moduł dla PHP dodający obsługę baz danych MySQL za pośrednictwem
 interfejsu PDO.
 
-%package pdo-oci
-Summary:	PHP Data Objects (PDO) Oracle support
-Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą Oracle'a
-Group:		Libraries
-URL:		https://www.php.net/manual/en/ref.pdo-oci.php
-%{?requires_php_extension}
-%{?requires_php_pdo_module}
-Provides:	php(pdo-oci)
-Provides:	php(pdo_oci)
-Obsoletes:	php-pdo-oci < 4:5.3.28-7
-Obsoletes:	php-pecl-PDO_OCI < 1.1
-
-%description pdo-oci
-This is a dynamic shared object (DSO) for PHP that will add PDO Oracle
-support.
-
-%description pdo-oci -l pl.UTF-8
-Moduł dla PHP dodający obsługę baz danych Oracle za pośrednictwem
-interfejsu PDO.
-
 %package pdo-odbc
 Summary:	PHP Data Objects (PDO) ODBC support
 Summary(pl.UTF-8):	Moduł PHP Data Objects (PDO) z obsługą ODBC
@@ -1475,24 +1394,6 @@ functions support to PHP.
 
 %description posix -l pl.UTF-8
 Moduł PHP umożliwiający korzystanie z funkcji POSIX.
-
-%package pspell
-Summary:	pspell extension module for PHP
-Summary(pl.UTF-8):	Moduł pspell dla PHP
-Group:		Libraries
-URL:		https://www.php.net/manual/en/book.pspell.php
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Provides:	php(pspell)
-Obsoletes:	php-pspell < 4:5.3.28-7
-
-%description pspell
-This is a dynamic shared object (DSO) for PHP that will add pspell
-support to PHP. It allows to check the spelling of a word and offer
-suggestions.
-
-%description pspell -l pl.UTF-8
-Moduł PHP umożliwiający korzystanie z pspella. Pozwala on na
-sprawdzanie pisowni słowa i sugerowanie poprawek.
 
 %package readline
 Summary:	readline extension module for PHP
@@ -1877,7 +1778,7 @@ cp -p php.ini-production php.ini
 
 %patch10 -p1 -b .ini
 %patch14 -p1
-%patch18 -p1
+
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
@@ -1893,9 +1794,7 @@ cp -p php.ini-production php.ini
 %patch50 -p1
 %patch53 -p1
 %patch59 -p1 -b .systzdata
-%if %{with instantclient}
-%patch60 -p1 -b .instantclient
-%endif
+
 %patch66 -p1
 %patch67 -p1 -b .mysql-lib-ver-mismatch
 %patch71 -p1 -b .libdb-info
@@ -2218,7 +2117,6 @@ for sapi in $sapis; do
 	%{?with_mhash:--with-mhash=yes} \
 	--with-mysql-sock=/var/lib/mysql/mysql.sock \
 	%{__with_without pdo_mysql pdo-mysql shared,%{!?with_mysqlnd:/usr}%{?with_mysqlnd:mysqlnd}} \
-	%{?with_pdo_oci:--with-pdo-oci=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{?with_pdo_odbc:--with-pdo-odbc=shared,unixODBC,/usr} \
 	%{?with_pdo_pgsql:--with-pdo-pgsql=shared} \
 	%{?with_pdo_sqlite:--with-pdo-sqlite=shared} \
@@ -2249,16 +2147,13 @@ for sapi in $sapis; do
 	--with-gdbm \
 	%{__with_without gmp gmp shared} \
 	%{__with_without ffi ffi shared} \
-	%{?with_imap:--with-imap=shared --with-imap-ssl} \
 	--with-jpeg \
 	%{?with_ldap:--with-ldap=shared --with-ldap-sasl} \
 	%{?with_mm:--with-mm} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
-	%{?with_oci:--with-oci8=shared%{?with_instantclient:,instantclient,%{_libdir}}} \
 	%{__enable_disable opcache opcache shared} \
 	%{?with_openssl:--with-openssl=shared} \
-	%{?with_kerberos5:--with-kerberos} \
 	--with-tcadb=/usr \
 	--with-external-libcrypt \
 	--with-external-pcre \
@@ -2266,7 +2161,6 @@ for sapi in $sapis; do
 	%{__enable_disable filter filter shared} \
 	%{__with_without pgsql pgsql shared} \
 	%{__enable_disable phar phar shared} \
-	%{?with_pspell:--with-pspell=shared} \
 	%{__with_without readline readline shared} \
 	%{?with_snmp:--with-snmp=shared} \
 	%{!?with_pdo_sqlite:--without-pdo-sqlite} \
@@ -2666,14 +2560,12 @@ fi \
 %extension_scripts gettext
 %extension_scripts gmp
 %extension_scripts iconv
-%extension_scripts imap
 %extension_scripts intl
 %extension_scripts json
 %extension_scripts ldap
 %extension_scripts mbstring
 %extension_scripts mysqli
 %extension_scripts mysqlnd
-%extension_scripts oci8
 %extension_scripts odbc
 %extension_scripts opcache
 %extension_scripts openssl
@@ -2682,13 +2574,11 @@ fi \
 %extension_scripts pdo-dblib
 %extension_scripts pdo-firebird
 %extension_scripts pdo-mysql
-%extension_scripts pdo-oci
 %extension_scripts pdo-odbc
 %extension_scripts pdo-pgsql
 %extension_scripts pdo-sqlite
 %extension_scripts pgsql
 %extension_scripts posix
-%extension_scripts pspell
 %extension_scripts session
 %extension_scripts shmop
 %extension_scripts simplexml
@@ -2954,14 +2844,6 @@ fi
 %attr(755,root,root) %{php_extensiondir}/iconv.so
 %endif
 
-%if %{with imap}
-%files imap
-%defattr(644,root,root,755)
-%doc ext/imap/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_imap.ini
-%attr(755,root,root) %{php_extensiondir}/imap.so
-%endif
-
 %if %{with intl}
 %files intl
 %defattr(644,root,root,755)
@@ -3004,14 +2886,6 @@ fi
 %doc ext/mysqlnd/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_mysqlnd.ini
 %attr(755,root,root) %{php_extensiondir}/mysqlnd.so
-%endif
-
-%if %{with pdo_oci}
-%files oci8
-%defattr(644,root,root,755)
-%doc ext/oci8/{CREDITS,README.md}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_oci8.ini
-%attr(755,root,root) %{php_extensiondir}/oci8.so
 %endif
 
 %if %{with odbc}
@@ -3078,14 +2952,6 @@ fi
 %attr(755,root,root) %{php_extensiondir}/pdo_mysql.so
 %endif
 
-%if %{with oci}
-%files pdo-oci
-%defattr(644,root,root,755)
-%doc ext/pdo_oci/CREDITS
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_pdo_oci.ini
-%attr(755,root,root) %{php_extensiondir}/pdo_oci.so
-%endif
-
 %if %{with pdo_odbc}
 %files pdo-odbc
 %defattr(644,root,root,755)
@@ -3141,13 +3007,6 @@ fi
 %doc ext/posix/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_posix.ini
 %attr(755,root,root) %{php_extensiondir}/posix.so
-%endif
-
-%if %{with pspell}
-%files pspell
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_pspell.ini
-%attr(755,root,root) %{php_extensiondir}/pspell.so
 %endif
 
 %if %{with readline}

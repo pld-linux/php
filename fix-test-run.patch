@@ -1,15 +1,16 @@
---- php-5.4.0alpha2/configure.ac~	2011-08-07 12:43:31.000000000 +0300
-+++ php-5.4.0alpha2/configure.ac	2011-08-07 12:44:11.495394662 +0300
-@@ -1271,6 +1271,9 @@
-   AC_DEFINE_UNQUOTED(PHP_BUILD_ARCH,"$PHP_BUILD_ARCH",[build architecture])
- fi
- 
+--- php-8.4.1/configure.ac~	2024-11-22 11:30:13.000000000 +0100
++++ php-8.4.1/configure.ac	2024-11-22 11:32:52.836654521 +0100
+@@ -1428,6 +1428,10 @@ PHP_SUBST([PHP_SAPI_OBJS])
+ PHP_SUBST([PHP_BINARY_OBJS])
+ PHP_SUBST([PHP_GLOBAL_OBJS])
+ PHP_SUBST([PHP_BINARIES])
++
 +# shift so that extensions like xml are loaded first
 +PHP_MODULES=$(echo "$PHP_MODULES" | sed -e 's,\(.*\)\(\$(phplibdir)/xml.la \),\2\1,')
 +
- PHP_SUBST_OLD(PHP_INSTALLED_SAPIS)
- 
- PHP_SUBST(PHP_FASTCGI_OBJS)
+ PHP_SUBST([PHP_MODULES])
+ PHP_SUBST([PHP_ZEND_EX])
+ PHP_SUBST([bindir])
 --- php-8.1.10/build/Makefile.global.orig	2022-09-25 19:52:15.520810107 +0200
 +++ php-8.1.10/build/Makefile.global	2022-09-25 19:54:52.676625388 +0200
 @@ -81,8 +81,15 @@ install-headers:

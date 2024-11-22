@@ -128,24 +128,17 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -857,58 +857,9 @@ default_socket_timeout = 60
+@@ -858,48 +858,7 @@ default_socket_timeout = 60
  ; deprecated in a future PHP major version. So, when it is possible, please
  ; move to the new ('extension=<ext>) syntax.
  ;
 -; Notes for Windows environments :
- ;
+-;
 -; - Many DLL files are located in the ext/
 -;   extension folders as well as the separate PECL DLL download.
 -;   Be sure to appropriately set the extension_dir directive.
-+; In PLD Linux you can install appropriate php83-<extension> or php83-pecl-<extension> package.
- ;
+-;
 -;extension=bz2
--
--; The ldap extension must be before curl if OpenSSL 1.0.2 and OpenLDAP is used
--; otherwise it results in segfault when unloading after using SASL.
--; See https://github.com/php/php-src/issues/8620 for more info.
--;extension=ldap
--
 -;extension=curl
 -;extension=ffi
 -;extension=ftp
@@ -154,17 +147,14 @@
 -;extension=gettext
 -;extension=gmp
 -;extension=intl
--;extension=imap
+-;extension=ldap
 -;extension=mbstring
 -;extension=exif      ; Must be after mbstring as it depends on it
 -;extension=mysqli
--;extension=oci8_12c  ; Use with Oracle Database 12c Instant Client
--;extension=oci8_19  ; Use with Oracle Database 19 Instant Client
 -;extension=odbc
 -;extension=openssl
 -;extension=pdo_firebird
 -;extension=pdo_mysql
--;extension=pdo_oci
 -;extension=pdo_odbc
 -;extension=pdo_pgsql
 -;extension=pdo_sqlite
@@ -184,10 +174,10 @@
 -;extension=zip
 -
 -;zend_extension=opcache
--
++; In PLD Linux you can install appropriate php84-<extension> or php84-pecl-<extension> package.
+ 
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;
- ;;;;;;;;;;;;;;;;;;;
 @@ -954,8 +867,9 @@
  
  [Date]
@@ -200,7 +190,7 @@
  
  ; https://php.net/date.default-latitude
  ;date.default_latitude = 31.7667
-@@ -970,19 +884,19 @@
+@@ -897,19 +897,19 @@ cli_server.color = On
  ; Use of this INI entry is deprecated, use global input_encoding instead.
  ; If empty, default_charset or input_encoding or iconv.input_encoding is used.
  ; The precedence is: default_charset < input_encoding < iconv.input_encoding
@@ -221,8 +211,8 @@
 -;iconv.output_encoding =
 +iconv.output_encoding = UTF-8
  
- [imap]
- ; rsh/ssh logins are disabled by default. Use this INI entry if you want to
+ [intl]
+ ;intl.default_locale =
 @@ -1360,7 +1274,7 @@
  
  [browscap]

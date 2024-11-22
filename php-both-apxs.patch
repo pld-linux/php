@@ -1,11 +1,11 @@
---- php-8.0.0beta4/build/Makefile.global~	2020-10-03 12:59:22.000000000 +0300
-+++ php-8.0.0beta4/build/Makefile.global	2020-10-03 13:02:40.788491363 +0300
-@@ -23,6 +23,12 @@
+--- php-8.4.1/build/Makefile.global~	2024-11-22 11:10:34.000000000 +0100
++++ php-8.4.1/build/Makefile.global	2024-11-22 11:11:22.486654532 +0100
+@@ -22,6 +22,12 @@ libphp.la: libphp_common.la $(PHP_SAPI_O
  	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) $(EXTRA_CFLAGS) -rpath $(phptempdir) $(EXTRA_LDFLAGS) $(LDFLAGS) $(PHP_RPATHS) $(phptempdir)/libphp_common.la $(PHP_SAPI_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@
- 	-@$(LIBTOOL) --silent --tag=CC --mode=install cp $@ $(phptempdir)/$@ >/dev/null 2>&1
+ 	-@$(LIBTOOL) --tag=CC --mode=install cp $@ $(phptempdir)/$@ >/dev/null 2>&1
  
 +$(LIBTOOL_SAPI): libphp_common.la $(PHP_SAPI_OBJS)
-+	$(LIBTOOL) --tag=CC --mode=link $(CC)                           -rpath $(phptempdir) $(EXTRA_LDFLAGS) $(LDFLAGS) $(PHP_RPATHS) $(phptempdir)/libphp_common.la $(PHP_SAPI_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@
++	$(LIBTOOL) --tag=CC --mode=link $(CC) -rpath $(phptempdir) $(EXTRA_LDFLAGS) $(LDFLAGS) $(PHP_RPATHS) $(phptempdir)/libphp_common.la $(PHP_SAPI_OBJS) $(EXTRA_LIBS) $(ZEND_EXTRA_LIBS) -o $@
 +	-@$(LIBTOOL) --silent --tag=CC --mode=install cp $@ $(phptempdir)/$@ >/dev/null 2>&1
 +
 +libtool-sapi: $(LIBTOOL_SAPI)

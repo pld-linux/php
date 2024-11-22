@@ -1,18 +1,13 @@
---- php-7.1.1/ext/dba/config.m4.orig	2017-01-17 21:44:40.000000000 +0100
-+++ php-7.1.1/ext/dba/config.m4	2017-01-27 22:08:45.385645468 +0100
-@@ -245,7 +245,7 @@
-         ]])],[
-           AC_EGREP_CPP(yes,[
- #include "$THIS_INCLUDE"
--#if DB_VERSION_MAJOR == $1 || ($1 == 4 && DB_VERSION_MAJOR == 5)
-+#if DB_VERSION_MAJOR == $1 || ($1 == 4 && (DB_VERSION_MAJOR == 5 || DB_VERSION_MAJOR == 6))
-             yes
- #endif
-           ],[
-@@ -322,10 +322,26 @@
+--- php-8.4.1/ext/dba/config.m4~	2024-11-22 11:43:54.000000000 +0100
++++ php-8.4.1/ext/dba/config.m4	2024-11-22 14:32:14.459988099 +0100
+@@ -459,6 +459,22 @@ if test "$PHP_DB4" != "no"; then
        THIS_PREFIX=$i
-       THIS_INCLUDE=$i/db4/db.h
+       THIS_INCLUDE=$i/include/db5.0/db.h
        break
++    elif test -f "$i/include/db5.2/db.h"; then
++      THIS_PREFIX=$i
++      THIS_INCLUDE=$i/include/db5.2/db.h
++      break
 +    elif test -f "$i/include/db6.2/db.h"; then
 +      THIS_PREFIX=$i
 +      THIS_INCLUDE=$i/include/db6.2/db.h
@@ -25,23 +20,16 @@
 +      THIS_PREFIX=$i
 +      THIS_INCLUDE=$i/include/db6.0/db.h
 +      break
-     elif test -f "$i/include/db5.3/db.h"; then
+     elif test -f "$i/include/db4.8/db.h"; then
        THIS_PREFIX=$i
-       THIS_INCLUDE=$i/include/db5.3/db.h
-       break
-+    elif test -f "$i/include/db5.2/db.h"; then
-+      THIS_PREFIX=$i
-+      THIS_INCLUDE=$i/include/db5.2/db.h
-+      break
-     elif test -f "$i/include/db5.1/db.h"; then
-       THIS_PREFIX=$i
-       THIS_INCLUDE=$i/include/db5.1/db.h
-@@ -366,7 +384,7 @@
-       break
-     fi
-   done
--  PHP_DBA_DB_CHECK(4, db-5.3 db-5.1 db-5.0 db-4.8 db-4.7 db-4.6 db-4.5 db-4.4 db-4.3 db-4.2 db-4.1 db-4.0 db-4 db4 db, [(void)db_create((DB**)0, (DB_ENV*)0, 0)])
-+  PHP_DBA_DB_CHECK(4, db-6.2 db-6.1 db-6.0 db-5.3 db-5.2 db-5.1 db-5.0 db-4.8 db-4.7 db-4.6 db-4.5 db-4.4 db-4.3 db-4.2 db-4.1 db-4.0 db-4 db4 db, [(void)db_create((DB**)0, (DB_ENV*)0, 0)])
- fi
- PHP_DBA_STD_RESULT(db4,Berkeley DB4)
- 
+       THIS_INCLUDE=$i/include/db4.8/db.h
+@@ -498,6 +514,9 @@ if test "$PHP_DB4" != "no"; then
+       db-5.3
+       db-5.1
+       db-5.0
++      db-6.2
++      db-6.1
++      db-6.0
+       db-4.8
+       db-4.7
+       db-4.6

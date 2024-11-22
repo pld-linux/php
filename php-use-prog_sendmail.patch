@@ -1,15 +1,17 @@
---- php-8.0.0rc1/build/php.m4~	2020-10-09 18:56:11.000000000 +0300
-+++ php-8.0.0rc1/build/php.m4	2020-10-09 18:58:11.039360902 +0300
-@@ -1710,8 +1710,10 @@
+--- php-8.4.1/build/php.m4~	2024-11-22 11:25:49.000000000 +0100
++++ php-8.4.1/build/php.m4	2024-11-22 11:27:58.516654519 +0100
+@@ -1602,9 +1602,11 @@ dnl
  dnl Search for the sendmail binary.
  dnl
- AC_DEFUN([PHP_PROG_SENDMAIL], [
--  PHP_ALT_PATH=/usr/bin:/usr/sbin:/usr/etc:/etc:/usr/ucblib:/usr/lib
--  AC_PATH_PROG(PROG_SENDMAIL, sendmail, /usr/sbin/sendmail, $PATH:$PHP_ALT_PATH)
-+  if test -z "$PROG_SENDMAIL"; then
-+    PHP_ALT_PATH=/usr/bin:/usr/sbin:/usr/etc:/etc:/usr/ucblib:/usr/lib
-+    AC_PATH_PROG(PROG_SENDMAIL, sendmail, /usr/sbin/sendmail, $PATH:$PHP_ALT_PATH)
-+  fi
-   PHP_SUBST(PROG_SENDMAIL)
- ])
+ AC_DEFUN([PHP_PROG_SENDMAIL],
+-[PHP_ALT_PATH=/usr/bin:/usr/sbin:/usr/etc:/etc:/usr/ucblib:/usr/lib
+-AC_PATH_PROG([PROG_SENDMAIL], [sendmail], [], [$PATH:$PHP_ALT_PATH])
+-AS_VAR_IF([PROG_SENDMAIL],, [PROG_SENDMAIL=/usr/sbin/sendmail
++[if test -z "$PROG_SENDMAIL"; then
++ PHP_ALT_PATH=/usr/bin:/usr/sbin:/usr/etc:/etc:/usr/ucblib:/usr/lib
++ AC_PATH_PROG([PROG_SENDMAIL], [sendmail], [], [$PATH:$PHP_ALT_PATH])
++fi
++ AS_VAR_IF([PROG_SENDMAIL],, [PROG_SENDMAIL=/usr/sbin/sendmail
+ AC_MSG_NOTICE([default sendmail_path INI directive set to $PROG_SENDMAIL])])])
  
+ dnl

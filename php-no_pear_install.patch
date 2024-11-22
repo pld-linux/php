@@ -1,11 +1,11 @@
---- php-5.4.0alpha2/configure.ac~	2011-08-01 12:23:18.000000000 +0300
-+++ php-5.4.0alpha2/configure.ac	2011-08-01 12:24:20.209743190 +0300
-@@ -1429,7 +1429,7 @@
+--- php-8.4.1/configure.ac~	2024-11-22 10:14:50.000000000 +0100
++++ php-8.4.1/configure.ac	2024-11-22 10:15:40.729987936 +0100
+@@ -1597,7 +1597,7 @@ else
  fi;
  
- all_targets="$lcov_target \$(OVERALL_TARGET) \$(PHP_MODULES) \$(PHP_ZEND_EX) \$(PHP_BINARIES) $pharcmd"
+ all_targets="\$(OVERALL_TARGET) \$(PHP_MODULES) \$(PHP_ZEND_EX) \$(PHP_BINARIES) $pharcmd"
 -install_targets="$install_sapi $install_modules $install_binaries install-build install-headers install-programs $install_pear $pharcmd_install"
 +install_targets="$install_sapi $install_modules $install_binaries install-build install-headers install-programs $pharcmd_install"
  
- PHP_SUBST(all_targets)
- PHP_SUBST(install_targets)
+ PHP_SUBST([all_targets])
+ PHP_SUBST([install_targets])

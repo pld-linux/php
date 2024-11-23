@@ -193,17 +193,17 @@ Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 Patch71:	libdb-info.patch
 URL:		https://www.php.net/
-%{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
+%{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 3.0}}
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison >= 3.0.0
 BuildRequires:	bzip2-devel >= 1.0.0
 %{?with_opcache:BuildRequires:	capstone-devel >= 3.0.0}
-%{?with_curl:BuildRequires:	curl-devel >= 7.29.0}
+%{?with_curl:BuildRequires:	curl-devel >= 7.61.0}
 BuildRequires:	cyrus-sasl-devel >= 2
 BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
-%{?with_enchant:BuildRequires:	enchant2-devel}
+%{?with_enchant:BuildRequires:	enchant2-devel >= 1.6.0}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
@@ -223,7 +223,7 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libpng-devel >= 1.0.8
 %{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
-%{?with_intl:BuildRequires:	libstdc++-devel}
+%{?with_intl:BuildRequires:	libstdc++-devel >= 6:4.8.1}
 BuildRequires:	libtool >= 2:2.4.6
 %{?with_webp:BuildRequires:	libwebp-devel >= 0.2.0}
 BuildRequires:	libxml2-devel >= 1:2.9.0
@@ -242,14 +242,14 @@ BuildRequires:	openssl-devel >= 1.0.2
 BuildRequires:	pam-devel
 BuildRequires:	pcre2-8-devel >= 10.30
 BuildRequires:	pkgconfig
-%{?with_pgsql:BuildRequires:	postgresql-devel}
+%{?with_pgsql:BuildRequires:	postgresql-devel >= 12}
 BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.566
 BuildRequires:	sed >= 4.0
 %if %{with sqlite3} || %{with pdo_sqlite}
-BuildRequires:	sqlite3-devel >= 3.7.7
+BuildRequires:	sqlite3-devel >= 3.7.14
 %endif
 %{?with_systemtap:BuildRequires:	systemtap-sdt-devel}
 BuildRequires:	tar >= 1:1.22
@@ -729,7 +729,7 @@ Summary(pl.UTF-8):	Moduł curl dla PHP
 Group:		Libraries
 URL:		https://www.php.net/manual/en/book.curl.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	curl-libs >= 7.29.0
+Requires:	curl-libs >= 7.61.0
 Provides:	php(curl)
 Obsoletes:	php-curl < 4:5.3.28-7
 
@@ -785,6 +785,7 @@ Summary(pl.UTF-8):	dowiązania biblioteki libenchant
 Group:		Libraries
 URL:		https://www.php.net/manual/en/book.enchant.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
+Requires:	enchant2 >= 1.6.0
 Provides:	php(enchant) = %{enchantver}
 Obsoletes:	php-enchant < 4:5.3.28-7
 Obsoletes:	php-pecl-enchant < %{enchantver}
@@ -1242,6 +1243,7 @@ Group:		Libraries
 URL:		https://www.php.net/manual/en/ref.pdo-firebird.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Requires:	Firebird-lib >= 3.0
 Provides:	php(pdo-firebird)
 Provides:	php(pdo_firebird)
 Obsoletes:	php-pdo-firebird < 4:5.3.28-7
@@ -1303,6 +1305,7 @@ Group:		Libraries
 URL:		https://www.php.net/manual/en/ref.pdo-pgsql.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Requires:	postgresql-libs >= 12
 Provides:	php(pdo-pgsql)
 Provides:	php(pdo_pgsql)
 Obsoletes:	php-pdo-pgsql < 4:5.3.28-7
@@ -1323,6 +1326,7 @@ Group:		Libraries
 URL:		https://www.php.net/manual/en/ref.pdo-sqlite.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-pdo = %{epoch}:%{version}-%{release}
+Requires:	sqlite3-libs >= 3.7.14
 Provides:	php(pdo-sqlite)
 Provides:	php(pdo_sqlite)
 Obsoletes:	php-pdo-sqlite < 4:5.3.28-7
@@ -1471,6 +1475,7 @@ URL:		https://www.php.net/manual/en/book.snmp.php
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
 Requires:	%{name}-sockets = %{epoch}:%{version}-%{release}
 Requires:	%{name}-spl = %{epoch}:%{version}-%{release}
+Requires:	net-snmp-libs >= 5.3
 Provides:	php(snmp)
 Obsoletes:	php-snmp < 4:5.3.28-7
 

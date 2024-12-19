@@ -194,6 +194,7 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch71:	libdb-info.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 3.0}}
+BuildRequires:	apache-base >= 2.4.0
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison >= 3.0.0

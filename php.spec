@@ -1775,35 +1775,35 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %setup -q -n %{orgname}-%{version}%{?subver}
 
 cp -p php.ini-production php.ini
-%patch0 -p1
-%patch1 -p1
-%patch3 -p1
-%patch4 -p1
-%patch6 -p1
-%patch7 -p1 -b .sapi-ini-file
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P3 -p1
+%patch -P4 -p1
+%patch -P6 -p1
+%patch -P7 -p1 -b .sapi-ini-file
 
-%patch10 -p1 -b .ini
-%patch14 -p1
+%patch -P10 -p1 -b .ini
+%patch -P14 -p1
 
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1 -b .zlib-for-getimagesize
-%patch25 -p1
-%patch27 -p1
-%patch29 -p1
-%patch31 -p1
-%patch39 -p1 -b .use-prog_sendmail
-%patch41 -p1
-%patch43 -p1
-%patch44 -p1
-%patch50 -p1
-%patch53 -p1
-%patch59 -p1 -b .systzdata
+%patch -P21 -p1
+%patch -P22 -p1
+%patch -P23 -p1
+%patch -P24 -p1 -b .zlib-for-getimagesize
+%patch -P25 -p1
+%patch -P27 -p1
+%patch -P29 -p1
+%patch -P31 -p1
+%patch -P39 -p1 -b .use-prog_sendmail
+%patch -P41 -p1
+%patch -P43 -p1
+%patch -P44 -p1
+%patch -P50 -p1
+%patch -P53 -p1
+%patch -P59 -p1 -b .systzdata
 
-%patch66 -p1
-%patch67 -p1 -b .mysql-lib-ver-mismatch
-%patch71 -p1 -b .libdb-info
+%patch -P66 -p1
+%patch -P67 -p1 -b .mysql-lib-ver-mismatch
+%patch -P71 -p1 -b .libdb-info
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \
 	ext/ext_skel.php \

@@ -227,6 +227,7 @@ Patch69:	fpm-conf-split.patch
 Patch70:	php-icu64.patch
 Patch71:	icu69.patch
 Patch72:	icu70.patch
+Patch73:	libxml2-2.12.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2109,6 +2110,7 @@ exit 1
 %patch -P70 -p1
 %patch -P71 -p1
 %patch -P72 -p1
+%patch -P73 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

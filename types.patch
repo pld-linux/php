@@ -1,0 +1,77 @@
+--- php-8.0.28/ext/pdo_dblib/dblib_stmt.c.orig	2023-02-14 12:05:44.000000000 +0100
++++ php-8.0.28/ext/pdo_dblib/dblib_stmt.c	2025-01-23 00:05:26.067889731 +0100
+@@ -347,7 +347,7 @@
+ }
+ 
+ static int pdo_dblib_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr,
+-	 zend_ulong *len, int *caller_frees)
++	 size_t *len, int *caller_frees)
+ {
+ 
+ 	pdo_dblib_stmt *S = (pdo_dblib_stmt*)stmt->driver_data;
+--- php-8.0.28/ext/pdo_firebird/firebird_statement.c.orig	2023-02-14 12:05:44.000000000 +0100
++++ php-8.0.28/ext/pdo_firebird/firebird_statement.c	2025-01-23 00:16:13.415116725 +0100
+@@ -259,7 +259,7 @@
+ 
+ /* fetch a blob into a fetch buffer */
+ static int firebird_fetch_blob(pdo_stmt_t *stmt, int colno, char **ptr, /* {{{ */
+-	zend_ulong *len, ISC_QUAD *blob_id)
++	size_t *len, ISC_QUAD *blob_id)
+ {
+ 	pdo_firebird_stmt *S = (pdo_firebird_stmt*)stmt->driver_data;
+ 	pdo_firebird_db_handle *H = S->H;
+@@ -341,7 +341,7 @@
+ /* }}} */
+ 
+ static int firebird_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr,  /* {{{ */
+-	zend_ulong *len, int *caller_frees)
++	size_t *len, int *caller_frees)
+ {
+ 	pdo_firebird_stmt *S = (pdo_firebird_stmt*)stmt->driver_data;
+ 	XSQLVAR const *var = &S->out_sqlda.sqlvar[colno];
+@@ -561,7 +561,7 @@
+ 
+ 	switch (event_type) {
+ 		char *value;
+-		zend_ulong value_len;
++		size_t  value_len;
+ 		int caller_frees;
+ 		zval *parameter;
+ 
+--- php-8.0.28/ext/pdo_odbc/odbc_stmt.c.orig	2023-02-14 12:05:44.000000000 +0100
++++ php-8.0.28/ext/pdo_odbc/odbc_stmt.c	2025-01-23 00:30:24.886905826 +0100
+@@ -89,7 +89,7 @@
+ }
+ 
+ static int pdo_odbc_ucs22utf8(pdo_stmt_t *stmt, int is_unicode, const char *buf,
+-	zend_ulong buflen, zend_ulong *outlen)
++	zend_ulong buflen, size_t *outlen)
+ {
+ #ifdef PHP_WIN32
+ 	if (is_unicode && buflen) {
+@@ -487,9 +487,9 @@
+ 				P = param->driver_data;
+ 
+ 				if (P->outbuf) {
+-					zend_ulong ulen;
++					size_t ulen;
+ 					char *srcbuf;
+-					zend_ulong srclen = 0;
++					size_t srclen = 0;
+ 
+ 					if (Z_ISREF(param->parameter)) {
+ 						parameter = Z_REFVAL(param->parameter);
+@@ -646,11 +646,11 @@
+ 	return 1;
+ }
+ 
+-static int odbc_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, zend_ulong *len, int *caller_frees)
++static int odbc_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *len, int *caller_frees)
+ {
+ 	pdo_odbc_stmt *S = (pdo_odbc_stmt*)stmt->driver_data;
+ 	pdo_odbc_column *C = &S->cols[colno];
+-	zend_ulong ulen;
++	size_t ulen;
+ 
+ 	/* if it is a column containing "long" data, perform late binding now */
+ 	if (C->is_long) {

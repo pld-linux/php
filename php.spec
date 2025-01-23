@@ -221,6 +221,7 @@ Patch74:	openssl.patch
 Patch75:	icu70.patch
 Patch76:	libxml2-2.12.patch
 Patch77:	types.patch
+Patch78:	includes.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2049,6 +2050,7 @@ cp -p php.ini-production php.ini
 %patch -P75 -p1
 %patch -P76 -p1
 %patch -P77 -p1
+%patch -P78 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

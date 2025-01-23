@@ -2269,8 +2269,8 @@ export CXXFLAGS="%{rpmcxxflags} -fPIC -DPIC"
 export CFLAGS="%{rpmcflags} -fPIC -DPIC"
 
 %if %{with intl}
-# icu 59+ C++ API requires C++ >= 11
-CXXFLAGS="$CXXFLAGS -std=c++11"
+# icu 74+ C++ API requires C++ >= 17
+CXXFLAGS="$CXXFLAGS -std=c++17"
 %endif
 
 sapis="

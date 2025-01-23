@@ -2252,8 +2252,8 @@ export PROG_SENDMAIL="/usr/lib/sendmail"
 export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
 	-I%{_includedir}/xmlrpc-epi"
 %if %{with intl}
-# icu 59+ C++ API requires C++ >= 11
-CXXFLAGS="%{rpmcxxflags} -std=c++11"
+# icu 74+ C++ API requires C++ >= 17
+CXXFLAGS="%{rpmcxxflags} -std=c++17"
 %endif
 
 sapis="

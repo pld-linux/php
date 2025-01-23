@@ -254,6 +254,7 @@ Patch77:	php-icu64.patch
 Patch78:	icu69.patch
 Patch79:	libxml2-2.12.patch
 Patch80:	readdir_r.patch
+Patch81:	types.patch
 # Fixes for security bugs
 # https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
 # also from RHEL6/CentOS7
@@ -2174,6 +2175,7 @@ gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch -P78 -p1
 %patch -P79 -p1
 %patch -P80 -p1
+%patch -P81 -p1
 
 %patch -P220 -p1
 %patch -P221 -p1

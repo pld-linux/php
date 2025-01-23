@@ -9,3 +9,19 @@
  		events[1], events[2], events[3], events[4], events[5], events[6], events[7],
  		events[8], events[9], events[10], events[11], events[12], events[13], events[14]);
  
+--- php-7.3.33/ext/interbase/ibase_query.c.orig	2021-11-16 12:18:38.000000000 +0100
++++ php-7.3.33/ext/interbase/ibase_query.c	2025-01-23 20:08:11.773054372 +0100
+@@ -695,10 +695,12 @@
+ 			case SQL_TYPE_TIME:
+ 				if (Z_TYPE_P(b_var) == IS_LONG) {
+ 					struct tm *res;
+-					res = php_gmtime_r(&Z_LVAL_P(b_var), &t);
++					time_t ts;
++					res = php_gmtime_r(&ts, &t);
+ 					if (!res) {
+ 						return FAILURE;
+ 					}
++					Z_LVAL_P(b_var) = (long) ts;
+ 				} else {
+ #ifdef HAVE_STRPTIME
+ 					char *format = INI_STR("ibase.timestampformat");

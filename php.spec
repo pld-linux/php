@@ -209,6 +209,7 @@ Patch73:	missing-includes.patch
 Patch74:	icu74.patch
 Patch75:	libxml2-2.12.patch
 Patch76:	types.patch
+Patch77:	includes.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1931,6 +1932,7 @@ cp -p php.ini-production php.ini
 %patch -P74 -p1
 %patch -P75 -p1
 %patch -P76 -p1
+%patch -P77 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

@@ -228,6 +228,7 @@ Patch76:	missing-includes.patch
 Patch77:	libxml2-2.12.patch
 Patch78:	types.patch
 Patch79:	includes.patch
+Patch80:	readdir_r.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2061,6 +2062,7 @@ cp -p php.ini-production php.ini
 %patch -P77 -p1
 %patch -P78 -p1
 %patch -P79 -p1
+%patch -P80 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

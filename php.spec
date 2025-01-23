@@ -170,7 +170,6 @@ Source13:	dep-tests.sh
 Source14:	skip-tests.sh
 Patch0:		%{orgname}-shared.patch
 Patch1:		%{orgname}-pldlogo.patch
-Patch2:		%{orgname}-mail.patch
 Patch3:		%{orgname}-link-libs.patch
 Patch4:		intl-stdc++.patch
 Patch5:		%{orgname}-filter-shared.patch
@@ -1985,7 +1984,6 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 cp -p php.ini-production php.ini
 %patch -P0 -p1
 %patch -P1 -p1
-%patch -P2 -p1
 %patch -P3 -p1
 %patch -P4 -p1
 %patch -P5 -p1

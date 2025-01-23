@@ -1,0 +1,15 @@
+--- php-7.3.33/acinclude.m4.orig	2025-01-23 12:02:30.409013262 +0100
++++ php-7.3.33/acinclude.m4	2025-01-23 12:02:54.179150479 +0100
+@@ -1361,10 +1361,10 @@
+   if (!dir)
+     return 1;
+   if (readdir_r(dir, (struct dirent *) entry, &pentry) == 0) {
+-    close(dir);
++    closedir(dir);
+     return 0;
+   }
+-  close(dir);
++  closedir(dir);
+   return 1;
+ }
+     ]])],[

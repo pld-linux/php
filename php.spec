@@ -248,7 +248,7 @@ Patch74:	php-icu64.patch
 Patch75:	icu69.patch
 Patch76:	icu70.patch
 Patch77:	libxml2-2.12.patch
-Patch78:	readdir_r.patch
+Patch78:	configure.patch
 Patch79:	types.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}

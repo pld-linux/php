@@ -230,7 +230,7 @@ Patch73:	openssl.patch
 Patch74:	php-icu64.patch
 Patch75:	icu69.patch
 Patch76:	libxml2-2.12.patch
-Patch77:	readdir_r.patch
+Patch77:	configure.patch
 Patch78:	types.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}

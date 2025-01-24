@@ -223,7 +223,7 @@ Patch77:	icu70.patch
 Patch78:	libxml2-2.12.patch
 Patch79:	types.patch
 Patch80:	includes.patch
-Patch81:	readdir_r.patch
+Patch81:	configure.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}

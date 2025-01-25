@@ -135,3 +135,17 @@
  				} else {
  #ifdef HAVE_STRPTIME
  					char *format = INI_STR("ibase.timestampformat");
+--- php-7.0.33/sapi/litespeed/lsapilib.c.orig	2025-01-25 12:05:15.151455149 +0100
++++ php-7.0.33/sapi/litespeed/lsapilib.c	2025-01-25 12:11:23.153577903 +0100
+@@ -2654,9 +2654,10 @@
+             return;
+     }
+     s_pid_dump_debug_info = fork();
++    time_t t = tmCur;
+ 
+     fprintf( stderr, "[%s] Possible runaway process, PPID: %d, PID: %d, reqCount: %d, process time: %ld, checkpoint time: %ld, start time: %ld\n",
+-                ctime(&tmCur), getpid(), pStatus->m_pid, pStatus->m_iReqCounter,
++                ctime(&t), getpid(), pStatus->m_pid, pStatus->m_iReqCounter,
+                 tmCur - pStatus->m_tmReqBegin, tmCur - pStatus->m_tmLastCheckPoint, tmCur - pStatus->m_tmStart );
+     snprintf( achCmd, 1024, "gdb --batch -ex \"attach %d\" -ex \"set height 0\" -ex \"bt\" >&2;PATH=$PATH:/usr/sbin lsof -p %d >&2", pStatus->m_pid, pStatus->m_pid );
+     if ( system( achCmd ) == -1 )

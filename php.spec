@@ -227,7 +227,7 @@ Patch69:	fpm-conf-split.patch
 Patch70:	php-icu64.patch
 Patch71:	icu69.patch
 Patch72:	icu70.patch
-Patch73:	libxml2-2.12.patch
+Patch73:	libxml2.patch
 Patch74:	configure.patch
 Patch75:	types.patch
 URL:		https://www.php.net/

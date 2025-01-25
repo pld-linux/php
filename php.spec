@@ -2100,44 +2100,44 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %prep
 %setup -q -n %{orgname}-%{version}%{?subver}
 cp -p php.ini-production php.ini
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%{?with_milter:%patch8 -p1}
-%patch9 -p1
-%patch10 -p1
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
+%patch -P5 -p1
+%patch -P6 -p1
+%patch -P7 -p1
+%{?with_milter:%patch -P8 -p1}
+%patch -P9 -p1
+%patch -P10 -p1
 
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch29 -p1
-%patch31 -p1
+%patch -P12 -p1
+%patch -P13 -p1
+%patch -P14 -p1
+%patch -P15 -p1
+%patch -P16 -p1
+%patch -P17 -p1
+%patch -P18 -p1
+%patch -P19 -p1
+%patch -P20 -p1
+%patch -P21 -p1
+%patch -P22 -p1
+%patch -P23 -p1
+%patch -P24 -p1
+%patch -P25 -p1
+%patch -P26 -p1
+%patch -P27 -p1
+%patch -P29 -p1
+%patch -P31 -p1
 %if "%{pld_release}" != "ac"
-%patch34 -p1
+%patch -P34 -p1
 %endif
-%{?with_sybase_ct:%patch35 -p1}
-%patch36 -p1
-%patch37 -p1
-%patch38 -p1
-%patch39 -p1
+%{?with_sybase_ct:%patch -P35 -p1}
+%patch -P36 -p1
+%patch -P37 -p1
+%patch -P38 -p1
+%patch -P39 -p1
 %if %{with fpm}
 %if 0
 # create split php-fpm.conf patch. review (restore other diffs) and commit
@@ -2151,37 +2151,37 @@ diff -u %{orgname}-%{version}/sapi/fpm/php-fpm.conf.in{.orig,} > %{PATCH69}
 diff -u /dev/null %{orgname}-%{version}/sapi/fpm/php-fpm.conf-d.in >> %{PATCH69}
 exit 1
 %else
-%patch69 -p1
+%patch -P69 -p1
 %endif
-%patch41 -p1
-%patch42 -p1
+%patch -P41 -p1
+%patch -P42 -p1
 %endif
-%patch43 -p1
-%patch44 -p1
-#%patch45 -p1 # imap annotations. fixme
-#%patch46 -p1 # imap myrights. fixme
+%patch -P43 -p1
+%patch -P44 -p1
+#%patch -P45 -p1 # imap annotations. fixme
+#%patch -P46 -p1 # imap myrights. fixme
 %if %{with suhosin}
-%patch47 -p1
+%patch -P47 -p1
 %endif
-%patch50 -p1
-%patch51 -p1
-%patch52 -p1
-%patch53 -p1
+%patch -P50 -p1
+%patch -P51 -p1
+%patch -P52 -p1
+%patch -P53 -p1
 %undos ext/spl/tests/SplFileInfo_getInode_basic.phpt
-%patch55 -p1
-%patch59 -p1
-%patch60 -p1
-%patch62 -p1
-%{?with_system_libzip:%patch65 -p1}
-%patch66 -p1
-%patch67 -p1
-%patch68 -p1
-%patch70 -p1
-%patch72 -p1
-%patch73 -p1
-%patch74 -p1
-%patch75 -p1
-%patch76 -p1
+%patch -P55 -p1
+%patch -P59 -p1
+%patch -P60 -p1
+%patch -P62 -p1
+%{?with_system_libzip:%patch -P65 -p1}
+%patch -P66 -p1
+%patch -P67 -p1
+%patch -P68 -p1
+%patch -P70 -p1
+%patch -P72 -p1
+%patch -P73 -p1
+%patch -P74 -p1
+%patch -P75 -p1
+%patch -P76 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

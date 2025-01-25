@@ -8,3 +8,13 @@
  #include "ext/standard/info.h"
  #include "lsapilib.h"
  
+--- php-7.1.33/ext/zip/lib/mkstemp.c.orig	2019-10-22 18:59:49.000000000 +0200
++++ php-7.1.33/ext/zip/lib/mkstemp.c	2025-01-25 00:53:13.113061891 +0100
+@@ -43,6 +43,7 @@
+ #endif
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <unistd.h>
+ 
+ #ifndef O_BINARY
+ #define O_BINARY 0

@@ -247,7 +247,7 @@ Patch73:	php-pdo-ssl.patch
 Patch74:	php-icu64.patch
 Patch75:	icu69.patch
 Patch76:	icu70.patch
-Patch77:	libxml2-2.12.patch
+Patch77:	libxml2.patch
 Patch78:	configure.patch
 Patch79:	types.patch
 Patch80:	includes.patch

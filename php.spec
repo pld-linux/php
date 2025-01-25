@@ -220,7 +220,7 @@ Patch74:	php-CVE-2019-11043.patch
 Patch75:	icu69.patch
 Patch76:	openssl.patch
 Patch77:	icu70.patch
-Patch78:	libxml2-2.12.patch
+Patch78:	libxml2.patch
 Patch79:	types.patch
 Patch80:	includes.patch
 Patch81:	configure.patch

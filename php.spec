@@ -229,7 +229,7 @@ Patch72:	mysqli-err.patch
 Patch73:	openssl.patch
 Patch74:	php-icu64.patch
 Patch75:	icu69.patch
-Patch76:	libxml2-2.12.patch
+Patch76:	libxml2.patch
 Patch77:	configure.patch
 Patch78:	types.patch
 URL:		https://www.php.net/

@@ -252,7 +252,7 @@ Patch75:	openssl.patch
 Patch76:	php-bug-61930.patch
 Patch77:	php-icu64.patch
 Patch78:	icu69.patch
-Patch79:	libxml2-2.12.patch
+Patch79:	libxml2.patch
 Patch80:	configure.patch
 Patch81:	types.patch
 # Fixes for security bugs

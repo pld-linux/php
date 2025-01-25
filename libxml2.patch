@@ -62,3 +62,14 @@ index 749f5a5685ec2..b731114775ad7 100644
  
  		if (xmlErrorPtr) {
  			soap_error2(E_ERROR, "Parsing WSDL: Couldn't load from '%s' : %s", struri, xmlErrorPtr->message);
+--- php-7.0.33/ext/dom/dom_iterators.c.orig	2018-12-04 18:22:49.000000000 +0100
++++ php-7.0.33/ext/dom/dom_iterators.c	2025-01-25 12:49:14.486861211 +0100
+@@ -42,7 +42,7 @@
+ 	xmlNotation *notation;
+ };
+ 
+-static void itemHashScanner (void *payload, void *data, xmlChar *name) /* {{{ */
++static void itemHashScanner (void *payload, void *data, const xmlChar *name) /* {{{ */
+ {
+ 	nodeIterator *priv = (nodeIterator *)data;
+ 

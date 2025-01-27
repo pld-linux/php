@@ -8,3 +8,30 @@
  
  #ifndef O_BINARY
  #define O_BINARY 0
+--- php-5.6.40/sapi/litespeed/lsapi_main.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/sapi/litespeed/lsapi_main.c	2025-01-27 22:38:03.269825030 +0100
+@@ -23,6 +23,8 @@
+ #include "php_variables.h"
+ #include "zend_highlight.h"
+ #include "zend.h"
++#include "ext/standard/basic_functions.h"
++#include "ext/standard/info.h"
+ 
+ #include "lsapilib.h"
+ 
+--- php-5.6.40/sapi/phpdbg/phpdbg_cmd.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/sapi/phpdbg/phpdbg_cmd.c	2025-01-27 22:43:42.511766052 +0100
+@@ -24,6 +24,13 @@
+ #include "phpdbg_set.h"
+ #include "phpdbg_prompt.h"
+ 
++#if HAVE_LIBEDIT
++#include <editline/readline.h>
++#else
++#include <readline/readline.h>
++#include <readline/history.h>
++#endif
++
+ ZEND_EXTERN_MODULE_GLOBALS(phpdbg);
+ 
+ static inline const char *phpdbg_command_name(const phpdbg_command_t *command, char *buffer) {

@@ -230,6 +230,7 @@ Patch72:	icu70.patch
 Patch73:	libxml2.patch
 Patch74:	configure.patch
 Patch75:	types.patch
+Patch76:	includes.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2115,6 +2116,7 @@ exit 1
 %patch -P73 -p1
 %patch -P74 -p1
 %patch -P75 -p1
+%patch -P76 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

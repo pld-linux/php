@@ -25,3 +25,87 @@
  				} else {
  #ifdef HAVE_STRPTIME
  					char *format = INI_STR("ibase.timestampformat");
+--- php-5.6.40/ext/interbase/ibase_events.c.orig	2025-01-27 00:37:50.826064380 +0100
++++ php-5.6.40/ext/interbase/ibase_events.c	2025-01-27 19:50:58.362432043 +0100
+@@ -195,7 +195,7 @@
+ /* }}} */
+ 
+ static isc_callback _php_ibase_callback(ibase_event *event, /* {{{ */
+-	unsigned short buffer_size, char *result_buf)
++	unsigned short buffer_size, const unsigned char *result_buf)
+ {
+ 	/* this function is called asynchronously by the Interbase client library. */
+ 	TSRMLS_FETCH_FROM_CTX(event->thread_ctx);
+@@ -246,7 +246,7 @@
+ 		case NEW:
+ 			/* re-register the event */
+ 			if (isc_que_events(IB_STATUS, &event->link->handle, &event->event_id, buffer_size,
+-				event->event_buffer,(isc_callback)_php_ibase_callback, (void *)event)) {
++				event->event_buffer,(ISC_EVENT_CALLBACK)_php_ibase_callback, (void *)event)) {
+ 
+ 				_php_ibase_error(TSRMLS_C);
+ 			}
+@@ -356,7 +356,7 @@
+ 
+ 	/* now register the events with the Interbase API */
+ 	if (isc_que_events(IB_STATUS, &ib_link->handle, &event->event_id, buffer_size,
+-		event->event_buffer,(isc_callback)_php_ibase_callback, (void *)event)) {
++		event->event_buffer,(ISC_EVENT_CALLBACK)_php_ibase_callback, (void *)event)) {
+ 
+ 		_php_ibase_error(TSRMLS_C);
+ 		efree(event);
+--- php-5.6.40/ext/mssql/php_mssql.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/mssql/php_mssql.c	2025-01-27 19:59:45.608785170 +0100
+@@ -1122,7 +1122,7 @@
+ 			}
+ 			
+ 			res_length = 19;
+-			spprintf(&res_buf, 0, "%d-%02d-%02d %02d:%02d:%02d" , dateinfo.year, dateinfo.month, dateinfo.day, dateinfo.hour, dateinfo.minute, dateinfo.second);
++			spprintf((char**)&res_buf, 0, "%d-%02d-%02d %02d:%02d:%02d" , dateinfo.year, dateinfo.month, dateinfo.day, dateinfo.hour, dateinfo.minute, dateinfo.second);
+ 		}
+ 
+ 		ZVAL_STRINGL(result, res_buf, res_length, 0);
+--- php-5.6.40/ext/pdo_dblib/pdo_dblib.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/pdo_dblib/pdo_dblib.c	2025-01-27 20:05:32.840773848 +0100
+@@ -138,7 +138,7 @@
+ }
+ 
+ int msg_handler(DBPROCESS *dbproc, DBINT msgno, int msgstate,
+-	int severity, char *msgtext, char *srvname, char *procname, DBUSMALLINT line)
++	int severity, char *msgtext, char *srvname, char *procname, DBINT line)
+ {
+ 	pdo_dblib_err *einfo;
+ 	TSRMLS_FETCH();
+--- php-5.6.40/ext/pdo_dblib/php_pdo_dblib_int.h.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/pdo_dblib/php_pdo_dblib_int.h	2025-01-27 20:07:05.007968377 +0100
+@@ -93,7 +93,7 @@
+ 	int oserr, char *dberrstr, char *oserrstr);
+ 
+ int msg_handler(DBPROCESS *dbproc, DBINT msgno, int msgstate,
+-	int severity, char *msgtext, char *srvname, char *procname, DBUSMALLINT line);
++	int severity, char *msgtext, char *srvname, char *procname, DBINT line);
+ 
+ extern pdo_driver_t pdo_dblib_driver;
+ extern struct pdo_stmt_methods dblib_stmt_methods;
+--- php-5.6.40/ext/wddx/wddx.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/wddx/wddx.c	2025-01-27 20:13:44.643590516 +0100
+@@ -535,7 +535,7 @@
+ 				continue;
+ 			}
+ 
+-			if (zend_hash_get_current_key_ex(objhash, &key, &key_len, &idx, 0, NULL) == HASH_KEY_IS_STRING) {
++			if (zend_hash_get_current_key_ex(objhash, (char**)&key, &key_len, &idx, 0, NULL) == HASH_KEY_IS_STRING) {
+ 				char *class_name, *prop_name;
+ 				
+ 				zend_unmangle_property_name(key, key_len-1, &class_name, &prop_name);
+--- php-5.6.40/sapi/litespeed/lsapi_main.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/sapi/litespeed/lsapi_main.c	2025-01-27 22:38:03.269825030 +0100
+@@ -69,6 +71,8 @@
+ 
+ #define SAPI_LSAPI_MAX_HEADER_LENGTH 2048
+ 
++void LSAPI_No_Check_ppid();
++
+ static int  lsapi_mode       = 1;
+ static char *php_self        = "";
+ static char *script_filename = "";

@@ -1,0 +1,11 @@
+--- php-5.6.40/sapi/litespeed/lsapi_main.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/sapi/litespeed/lsapi_main.c	2025-01-27 22:38:03.269825030 +0100
+@@ -23,6 +23,8 @@
+ #include "php_variables.h"
+ #include "zend_highlight.h"
+ #include "zend.h"
++#include "ext/standard/basic_functions.h"
++#include "ext/standard/info.h"
+ 
+ #include "lsapilib.h"
+ 

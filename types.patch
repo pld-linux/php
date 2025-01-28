@@ -155,3 +155,253 @@
  static int  lsapi_mode       = 0;
  static char *php_self        = "";
  static char *script_filename = "";
+--- php-5.6.40/ext/interbase/interbase.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/interbase/interbase.c	2025-01-28 00:04:49.746301207 +0100
+@@ -897,7 +897,7 @@
+ 	long largs[] = { 0, 0, 0 };
+ 	PHP_MD5_CTX hash_context;
+ 	zend_rsrc_list_entry new_index_ptr, *le;
+-	isc_db_handle db_handle = NULL;
++	isc_db_handle db_handle = (isc_db_handle) NULL;
+ 	ibase_db_link *ib_link;
+ 
+ 	RESET_ERRMSG;
+@@ -1108,7 +1108,7 @@
+ 
+ 	/* isc_drop_database() doesn't invalidate the transaction handles */
+ 	for (l = ib_link->tr_list; l != NULL; l = l->next) {
+-		if (l->trans != NULL) l->trans->handle = NULL;
++		if (l->trans != NULL) l->trans->handle = (isc_tr_handle) NULL;
+ 	}
+ 
+ 	zend_list_delete(link_id);
+@@ -1128,7 +1128,7 @@
+ 	char last_tpb[TPB_MAX_SIZE];
+ 	ibase_db_link **ib_link = NULL;
+ 	ibase_trans *ib_trans;
+-	isc_tr_handle tr_handle = NULL;
++	isc_tr_handle tr_handle = (isc_tr_handle) NULL;
+ 	ISC_STATUS result;
+ 	
+ 	RESET_ERRMSG;
+@@ -1289,7 +1289,7 @@
+ 
+ 		if (tr == NULL) {
+ 			tr = (ibase_trans *) emalloc(sizeof(ibase_trans));
+-			tr->handle = NULL;
++			tr->handle = (isc_tr_handle) NULL;
+ 			tr->link_cnt = 1;
+ 			tr->affected_rows = 0;
+ 			tr->db_link[0] = ib_link;
+--- php-5.6.40/ext/interbase/ibase_query.c.orig	2025-01-27 23:26:52.413255597 +0100
++++ php-5.6.40/ext/interbase/ibase_query.c	2025-01-28 00:22:00.565540896 +0100
+@@ -328,7 +328,7 @@
+ 	ib_query->trans = trans;
+ 	ib_query->result_res_id = 0;
+ 	ib_query->result = NULL;
+-	ib_query->stmt = NULL;
++	ib_query->stmt = (isc_stmt_handle) NULL;
+ 	ib_query->in_array = NULL;
+ 	ib_query->out_array = NULL;
+ 	ib_query->dialect = dialect;
+@@ -739,7 +739,7 @@
+ 				if (Z_STRLEN_P(b_var) != BLOB_ID_LEN ||
+ 					!_php_ibase_string_to_quad(Z_STRVAL_P(b_var), &buf[i].val.qval)) {
+ 
+-					ibase_blob ib_blob = { NULL, BLOB_INPUT };
++					ibase_blob ib_blob = { (isc_blob_handle) NULL, BLOB_INPUT };
+ 
+ 					if (isc_create_blob(IB_STATUS, &ib_query->link->handle,
+ 							&ib_query->trans->handle, &ib_blob.bl_handle, &ib_blob.bl_qd)) {
+@@ -886,7 +886,7 @@
+ 		case isc_info_sql_stmt_start_trans:
+ 
+ 			/* a SET TRANSACTION statement should be executed with a NULL trans handle */
+-			tr = NULL;
++			tr = (isc_tr_handle) NULL;
+ 
+ 			if (isc_dsql_execute_immediate(IB_STATUS, &ib_query->link->handle, &tr, 0, 
+ 					ib_query->query, ib_query->dialect, NULL)) {
+@@ -1102,8 +1102,8 @@
+ 			/* the statement is 'CREATE DATABASE ...' if the link argument is IBASE_CREATE */
+ 			if (SUCCESS == zend_parse_parameters_ex(ZEND_PARSE_PARAMS_QUIET, ZEND_NUM_ARGS()
+ 					TSRMLS_CC, "ls", &l, &query, &query_len) && l == PHP_IBASE_CREATE) {
+-				isc_db_handle db = NULL;
+-				isc_tr_handle trans = NULL;
++				isc_db_handle db = (isc_db_handle) NULL;
++				isc_tr_handle trans = (isc_db_handle) NULL;
+ 
+ 				if (PG(sql_safe_mode)) {
+ 					_php_ibase_module_error("CREATE DATABASE is not allowed in SQL safe mode"
+@@ -1184,7 +1184,7 @@
+ 
+ 			/* EXECUTE PROCEDURE returns only one row => statement can be released immediately */
+ 			if (ib_query.statement_type != isc_info_sql_stmt_exec_procedure) {
+-				ib_query.stmt = NULL; /* keep stmt when free query */
++				ib_query.stmt = (isc_stmt_handle) NULL; /* keep stmt when free query */
+ 			}
+ 			ZEND_REGISTER_RESOURCE(return_value, result, le_result);
+ 		}
+@@ -1552,7 +1552,7 @@
+ 						char bl_info[20];
+ 						unsigned short i;
+ 
+-						blob_handle.bl_handle = NULL;
++						blob_handle.bl_handle = (isc_blob_handle) NULL;
+ 						blob_handle.bl_qd = *(ISC_QUAD *) var->sqldata;
+ 
+ 						if (isc_open_blob(IB_STATUS, &ib_result->link->handle, &ib_result->trans->handle,
+@@ -1843,7 +1843,7 @@
+ 		if (result != NULL) {
+ 			result->type = EXECUTE_RESULT;
+ 			if (ib_query->statement_type == isc_info_sql_stmt_exec_procedure) {
+-				result->stmt = NULL;
++				result->stmt = (isc_stmt_handle) NULL;
+ 			}
+ 			ib_query->result_res_id = zend_list_insert(result, le_result TSRMLS_CC);
+ 			RETVAL_RESOURCE(ib_query->result_res_id);
+--- php-5.6.40/ext/interbase/ibase_service.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/interbase/ibase_service.c	2025-01-28 00:25:34.393431998 +0100
+@@ -211,7 +211,7 @@
+ 	int hlen, ulen, plen, spb_len;
+ 	ibase_service *svm;
+ 	char buf[128], *host, *user, *pass, *loc;
+-	isc_svc_handle handle = NULL;
++	isc_svc_handle handle = (isc_svc_handle) NULL;
+ 
+ 	RESET_ERRMSG;
+ 
+--- php-5.6.40/ext/interbase/ibase_events.c.orig	2025-01-27 23:26:52.416588950 +0100
++++ php-5.6.40/ext/interbase/ibase_events.c	2025-01-28 00:28:28.141093592 +0100
+@@ -91,7 +91,7 @@
+ 	char **events, unsigned short *l, char **event_buf, char **result_buf)
+ {
+ 	ISC_STATUS dummy_result[20];
+-	unsigned long dummy_count[15];
++	ISC_ULONG dummy_count[15];
+ 
+ 	/**
+ 	 * Unfortunately, there's no clean and portable way in C to pass arguments to
+@@ -129,7 +129,7 @@
+ 	int num_args;
+ 	char *event_buffer, *result_buffer, *events[15];
+ 	unsigned short i = 0, event_count = 0, buffer_size;
+-	unsigned long occurred_event[15];
++	ISC_ULONG occurred_event[15];
+ 
+ 	RESET_ERRMSG;
+ 
+@@ -207,7 +207,7 @@
+ 	 */
+ 	switch (event->state) {
+ 		unsigned short i;
+-		unsigned long occurred_event[15];
++		ISC_ULONG occurred_event[15];
+ 		zval event_name, link_id, return_value, *args[2];
+ 
+ 		default: /* == DEAD */
+--- php-5.6.40/ext/interbase/ibase_blobs.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/interbase/ibase_blobs.c	2025-01-28 21:34:20.861538207 +0100
+@@ -218,7 +218,7 @@
+ 	PHP_IBASE_LINK_TRANS(link, ib_link, trans);
+ 
+ 	ib_blob = (ibase_blob *) emalloc(sizeof(ibase_blob));
+-	ib_blob->bl_handle = NULL;
++	ib_blob->bl_handle = (isc_blob_handle) NULL;
+ 	ib_blob->type = BLOB_INPUT;
+ 
+ 	if (isc_create_blob(IB_STATUS, &ib_link->handle, &trans->handle, &ib_blob->bl_handle, &ib_blob->bl_qd)) {
+@@ -262,7 +262,7 @@
+ 	PHP_IBASE_LINK_TRANS(link, ib_link, trans);
+ 
+ 	ib_blob = (ibase_blob *) emalloc(sizeof(ibase_blob));
+-	ib_blob->bl_handle = NULL;
++	ib_blob->bl_handle = (isc_blob_handle) NULL;
+ 	ib_blob->type = BLOB_OUTPUT;
+ 
+ 	do {
+@@ -362,7 +362,7 @@
+ 				RETURN_FALSE;
+ 			}
+ 		}
+-		ib_blob->bl_handle = NULL;
++		ib_blob->bl_handle = (isc_blob_handle) NULL;
+ 
+ 		RETVAL_STRINGL(_php_ibase_quad_to_string(ib_blob->bl_qd), BLOB_ID_LEN, 0);
+ 	} else { /* discard created blob */
+@@ -370,7 +370,7 @@
+ 			_php_ibase_error(TSRMLS_C);
+ 			RETURN_FALSE;
+ 		}
+-		ib_blob->bl_handle = NULL;
++		ib_blob->bl_handle = (isc_blob_handle) NULL;
+ 		RETVAL_TRUE;
+ 	}
+ 	zend_list_delete(Z_LVAL_PP(blob_arg));
+@@ -402,7 +402,7 @@
+ 	zval *link = NULL;
+ 	ibase_db_link *ib_link;
+ 	ibase_trans *trans = NULL;
+-	ibase_blob ib_blob = { NULL, BLOB_INPUT };
++	ibase_blob ib_blob = { (isc_blob_handle) NULL, BLOB_INPUT };
+ 	IBASE_BLOBINFO bl_info;
+ 
+ 	RESET_ERRMSG;
+@@ -478,7 +478,7 @@
+ 	zval *link = NULL;
+ 	ibase_db_link *ib_link;
+ 	ibase_trans *trans = NULL;
+-	ibase_blob ib_blob_id = { NULL, BLOB_OUTPUT  };
++	ibase_blob ib_blob_id = { (isc_blob_handle) NULL, BLOB_OUTPUT  };
+ 	char bl_data[IBASE_BLOB_SEG];
+ 	unsigned short seg_len;
+ 
+@@ -539,7 +539,7 @@
+ 	zval *link = NULL, *file;
+ 	int size;
+ 	unsigned short b;
+-	ibase_blob ib_blob = { NULL, 0 };
++	ibase_blob ib_blob = { (isc_blob_handle) NULL, 0 };
+ 	ibase_db_link *ib_link;
+ 	ibase_trans *trans = NULL;
+ 	char bl_data[IBASE_BLOB_SEG];
+--- php-5.6.40/ext/pdo_firebird/firebird_driver.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/pdo_firebird/firebird_driver.c	2025-01-28 21:39:33.790012162 +0100
+@@ -140,7 +140,7 @@
+ 	HashTable *np;
+ 
+ 	do {
+-		isc_stmt_handle s = NULL;
++		isc_stmt_handle s = (isc_stmt_handle) NULL;
+ 		XSQLDA num_sqlda;
+ 		static char const info[] = { isc_info_sql_stmt_type };
+ 		char result[8];
+@@ -221,7 +221,7 @@
+ static long firebird_handle_doer(pdo_dbh_t *dbh, const char *sql, long sql_len TSRMLS_DC) /* {{{ */
+ {
+ 	pdo_firebird_db_handle *H = (pdo_firebird_db_handle *)dbh->driver_data;
+-	isc_stmt_handle stmt = NULL;
++	isc_stmt_handle stmt = (isc_stmt_handle) NULL;
+ 	static char const info_count[] = { isc_info_sql_records };
+ 	char result[64];
+ 	int ret = 0;
+--- php-5.6.40/ext/pdo_firebird/firebird_statement.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/pdo_firebird/firebird_statement.c	2025-01-28 21:41:39.294070332 +0100
+@@ -223,7 +223,7 @@
+ {
+ 	pdo_firebird_stmt *S = (pdo_firebird_stmt*)stmt->driver_data;
+ 	pdo_firebird_db_handle *H = S->H;
+-	isc_blob_handle blobh = NULL;
++	isc_blob_handle blobh = (isc_blob_handle) NULL;
+ 	char const bl_item = isc_info_blob_total_length;
+ 	char bl_info[20];
+ 	unsigned short i;
+@@ -412,7 +412,7 @@
+ {
+ 	pdo_firebird_stmt *S = (pdo_firebird_stmt*)stmt->driver_data;
+ 	pdo_firebird_db_handle *H = S->H;
+-	isc_blob_handle h = NULL;
++	isc_blob_handle h = (isc_blob_handle) NULL;
+ 	unsigned long put_cnt = 0, rem_cnt;
+ 	unsigned short chunk_size;
+ 	int result = 1;

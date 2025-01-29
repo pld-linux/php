@@ -43,7 +43,7 @@ for ext in $ext_dir/*.so; do
 
 	echo -n "$ext (deps: ${deps# })..."
 
-	grep -rlE '^extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_CTYPE=C LC_ALL= sort | xargs cat > $tmpini
+	grep -rlE '^extension=('$(echo "${deps# }" | tr ' ' '|')').so$' $conf_dir | LC_CTYPE=C LC_COLLATE=C sort | xargs cat > $tmpini
 	$php -n -d extension_dir=$ext_dir -c $tmpini -r "exit(extension_loaded('${ext}') ? 0 : 1);"
 	rc=$?
 	if [ $rc = 0 ]; then

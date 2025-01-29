@@ -233,3 +233,33 @@
        ac_cv_broken_sprintf=no
      ],[
        ac_cv_broken_sprintf=yes
+--- php-5.5.38/TSRM/threads.m4.orig	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/TSRM/threads.m4	2025-01-29 21:35:44.424923887 +0100
+@@ -135,8 +135,8 @@
+       fi
+     done
+   fi
+-fi
+ ])
++fi
+ 
+ AC_CACHE_CHECK(for pthreads_lib, ac_cv_pthreads_lib,[
+ ac_cv_pthreads_lib=
+--- php-5.5.38/ext/curl/config.m4.orig	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/curl/config.m4	2025-01-29 22:41:36.453994182 +0100
+@@ -61,6 +61,7 @@
+     AC_PROG_CPP
+     AC_MSG_CHECKING([for openssl support in libcurl])
+     AC_TRY_RUN([
++#include <string.h>
+ #include <curl/curl.h>
+ 
+ int main(int argc, char *argv[])
+@@ -88,6 +89,7 @@
+    
+     AC_MSG_CHECKING([for gnutls support in libcurl])
+     AC_TRY_RUN([
++#include <string.h>
+ #include <curl/curl.h>
+ 
+ int main(int argc, char *argv[])

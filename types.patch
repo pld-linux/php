@@ -405,3 +405,14 @@
  	unsigned long put_cnt = 0, rem_cnt;
  	unsigned short chunk_size;
  	int result = 1;
+--- php-5.5.38/ext/zip/lib/zip_source_pkware.c.orig	2016-07-20 10:41:48.000000000 +0200
++++ php-5.5.38/ext/zip/lib/zip_source_pkware.c	2025-01-29 22:53:08.977879647 +0100
+@@ -49,7 +49,7 @@
+ #define KEY1		591751049
+ #define KEY2		878082192
+ 
+-static const uLongf *crc = NULL;
++static const z_crc_t *crc = NULL;
+ 
+ #define CRC32(c, b) (crc[((c) ^ (b)) & 0xff] ^ ((c) >> 8))
+ 

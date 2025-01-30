@@ -416,3 +416,40 @@
  
  #define CRC32(c, b) (crc[((c) ^ (b)) & 0xff] ^ ((c) >> 8))
  
+--- php-5.4.45/ext/pdo_odbc/odbc_stmt.c.orig	2015-09-01 22:09:37.000000000 +0200
++++ php-5.4.45/ext/pdo_odbc/odbc_stmt.c	2025-01-30 11:36:24.490415177 +0100
+@@ -279,7 +279,7 @@
+ 	pdo_odbc_stmt *S = (pdo_odbc_stmt*)stmt->driver_data;
+ 	RETCODE rc;
+ 	SWORD sqltype = 0, ctype = 0, scale = 0, nullable = 0;
+-	UDWORD precision = 0;
++	SQLULEN precision = 0;
+ 	pdo_odbc_param *P;
+ 	
+ 	/* we're only interested in parameters for prepared SQL right now */
+@@ -370,13 +370,14 @@
+ 					return 0;
+ 				}
+ 
++				SQLLEN len = P->len;
+ 				rc = SQLBindParameter(S->stmt, (SQLUSMALLINT) param->paramno+1,
+ 						P->paramtype, ctype, sqltype, precision, scale,
+ 						P->paramtype == SQL_PARAM_INPUT ? 
+ 							(SQLPOINTER)param :
+ 							P->outbuf,
+-						P->len,
+-						&P->len
++						len,
++						&len
+ 						);
+ 	
+ 				if (rc == SQL_SUCCESS || rc == SQL_SUCCESS_WITH_INFO) {
+@@ -551,7 +552,7 @@
+ 	struct pdo_column_data *col = &stmt->columns[colno];
+ 	RETCODE rc;
+ 	SWORD	colnamelen;
+-	SDWORD	colsize;
++	SQLULEN	colsize;
+ 	SQLLEN displaysize;
+ 
+ 	rc = SQLDescribeCol(S->stmt, colno+1, S->cols[colno].colname,

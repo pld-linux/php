@@ -398,12 +398,13 @@
  						);
  	
  				if (rc == SQL_SUCCESS || rc == SQL_SUCCESS_WITH_INFO) {
-@@ -551,7 +552,7 @@
- 	struct pdo_column_data *col = &stmt->columns[colno];
+@@ -546,7 +547,8 @@
+ 	zend_bool dyn = FALSE;
  	RETCODE rc;
  	SWORD	colnamelen;
--	SDWORD	colsize;
+-	SDWORD	colsize, displaysize;
 +	SQLULEN	colsize;
- 	SQLLEN displaysize;
++	SQLLEN	displaysize;
  
  	rc = SQLDescribeCol(S->stmt, colno+1, S->cols[colno].colname,
+ 			sizeof(S->cols[colno].colname)-1, &colnamelen,

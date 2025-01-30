@@ -408,3 +408,75 @@
  
  	rc = SQLDescribeCol(S->stmt, colno+1, S->cols[colno].colname,
  			sizeof(S->cols[colno].colname)-1, &colnamelen,
+--- php-5.3.29/Zend/zend_object_handlers.c.orig	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/Zend/zend_object_handlers.c	2025-01-30 12:28:28.364628937 +0100
+@@ -297,7 +297,7 @@
+ 		info.name_length = Z_STRLEN_P(member);
+ 		info.h = zend_get_hash_value(Z_STRVAL_P(member), Z_STRLEN_P(member) + 1);
+ 	} else if(property_info->name[0] == '\0'){
+-		const char *class_name = NULL, *prop_name = NULL;
++		char *class_name = NULL, *prop_name = NULL;
+ 		zend_unmangle_property_name(property_info->name, property_info->name_length, &class_name, &prop_name);
+ 		if(class_name) {
+ 			/* use unmangled name for protected properties */
+--- php-5.6.40/ext/fileinfo/libmagic/funcs.c.orig	2019-01-09 10:54:13.000000000 +0100
++++ php-5.6.40/ext/fileinfo/libmagic/funcs.c	2025-01-27 19:38:59.298313486 +0100
+@@ -437,6 +437,7 @@
+ 	return ms->o.buf == NULL ? 0 : strlen(ms->o.buf);
+ }
+ 
++int
+ file_replace(struct magic_set *ms, const char *pat, const char *rep)
+ {
+ 	zval *patt;
+--- php-5.3.29/ext/pdo_dblib/dblib_stmt.c.orig	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/pdo_dblib/dblib_stmt.c	2025-01-30 12:38:03.447857397 +0100
+@@ -75,7 +75,7 @@
+ 	int arows;
+ 	unsigned int size;
+ 	
+-	dbsetuserdata(H->link, &S->err);
++	dbsetuserdata(H->link, (BYTE*) &S->err);
+ 
+ 	if (S->rows) {
+ 		/* clean them up */
+--- php-5.3.29/ext/pgsql/pgsql.c.orig	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/pgsql/pgsql.c	2025-01-30 13:11:11.259009429 +0100
+@@ -728,7 +728,7 @@
+ static int le_link, le_plink, le_result, le_lofp, le_string;
+ 
+ /* {{{ _php_pgsql_trim_message */
+-static char * _php_pgsql_trim_message(const char *message, int *len)
++static char * _php_pgsql_trim_message(const char *message, size_t *len)
+ {
+ 	register int i = strlen(message)-1;
+ 
+@@ -6265,7 +6265,7 @@
+ 				char *element = PQgetvalue(pg_result, pg_row, i);
+ 				if (element) {
+ 					char *data;
+-					size_t data_len;
++					int data_len;
+ 					const size_t element_len = strlen(element);
+ 
+ 					if (PG(magic_quotes_runtime)) {
+--- php-5.3.29/ext/soap/soap.c.orig	2014-08-13 21:22:50.000000000 +0200
++++ php-5.3.29/ext/soap/soap.c	2025-01-30 13:13:36.876493027 +0100
+@@ -4142,7 +4142,7 @@
+ 
+ 		if (version == SOAP_1_1) {
+ 			if (zend_hash_find(prop, "faultcode", sizeof("faultcode"), (void**)&tmp) == SUCCESS) {
+-				size_t new_len;
++				int new_len;
+ 				xmlNodePtr node = xmlNewNode(NULL, BAD_CAST("faultcode"));
+ 				char *str = php_escape_html_entities((unsigned char*)Z_STRVAL_PP(tmp), Z_STRLEN_PP(tmp), &new_len, 0, 0, NULL TSRMLS_CC);
+ 				xmlAddChild(param, node);
+@@ -4167,7 +4167,7 @@
+ 			detail_name = "detail";
+ 		} else {
+ 			if (zend_hash_find(prop, "faultcode", sizeof("faultcode"), (void**)&tmp) == SUCCESS) {
+-				size_t new_len;
++				int new_len;
+ 				xmlNodePtr node = xmlNewChild(param, ns, BAD_CAST("Code"), NULL);
+ 				char *str = php_escape_html_entities((unsigned char*)Z_STRVAL_PP(tmp), Z_STRLEN_PP(tmp), &new_len, 0, 0, NULL TSRMLS_CC);
+ 				node = xmlNewChild(node, ns, BAD_CAST("Value"), NULL);

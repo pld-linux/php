@@ -20,3 +20,13 @@
  #ifdef HAVE_GD_WBMP
  #include "libgd/wbmp.h"
  #endif
+--- php-5.3.29/sapi/litespeed/lsapi_main.c.orig	2025-01-30 12:21:08.288824792 +0100
++++ php-5.3.29/sapi/litespeed/lsapi_main.c	2025-01-30 12:40:58.378839232 +0100
+@@ -27,6 +27,7 @@
+ #include "zend.h"
+ #include "ext/standard/basic_functions.h"
+ #include "ext/standard/info.h"
++#include "ext/standard/php_string.h"
+ 
+ #include "lsapilib.h"
+ 

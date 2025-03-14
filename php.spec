@@ -150,7 +150,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.2.27
+Version:	8.2.28
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -159,7 +159,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	8d640b2782b7d91ff0eca92dc2ba1271
+# Source0-md5:	64dc1e6377967c87cecbfba714af8995
 #Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
@@ -1873,40 +1873,40 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 %setup -q -n %{orgname}-%{version}%{?subver}
 
 cp -p php.ini-production php.ini
-%patch0 -p1
-%patch1 -p1
+%patch -P0 -p1
+%patch -P1 -p1
 #%patch2 -p1 -b .mail
-%patch3 -p1
-%patch4 -p1
+%patch -P3 -p1
+%patch -P4 -p1
 #%patch5 -p1 resolved upstream?
-%patch6 -p1
-%patch7 -p1 -b .sapi-ini-file
+%patch -P6 -p1
+%patch -P7 -p1 -b .sapi-ini-file
 
-%patch10 -p1 -b .ini
-%patch14 -p1
-%patch18 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1 -b .zlib-for-getimagesize
-%patch25 -p1
-%patch27 -p1
-%patch29 -p1
-%patch31 -p1
-%patch39 -p1 -b .use-prog_sendmail
-%patch41 -p1
-%patch43 -p1
-%patch44 -p1
-%patch50 -p1
-%patch53 -p1
-%patch59 -p1 -b .systzdata
+%patch -P10 -p1 -b .ini
+%patch -P14 -p1
+%patch -P18 -p1
+%patch -P21 -p1
+%patch -P22 -p1
+%patch -P23 -p1
+%patch -P24 -p1 -b .zlib-for-getimagesize
+%patch -P25 -p1
+%patch -P27 -p1
+%patch -P29 -p1
+%patch -P31 -p1
+%patch -P39 -p1 -b .use-prog_sendmail
+%patch -P41 -p1
+%patch -P43 -p1
+%patch -P44 -p1
+%patch -P50 -p1
+%patch -P53 -p1
+%patch -P59 -p1 -b .systzdata
 %if %{with instantclient}
-%patch60 -p1 -b .instantclient
+%patch -P60 -p1 -b .instantclient
 %endif
-%patch66 -p1
-%patch67 -p1 -b .mysql-lib-ver-mismatch
+%patch -P66 -p1
+%patch -P67 -p1 -b .mysql-lib-ver-mismatch
 #%patch68 -p1 DROP or update to 7.0 APIs
-%patch71 -p1 -b .libdb-info
+%patch -P71 -p1 -b .libdb-info
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \
 	ext/ext_skel.php \

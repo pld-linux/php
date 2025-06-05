@@ -139,7 +139,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.4.7
+Version:	8.4.8
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -148,7 +148,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	d781a4e08fa8903919ca28b1e2419393
+# Source0-md5:	d1fb4d81da64c38871f4905e0bd20104
 #Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
@@ -285,7 +285,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.22.5
+%define		zipver		1.22.6
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
@@ -2325,7 +2325,7 @@ ln -s libphp8-$v.so $RPM_BUILD_ROOT%{_libdir}/apache/mod_php.so
 
 # install litespeed sapi
 %if %{with litespeed}
-libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/%{name}.litespeed
+libtool --mode=install install -p sapi/litespeed/lsphp $RPM_BUILD_ROOT%{_sbindir}/%{name}.litespeed
 %endif
 
 %if %{with phpdbg}

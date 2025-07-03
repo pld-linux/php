@@ -1875,10 +1875,10 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 cp -p php.ini-production php.ini
 %patch -P0 -p1
 %patch -P1 -p1
-#%patch2 -p1 -b .mail
+#%%patch2 -p1 -b .mail
 %patch -P3 -p1
 %patch -P4 -p1
-#%patch5 -p1 resolved upstream?
+#%%patch5 -p1 resolved upstream?
 %patch -P6 -p1
 %patch -P7 -p1 -b .sapi-ini-file
 
@@ -1905,7 +1905,7 @@ cp -p php.ini-production php.ini
 %endif
 %patch -P66 -p1
 %patch -P67 -p1 -b .mysql-lib-ver-mismatch
-#%patch68 -p1 DROP or update to 7.0 APIs
+#%%patch68 -p1 DROP or update to 7.0 APIs
 %patch -P71 -p1 -b .libdb-info
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \

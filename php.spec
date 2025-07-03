@@ -1872,7 +1872,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 cp -p php.ini-production php.ini
 %patch -P0 -p1
 %patch -P1 -p1
-#%patch -P2 -p1 -b .mail
+#%%patch -P2 -p1 -b .mail
 %patch -P3 -p1
 %patch -P4 -p1
 %patch -P5 -p1
@@ -1902,7 +1902,7 @@ cp -p php.ini-production php.ini
 %endif
 %patch -P66 -p1
 %patch -P67 -p1 -b .mysql-lib-ver-mismatch
-#%patch -P68 -p1 DROP or update to 7.0 APIs
+#%%patch -P68 -p1 DROP or update to 7.0 APIs
 %patch -P71 -p1 -b .libdb-info
 %patch -P72 -p1
 

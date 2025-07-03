@@ -148,7 +148,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.1.32
+Version:	8.1.33
 Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -157,7 +157,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	685eda239895545d75c124be537d34e4
+# Source0-md5:	36cd5b20659667cbddd171c6238dd64b
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -205,7 +205,6 @@ Patch67:	mysql-lib-ver-mismatch.patch
 # https://bugs.php.net/bug.php?id=68344
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
-Patch72:	icu74.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1904,7 +1903,6 @@ cp -p php.ini-production php.ini
 %patch -P67 -p1 -b .mysql-lib-ver-mismatch
 #%%patch -P68 -p1 DROP or update to 7.0 APIs
 %patch -P71 -p1 -b .libdb-info
-%patch -P72 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

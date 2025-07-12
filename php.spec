@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	30
+%define		rel	31
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2162,8 +2162,8 @@ exit 1
 %endif
 %patch -P43 -p1
 %patch -P44 -p1
-#%patch -P45 -p1 # imap annotations. fixme
-#%patch -P46 -p1 # imap myrights. fixme
+#%%patch -P45 -p1 # imap annotations. fixme
+#%%patch -P46 -p1 # imap myrights. fixme
 %if %{with suhosin}
 %patch -P47 -p1
 %endif

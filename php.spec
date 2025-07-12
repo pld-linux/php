@@ -237,7 +237,7 @@ BuildRequires:	libxml2-devel >= 1:2.9.0
 %{!?with_pdo_mysql:BuildRequires:	mysql-devel}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.3}
 BuildRequires: oniguruma-devel
-%{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
+%{?with_ldap:BuildRequires:	openldap-devel >= 2.6.0}
 %if %{with openssl} || %{with ldap}
 BuildRequires:	openssl-devel >= 1.0.2
 %endif

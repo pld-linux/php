@@ -63,7 +63,7 @@
  
  ; Directory where the temporary files should be placed.
  ; Defaults to the system default (see sys_get_temp_dir)
-@@ -758,64 +768,6 @@
+@@ -787,70 +787,6 @@ user_dir =
  ; https://php.net/enable-dl
  enable_dl = Off
  
@@ -106,6 +106,12 @@
 -; https://php.net/fastcgi.impersonate
 -;fastcgi.impersonate = 1
 -
+-; Prevent decoding of SCRIPT_FILENAME when using Apache ProxyPass or
+-; ProxyPassMatch. This should only be used if script file paths are already
+-; stored in an encoded format on the file system.
+-; Default is 0.
+-;fastcgi.script_path_encoded = 1
+-
 -; Disable logging through FastCGI connection. PHP's default behavior is to enable
 -; this feature.
 -;fastcgi.logging = 0
@@ -128,18 +134,20 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -858,48 +858,7 @@ default_socket_timeout = 60
+@@ -863,49 +863,8 @@ default_socket_timeout = 60
  ; deprecated in a future PHP major version. So, when it is possible, please
  ; move to the new ('extension=<ext>) syntax.
  ;
 -; Notes for Windows environments :
--;
++; In PLD Linux you can install appropriate php84-<extension> or php84-pecl-<extension> package.
+ ;
 -; - Many DLL files are located in the ext/
 -;   extension folders as well as the separate PECL DLL download.
 -;   Be sure to appropriately set the extension_dir directive.
 -;
 -;extension=bz2
 -;extension=curl
+-;extension=exif
 -;extension=ffi
 -;extension=ftp
 -;extension=fileinfo
@@ -149,7 +157,6 @@
 -;extension=intl
 -;extension=ldap
 -;extension=mbstring
--;extension=exif      ; Must be after mbstring as it depends on it
 -;extension=mysqli
 -;extension=odbc
 -;extension=openssl
@@ -174,10 +181,10 @@
 -;extension=zip
 -
 -;zend_extension=opcache
-+; In PLD Linux you can install appropriate php84-<extension> or php84-pecl-<extension> package.
- 
+-
  ;;;;;;;;;;;;;;;;;;;
  ; Module Settings ;
+ ;;;;;;;;;;;;;;;;;;;
 @@ -954,8 +867,9 @@
  
  [Date]
@@ -231,7 +238,8 @@
  
  ; (time to live) Sets the number of second while cached file will be used
  ; instead of original one.
-@@ -1673,161 +1673,6 @@ ldap.max_links = -1
+
+@@ -1575,170 +1575,6 @@ ldap.max_links = -1
  [dba]
  ;dba.default_handler=
  
@@ -342,6 +350,15 @@
 -; SHM reset. The default "" disables file based caching.
 -;opcache.file_cache=
 -
+-; Enables or disables read-only mode for the second level cache directory.
+-; It should improve performance for read-only containers,
+-; when the cache is pre-warmed and packaged alongside the application.
+-; Best used with `opcache.validate_timestamps=0`, `opcache.enable_file_override=1`
+-; and `opcache.file_cache_consistency_checks=0`.
+-; Note: A cache generated with a different build of PHP, a different file path,
+-; or different settings (including which extensions are loaded), may be ignored.
+-;opcache.file_cache_read_only=0
+-
 -; Enables or disables opcode caching in shared memory.
 -;opcache.file_cache_only=0
 -
@@ -393,4 +410,3 @@
  [curl]
  ; A default value for the CURLOPT_CAINFO option. This is required to be an
  ; absolute path.
-

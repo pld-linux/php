@@ -55,9 +55,9 @@ diff -up ./ext/date/config0.m4.systzdata ./ext/date/config0.m4
 +   fi
 +fi
 +
- PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -I@ext_builddir@/lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -DHAVE_TIMELIB_CONFIG_H=1"
- timelib_sources="lib/astro.c lib/dow.c lib/parse_date.c lib/parse_tz.c lib/parse_posix.c
-                  lib/timelib.c lib/tm2unixtime.c lib/unixtime2tm.c lib/parse_iso_intervals.c lib/interval.c"
+ PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -DHAVE_TIMELIB_CONFIG_H=1"
+ PHP_TIMELIB_CFLAGS="$PHP_DATE_CFLAGS"
+ PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -I@ext_builddir@/lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
 diff -up ./ext/date/lib/parse_tz.c.systzdata ./ext/date/lib/parse_tz.c
 --- ./ext/date/lib/parse_tz.c.systzdata	2024-07-02 15:43:13.000000000 +0200
 +++ ./ext/date/lib/parse_tz.c	2024-07-03 16:21:20.240786848 +0200

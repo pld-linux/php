@@ -128,10 +128,10 @@
 %endif
 
 %define		orgname		php
-%define		ver_suffix	84
+%define		ver_suffix	85
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
-%define		subver		%{nil}
-%define		rel		3
+%define		subver		alpha1
+%define		rel		0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -139,7 +139,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.4.10
+Version:	8.5.0
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -147,9 +147,10 @@ Epoch:		4
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	b73a7c365a7e75905745528d218cf128
-#Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
+#XSource0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+# XSource0-md5:	b73a7c365a7e75905745528d218cf128
+Source0:	https://downloads.php.net/~daniels/php-%{version}%{subver}.tar.xz
+# Source0-md5:	75498754fc2cf772d0377f24c76b4730
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -177,7 +178,7 @@ Patch21:	%{orgname}-dba-link.patch
 Patch22:	%{orgname}-both-apxs.patch
 Patch23:	%{orgname}-builddir.patch
 Patch24:	%{orgname}-zlib-for-getimagesize.patch
-Patch25:	%{orgname}-stupidapache_version.patch
+
 Patch27:	%{orgname}-config-dir.patch
 Patch29:	%{orgname}-fcgi-graceful.patch
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
@@ -271,7 +272,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20240924
+%define		php_api_version		20240925
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20240423
@@ -1789,7 +1790,7 @@ cp -p php.ini-production php.ini
 %patch -P22 -p1
 %patch -P23 -p1
 %patch -P24 -p1 -b .zlib-for-getimagesize
-%patch -P25 -p1
+
 %patch -P27 -p1
 %patch -P29 -p1
 %patch -P31 -p1
@@ -1876,8 +1877,8 @@ sed -i -e 's#-fvisibility=hidden##g' configure*
 # fails sometimes
 %{__rm} ext/sockets/tests/mcast_ipv?_recv.phpt
 # causes stack exhausion
-%{__rm} Zend/tests/bug54268.phpt
-%{__rm} Zend/tests/bug68412.phpt
+%{__rm} Zend/tests/class_alias/bug54268.phpt
+%{__rm} Zend/tests/magic_methods/bug68412.phpt
 
 # avoid issues when two builds run simultaneously
 %ifarch %{x8664}

@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	42
+%define		rel	43
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -1880,43 +1880,43 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 
 %prep
 %setup -q -n %{orgname}-%{version}
-%patch100 -p1
+%patch -P100 -p1
 # for suhosin patch
 %{__sed} -i -e 's,\r$,,' Zend/Zend.dsp Zend/ZendTS.dsp
 
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
+%patch -P5 -p1
+%patch -P6 -p1
+%patch -P7 -p1
+%patch -P8 -p1
+%patch -P9 -p1
 
 cp php.ini-dist php.ini
-%patch10 -p1
+%patch -P10 -p1
 # for ac2.53b/am1.6b - AC_LANG_CXX has AM_CONDITIONAL, so cannot be invoked
 # conditionally...
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
+%patch -P11 -p1
+%patch -P12 -p1
+%patch -P13 -p1
+%patch -P14 -p1
+%patch -P15 -p1
+%patch -P16 -p1
+%patch -P17 -p1
+%patch -P18 -p1
 %if %{with system_gd}
-%patch19 -p1
+%patch -P19 -p1
 %endif
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
+%patch -P20 -p1
+%patch -P21 -p1
+%patch -P22 -p1
+%patch -P23 -p1
+%patch -P24 -p1
 
-%{?with_versioning:%patch25 -p1}
+%{?with_versioning:%patch -P25 -p1}
 
 %if 0
 %{__tar} jxf %{SOURCE9}
@@ -1927,78 +1927,78 @@ for a in gentoo-patchset/*.patch; do
 done
 %endif
 
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-#%patch31 -p1
-%patch32 -p1
-%patch33 -p1
+%patch -P26 -p1
+%patch -P27 -p1
+%patch -P28 -p1
+%patch -P29 -p1
+%patch -P30 -p1
+#%patch -P31 -p1
+%patch -P32 -p1
+%patch -P33 -p1
 %if "%{pld_release}" != "ac"
-%patch34 -p1
+%patch -P34 -p1
 %endif
-%patch35 -p1
+%patch -P35 -p1
 
 # mysql default charset for mysql/mysql/pdo-mysql extensions
-%patch36 -p1
-%patch37 -p1
-%patch38 -p0
+%patch -P36 -p1
+%patch -P37 -p1
+%patch -P38 -p0
 
-%patch39 -p1
+%patch -P39 -p1
 
 %if %{with fpm}
-%patch40 -p1
-%patch41 -p1
-%patch42 -p1
+%patch -P40 -p1
+%patch -P41 -p1
+%patch -P42 -p1
 %endif
 
-%patch43 -p1
-%patch44 -p1
-%patch45 -p1
-%patch46 -p1
+%patch -P43 -p1
+%patch -P44 -p1
+%patch -P45 -p1
+%patch -P46 -p1
 %if %{with suhosin}
-%patch47 -p1
+%patch -P47 -p1
 %endif
-%patch48 -p1
-%patch49 -p1
-%patch50 -p1
-%patch51 -p1
-%patch52 -p1
-%patch53 -p1
-%patch54 -p1
-%patch55 -p1
-%patch56 -p1
-%patch57 -p1
-%patch58 -p4
-%patch59 -p1
-%patch60 -p1
-%patch61 -p1
-%{?with_system_libzip:%patch65 -p1}
-%patch66 -p1
-%patch67 -p1
-%patch69 -p4
-%patch70 -p1
-%patch71 -p1
-%patch72 -p1
-%patch73 -p1
-%patch74 -p1
-%patch75 -p1
-%patch76 -p1
-%patch77 -p1
-%patch78 -p1
-%patch79 -p1
-%patch80 -p1
-%patch81 -p1
+%patch -P48 -p1
+%patch -P49 -p1
+%patch -P50 -p1
+%patch -P51 -p1
+%patch -P52 -p1
+%patch -P53 -p1
+%patch -P54 -p1
+%patch -P55 -p1
+%patch -P56 -p1
+%patch -P57 -p1
+%patch -P58 -p4
+%patch -P59 -p1
+%patch -P60 -p1
+%patch -P61 -p1
+%{?with_system_libzip:%patch -P65 -p1}
+%patch -P66 -p1
+%patch -P67 -p1
+%patch -P69 -p4
+%patch -P70 -p1
+%patch -P71 -p1
+%patch -P72 -p1
+%patch -P73 -p1
+%patch -P74 -p1
+%patch -P75 -p1
+%patch -P76 -p1
+%patch -P77 -p1
+%patch -P78 -p1
+%patch -P79 -p1
+%patch -P80 -p1
+%patch -P81 -p1
 
 # Bugfix backport from 5.3.6
-%patch311 -p1 -b .bug-47435
-%patch314 -p1 -b .bug-39199
+%patch -P311 -p1 -b .bug-47435
+%patch -P314 -p1 -b .bug-39199
 # Bugfix backport from 5.3.7
-#accert %patch333 -p1 -b .bug-54924
-#soap %patch355 -p1 -b .bug-55323
+#accert %%patch -P333 -p1 -b .bug-54924
+#soap %%patch -P355 -p1 -b .bug-55323
 # causes regression -> magic_quotes_gpc setting cannot be changed
-#%%patch402 -p1 -b .bug-323016
+#%%%patch -P402 -p1 -b .bug-323016
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

@@ -149,7 +149,7 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.1.33
-Release:	1
+Release:	2
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend

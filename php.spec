@@ -230,6 +230,7 @@ Patch80:	mysqli-err.patch
 Patch81:	openssl.patch
 Patch82:	libxml2.patch
 Patch83:	readdir.patch
+Patch84:	fopencookie.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -1994,6 +1995,7 @@ done
 %patch -P81 -p1
 %patch -P82 -p1
 %patch -P83 -p1
+%patch -P84 -p1
 
 # Bugfix backport from 5.3.6
 %patch -P311 -p1 -b .bug-47435

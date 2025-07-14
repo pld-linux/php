@@ -1,0 +1,19 @@
+--- php-5.2.17.org/acinclude.m4	2025-07-14 18:21:57.202299884 +0200
++++ php-5.2.17/acinclude.m4	2025-07-14 18:51:21.089790420 +0200
+@@ -1757,6 +1757,7 @@
+ dnl even newer glibcs have a different seeker definition...
+ AC_TRY_RUN([
+ #define _GNU_SOURCE
++#include <stdlib.h>
+ #include <stdio.h>
+ 
+ struct cookiedata {
+@@ -1775,7 +1775,7 @@
+ 
+ cookie_io_functions_t funcs = {reader, writer, seeker, closer};
+ 
+-main() {
++int main() {
+   struct cookiedata g = { 0 };
+   FILE *fp = fopencookie(&g, "r", funcs);
+ 

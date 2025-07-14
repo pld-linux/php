@@ -148,7 +148,7 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.0.28
-Release:	8
+Release:	9
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -1871,7 +1871,7 @@ Moduł PHP umożliwiający używanie kompresji zlib.
 cp -p php.ini-production php.ini
 %patch -P0 -p1
 %patch -P1 -p1
-#%patch -P2 -p1 -b .mail
+#%%patch -P2 -p1 -b .mail
 %patch -P3 -p1
 %patch -P4 -p1
 %patch -P5 -p1

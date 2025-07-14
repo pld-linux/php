@@ -1,0 +1,178 @@
+diff -ur php-5.2.17.org/ext/session/mod_files.c php-5.2.17/ext/session/mod_files.c
+--- php-5.2.17.org/ext/session/mod_files.c	2025-07-14 14:22:45.636981032 +0200
++++ php-5.2.17/ext/session/mod_files.c	2025-07-14 14:24:07.700813103 +0200
+@@ -210,7 +210,7 @@
+ {
+ 	DIR *dir;
+ 	char dentry[sizeof(struct dirent) + MAXPATHLEN];
+-	struct dirent *entry = (struct dirent *) &dentry;
++	struct dirent *entry;
+ 	struct stat sbuf;
+ 	char buf[MAXPATHLEN];
+ 	time_t now;
+@@ -230,7 +230,7 @@
+ 	memcpy(buf, dirname, dirname_len);
+ 	buf[dirname_len] = PHP_DIR_SEPARATOR;
+ 
+-	while (php_readdir_r(dir, (struct dirent *) dentry, &entry) == 0 && entry) {
++	while ((entry = readdir(dir))) {
+ 		/* does the file start with our prefix? */
+ 		if (!strncmp(entry->d_name, FILE_PREFIX, sizeof(FILE_PREFIX) - 1)) {
+ 			size_t entry_len = strlen(entry->d_name);
+Tylko w php-5.2.17/ext/session: mod_files.c~
+diff -ur php-5.2.17.org/ext/session/mod_files.c.orig php-5.2.17/ext/session/mod_files.c.orig
+--- php-5.2.17.org/ext/session/mod_files.c.orig	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/ext/session/mod_files.c.orig	2025-07-14 14:23:54.200731143 +0200
+@@ -210,7 +210,7 @@
+ {
+ 	DIR *dir;
+ 	char dentry[sizeof(struct dirent) + MAXPATHLEN];
+-	struct dirent *entry = (struct dirent *) &dentry;
++	struct dirent *entry;
+ 	struct stat sbuf;
+ 	char buf[MAXPATHLEN];
+ 	time_t now;
+@@ -231,7 +231,7 @@
+ 	memcpy(buf, dirname, dirname_len);
+ 	buf[dirname_len] = PHP_DIR_SEPARATOR;
+ 
+-	while (php_readdir_r(dir, (struct dirent *) dentry, &entry) == 0 && entry) {
++	while ((entry = readdir(dir))) {
+ 		/* does the file start with our prefix? */
+ 		if (!strncmp(entry->d_name, FILE_PREFIX, sizeof(FILE_PREFIX) - 1)) {
+ 			size_t entry_len = strlen(entry->d_name);
+Tylko w php-5.2.17/ext/session: mod_files.c.orig~
+diff -ur php-5.2.17.org/main/php_reentrancy.h php-5.2.17/main/php_reentrancy.h
+--- php-5.2.17.org/main/php_reentrancy.h	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/main/php_reentrancy.h	2025-07-14 14:25:00.217798607 +0200
+@@ -51,13 +51,6 @@
+ 
+ BEGIN_EXTERN_C()
+ 
+-#if defined(HAVE_POSIX_READDIR_R)
+-#define php_readdir_r readdir_r
+-#else
+-PHPAPI int php_readdir_r(DIR *dirp, struct dirent *entry,
+-		struct dirent **result);
+-#endif
+-
+ #if !defined(HAVE_LOCALTIME_R) && defined(HAVE_LOCALTIME)
+ #define PHP_NEED_REENTRANCY 1
+ PHPAPI struct tm *php_localtime_r(const time_t *const timep, struct tm *p_tm);
+Tylko w php-5.2.17/main: php_reentrancy.h~
+diff -ur php-5.2.17.org/main/php_scandir.c php-5.2.17/main/php_scandir.c
+--- php-5.2.17.org/main/php_scandir.c	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/main/php_scandir.c	2025-07-14 14:26:11.348230448 +0200
+@@ -64,7 +64,7 @@
+ 	int vector_size = 0;
+ 	int nfiles = 0;
+ 	char entry[sizeof(struct dirent)+MAXPATHLEN];
+-	struct dirent *dp = (struct dirent *)&entry;
++	struct dirent *dp;
+ 
+ 	if (namelist == NULL) {
+ 		return -1;
+@@ -74,7 +74,7 @@
+ 		return -1;
+ 	}
+ 
+-	while (!php_readdir_r(dirp, (struct dirent *)entry, &dp) && dp) {
++	while ((dp = readdir(dirp))) {
+ 		int dsize = 0;
+ 		struct dirent *newdp = NULL;
+ 
+Tylko w php-5.2.17/main: php_scandir.c~
+diff -ur php-5.2.17.org/main/reentrancy.c php-5.2.17/main/reentrancy.c
+--- php-5.2.17.org/main/reentrancy.c	2025-07-14 14:22:45.206978415 +0200
++++ php-5.2.17/main/reentrancy.c	2025-07-14 14:26:26.958325219 +0200
+@@ -123,54 +123,6 @@
+ 
+ #endif /* BEOS */
+ 
+-#if !defined(HAVE_POSIX_READDIR_R)
+-
+-PHPAPI int php_readdir_r(DIR *dirp, struct dirent *entry, 
+-		struct dirent **result)
+-{
+-#if defined(HAVE_OLD_READDIR_R)
+-	int ret = 0;
+-	
+-	/* We cannot rely on the return value of readdir_r
+-	   as it differs between various platforms
+-	   (HPUX returns 0 on success whereas Solaris returns non-zero)
+-	 */
+-	entry->d_name[0] = '\0';
+-	readdir_r(dirp, entry);
+-	
+-	if (entry->d_name[0] == '\0') {
+-		*result = NULL;
+-		ret = errno;
+-	} else {
+-		*result = entry;
+-	}
+-	return ret;
+-#else
+-	struct dirent *ptr;
+-	int ret = 0;
+-
+-	local_lock(READDIR_R);
+-	
+-	errno = 0;
+-	
+-	ptr = readdir(dirp);
+-	
+-	if (!ptr && errno != 0)
+-		ret = errno;
+-
+-	if (ptr)
+-		memcpy(entry, ptr, sizeof(*ptr));
+-
+-	*result = ptr;
+-
+-	local_unlock(READDIR_R);
+-
+-	return ret;
+-#endif
+-}
+-
+-#endif
+-
+ #if !defined(HAVE_LOCALTIME_R) && defined(HAVE_LOCALTIME)
+ 
+ PHPAPI struct tm *php_localtime_r(const time_t *const timep, struct tm *p_tm)
+Tylko w php-5.2.17/main: reentrancy.c~
+diff -ur php-5.2.17.org/main/streams/plain_wrapper.c php-5.2.17/main/streams/plain_wrapper.c
+--- php-5.2.17.org/main/streams/plain_wrapper.c	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/main/streams/plain_wrapper.c	2025-07-14 14:26:52.965149775 +0200
+@@ -808,14 +808,15 @@
+ 	DIR *dir = (DIR*)stream->abstract;
+ 	/* avoid libc5 readdir problems */
+ 	char entry[sizeof(struct dirent)+MAXPATHLEN];
+-	struct dirent *result = (struct dirent *)&entry;
++	struct dirent *result;
+ 	php_stream_dirent *ent = (php_stream_dirent*)buf;
+ 
+ 	/* avoid problems if someone mis-uses the stream */
+ 	if (count != sizeof(php_stream_dirent))
+ 		return 0;
+ 
+-	if (php_readdir_r(dir, (struct dirent *)entry, &result) == 0 && result) {
++	result = readdir(dir);
++	if (result) {
+ 		PHP_STRLCPY(ent->d_name, result->d_name, sizeof(ent->d_name), strlen(result->d_name));
+ 		return sizeof(php_stream_dirent);
+ 	}
+Tylko w php-5.2.17/main/streams: plain_wrapper.c~
+diff -ur php-5.2.17.org/win32/readdir.h php-5.2.17/win32/readdir.h
+--- php-5.2.17.org/win32/readdir.h	2006-12-01 21:17:50.000000000 +0100
++++ php-5.2.17/win32/readdir.h	2025-07-14 14:23:23.500544759 +0200
+@@ -17,8 +17,6 @@
+ #include <sys/types.h>
+ #include <direct.h>
+ 
+-#define php_readdir_r readdir_r
+-
+ /* struct dirent - same as Unix */
+ 
+ struct dirent {
+Tylko w php-5.2.17/win32: readdir.h~

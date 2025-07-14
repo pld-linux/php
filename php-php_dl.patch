@@ -28,7 +28,7 @@ this allows to load permanent modules with full path (eases make test code)
 -				RETURN_FALSE;
 -			}
 +			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Temporary module name should contain only filename");
-+			return FAILURE;
++			RETURN_FALSE;
  		}
 +		libpath = estrdup(filename);
 +	} else if (extension_dir && extension_dir[0]) {
@@ -43,7 +43,7 @@ this allows to load permanent modules with full path (eases make test code)
  		}
  	} else {
 -		libpath = estrndup(Z_STRVAL_P(file), Z_STRLEN_P(file));
-+		return FAILURE; /* Not full path given or extension_dir is not set */
++		RETURN_FALSE; /* Not full path given or extension_dir is not set */
  	}
  
  	/* load dynamic symbol */

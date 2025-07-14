@@ -228,6 +228,8 @@ Patch78:	php-bug-68486.patch
 Patch79:	libevent-2.1.patch
 Patch80:	mysqli-err.patch
 Patch81:	openssl.patch
+Patch82:	libxml2.patch
+Patch83:	readdir.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -1990,6 +1992,8 @@ done
 %patch -P79 -p1
 %patch -P80 -p1
 %patch -P81 -p1
+%patch -P82 -p1
+%patch -P83 -p1
 
 # Bugfix backport from 5.3.6
 %patch -P311 -p1 -b .bug-47435
@@ -1998,7 +2002,7 @@ done
 #accert %%patch -P333 -p1 -b .bug-54924
 #soap %%patch -P355 -p1 -b .bug-55323
 # causes regression -> magic_quotes_gpc setting cannot be changed
-#%%%patch -P402 -p1 -b .bug-323016
+#%%patch -P402 -p1 -b .bug-323016
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

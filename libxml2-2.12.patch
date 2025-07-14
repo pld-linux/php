@@ -62,3 +62,20 @@ index 749f5a5685ec2..b731114775ad7 100644
  
  		if (xmlErrorPtr) {
  			soap_error2(E_ERROR, "Parsing WSDL: Couldn't load from '%s' : %s", struri, xmlErrorPtr->message);
+diff --git a/ext/libxml/libxml.c b/ext/libxml/libxml.c
+index 6cdfbd397f7..dc5e7790952 100644
+--- a/ext/libxml/libxml.c
++++ b/ext/libxml/libxml.c
+@@ -430,8 +430,10 @@ php_libxml_input_buffer_create_filename(const char *URI, xmlCharEncoding enc)
+ static xmlOutputBufferPtr
+ php_libxml_output_buffer_create_filename(const char *URI,
+                               xmlCharEncodingHandlerPtr encoder,
+-                              int compression ATTRIBUTE_UNUSED)
++                              int compression)
+ {
++	php_ignore_value(compression);
++
+ 	xmlOutputBufferPtr ret;
+ 	xmlURIPtr puri;
+ 	void *context = NULL;
+

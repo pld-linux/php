@@ -1,0 +1,26 @@
+diff -ur php-5.2.17.org/ext/curl/interface.c php-5.2.17/ext/curl/interface.c
+--- php-5.2.17.org/ext/curl/interface.c	2025-07-14 19:41:23.264777178 +0200
++++ php-5.2.17/ext/curl/interface.c	2025-07-14 19:48:25.274022837 +0200
+@@ -1237,19 +1237,19 @@
+ 	dupch->cp = cp;
+ 	dupch->uses = 0;
+ 	if (ch->handlers->write->stream) {
+-		zval_add_ref(ch->handlers->write->stream);
++		zval_add_ref(&ch->handlers->write->stream);
+ 	}
+ 	dupch->handlers->write->stream = ch->handlers->write->stream;
+ 	dupch->handlers->write->method = ch->handlers->write->method;
+ 	dupch->handlers->write->type   = ch->handlers->write->type;
+ 	if (ch->handlers->read->stream) {
+-		zval_add_ref(ch->handlers->read->stream);
++		zval_add_ref(&ch->handlers->read->stream);
+ 	}
+ 	dupch->handlers->read->stream  = ch->handlers->read->stream;
+ 	dupch->handlers->read->method  = ch->handlers->read->method;
+ 	dupch->handlers->write_header->method = ch->handlers->write_header->method;
+ 	if (ch->handlers->write_header->stream) {
+-		zval_add_ref(ch->handlers->write_header->stream);
++		zval_add_ref(&ch->handlers->write_header->stream);
+ 	}
+ 	dupch->handlers->write_header->stream = ch->handlers->write_header->stream;
+ 

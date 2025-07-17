@@ -1,0 +1,11 @@
+--- php-5.2.17/ext/xmlwriter/php_xmlwriter.c~	2025-07-17 14:40:39.000000000 +0200
++++ php-5.2.17/ext/xmlwriter/php_xmlwriter.c	2025-07-17 14:48:41.012841386 +0200
+@@ -28,7 +28,7 @@
+ #include "php_ini.h"
+ #include "ext/standard/info.h"
+ #include "php_xmlwriter.h"
+-
++#include "ext/standard/php_string.h"
+ 
+ #if LIBXML_VERSION >= 20605
+ static PHP_FUNCTION(xmlwriter_set_indent);

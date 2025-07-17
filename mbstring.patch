@@ -1,0 +1,20 @@
+--- php-5.2.17/ext/mbstring/mbstring.c.org	2010-01-03 10:23:27.000000000 +0100
++++ php-5.2.17/ext/mbstring/mbstring.c	2025-07-17 13:25:23.262801399 +0200
+@@ -4277,7 +4277,7 @@ MBSTRING_API int php_mb_stripos(int mode
+ 	needle.no_encoding = MBSTRG(current_internal_encoding);
+ 
+ 	do {
+-		haystack.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_haystack, (size_t) old_haystack_len, &haystack.len, from_encoding TSRMLS_CC);
++		haystack.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_haystack, (size_t) old_haystack_len, (unsigned long *)&haystack.len, from_encoding TSRMLS_CC);
+ 
+ 		if (!haystack.val) {
+ 			break;
+@@ -4287,7 +4287,7 @@ MBSTRING_API int php_mb_stripos(int mode
+ 			break;
+ 		}
+ 
+-		needle.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_needle, (size_t) old_needle_len, &needle.len, from_encoding TSRMLS_CC);
++		needle.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_needle, (size_t) old_needle_len, (unsigned long *)&needle.len, from_encoding TSRMLS_CC);
+ 
+ 		if (!needle.val) {
+ 			break;

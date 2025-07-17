@@ -38,15 +38,15 @@
 %bcond_without	curl		# without CURL extension module
 %bcond_without	filter		# without filter extension module
 %bcond_without	imap		# without IMAP extension module
-%bcond_without	interbase	# without InterBase extension module
+%bcond_with	interbase	# without InterBase extension module
 %bcond_without	ldap		# without LDAP extension module
 %bcond_without	mhash		# without mhash extension module
 %bcond_without	mime_magic	# without mime-magic module
 %bcond_with	ming		# with ming extension module
 %bcond_without	mm		# without mm support for session storage
-%bcond_without	mssql		# without MS SQL extension module
+%bcond_with	mssql		# without MS SQL extension module
 %bcond_without	mysqli		# without mysqli support (Requires mysql > 4.1)
-%bcond_without	odbc		# without ODBC extension module
+%bcond_with	odbc		# without ODBC extension module
 %bcond_without	openssl		# without OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcre		# without PCRE extension module
 %bcond_without	pgsql		# without PostgreSQL extension module
@@ -54,8 +54,8 @@
 %bcond_without	recode		# without recode extension module
 %bcond_without	snmp		# without SNMP extension module
 %bcond_without	sqlite		# without SQLite extension module
-%bcond_without	sybase		# without Sybase extension module
-%bcond_without	sybase_ct	# without Sybase-CT extension module
+%bcond_with	sybase		# without Sybase extension module
+%bcond_with	sybase_ct	# without Sybase-CT extension module
 %bcond_without	tidy		# without Tidy extension module
 %bcond_without	wddx		# without WDDX extension module
 %bcond_without	xmlrpc		# without XML-RPC extension module
@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	45
+%define		rel	46
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -232,6 +232,10 @@ Patch82:	libxml2.patch
 Patch83:	readdir.patch
 Patch84:	fopencookie.patch
 Patch85:	curl.patch
+Patch86:	mbstring.patch
+Patch87:	pgsql.patch
+Patch88:	zip.patch
+Patch89:	xmlwriter.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -288,6 +292,7 @@ BuildRequires:	libxslt-devel >= 1.1.0
 %{?with_ming:BuildRequires:	ming-devel >= 0.3}
 %{?with_mm:BuildRequires:	mm-devel >= 1.3.0}
 BuildRequires:	mysql-devel >= 4.0.0
+BuildRequires:	mysql-devel < 6.0
 %{?with_mysqli:BuildRequires:	mysql-devel >= 4.1}
 BuildRequires:	ncurses-ext-devel
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.0.7}
@@ -1998,6 +2003,10 @@ done
 %patch -P83 -p1
 %patch -P84 -p1
 %patch -P85 -p1
+%patch -P86 -p1
+%patch -P87 -p1
+%patch -P88 -p1
+%patch -P89 -p1
 
 # Bugfix backport from 5.3.6
 %patch -P311 -p1 -b .bug-47435

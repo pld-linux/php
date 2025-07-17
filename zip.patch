@@ -1,0 +1,11 @@
+--- php-5.2.17/ext/zip/php_zip.c~	2025-07-17 14:18:21.000000000 +0200
++++ php-5.2.17/ext/zip/php_zip.c	2025-07-17 14:38:24.975456935 +0200
+@@ -436,7 +436,7 @@ static int php_zip_extract_file(struct z
+ 			len = spprintf(&file_dirname_fullpath, 0, "%s/%s", dest, file_dirname);
+ 		}
+ 
+-		php_basename(path_cleaned, path_cleaned_len, NULL, 0, &file_basename, (unsigned int *)&file_basename_len TSRMLS_CC);
++		php_basename(path_cleaned, path_cleaned_len, NULL, 0, &file_basename, &file_basename_len TSRMLS_CC);
+ 
+ 		if (OPENBASEDIR_CHECKPATH(file_dirname_fullpath)) {
+ 			efree(file_dirname_fullpath);

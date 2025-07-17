@@ -1,0 +1,34 @@
+--- php-5.2.17/ext/pdo_pgsql/pgsql_driver.c~	2010-01-12 13:46:54.000000000 +0100
++++ php-5.2.17/ext/pdo_pgsql/pgsql_driver.c	2025-07-17 14:27:34.374458676 +0200
+@@ -309,16 +309,17 @@ static int pgsql_handle_quoter(pdo_dbh_t
+ {
+ 	unsigned char *escaped;
+ 	pdo_pgsql_db_handle *H = (pdo_pgsql_db_handle *)dbh->driver_data;
++	size_t tmp_len;
+ 	
+ 	switch (paramtype) {
+ 		case PDO_PARAM_LOB:
+ 			/* escapedlen returned by PQescapeBytea() accounts for trailing 0 */
+ #ifdef HAVE_PQESCAPE_BYTEA_CONN
+-			escaped = PQescapeByteaConn(H->server, unquoted, unquotedlen, quotedlen);
++			escaped = PQescapeByteaConn(H->server, unquoted, unquotedlen, &tmp_len);
+ #else
+-			escaped = PQescapeBytea(unquoted, unquotedlen, quotedlen);
++			escaped = PQescapeBytea(unquoted, unquotedlen, &tmp_len);
+ #endif
+-			*quotedlen += 1;
++			*quotedlen = (int)tmp_len + 1;
+ 			*quoted = emalloc(*quotedlen + 1);
+ 			memcpy((*quoted)+1, escaped, *quotedlen-2);
+ 			(*quoted)[0] = '\'';
+--- php-5.2.17/ext/pgsql/pgsql.c~	2025-07-17 14:18:21.000000000 +0200
++++ php-5.2.17/ext/pgsql/pgsql.c	2025-07-17 14:32:24.582521071 +0200
+@@ -272,7 +272,7 @@ ZEND_GET_MODULE(pgsql)
+ static int le_link, le_plink, le_result, le_lofp, le_string;
+ 
+ /* {{{ _php_pgsql_trim_message */
+-static char * _php_pgsql_trim_message(const char *message, int *len)
++static char * _php_pgsql_trim_message(const char *message, size_t *len)
+ {
+ 	register int i = strlen(message)-1;
+ 

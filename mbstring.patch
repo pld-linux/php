@@ -5,7 +5,7 @@
  
  	do {
 -		haystack.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_haystack, (size_t) old_haystack_len, &haystack.len, from_encoding TSRMLS_CC);
-+		haystack.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_haystack, (size_t) old_haystack_len, (unsigned long *)&haystack.len, from_encoding TSRMLS_CC);
++		haystack.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_haystack, (size_t) old_haystack_len, (size_t *)&haystack.len, from_encoding TSRMLS_CC);
  
  		if (!haystack.val) {
  			break;
@@ -14,7 +14,7 @@
  		}
  
 -		needle.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_needle, (size_t) old_needle_len, &needle.len, from_encoding TSRMLS_CC);
-+		needle.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_needle, (size_t) old_needle_len, (unsigned long *)&needle.len, from_encoding TSRMLS_CC);
++		needle.val = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, old_needle, (size_t) old_needle_len, (size_t *)&needle.len, from_encoding TSRMLS_CC);
  
  		if (!needle.val) {
  			break;

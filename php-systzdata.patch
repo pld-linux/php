@@ -39,9 +39,9 @@ r1: initial revision
 diff -up ./ext/date/config0.m4.systzdata ./ext/date/config0.m4
 --- ./ext/date/config0.m4.systzdata	2024-07-03 16:21:20.240786848 +0200
 +++ ./ext/date/config0.m4	2024-07-03 16:25:14.838995464 +0200
-@@ -8,6 +8,18 @@
-   [PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -Wno-implicit-fallthrough"],,
-   [-Werror])
+@@ -14,6 +14,18 @@ PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -I@ext
+ AX_CHECK_COMPILE_FLAG([-fwrapv],
+   [PHP_TIMELIB_CFLAGS="$PHP_TIMELIB_CFLAGS -fwrapv"])
  
 +PHP_ARG_WITH(system-tzdata, for use of system timezone data,
 +  [AS_HELP_STRING([--with-system-tzdata[=DIR]],[to specify use of system timezone data])], no, no)
@@ -55,9 +55,9 @@ diff -up ./ext/date/config0.m4.systzdata ./ext/date/config0.m4
 +   fi
 +fi
 +
- PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -DHAVE_TIMELIB_CONFIG_H=1"
- PHP_TIMELIB_CFLAGS="$PHP_DATE_CFLAGS"
- PHP_DATE_CFLAGS="$PHP_DATE_CFLAGS -I@ext_builddir@/lib -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
+ timelib_sources="lib/astro.c lib/dow.c lib/parse_date.c lib/parse_tz.c lib/parse_posix.c
+                  lib/timelib.c lib/tm2unixtime.c lib/unixtime2tm.c lib/parse_iso_intervals.c lib/interval.c"
+ 
 diff -up ./ext/date/lib/parse_tz.c.systzdata ./ext/date/lib/parse_tz.c
 --- ./ext/date/lib/parse_tz.c.systzdata	2024-07-02 15:43:13.000000000 +0200
 +++ ./ext/date/lib/parse_tz.c	2024-07-03 16:21:20.240786848 +0200

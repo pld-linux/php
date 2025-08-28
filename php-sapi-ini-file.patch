@@ -25,29 +25,30 @@ $ php -r 'var_dump(array(get_cfg_var("cfg_file_path"),php_ini_loaded_file()));'
 
 https://github.com/pld-linux/php/commit/762ec2e
 
---- php-8.0.0rc1/main/php_ini.c~	2020-10-09 18:15:48.000000000 +0300
-+++ php-8.0.0rc1/main/php_ini.c	2020-10-09 18:42:20.087488856 +0300
-@@ -65,6 +65,11 @@
- PHPAPI char *php_ini_scanned_path=NULL;
- PHPAPI char *php_ini_scanned_files=NULL;
+
+--- php-8.5.0beta1/main/php_ini.c~	2025-08-28 15:40:36.544074056 +0200
++++ php-8.5.0beta1/main/php_ini.c	2025-08-28 15:50:43.598534290 +0200
+@@ -410,6 +410,11 @@ static void append_ini_path(char *php_in
+ 	strlcat(php_ini_search_path, path, search_path_size);
+ }
  
 +static int php_csort(const struct dirent **a, const struct dirent **b)
 +{
-+	return strcmp((*a)->d_name,(*b)->d_name);
++       return strcmp((*a)->d_name,(*b)->d_name);
 +}
 +
- /* {{{ php_ini_displayer_cb */
- static ZEND_COLD void php_ini_displayer_cb(zend_ini_entry *ini_entry, int type)
+ /* {{{ php_init_config */
+ void php_init_config(void)
  {
-@@ -661,12 +666,14 @@ int php_init_config(void)
+@@ -640,12 +645,14 @@ void php_init_config(void)
+ 		char *p;
  		zend_llist scanned_ini_list;
- 		zend_llist_element *element;
- 		int l, total_l = 0;
+ 		size_t total_l = 0;
 +		const char *fmt = "%s:" PHP_CONFIG_FILE_PATH "/%s.d";
  		char *bufpath, *debpath, *endpath;
- 		int lenpath;
+ 		size_t lenpath;
  
- 		zend_llist_init(&scanned_ini_list, sizeof(char *), (llist_dtor_func_t) free_estring, 1);
+ 		zend_llist_init(&scanned_ini_list, sizeof(char *), (llist_dtor_func_t) free_estring, true);
  
 -		bufpath = estrdup(php_ini_scanned_path);
 +		bufpath = emalloc(strlen(php_ini_scanned_path) + strlen(fmt) + strlen(sapi_module.name));
@@ -55,12 +56,3 @@ https://github.com/pld-linux/php/commit/762ec2e
  		for (debpath = bufpath ; debpath ; debpath=endpath) {
  			endpath = strchr(debpath, DEFAULT_DIR_SEPARATOR);
  			if (endpath) {
-@@ -679,7 +686,7 @@ int php_init_config(void)
- 			}
- 			lenpath = (int)strlen(debpath);
- 
--			if (lenpath > 0 && (ndir = php_scandir(debpath, &namelist, 0, php_alphasort)) > 0) {
-+			if (lenpath > 0 && (ndir = php_scandir(debpath, &namelist, 0, php_csort)) > 0) {
- 
- 				for (i = 0; i < ndir; i++) {
- 

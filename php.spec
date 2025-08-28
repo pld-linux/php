@@ -51,7 +51,6 @@
 %bcond_without	mysqli		# mysqli support (Requires mysql >= 4.1)
 %bcond_without	mysqlnd		# mysqlnd support in mysql related extensions
 %bcond_without	odbc		# ODBC extension module
-%bcond_without	opcache		# Enable Zend OPcache extension support
 %bcond_without	openssl		# OpenSSL support and OpenSSL extension (module)
 %bcond_without	pcntl		# pcntl extension module
 %bcond_without	pcre_jit	# PCRE JIT
@@ -130,7 +129,7 @@
 %define		orgname		php
 %define		ver_suffix	85
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
-%define		subver		alpha1
+%define		subver		beta1
 %define		rel		0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -149,8 +148,8 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #XSource0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 # XSource0-md5:	b73a7c365a7e75905745528d218cf128
-Source0:	https://downloads.php.net/~daniels/php-%{version}%{subver}.tar.xz
-# Source0-md5:	75498754fc2cf772d0377f24c76b4730
+Source0:	https://downloads.php.net/~edorian/php-%{version}%{subver}.tar.xz
+# Source0-md5:	feb40d030b3c5fe0432dbeea249e346f
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -180,7 +179,7 @@ Patch23:	%{orgname}-builddir.patch
 Patch24:	%{orgname}-zlib-for-getimagesize.patch
 
 Patch27:	%{orgname}-config-dir.patch
-Patch29:	%{orgname}-fcgi-graceful.patch
+
 Patch31:	%{orgname}-fcgi-error_log-no-newlines.patch
 Patch39:	%{orgname}-use-prog_sendmail.patch
 Patch41:	%{orgname}-fpm-config.patch
@@ -200,7 +199,7 @@ BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison >= 3.0.0
 BuildRequires:	bzip2-devel >= 1.0.0
-%{?with_opcache:BuildRequires:	capstone-devel >= 3.0.0}
+BuildRequires:	capstone-devel >= 3.0.0
 %{?with_curl:BuildRequires:	curl-devel >= 7.61.0}
 BuildRequires:	cyrus-sasl-devel >= 2
 BuildRequires:	db-devel >= 4.0
@@ -220,7 +219,7 @@ BuildRequires:	gmp-devel >= 4.2
 %{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
 %{?with_avif:BuildRequires:	libavif-devel >= 0.8.2}
 %{?with_ffi:BuildRequires:	libffi-devel >= 7:3.0.11}
-%{?with_intl:BuildRequires:	libicu-devel >= 50.1}
+%{?with_intl:BuildRequires:	libicu-devel >= 57.1}
 BuildRequires:	libjpeg-devel
 BuildRequires:	libltdl-devel >= 1.4
 BuildRequires:	libpng-devel >= 1.0.8
@@ -564,6 +563,7 @@ Obsoletes:	php-hwapi < 4:5.2.0
 Obsoletes:	php-hyperwave < 3:5.0.0
 Obsoletes:	php-java < 3:5.0.0
 Obsoletes:	php-mcal < 3:5.0.0
+Obsoletes:	php85-opcache < 4:8.5.0
 Obsoletes:	php-pcre < 4:5.3.28-7
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-pecl-hash < %{hashver}
@@ -1141,31 +1141,6 @@ Moduł PHP ze wsparciem dla ODBC.
 
 %description odbc -l pt_BR.UTF-8
 Um módulo para aplicações PHP que usam ODBC.
-
-%package opcache
-Summary:	Zend Optimizer+ - PHP code optimizer
-Summary(pl.UTF-8):	Zend Optimizer+ - optymalizator kodu PHP
-Group:		Libraries
-URL:		https://wiki.php.net/rfc/optimizerplus
-Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	%{name}-pcre = %{epoch}:%{version}-%{release}
-Provides:	php(opcache) = %{version}
-
-%description opcache
-The Zend OPcache provides faster PHP execution through opcode caching
-and optimization. It improves PHP performance by storing precompiled
-script bytecode in the shared memory. This eliminates the stages of
-reading code from the disk and compiling it on future access. In
-addition, it applies a few bytecode optimization patterns that make
-code execution faster.
-
-%description opcache -l pl.UTF-8
-Zend OPcache zapewnia szybsze wykonywanie kodu PHP dzięki buforowaniu
-i optymalizacji na poziomie opcode'ów. Poprawia wydajność PHP
-przechowując prekompilowany bajtkod skryptu w pamięci współdzielonej.
-Eliminuje etapy odczytu kodu z dysku i kompilacji przy późniejszym
-dostępie. Ponadto wykonuje kilka wzorców optymalizacji bajtkodu,
-czyniąc wykonywanie kodu szybszym.
 
 %package openssl
 Summary:	OpenSSL extension module for PHP
@@ -1792,7 +1767,7 @@ cp -p php.ini-production php.ini
 %patch -P24 -p1 -b .zlib-for-getimagesize
 
 %patch -P27 -p1
-%patch -P29 -p1
+
 %patch -P31 -p1
 %patch -P39 -p1 -b .use-prog_sendmail
 %patch -P41 -p1
@@ -2094,7 +2069,7 @@ for sapi in $sapis; do
 	--enable-option-checking=fatal \
 	%{__enable_disable bcmath bcmath shared} \
 	%{__enable_disable calendar calendar shared} \
-	%{?with_opcache:--with-capstone} \
+	--with-capstone \
 	%{__enable_disable ctype ctype shared} \
 	%{__enable_disable dba dba shared} \
 	%{__enable_disable dom dom shared} \
@@ -2158,7 +2133,6 @@ for sapi in $sapis; do
 	%{?with_mm:--with-mm} \
 	%{?with_mysqlnd:--enable-mysqlnd=shared} \
 	%{?with_mysqli:--with-mysqli=shared,%{!?with_mysqlnd:/usr/bin/mysql_config}%{?with_mysqlnd:mysqlnd}} \
-	%{__enable_disable opcache opcache shared} \
 	%{?with_openssl:--with-openssl=shared} \
 	--with-tcadb=/usr \
 	--with-external-libcrypt \
@@ -2573,7 +2547,6 @@ fi \
 %extension_scripts mysqli
 %extension_scripts mysqlnd
 %extension_scripts odbc
-%extension_scripts opcache
 %extension_scripts openssl
 %extension_scripts pcntl
 %extension_scripts pdo
@@ -2697,6 +2670,7 @@ fi
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/timezone.ini
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/opcache.ini
 %attr(755,root,root) %{_libdir}/libphp_common-*.so
 %dir %{php_extensiondir}
 
@@ -2900,14 +2874,6 @@ fi
 %doc ext/odbc/CREDITS
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_odbc.ini
 %attr(755,root,root) %{php_extensiondir}/odbc.so
-%endif
-
-%if %{with opcache}
-%files opcache
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/??_opcache.ini
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/opcache.ini
-%attr(755,root,root) %{php_extensiondir}/opcache.so
 %endif
 
 %if %{with openssl}

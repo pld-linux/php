@@ -134,12 +134,12 @@
  ;;;;;;;;;;;;;;;;
  ; File Uploads ;
  ;;;;;;;;;;;;;;;;
-@@ -863,49 +863,8 @@ default_socket_timeout = 60
+@@ -870,51 +870,8 @@ default_socket_timeout = 60
  ; deprecated in a future PHP major version. So, when it is possible, please
  ; move to the new ('extension=<ext>) syntax.
  ;
 -; Notes for Windows environments :
-+; In PLD Linux you can install appropriate php84-<extension> or php84-pecl-<extension> package.
++; In PLD Linux you can install appropriate php85-<extension> or php85-pecl-<extension> package.
  ;
 -; - Many DLL files are located in the ext/
 -;   extension folders as well as the separate PECL DLL download.
@@ -180,11 +180,13 @@
 -;extension=xsl
 -;extension=zip
 -
--;zend_extension=opcache
+-;;;;;;;;;;;;;;;;;;;
+-; Module Settings ;
+-;;;;;;;;;;;;;;;;;;;
 -
- ;;;;;;;;;;;;;;;;;;;
- ; Module Settings ;
- ;;;;;;;;;;;;;;;;;;;
+ [CLI Server]
+ ; Whether the CLI web server uses ANSI color coding in its terminal output.
+ cli_server.color = On
 @@ -954,8 +867,9 @@
  
  [Date]

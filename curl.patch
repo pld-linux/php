@@ -1,14 +1,20 @@
---- php-5.6.40/ext/curl/interface.c~	2019-01-09 10:54:13.000000000 +0100
-+++ php-5.6.40/ext/curl/interface.c	2024-07-18 09:44:35.079870385 +0200
-@@ -3213,7 +3213,11 @@ PHP_FUNCTION(curl_error)
+--- php-5.6.40/ext/curl/interface.c.org	2025-10-09 15:32:07.139978102 +0200
++++ php-5.6.40/ext/curl/interface.c	2025-10-09 15:34:42.704138342 +0200
+@@ -3212,8 +3212,16 @@ PHP_FUNCTION(curl_error)
+ 
  	ZEND_FETCH_RESOURCE(ch, php_curl *, &zid, -1, le_curl_name, le_curl);
  
- 	ch->err.str[CURL_ERROR_SIZE] = 0;
+-	ch->err.str[CURL_ERROR_SIZE] = 0;
 -	RETURN_STRING(ch->err.str, 1);
-+	if (strlen(ch->err.str) > 0) {
-+		RETURN_STRING(ch->err.str, 1);
++	if (ch->err.no) {
++		ch->err.str[CURL_ERROR_SIZE] = 0;
++		if (strlen(ch->err.str) > 0) {
++			RETURN_STRING(ch->err.str, 1);
++		} else {
++			RETURN_STRING(curl_easy_strerror(ch->err.no), 1);
++		}
 +	} else {
-+		RETURN_STRING(curl_easy_strerror(ch->err.no), 1);
++		RETURN_EMPTY_STRING();
 +	}
  }
  /* }}} */

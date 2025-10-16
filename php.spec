@@ -531,7 +531,7 @@ Requires(post):	sed >= 4.0
 Requires:	glibc >= 6:2.3.5
 Requires:	php-dirs >= 1.4
 Requires:	rpm-whiteout >= 1.28
-Requires:	tzdata
+Requires:	tzdata-zoneinfo
 Requires:	zlib >= 1.2.0.4
 Provides:	%{name}(debug) = %{php_debug}
 Provides:	%{name}(modules_api) = %{php_api_version}

@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	35
+%define		rel	36
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -358,6 +358,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_zend_zts		%{!?with_zts:0}%{?with_zts:1}
 %define		php_debug		%{!?with_debug:0}%{?with_debug:1}
+
+%define		specflags	-std=gnu17
 
 %if %{with gcov}
 %undefine	with_ccache

@@ -129,7 +129,7 @@
 %define		orgname		php
 %define		ver_suffix	85
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
-%define		subver		beta1
+%define		subver		RC5
 %define		rel		0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
@@ -148,8 +148,8 @@ License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 #XSource0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 # XSource0-md5:	b73a7c365a7e75905745528d218cf128
-Source0:	https://downloads.php.net/~edorian/php-%{version}%{subver}.tar.xz
-# Source0-md5:	feb40d030b3c5fe0432dbeea249e346f
+Source0:	https://downloads.php.net/~daniels/php-%{version}%{subver}.tar.xz
+# Source0-md5:	8e2521c5e3c3650ac7d5473aadb62de2
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -271,7 +271,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20240925
+%define		php_api_version		20250925
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20240423
@@ -285,7 +285,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.22.6
+%define		zipver		1.22.7
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 

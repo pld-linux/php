@@ -129,8 +129,8 @@
 %define		orgname		php
 %define		ver_suffix	85
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
-%define		subver		RC5
-%define		rel		0.1
+%define		subver		%{nil}
+%define		rel		1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -146,10 +146,8 @@ Epoch:		4
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-#XSource0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# XSource0-md5:	b73a7c365a7e75905745528d218cf128
-Source0:	https://downloads.php.net/~daniels/php-%{version}%{subver}.tar.xz
-# Source0-md5:	8e2521c5e3c3650ac7d5473aadb62de2
+Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	6105f8b2f36811369e39aa3edf0f4faa
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

@@ -1,0 +1,65 @@
+commit b7356692f69f4ac0a07ea54e83debdd04b426dcb
+Author: George Peter Banyard <girgias@php.net>
+Date:   Wed May 12 14:41:11 2021 +0100
+
+    Specify function pointer signature for scanf implementation
+    
+    Fix [-Wstrict-prototypes] warnings in standard/scanf.c
+
+diff --git a/ext/standard/scanf.c b/ext/standard/scanf.c
+index f58b4195cc5..78ecc1642cf 100644
+--- a/ext/standard/scanf.c
++++ b/ext/standard/scanf.c
+@@ -106,6 +106,8 @@ typedef struct CharSet {
+ 	} *ranges;
+ } CharSet;
+ 
++typedef zend_long (*int_string_formater)(const char*, char**, int);
++
+ /*
+  * Declarations for functions used only in this file.
+  */
+@@ -583,7 +585,7 @@ PHPAPI int php_sscanf_internal( char *string, char *format,
+ 	int  base = 0;
+ 	int  underflow = 0;
+ 	size_t width;
+-	zend_long (*fn)() = NULL;
++	int_string_formater fn = NULL;
+ 	char *ch, sch;
+ 	int  flags;
+ 	char buf[64];	/* Temporary buffer to hold scanned number
+@@ -740,29 +742,29 @@ literal:
+ 			case 'D':
+ 				op = 'i';
+ 				base = 10;
+-				fn = (zend_long (*)())ZEND_STRTOL_PTR;
++				fn = (int_string_formater)ZEND_STRTOL_PTR;
+ 				break;
+ 			case 'i':
+ 				op = 'i';
+ 				base = 0;
+-				fn = (zend_long (*)())ZEND_STRTOL_PTR;
++				fn = (int_string_formater)ZEND_STRTOL_PTR;
+ 				break;
+ 			case 'o':
+ 				op = 'i';
+ 				base = 8;
+-				fn = (zend_long (*)())ZEND_STRTOL_PTR;
++				fn = (int_string_formater)ZEND_STRTOL_PTR;
+ 				break;
+ 			case 'x':
+ 			case 'X':
+ 				op = 'i';
+ 				base = 16;
+-				fn = (zend_long (*)())ZEND_STRTOL_PTR;
++				fn = (int_string_formater)ZEND_STRTOL_PTR;
+ 				break;
+ 			case 'u':
+ 				op = 'i';
+ 				base = 10;
+ 				flags |= SCAN_UNSIGNED;
+-				fn = (zend_long (*)())ZEND_STRTOUL_PTR;
++				fn = (int_string_formater)ZEND_STRTOUL_PTR;
+ 				break;
+ 
+ 			case 'f':

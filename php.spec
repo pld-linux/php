@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.0.33
-Release:	24
+Release:	25
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -2305,6 +2305,7 @@ for sapi in $sapis; do
 	esac
 
 	%configure \
+	CFLAGS="%{rpmcflags} -std=gnu17" \
 	EXTRA_LDFLAGS="%{rpmldflags}" \
 	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"

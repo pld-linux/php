@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	49
+%define		rel	50
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2133,7 +2133,7 @@ for sapi in $sapis; do
 	esac
 
 	%configure \
-	CFLAGS="%{rpmcflags} -DOPENSSL_NO_SSL2=1 -DOPENSSL_NO_SSL3=1" \
+	CFLAGS="%{rpmcflags} -std=gnu17 -DOPENSSL_NO_SSL2=1 -DOPENSSL_NO_SSL3=1" \
 	FORCE_APACHE_VERSION="${apache_ver}" \
 	EXTRA_LDFLAGS="%{rpmldflags}" \
 	$sapi_args \

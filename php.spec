@@ -140,7 +140,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	43
+%define		rel	44
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -2357,6 +2357,7 @@ for sapi in $sapis; do
 	esac
 
 	%configure \
+	CFLAGS="%{rpmcflags} -std=gnu17" \
 	EXTRA_LDFLAGS="%{rpmldflags}" \
 	$sapi_args \
 %if "%{!?configure_cache:0}%{?configure_cache}" == "0"

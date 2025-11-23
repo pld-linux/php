@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.4.33
-Release:	11
+Release:	12
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -2156,7 +2156,7 @@ export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
 # This should be detected by configure and set there,
 # but looks like the build system is hosed on 7.3
 export CXXFLAGS="%{rpmcxxflags} -fPIC -DPIC"
-export CFLAGS="%{rpmcflags} -fPIC -DPIC"
+export CFLAGS="%{rpmcflags} -std=gnu17 -fPIC -DPIC"
 
 sapis="
 cli

@@ -155,7 +155,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.34
-Release:	19
+Release:	20
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -2269,7 +2269,7 @@ if [ ! -f _built-conf ]; then
 	touch _built-conf
 fi
 export PROG_SENDMAIL="/usr/lib/sendmail"
-export CPPFLAGS="-DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
+export CPPFLAGS="-std=gnu17 -DDEBUG_FASTCGI -DHAVE_STRNDUP %{rpmcppflags} \
 	-I%{_includedir}/xmlrpc-epi"
 %if %{with intl}
 # icu 74+ C++ API requires C++ >= 17

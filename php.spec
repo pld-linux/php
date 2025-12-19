@@ -148,8 +148,8 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.1.33
-Release:	3
+Version:	8.1.34
+Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -157,7 +157,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	36cd5b20659667cbddd171c6238dd64b
+# Source0-md5:	73c7f2a56f76bbaa4510b413a8468d8e
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

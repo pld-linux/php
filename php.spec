@@ -130,7 +130,7 @@
 %define		ver_suffix	85
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		2
+%define		rel		3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -2390,7 +2390,7 @@ cp -p %{_sourcedir}/opcache.ini $RPM_BUILD_ROOT%{_sysconfdir}/conf.d
 # for CLI SAPI only
 %{__mv} $RPM_BUILD_ROOT%{_sysconfdir}/{conf.d/??_readline.ini,cli.d}
 
-sed -i -e '/^phpdir/ s,/php/build,/%{name}/build,' $RPM_BUILD_ROOT%{_bindir}/phpize
+sed -i -e 's#^phpdir=.*#phpdir=%{_libdir}/%{name}/build#' $RPM_BUILD_ROOT%{_bindir}/phpize
 
 # for php-pecl-mailparse
 install -d $RPM_BUILD_ROOT%{_includedir}/php/ext/mbstring

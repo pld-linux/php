@@ -130,7 +130,7 @@
 %define		ver_suffix	85
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		3
+%define		rel		1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -138,7 +138,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.5.2
+Version:	8.5.3
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -147,7 +147,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	f6af79d3102b72a67b5f89230636a7b8
+# Source0-md5:	94fc364f6e56b02a46f67395411fbffa
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

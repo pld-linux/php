@@ -139,7 +139,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.4.18
+Version:	8.4.19
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -148,7 +148,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	9cc32e70dd9cdd2de7b73b3764d6b457
+# Source0-md5:	a8bbb22312f235d576dc6537a5f364f9
 #Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
@@ -2330,7 +2330,8 @@ libtool --mode=install install -p sapi/litespeed/lsphp $RPM_BUILD_ROOT%{_sbindir
 
 %if %{with phpdbg}
 %{__make} -f Makefile.phpdbg install-phpdbg \
-	INSTALL="libtool --mode=install install -p" \
+	LIBTOOL="libtool" \
+	INSTALL="install -p" \
 	INSTALL_ROOT=$RPM_BUILD_ROOT
 
 %if %{without default_php}

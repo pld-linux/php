@@ -33,7 +33,7 @@
 %bcond_without	calendar	# calendar extension module
 %bcond_without	ctype		# ctype extension module
 %bcond_without	curl		# CURL extension module
-%bcond_with	dba		# DBA extension module
+%bcond_without	dba		# DBA extension module
 %bcond_without	dom		# DOM extension module
 %bcond_without	enchant		# Enchant extension module
 %bcond_without	exif		# EXIF extension module
@@ -213,7 +213,7 @@ BuildRequires:	bzip2-devel >= 1.0.0
 %{?with_opcache:BuildRequires:	capstone-devel >= 3.0.0}
 %{?with_curl:BuildRequires:	curl-devel >= 7.29.0}
 BuildRequires:	cyrus-sasl-devel >= 2
-%{?with_dba:BuildRequires:	db-devel >= 4.0}
+BuildRequires:	db-devel >= 4.0
 BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant2-devel}
 %if %{with pdo_dblib}

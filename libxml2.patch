@@ -90,3 +90,29 @@ index 6cdfbd397f7..dc5e7790952 100644
  	xmlURIPtr puri;
  	void *context = NULL;
 
+commit 67259e451d5d58b4842776c5696a66d74e157609
+Author: Niels Dossche <7771979+nielsdos@users.noreply.github.com>
+Date:   Fri Jul 5 23:34:09 2024 +0200
+
+    Fix GH-14834: Error installing PHP when --with-pear is used
+    
+    libxml2 2.13 makes changes to how the parsing state is set, update our
+    code accordingly. In particular, it started reporting entities within
+    attributes, while it should only report entities inside text nodes.
+    
+    Closes GH-14837.
+
+diff --git a/ext/xml/compat.c b/ext/xml/compat.c
+index 242cc4ba7c4..5f55dc62b36 100644
+--- a/ext/xml/compat.c
++++ b/ext/xml/compat.c
+@@ -375,7 +375,7 @@ _get_entity(void *user, const xmlChar *name)
+ 		if (ret == NULL)
+ 			ret = xmlGetDocEntity(parser->parser->myDoc, name);
+ 
+-		if (ret == NULL || (parser->parser->instate != XML_PARSER_ENTITY_VALUE && parser->parser->instate != XML_PARSER_ATTRIBUTE_VALUE)) {
++		if (ret == NULL || parser->parser->instate == XML_PARSER_CONTENT) {
+ 			if (ret == NULL || ret->etype == XML_INTERNAL_GENERAL_ENTITY || ret->etype == XML_INTERNAL_PARAMETER_ENTITY || ret->etype == XML_INTERNAL_PREDEFINED_ENTITY) {
+ 				/* Predefined entities will expand unless no cdata handler is present */
+ 				if (parser->h_default && ! (ret && ret->etype == XML_INTERNAL_PREDEFINED_ENTITY && parser->h_cdata)) {
+

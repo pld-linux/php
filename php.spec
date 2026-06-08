@@ -149,7 +149,7 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.1.34
-Release:	3
+Release:	4
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -205,6 +205,7 @@ Patch67:	mysql-lib-ver-mismatch.patch
 # https://bugs.php.net/bug.php?id=68344
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
+Patch72:	php-xml-attr-entity.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1903,6 +1904,7 @@ cp -p php.ini-production php.ini
 %patch -P67 -p1 -b .mysql-lib-ver-mismatch
 #%%patch -P68 -p1 DROP or update to 7.0 APIs
 %patch -P71 -p1 -b .libdb-info
+%patch -P72 -p1 -b .attr-entity
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

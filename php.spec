@@ -127,10 +127,10 @@
 %endif
 
 %define		orgname		php
-%define		ver_suffix	85
+%define		ver_suffix	86
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
-%define		subver		%{nil}
-%define		rel		1
+%define		subver		beta2
+%define		rel		0.1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -138,16 +138,17 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.5.10
+Version:	8.6.0
 Release:	%{rel}
 Epoch:		4
-# All files licensed under PHP version 3.01, except
-# Zend is licensed under Zend
-# TSRM is licensed under BSD
-License:	PHP 3.01 and Zend and BSD
+# All files licensed under BSD, except
+# TSRM which has its own BSD variant
+License:	BSD
 Group:		Libraries
-Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	b78bb233fa181461a6069c90d95a94a4
+#XSource0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+# XSource0-md5:	b78bb233fa181461a6069c90d95a94a4
+Source0:	https://downloads.php.net/~mbeccati/php-%{version}%{subver}.tar.xz
+# Source0-md5:	70993fd0680d3b58ae5f18eb10bb06ac
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -168,7 +169,6 @@ Patch6:		opcache-nokill-perm.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 
 Patch10:	%{orgname}-ini.patch
-Patch11:	embed.patch
 Patch14:	%{orgname}-no_pear_install.patch
 
 Patch21:	%{orgname}-dba-link.patch
@@ -269,7 +269,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20250925
+%define		php_api_version		20250926
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20240423
@@ -283,7 +283,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		jsonver		%{version}
 %define		pharver		%{version}
 %define		sqlite3ver	%{version}
-%define		zipver		1.22.8
+%define		zipver		%{version}
 %define		phpdbgver	%{version}
 %define		sodiumver	%{version}
 
@@ -561,7 +561,6 @@ Obsoletes:	php-hwapi < 4:5.2.0
 Obsoletes:	php-hyperwave < 3:5.0.0
 Obsoletes:	php-java < 3:5.0.0
 Obsoletes:	php-mcal < 3:5.0.0
-Obsoletes:	php85-opcache < 4:8.5.0
 Obsoletes:	php-pcre < 4:5.3.28-7
 Obsoletes:	php-pecl-domxml
 Obsoletes:	php-pecl-hash < %{hashver}
@@ -1801,7 +1800,6 @@ find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 #%{__rm} -r ext/pcre/pcre2lib
 %{__rm} ext/date/lib/timezonedb.h
 
-cp -pf Zend/LICENSE{,.Zend}
 install -p %{SOURCE13} dep-tests.sh
 
 # breaks build
@@ -1927,8 +1925,8 @@ ver=$(awk '/#define PHP_SODIUM_VERSION/ {print $3}' ext/sodium/php_libsodium.h |
 if test "$ver" != "PHP_VERSION"; then
 	exit 1
 fi
-ver=$(sed -n '/#define PHP_ZIP_VERSION /{s/.* "//;s/".*$//;p}' ext/zip/php_zip.h)
-if test "$ver" != "%{zipver}"; then
+ver=$(get_version PHP_ZIP_VERSION ext/zip/php_zip.h)
+if test "$ver" != "PHP_VERSION"; then
 	: Error: Upstream ZIP version is now ${ver}, expecting %{zipver}.
 	: Update the zipver macro and rebuild.
 	exit 1
@@ -2315,6 +2313,7 @@ libtool --mode=install install -p sapi/litespeed/lsphp $RPM_BUILD_ROOT%{_sbindir
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libphp_common.a
 
 # install CGI/FCGI
 %if %{with cgi}
@@ -2375,6 +2374,7 @@ cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/cli.d/php.ini
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/apache2handler.d/php.ini
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.a
 %endif
 
 # ensure that paths are correct for current php version and arch
@@ -2664,7 +2664,7 @@ fi
 
 %files common
 %defattr(644,root,root,755)
-%doc EXTENSIONS LICENSE NEWS UPGRADING* Zend/{LICENSE.Zend,README*} php.ini-* .gdbinit
+%doc EXTENSIONS LICENSE NEWS UPGRADING* Zend/README* php.ini-* .gdbinit
 %dir %{_sysconfdir}
 %dir %{_sysconfdir}/conf.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.ini
@@ -3072,9 +3072,11 @@ fi
 %{php_data_dir}/tests/php/func
 %{php_data_dir}/tests/php/lang
 %{php_data_dir}/tests/php/output
+%{php_data_dir}/tests/php/probe_cache.inc
 %{php_data_dir}/tests/php/run-test
 %{php_data_dir}/tests/php/security
 %{php_data_dir}/tests/php/strings
+%{php_data_dir}/tests/php/unit
 %attr(755,root,root) %{php_data_dir}/tests/php/run-tests.php
 
 %if %{with tidy}

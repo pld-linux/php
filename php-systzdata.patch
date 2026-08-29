@@ -55,7 +55,7 @@ diff -up ./ext/date/config0.m4.systzdata ./ext/date/config0.m4
 +   fi
 +fi
 +
- timelib_sources="lib/astro.c lib/dow.c lib/parse_date.c lib/parse_tz.c lib/parse_posix.c
+ timelib_sources="lib/astro.c lib/dow.c lib/duration.c lib/parse_date.c lib/parse_tz.c lib/parse_posix.c
                   lib/timelib.c lib/tm2unixtime.c lib/unixtime2tm.c lib/parse_iso_intervals.c lib/interval.c"
  
 diff -up ./ext/date/lib/parse_tz.c.systzdata ./ext/date/lib/parse_tz.c

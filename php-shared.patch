@@ -9,7 +9,7 @@
 +
  dnl Checks for some support/generator progs.
  PHP_PROG_BISON([3.0.0])
- PHP_PROG_RE2C([1.0.3], [--no-generation-date])
+ PHP_PROG_RE2C([1.0.3], [--no-generation-date -W])
 --- php-8.0.0beta4/build/Makefile.global~	2020-09-28 07:54:00.000000000 +0300
 +++ php-8.0.0beta4/build/Makefile.global	2020-09-28 07:54:42.203157017 +0300
 @@ -13,8 +13,12 @@

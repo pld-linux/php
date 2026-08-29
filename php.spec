@@ -170,7 +170,6 @@ Patch6:		opcache-nokill-perm.patch
 Patch7:		%{orgname}-sapi-ini-file.patch
 
 Patch10:	%{orgname}-ini.patch
-Patch11:	embed.patch
 Patch14:	%{orgname}-no_pear_install.patch
 
 Patch21:	%{orgname}-dba-link.patch
@@ -2342,6 +2341,7 @@ libtool --mode=install install -p sapi/litespeed/lsphp $RPM_BUILD_ROOT%{_sbindir
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libphp_common.a
 
 # install CGI/FCGI
 %if %{with cgi}
@@ -2402,6 +2402,7 @@ cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/cli.d/php.ini
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/apache2handler.d/php.ini
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.a
 %endif
 
 # ensure that paths are correct for current php version and arch

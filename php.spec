@@ -151,7 +151,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.1.33
-Release:	26
+Release:	27
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -224,6 +224,7 @@ Patch77:	types.patch
 Patch78:	includes.patch
 Patch79:	configure.patch
 Patch80:	ac_prog_sed.patch
+Patch81:	opcache-revalidate-path-once.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2055,6 +2056,7 @@ cp -p php.ini-production php.ini
 %patch -P78 -p1
 %patch -P79 -p1
 %patch -P80 -p1
+%patch -P81 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

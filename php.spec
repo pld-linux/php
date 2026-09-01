@@ -148,7 +148,7 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.0.28
-Release:	16
+Release:	17
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -207,6 +207,7 @@ Patch73:	missing-includes.patch
 Patch74:	icu74.patch
 Patch75:	libxml2-2.12.patch
 Patch76:	types.patch
+Patch77:	opcache-revalidate-path-once.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1908,6 +1909,7 @@ cp -p php.ini-production php.ini
 %patch -P74 -p1
 %patch -P75 -p1
 %patch -P76 -p1
+%patch -P77 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

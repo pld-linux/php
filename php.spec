@@ -129,8 +129,8 @@
 %define		orgname		php
 %define		ver_suffix	86
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
-%define		subver		beta2
-%define		rel		0.3
+%define		subver		RC2
+%define		rel		0.4
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -148,7 +148,7 @@ Group:		Libraries
 #XSource0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 # XSource0-md5:	b78bb233fa181461a6069c90d95a94a4
 Source0:	https://downloads.php.net/~mbeccati/php-%{version}%{subver}.tar.xz
-# Source0-md5:	70993fd0680d3b58ae5f18eb10bb06ac
+# Source0-md5:	62e9d8759ccbf41610c4810d8403421c
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -193,40 +193,37 @@ Patch71:	libdb-info.patch
 Patch72:	opcache-revalidate-path-once.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 3.0}}
-BuildRequires:	apache-base >= 2.4.0
-BuildRequires:	autoconf >= 2.59
+BuildRequires:	autoconf >= 2.68
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison >= 3.0.0
-BuildRequires:	bzip2-devel >= 1.0.0
+%{?with_bzip2:BuildRequires:	bzip2-devel >= 1.0.0}
 BuildRequires:	capstone-devel >= 3.0.0
 %{?with_curl:BuildRequires:	curl-devel >= 7.61.0}
-BuildRequires:	cyrus-sasl-devel >= 2
+%{?with_ldap:BuildRequires:	cyrus-sasl-devel >= 2}
 BuildRequires:	db-devel >= 4.0
-BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant2-devel >= 1.6.0}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
-BuildRequires:	freetype-devel >= 1:2.5.1
+%{!?with_system_gd:BuildRequires:	freetype-devel >= 1:2.5.1}
 %if %{with system_gd}
 BuildRequires:	gd-devel >= 2.1
 %endif
 BuildRequires:	gdbm-devel
-BuildRequires:	gmp-devel >= 4.2
+%{?with_gmp:BuildRequires:	gmp-devel >= 4.2}
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_fpm:BuildRequires:	libapparmor-devel}
 %{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
-%{?with_avif:BuildRequires:	libavif-devel >= 0.8.2}
+%{!?with_system_gd:%{?with_avif:BuildRequires:	libavif-devel >= 1.0.0}}
 %{?with_ffi:BuildRequires:	libffi-devel >= 7:3.0.11}
 %{?with_intl:BuildRequires:	libicu-devel >= 57.1}
-BuildRequires:	libjpeg-devel
-BuildRequires:	libltdl-devel >= 1.4
-BuildRequires:	libpng-devel >= 1.0.8
+%{!?with_system_gd:BuildRequires:	libjpeg-devel}
+%{!?with_system_gd:BuildRequires:	libpng-devel >= 1.0.8}
 %{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %{?with_intl:BuildRequires:	libstdc++-devel >= 6:4.8.1}
 BuildRequires:	libtool >= 2:2.4.6
-%{?with_webp:BuildRequires:	libwebp-devel >= 0.2.0}
-BuildRequires:	libxml2-devel >= 1:2.9.0
+%{!?with_system_gd:%{?with_webp:BuildRequires:	libwebp-devel >= 0.2.0}}
+BuildRequires:	libxml2-devel >= 1:2.9.4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
 %{?with_zip:BuildRequires:	libzip-devel >= 1.7.1}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
@@ -234,22 +231,21 @@ BuildRequires:	libxml2-devel >= 1:2.9.0
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
 %{!?with_pdo_mysql:BuildRequires:	mysql-devel}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.3}
-BuildRequires: oniguruma-devel
+%{?with_mbstring:BuildRequires:	oniguruma-devel}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.6.0}
 %if %{with openssl} || %{with ldap}
-BuildRequires:	openssl-devel >= 1.0.2
+BuildRequires:	openssl-devel >= 1.1.1
 %endif
-BuildRequires:	pam-devel
 BuildRequires:	pcre2-8-devel >= 10.30
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel >= 12}
-BuildRequires:	readline-devel
+%{?with_readline:BuildRequires:	readline-devel}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.566
 BuildRequires:	sed >= 4.0
 %if %{with sqlite3} || %{with pdo_sqlite}
-BuildRequires:	sqlite3-devel >= 3.7.14
+BuildRequires:	sqlite3-devel >= 3.7.17
 %endif
 %{?with_systemtap:BuildRequires:	systemtap-sdt-devel}
 BuildRequires:	tar >= 1:1.22
@@ -257,8 +253,9 @@ BuildRequires:	tar >= 1:1.22
 BuildRequires:	tokyocabinet-devel
 %{?with_odbc:BuildRequires:	unixODBC-devel}
 BuildRequires:	xz
-BuildRequires:	zlib-devel >= 1.2.0.4
+BuildRequires:	zlib-devel >= 1.2.11
 %if %{with apache2}
+BuildRequires:	apache-base >= 2.4.0
 BuildRequires:	apache-devel >= 2.4.0
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
@@ -270,7 +267,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20250926
+%define		php_api_version		20260924
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20240423
@@ -2086,6 +2083,7 @@ for sapi in $sapis; do
 %if %{with fpm}
 	--with-fpm-user=http \
 	--with-fpm-group=http \
+	--with-fpm-apparmor \
 %endif
 %if %{with pdo_dblib}
 	--with-pdo-dblib=shared \

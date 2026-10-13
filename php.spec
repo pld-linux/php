@@ -246,6 +246,7 @@ BuildRequires:	libpng-devel >= 1.0.8
 %{?with_intl:BuildRequires:	libstdc++-devel}
 BuildRequires:	libtool >= 2:2.4.6
 %{?with_webp:BuildRequires:	libwebp-devel}
+BuildRequires:	libxcrypt-devel
 BuildRequires:	libxml2-devel >= 1:2.7.6-4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
 %{?with_zip:BuildRequires:	libzip-devel >= 1.3.1}

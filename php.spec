@@ -139,7 +139,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.4.26
+Version:	8.4.27
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -148,7 +148,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	8c9d126a31b3074d86199d16ad8a07e7
+# Source0-md5:	98ff3d42f46ec8fbda4f051bdc70f319
 #Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
@@ -194,41 +194,38 @@ Patch71:	libdb-info.patch
 Patch72:	opcache-revalidate-path-once.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 3.0}}
-BuildRequires:	apache-base >= 2.4.0
-BuildRequires:	autoconf >= 2.59
+BuildRequires:	autoconf >= 2.68
 BuildRequires:	automake >= 1.4d
 BuildRequires:	bison >= 3.0.0
-BuildRequires:	bzip2-devel >= 1.0.0
+%{?with_bzip2:BuildRequires:	bzip2-devel >= 1.0.0}
 %{?with_opcache:BuildRequires:	capstone-devel >= 3.0.0}
 %{?with_curl:BuildRequires:	curl-devel >= 7.61.0}
-BuildRequires:	cyrus-sasl-devel >= 2
-BuildRequires:	db-devel >= 4.0
-BuildRequires:	elfutils-devel
+%{?with_ldap:BuildRequires:	cyrus-sasl-devel >= 2}
+%{?with_dba:BuildRequires:	db-devel >= 4.0}
 %{?with_enchant:BuildRequires:	enchant2-devel >= 1.6.0}
 %if %{with pdo_dblib}
 BuildRequires:	freetds-devel >= 0.82
 %endif
-BuildRequires:	freetype-devel >= 1:2.5.1
+%{!?with_system_gd:BuildRequires:	freetype-devel >= 1:2.5.1}
 %if %{with system_gd}
 BuildRequires:	gd-devel >= 2.1
 %endif
-BuildRequires:	gdbm-devel
-BuildRequires:	gmp-devel >= 4.2
+%{?with_dba:BuildRequires:	gdbm-devel}
+%{?with_gmp:BuildRequires:	gmp-devel >= 4.2}
 %{?with_gcov:BuildRequires:	lcov}
 %{?with_fpm:BuildRequires:	libapparmor-devel}
 %{?with_argon2:BuildRequires:	libargon2-devel >= 20161029}
-%{?with_avif:BuildRequires:	libavif-devel >= 0.8.2}
+%{!?with_system_gd:%{?with_avif:BuildRequires:	libavif-devel >= 0.8.2}}
 %{?with_ffi:BuildRequires:	libffi-devel >= 7:3.0.11}
 %{?with_intl:BuildRequires:	libicu-devel >= 50.1}
-BuildRequires:	libjpeg-devel
-BuildRequires:	libltdl-devel >= 1.4
-BuildRequires:	libpng-devel >= 1.0.8
+%{!?with_system_gd:BuildRequires:	libjpeg-devel}
+%{!?with_system_gd:BuildRequires:	libpng-devel >= 1.0.8}
 %{?with_sodium:BuildRequires:	libsodium-devel >= 1.0.8}
 %{?with_intl:BuildRequires:	libstdc++-devel >= 6:4.8.1}
 BuildRequires:	libtool >= 2:2.4.6
-%{?with_webp:BuildRequires:	libwebp-devel >= 0.2.0}
+%{!?with_system_gd:%{?with_webp:BuildRequires:	libwebp-devel >= 0.2.0}}
 BuildRequires:	libxcrypt-devel
-BuildRequires:	libxml2-devel >= 1:2.9.0
+BuildRequires:	libxml2-devel >= 1:2.9.4
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
 %{?with_zip:BuildRequires:	libzip-devel >= 1.7.1}
 %{?with_snmp:%{?with_tests:BuildRequires:	mibs-net-snmp}}
@@ -236,16 +233,15 @@ BuildRequires:	libxml2-devel >= 1:2.9.0
 %{!?with_mysqli:BuildRequires:	mysql-devel >= 4.1.13}
 %{!?with_pdo_mysql:BuildRequires:	mysql-devel}
 %{?with_snmp:BuildRequires:	net-snmp-devel >= 5.3}
-BuildRequires: oniguruma-devel
+%{?with_mbstring:BuildRequires:	oniguruma-devel}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %if %{with openssl} || %{with ldap}
-BuildRequires:	openssl-devel >= 1.0.2
+BuildRequires:	openssl-devel >= 1.1.1
 %endif
-BuildRequires:	pam-devel
 BuildRequires:	pcre2-8-devel >= 10.30
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel >= 12}
-BuildRequires:	readline-devel
+%{?with_readline:BuildRequires:	readline-devel}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.566
@@ -256,11 +252,12 @@ BuildRequires:	sqlite3-devel >= 3.7.14
 %{?with_systemtap:BuildRequires:	systemtap-sdt-devel}
 BuildRequires:	tar >= 1:1.22
 %{?with_tidy:BuildRequires:	tidy-devel}
-BuildRequires:	tokyocabinet-devel
+%{?with_dba:BuildRequires:	tokyocabinet-devel}
 %{?with_odbc:BuildRequires:	unixODBC-devel}
 BuildRequires:	xz
-BuildRequires:	zlib-devel >= 1.2.0.4
+BuildRequires:	zlib-devel >= 1.2.11
 %if %{with apache2}
+BuildRequires:	apache-base >= 2.4.0
 BuildRequires:	apache-devel >= 2.4.0
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
@@ -600,7 +597,7 @@ Summary(ru.UTF-8):	Пакет разработки для построения �
 Summary(uk.UTF-8):	Пакет розробки для побудови розширень PHP
 Group:		Development/Languages/PHP
 Requires:	%{name}-common = %{epoch}:%{version}-%{release}
-Requires:	autoconf >= 2.59
+Requires:	autoconf >= 2.68
 Requires:	automake >= 1.4d
 Requires:	libtool >= 2:2.4.6
 Requires:	pcre2-8-devel >= 10.30
@@ -2114,6 +2111,7 @@ for sapi in $sapis; do
 %if %{with fpm}
 	--with-fpm-user=http \
 	--with-fpm-group=http \
+	--with-fpm-apparmor \
 %endif
 %if %{with pdo_dblib}
 	--with-pdo-dblib=shared \
@@ -2209,9 +2207,7 @@ cp -af Makefile.cli Makefile
 %endif
 
 %if %{with phpdbg}
-# PHP_READLINE_LIBS is empty, so force readline here
-%{__make} -f Makefile.phpdbg phpdbg \
-	PHPDBG_EXTRA_LIBS=-lreadline
+%{__make} -f Makefile.phpdbg phpdbg
 %endif
 
 # CGI/FCGI

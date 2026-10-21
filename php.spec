@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.4.33
-Release:	17
+Release:	18
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -205,12 +205,61 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
 Patch72:	openssl.patch
-Patch73:	missing-includes.patch
 Patch74:	icu74.patch
 Patch75:	libxml2-2.12.patch
 Patch76:	types.patch
 Patch77:	includes.patch
 Patch78:	opcache-revalidate-path-once.patch
+# https://github.com/php/php-src/commit/789a37f14405e2d1a05a76c9fb4ed2d49d4580d5, 7.4 backport from Debian
+Patch190:	php-cve-2022-4900.patch
+# post_max_size part of https://github.com/php/php-src/commit/01a40e89fbfc499936e3b05888d8f00bfde886df, missing in the 7.4 minimal fix
+Patch191:	php-cve-2026-109618-post_max_size.patch
+# Patch200+: security backports for EOL 7.4 by Remi Collet, numbered as in
+# https://git.remirepo.net/cgit/rpms/scl-php74/php.git/tree/php.spec
+Patch200:	php-cve-2022-31631.patch
+Patch201:	php-cve-2023-0567.patch
+Patch202:	php-cve-2023-0568.patch
+Patch203:	php-cve-2023-0662.patch
+Patch204:	php-cve-2023-3247.patch
+Patch205:	php-cve-2023-3823.patch
+Patch206:	php-cve-2023-3824.patch
+Patch207:	php-cve-2024-2756.patch
+Patch208:	php-cve-2024-3096.patch
+Patch209:	php-cve-2024-5458.patch
+Patch210:	php-cve-2024-8925.patch
+Patch211:	php-cve-2024-8926.patch
+Patch212:	php-cve-2024-8927.patch
+Patch213:	php-cve-2024-9026.patch
+Patch214:	php-cve-2024-11236.patch
+Patch215:	php-cve-2024-11234.patch
+Patch216:	php-cve-2024-8932.patch
+Patch217:	php-cve-2024-11233.patch
+Patch218:	php-ghsa-4w77-75f9-2c8w.patch
+Patch219:	php-cve-2024-8929.patch
+Patch220:	php-cve-2025-1217.patch
+Patch221:	php-cve-2025-1734.patch
+Patch222:	php-cve-2025-1861.patch
+Patch223:	php-cve-2025-1736.patch
+Patch224:	php-cve-2025-1219.patch
+Patch225:	php-cve-2025-6491.patch
+Patch226:	php-cve-2025-1220.patch
+Patch227:	php-cve-2025-1735.patch
+Patch228:	php-cve-2025-14177.patch
+Patch229:	php-cve-2025-14178.patch
+Patch230:	php-ghsa-www2-q4fc-65wf.patch
+Patch231:	php-cve-2026-6722.patch
+Patch232:	php-cve-2026-7261.patch
+Patch233:	php-cve-2026-7262.patch
+Patch234:	php-cve-2026-6735.patch
+Patch235:	php-cve-2026-7568.patch
+Patch236:	php-cve-2026-7258.patch
+Patch237:	php-cve-2026-14355.patch
+Patch238:	php-cve-2026-9672.patch
+Patch239:	php-cve-2026-17543.patch
+Patch240:	php-cve-2026-7260.patch
+Patch241:	php-gh22643.patch
+Patch242:	php-from-8.2.34-to-7.4.patch
+Patch243:	php-7.4-cve-2026-109618.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -265,6 +314,7 @@ BuildRequires:	pam-devel
 BuildRequires:	pcre2-8-devel >= 10.30
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel}
+BuildRequires:	re2c >= 0.13.4
 BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
@@ -1930,12 +1980,57 @@ cp -p php.ini-production php.ini
 #%%patch -P68 -p1 DROP or update to 7.0 APIs
 %patch -P71 -p1
 %patch -P72 -p1
-%patch -P73 -p1
 %patch -P74 -p1
 %patch -P75 -p1
 %patch -P76 -p1
 %patch -P77 -p1
 %patch -P78 -p1
+%patch -P190 -p1
+%patch -P200 -p1
+%patch -P201 -p1
+%patch -P202 -p1
+%patch -P203 -p1
+%patch -P204 -p1
+%patch -P205 -p1
+%patch -P206 -p1
+%patch -P207 -p1
+%patch -P208 -p1
+%patch -P209 -p1
+%patch -P210 -p1
+%patch -P211 -p1
+%patch -P212 -p1
+%patch -P213 -p1
+%patch -P214 -p1
+%patch -P215 -p1
+%patch -P216 -p1
+%patch -P217 -p1
+%patch -P218 -p1
+%patch -P219 -p1
+%patch -P220 -p1
+%patch -P221 -p1
+%patch -P222 -p1
+%patch -P223 -p1
+%patch -P224 -p1
+%patch -P225 -p1
+%patch -P226 -p1
+%patch -P227 -p1
+%patch -P228 -p1
+%patch -P229 -p1
+%patch -P230 -p1
+%patch -P231 -p1
+%patch -P232 -p1
+%patch -P233 -p1
+%patch -P234 -p1
+%patch -P235 -p1
+%patch -P236 -p1
+%patch -P237 -p1
+%patch -P238 -p1
+%patch -P239 -p1
+%patch -P240 -p1
+%patch -P241 -p1
+%patch -P242 -p1
+%patch -P243 -p1
+%patch -P191 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	40
+%define		rel	41
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -174,7 +174,7 @@ Epoch:		4
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 # Source0-md5:	c7dde3afb16ce7b761abf2805125d372
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -251,6 +251,124 @@ Patch77:	libxml2.patch
 Patch78:	configure.patch
 Patch79:	types.patch
 Patch80:	includes.patch
+# Patch200+: security backports for EOL 5.6 by Remi Collet, numbered as in
+# https://git.remirepo.net/cgit/rpms/scl-php56/php.git/tree/php.spec
+# with NEWS hunks dropped; his php-bug78599.patch is Patch68 here
+Patch208:	php-bug77396.patch
+Patch209:	php-bug77431.patch
+Patch210:	php-bug77540.patch
+Patch211:	php-bug77563.patch
+Patch212:	php-bug77586.patch
+Patch213:	php-bug77630.patch
+Patch215:	php-sqlite3-defensive.patch
+Patch216:	php-bug77753.patch
+Patch217:	php-bug77831.patch
+Patch218:	php-bug77950.patch
+Patch219:	php-bug78069.patch
+Patch220:	php-bug77988.patch
+Patch221:	php-bug77967.patch
+Patch222:	php-bug78222.patch
+Patch223:	php-bug78256.patch
+Patch224:	php-bug77919.patch
+Patch225:	php-bug75457.patch
+Patch226:	php-bug78380.patch
+Patch228:	php-bug78878.patch
+Patch229:	php-bug78862.patch
+Patch230:	php-bug78863.patch
+Patch231:	php-bug78793.patch
+Patch232:	php-bug78910.patch
+Patch233:	php-bug79099.patch
+Patch234:	php-bug79037.patch
+Patch236:	php-bug79221.patch
+Patch237:	php-bug79082.patch
+Patch238:	php-bug79282.patch
+Patch239:	php-bug79329.patch
+Patch240:	php-bug79330.patch
+Patch241:	php-bug79465.patch
+Patch242:	php-bug78875.patch
+Patch243:	php-bug79797.patch
+Patch244:	php-bug79877.patch
+Patch246:	php-bug79699.patch
+Patch247:	php-bug77423.patch
+Patch248:	php-bug80672.patch
+Patch249:	php-bug80710.patch
+Patch250:	php-bug81122.patch
+Patch251:	php-bug76450.patch
+Patch252:	php-bug81211.patch
+Patch253:	php-bug81026.patch
+Patch254:	php-bug79971.patch
+Patch255:	php-bug81719.patch
+Patch256:	php-bug81720.patch
+Patch257:	php-bug81727.patch
+Patch258:	php-bug81726.patch
+Patch259:	php-bug81740.patch
+Patch260:	php-bug81744.patch
+Patch261:	php-bug81746.patch
+Patch262:	php-cve-2023-0662.patch
+Patch263:	php-cve-2023-3247.patch
+# Remi's 2023-3823 and 2023-3824 file names are swapped: 264 is the phar fix, 265 the libxml one
+Patch264:	php-cve-2023-3823.patch
+Patch265:	php-cve-2023-3824.patch
+Patch266:	php-cve-2024-2756.patch
+Patch267:	php-cve-2024-3096.patch
+Patch268:	php-cve-2024-5458.patch
+Patch269:	php-cve-2024-8925.patch
+Patch270:	php-cve-2024-8926.patch
+Patch271:	php-cve-2024-8927.patch
+Patch273:	php-cve-2024-11234.patch
+Patch274:	php-cve-2024-8932.patch
+Patch275:	php-cve-2024-11233.patch
+Patch276:	php-ghsa-4w77-75f9-2c8w.patch
+Patch277:	php-cve-2026-7261.patch
+Patch278:	php-cve-2026-7262.patch
+Patch279:	php-cve-2026-6735.patch
+Patch280:	php-cve-2026-14355.patch
+# Patch300+: security backports for EOL 5.6 by Freexian ELTS, from php5 5.6.40+dfsg-0+deb8u23
+# https://deb.freexian.com/extended-lts/pool/main/p/php5/
+# https://github.com/php/php-src/commit/8d3dfabef459fe7815e8ea2fd68753fd17859d7b
+Patch300:	php-cve-2019-9022.patch
+# bundled libmagic: https://github.com/file/file/commit/46a8443f76cec4b41ec736eca396984c74664f84
+Patch301:	php-libmagic-cve-2019-18218.patch
+Patch302:	php-cve-2024-11236.patch
+Patch303:	php-cve-2024-8929.patch
+Patch304:	php-bug69899.patch
+# test-only: ServerClientTestCase and server-8.0.inc used by the CVE-2025 http tests
+Patch305:	php-tests-http-server-8.0.patch
+Patch306:	php-tests-openssl-server-8.1.patch
+Patch307:	php-cve-2025-1217.patch
+Patch308:	php-cve-2025-1219.patch
+Patch309:	php-cve-2025-1734.patch
+Patch310:	php-cve-2025-1736.patch
+Patch311:	php-cve-2025-1861.patch
+# CVE-2026-109618, CVE-2026-109619: upstream minimal mitigation for EOL branches, 5.6 port from
+# https://github.com/shivammathur/php-src-backports/commit/b18ab39d35ca71365193143283fa621d45628156
+Patch400:	php-cve-2026-109618.patch
+# Patch410+: 5.6 ports of upstream fixes no 5.6 tree carries; each names its upstream commit
+Patch410:	php-cve-2025-1220.patch
+Patch411:	php-ghsa-www2-q4fc-65wf.patch
+Patch412:	php-cve-2026-7258.patch
+Patch413:	php-cve-2026-92842.patch
+Patch414:	php-ghsa-ch8v-r6jh-4vvr.patch
+Patch415:	php-cve-2026-91766.patch
+Patch416:	php-cve-2026-93682.patch
+Patch417:	php-cve-2026-91769.patch
+Patch418:	php-cve-2026-91767.patch
+Patch419:	php-cve-2026-91768.patch
+Patch420:	php-cve-2026-6103.patch
+Patch421:	php-cve-2026-7260.patch
+Patch422:	php-cve-2026-9672.patch
+Patch423:	php-cve-2025-14177.patch
+Patch424:	php-cve-2025-1735.patch
+Patch425:	php-cve-2026-17543.patch
+Patch426:	php-cve-2025-1218.patch
+Patch427:	php-cve-2025-14181.patch
+Patch428:	php-cve-2026-6722.patch
+Patch429:	php-cve-2026-91765.patch
+Patch430:	php-cve-2025-6491.patch
+Patch431:	php-bug47925.patch
+Patch432:	php-gh22761.patch
+# PLD-only: text-protocol row fields left untyped when decoding fails, then freed (5.6-specific code)
+Patch433:	php-mysqlnd-row-uninit-free.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2192,6 +2310,111 @@ exit 1
 %patch -P78 -p1
 %patch -P79 -p1
 %patch -P80 -p1
+%patch -P208 -p1
+%patch -P209 -p1
+%patch -P210 -p1
+%patch -P211 -p1
+%patch -P212 -p1
+%patch -P213 -p1
+%patch -P215 -p1
+%patch -P216 -p1
+%patch -P217 -p1
+%patch -P218 -p1
+%patch -P219 -p1
+%patch -P220 -p1
+%patch -P221 -p1
+%patch -P222 -p1
+%patch -P223 -p1
+%patch -P224 -p1
+%patch -P225 -p1
+%patch -P226 -p1
+%patch -P228 -p1
+%patch -P229 -p1
+%patch -P230 -p1
+%patch -P231 -p1
+%patch -P232 -p1
+%patch -P233 -p1
+%patch -P234 -p1
+%patch -P236 -p1
+%patch -P237 -p1
+%patch -P238 -p1
+%patch -P239 -p1
+%patch -P240 -p1
+%patch -P241 -p1
+%patch -P242 -p1
+%patch -P243 -p1
+%patch -P244 -p1
+%patch -P246 -p1
+%patch -P247 -p1
+%patch -P248 -p1
+%patch -P249 -p1
+%patch -P250 -p1
+%patch -P251 -p1
+%patch -P252 -p1
+%patch -P253 -p1
+%patch -P254 -p1
+%patch -P255 -p1
+%patch -P256 -p1
+%patch -P257 -p1
+%patch -P258 -p1
+%patch -P259 -p1
+%patch -P260 -p1
+%patch -P261 -p1
+%patch -P262 -p1
+%patch -P263 -p1
+%patch -P264 -p1
+%patch -P265 -p1
+%patch -P266 -p1
+%patch -P267 -p1
+%patch -P268 -p1
+%patch -P269 -p1
+%patch -P270 -p1
+%patch -P271 -p1
+%patch -P273 -p1
+%patch -P274 -p1
+%patch -P275 -p1
+%patch -P276 -p1
+%patch -P277 -p1
+%patch -P278 -p1
+%patch -P279 -p1
+%patch -P280 -p1
+%patch -P300 -p1
+%patch -P301 -p1
+%patch -P302 -p1
+%patch -P303 -p1
+%patch -P304 -p1
+%patch -P305 -p1
+%patch -P306 -p1
+%patch -P307 -p1
+%patch -P308 -p1
+%patch -P309 -p1
+%patch -P310 -p1
+%patch -P311 -p1
+%patch -P400 -p1
+%patch -P410 -p1
+%patch -P411 -p1
+%patch -P412 -p1
+%patch -P413 -p1
+%patch -P414 -p1
+%patch -P415 -p1
+%patch -P416 -p1
+%patch -P417 -p1
+%patch -P418 -p1
+%patch -P419 -p1
+%patch -P420 -p1
+%patch -P421 -p1
+%patch -P422 -p1
+%patch -P423 -p1
+%patch -P424 -p1
+%patch -P425 -p1
+%patch -P426 -p1
+%patch -P427 -p1
+%patch -P428 -p1
+%patch -P429 -p1
+%patch -P430 -p1
+%patch -P431 -p1
+%patch -P432 -p1
+%patch -P433 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

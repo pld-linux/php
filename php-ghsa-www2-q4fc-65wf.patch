@@ -1,0 +1,325 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Niels Dossche <7771979+nielsdos@users.noreply.github.com>
+Date: Sat, 6 Sep 2025 19:55:13 +0000
+Subject: [PATCH] Fix GHSA-www2-q4fc-65wf: null byte termination in
+ dns_get_record() and friends
+
+Backport of https://github.com/php/php-src/commit/ed70b1ea43a9b7ffa2f53b3e5d6ba403f37ae81c
+7.4 reference: https://github.com/shivammathur/php-src-backports/commit/3e9d47f6cc04c9978bb384e2d487cf28d37889f0
+
+5.6: "s" -> "p" in zend_parse_parameters() format strings; test emits warnings
+instead of ValueError, and the 5.6-only ip2long/getservbyname tests get the new message.
+---
+ ext/standard/basic_functions.c                | 10 ++---
+ ext/standard/dns.c                            |  6 +--
+ ext/standard/dns_win32.c                      |  6 +--
+ .../getservbyname_variation1.phpt             |  8 ++--
+ .../getservbyname_variation13.phpt            |  2 +-
+ .../getservbyname_variation6.phpt             |  2 +-
+ .../getservbyname_variation8.phpt             |  8 ++--
+ .../tests/network/ghsa-www2-q4fc-65wf.phpt    | 43 +++++++++++++++++++
+ ext/standard/tests/network/ip.phpt            |  2 +-
+ .../tests/network/ip2long_variation1.phpt     | 12 +++---
+ ext/standard/tests/network/ip_x86_64.phpt     |  2 +-
+ 11 files changed, 72 insertions(+), 29 deletions(-)
+ create mode 100644 ext/standard/tests/network/ghsa-www2-q4fc-65wf.phpt
+
+diff --git a/ext/standard/basic_functions.c b/ext/standard/basic_functions.c
+index 1ea19066..3ac986f3 100644
+--- a/ext/standard/basic_functions.c
++++ b/ext/standard/basic_functions.c
+@@ -3885,7 +3885,7 @@ PHP_NAMED_FUNCTION(php_inet_pton)
+ 	int address_len;
+ 	char buffer[17];
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &address, &address_len) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "p", &address, &address_len) == FAILURE) {
+ 		RETURN_FALSE;
+ 	}
+ 
+@@ -3925,7 +3925,7 @@ PHP_FUNCTION(ip2long)
+ 	unsigned long int ip;
+ #endif
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &addr, &addr_len) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "p", &addr, &addr_len) == FAILURE) {
+ 		return;
+ 	}
+ 
+@@ -5596,7 +5596,7 @@ PHP_FUNCTION(getservbyname)
+ 	int name_len, proto_len;
+ 	struct servent *serv;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &name, &name_len, &proto, &proto_len) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "pp", &name, &name_len, &proto, &proto_len) == FAILURE) {
+ 		return;
+ 	}
+ 
+@@ -5630,7 +5630,7 @@ PHP_FUNCTION(getservbyport)
+ 	long port;
+ 	struct servent *serv;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ls", &port, &proto, &proto_len) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lp", &port, &proto, &proto_len) == FAILURE) {
+ 		return;
+ 	}
+ 
+@@ -5654,7 +5654,7 @@ PHP_FUNCTION(getprotobyname)
+ 	int name_len;
+ 	struct protoent *ent;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "p", &name, &name_len) == FAILURE) {
+ 		return;
+ 	}
+ 
+diff --git a/ext/standard/dns.c b/ext/standard/dns.c
+index d637b4af..2201432e 100644
+--- a/ext/standard/dns.c
++++ b/ext/standard/dns.c
+@@ -368,7 +368,7 @@ PHP_FUNCTION(dns_check_record)
+ 	struct __res_state *handle = &state;
+ #endif
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &hostname, &hostname_len, &rectype, &rectype_len) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "p|s", &hostname, &hostname_len, &rectype, &rectype_len) == FAILURE) {
+ 		return;
+ 	}
+ 
+@@ -788,7 +788,7 @@ PHP_FUNCTION(dns_get_record)
+ 	int type, first_query = 1, store_results = 1;
+ 	zend_bool raw = 0;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|lz!z!b",
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "p|lz!z!b",
+ 			&hostname, &hostname_len, &type_param, &authns, &addtl, &raw) == FAILURE) {
+ 		return;
+ 	}
+@@ -1016,7 +1016,7 @@ PHP_FUNCTION(dns_get_mx)
+ 	struct __res_state *handle = &state;
+ #endif
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz|z", &hostname, &hostname_len, &mx_list, &weight_list) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "pz|z", &hostname, &hostname_len, &mx_list, &weight_list) == FAILURE) {
+ 		return;
+ 	}
+ 
+diff --git a/ext/standard/dns_win32.c b/ext/standard/dns_win32.c
+index f94ef355..ee195a37 100644
+--- a/ext/standard/dns_win32.c
++++ b/ext/standard/dns_win32.c
+@@ -50,7 +50,7 @@ PHP_FUNCTION(dns_get_mx) /* {{{ */
+ 	DNS_STATUS      status;                 /* Return value of DnsQuery_A() function */
+ 	PDNS_RECORD     pResult, pRec;          /* Pointer to DNS_RECORD structure */
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz|z", &hostname, &hostname_len, &mx_list, &weight_list) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "pz|z", &hostname, &hostname_len, &mx_list, &weight_list) == FAILURE) {
+ 		return;
+ 	}
+ 
+@@ -99,7 +99,7 @@ PHP_FUNCTION(dns_check_record)
+ 	DNS_STATUS      status;                 /* Return value of DnsQuery_A() function */
+ 	PDNS_RECORD     pResult;          /* Pointer to DNS_RECORD structure */
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|s", &hostname, &hostname_len, &rectype, &rectype_len) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "p|s", &hostname, &hostname_len, &rectype, &rectype_len) == FAILURE) {
+ 		return;
+ 	}
+ 
+@@ -354,7 +354,7 @@ PHP_FUNCTION(dns_get_record)
+ 	int type, type_to_fetch, first_query = 1, store_results = 1;
+ 	zend_bool raw = 0;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|lz!z!b",
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "p|lz!z!b",
+ 			&hostname, &hostname_len, &type_param, &authns, &addtl, &raw) == FAILURE) {
+ 		return;
+ 	}
+diff --git a/ext/standard/tests/general_functions/getservbyname_variation1.phpt b/ext/standard/tests/general_functions/getservbyname_variation1.phpt
+index 7dd01aab..ac7d9fe0 100644
+--- a/ext/standard/tests/general_functions/getservbyname_variation1.phpt
++++ b/ext/standard/tests/general_functions/getservbyname_variation1.phpt
+@@ -27,14 +27,14 @@ foreach ( $variation_array as $var ) {
+ --EXPECTF--
+ *** Test substituting argument 1 with array values ***
+ 
+-Warning: getservbyname() expects parameter 1 to be string, array given in %s on line %d
++Warning: getservbyname() expects parameter 1 to be a valid path, array given in %s on line %d
+ NULL
+ 
+-Warning: getservbyname() expects parameter 1 to be string, array given in %s on line %d
++Warning: getservbyname() expects parameter 1 to be a valid path, array given in %s on line %d
+ NULL
+ 
+-Warning: getservbyname() expects parameter 1 to be string, array given in %s on line %d
++Warning: getservbyname() expects parameter 1 to be a valid path, array given in %s on line %d
+ NULL
+ 
+-Warning: getservbyname() expects parameter 1 to be string, array given in %s on line %d
++Warning: getservbyname() expects parameter 1 to be a valid path, array given in %s on line %d
+ NULL
+diff --git a/ext/standard/tests/general_functions/getservbyname_variation13.phpt b/ext/standard/tests/general_functions/getservbyname_variation13.phpt
+index 8dad8cda..b556d464 100644
+--- a/ext/standard/tests/general_functions/getservbyname_variation13.phpt
++++ b/ext/standard/tests/general_functions/getservbyname_variation13.phpt
+@@ -34,5 +34,5 @@ foreach ( $variation_array as $var ) {
+ *** Test substituting argument 2 with object values ***
+ bool(false)
+ 
+-Warning: getservbyname() expects parameter 2 to be string, object given in %s.php on line %d
++Warning: getservbyname() expects parameter 2 to be a valid path, object given in %s.php on line %d
+ NULL
+diff --git a/ext/standard/tests/general_functions/getservbyname_variation6.phpt b/ext/standard/tests/general_functions/getservbyname_variation6.phpt
+index 0dfafa62..e184c1a1 100644
+--- a/ext/standard/tests/general_functions/getservbyname_variation6.phpt
++++ b/ext/standard/tests/general_functions/getservbyname_variation6.phpt
+@@ -34,5 +34,5 @@ foreach ( $variation_array as $var ) {
+ *** Test substituting argument 1 with object values ***
+ bool(false)
+ 
+-Warning: getservbyname() expects parameter 1 to be string, object given in %s.php on line %d
++Warning: getservbyname() expects parameter 1 to be a valid path, object given in %s.php on line %d
+ NULL
+diff --git a/ext/standard/tests/general_functions/getservbyname_variation8.phpt b/ext/standard/tests/general_functions/getservbyname_variation8.phpt
+index 69d1d77b..78d7d0b7 100644
+--- a/ext/standard/tests/general_functions/getservbyname_variation8.phpt
++++ b/ext/standard/tests/general_functions/getservbyname_variation8.phpt
+@@ -27,14 +27,14 @@ foreach ( $variation_array as $var ) {
+ --EXPECTF--
+ *** Test substituting argument 2 with array values ***
+ 
+-Warning: getservbyname() expects parameter 2 to be string, array given in %s on line %d
++Warning: getservbyname() expects parameter 2 to be a valid path, array given in %s on line %d
+ NULL
+ 
+-Warning: getservbyname() expects parameter 2 to be string, array given in %s on line %d
++Warning: getservbyname() expects parameter 2 to be a valid path, array given in %s on line %d
+ NULL
+ 
+-Warning: getservbyname() expects parameter 2 to be string, array given in %s on line %d
++Warning: getservbyname() expects parameter 2 to be a valid path, array given in %s on line %d
+ NULL
+ 
+-Warning: getservbyname() expects parameter 2 to be string, array given in %s on line %d
++Warning: getservbyname() expects parameter 2 to be a valid path, array given in %s on line %d
+ NULL
+diff --git a/ext/standard/tests/network/ghsa-www2-q4fc-65wf.phpt b/ext/standard/tests/network/ghsa-www2-q4fc-65wf.phpt
+new file mode 100644
+index 00000000..0f7cbe1e
+--- /dev/null
++++ b/ext/standard/tests/network/ghsa-www2-q4fc-65wf.phpt
+@@ -0,0 +1,43 @@
++--TEST--
++GHSA-www2-q4fc-65wf
++--DESCRIPTION--
++This is a ZPP test but *keep* this as it is security-sensitive!
++--FILE--
++<?php
++var_dump(dns_check_record("\0"));
++var_dump(dns_get_mx("\0", $out));
++var_dump(dns_get_record("\0"));
++var_dump(getprotobyname("\0"));
++var_dump(getservbyname("\0", "tcp"));
++var_dump(getservbyname("x", "tcp\0"));
++var_dump(getservbyport(0, "tcp\0"));
++var_dump(inet_pton("\0"));
++var_dump(ip2long("\0"));
++?>
++--EXPECTF--
++Warning: dns_check_record() expects parameter 1 to be a valid path, string given in %s on line %d
++NULL
++
++Warning: dns_get_mx() expects parameter 1 to be a valid path, string given in %s on line %d
++NULL
++
++Warning: dns_get_record() expects parameter 1 to be a valid path, string given in %s on line %d
++NULL
++
++Warning: getprotobyname() expects parameter 1 to be a valid path, string given in %s on line %d
++NULL
++
++Warning: getservbyname() expects parameter 1 to be a valid path, string given in %s on line %d
++NULL
++
++Warning: getservbyname() expects parameter 2 to be a valid path, string given in %s on line %d
++NULL
++
++Warning: getservbyport() expects parameter 2 to be a valid path, string given in %s on line %d
++NULL
++
++Warning: inet_pton() expects parameter 1 to be a valid path, string given in %s on line %d
++bool(false)
++
++Warning: ip2long() expects parameter 1 to be a valid path, string given in %s on line %d
++NULL
+diff --git a/ext/standard/tests/network/ip.phpt b/ext/standard/tests/network/ip.phpt
+index 3fc1b9dc..ac9a5732 100644
+--- a/ext/standard/tests/network/ip.phpt
++++ b/ext/standard/tests/network/ip.phpt
+@@ -54,7 +54,7 @@ bool(false)
+ bool(false)
+ int(1869573999)
+ 
+-Warning: ip2long() expects parameter 1 to be string, array given in %s on line %d
++Warning: ip2long() expects parameter 1 to be a valid path, array given in %s on line %d
+ NULL
+ 
+ Warning: long2ip() expects exactly 1 parameter, 0 given in %s on line %d
+diff --git a/ext/standard/tests/network/ip2long_variation1.phpt b/ext/standard/tests/network/ip2long_variation1.phpt
+index b228c9bd..941a2d64 100644
+--- a/ext/standard/tests/network/ip2long_variation1.phpt
++++ b/ext/standard/tests/network/ip2long_variation1.phpt
+@@ -141,19 +141,19 @@ bool(false)
+ bool(false)
+ 
+ --empty array--
+-Error: 2 - ip2long() expects parameter 1 to be string, array given, %s(%d)
++Error: 2 - ip2long() expects parameter 1 to be a valid path, array given, %s(%d)
+ NULL
+ 
+ --int indexed array--
+-Error: 2 - ip2long() expects parameter 1 to be string, array given, %s(%d)
++Error: 2 - ip2long() expects parameter 1 to be a valid path, array given, %s(%d)
+ NULL
+ 
+ --associative array--
+-Error: 2 - ip2long() expects parameter 1 to be string, array given, %s(%d)
++Error: 2 - ip2long() expects parameter 1 to be a valid path, array given, %s(%d)
+ NULL
+ 
+ --nested arrays--
+-Error: 2 - ip2long() expects parameter 1 to be string, array given, %s(%d)
++Error: 2 - ip2long() expects parameter 1 to be a valid path, array given, %s(%d)
+ NULL
+ 
+ --uppercase NULL--
+@@ -184,7 +184,7 @@ bool(false)
+ bool(false)
+ 
+ --instance of classWithoutToString--
+-Error: 2 - ip2long() expects parameter 1 to be string, object given, %s(%d)
++Error: 2 - ip2long() expects parameter 1 to be a valid path, object given, %s(%d)
+ NULL
+ 
+ --undefined var--
+@@ -194,6 +194,6 @@ bool(false)
+ bool(false)
+ 
+ --resource--
+-Error: 2 - ip2long() expects parameter 1 to be string, resource given, %s(%d)
++Error: 2 - ip2long() expects parameter 1 to be a valid path, resource given, %s(%d)
+ NULL
+ ===DONE===
+diff --git a/ext/standard/tests/network/ip_x86_64.phpt b/ext/standard/tests/network/ip_x86_64.phpt
+index 1fcb8b20..e234dbdc 100644
+--- a/ext/standard/tests/network/ip_x86_64.phpt
++++ b/ext/standard/tests/network/ip_x86_64.phpt
+@@ -54,7 +54,7 @@ bool(false)
+ bool(false)
+ int(1869573999)
+ 
+-Warning: ip2long() expects parameter 1 to be string, array given in %s on line %d
++Warning: ip2long() expects parameter 1 to be a valid path, array given in %s on line %d
+ NULL
+ 
+ Warning: long2ip() expects exactly 1 parameter, 0 given in %s on line %d

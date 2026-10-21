@@ -383,7 +383,7 @@ r1: initial revision
 +        size_t n;
 +        char *data, *p;
 +        
-+        data = malloc(3 * sysdb->index_size + 7);
++        data = malloc(3 * sysdb->index_size + sizeof(FAKE_HEADER) - 1);
 +
 +        p = mempcpy(data, FAKE_HEADER, sizeof(FAKE_HEADER) - 1);
 +

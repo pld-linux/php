@@ -1,0 +1,82 @@
+From 353eab09221605bbf48bcd60ff3882a083b3e2d0 Mon Sep 17 00:00:00 2001
+From: Ilia Alshanetsky <ilia@ilia.ws>
+Date: Thu, 16 Jul 2026 08:30:45 -0400
+Subject: [PATCH] ext/soap: fix NULL deref on malformed HTTP status line
+
+Backport of https://github.com/php/php-src/commit/1c4bf04783b4915a908a1f7f09a4f4fe2f115ed6
+(GH-22761; fixed in PHP 8.4+, no advisory)
+
+5.6: same code change; the test uses 5.6's ServerClientTestCase
+(phpt_notify/phpt_wait, fixed port) instead of {{ ADDR }}.
+---
+ ext/soap/php_http.c                          | 14 ++++----
+ ext/soap/tests/http_status_line_no_code.phpt | 34 ++++++++++++++++++++
+ 2 files changed, 41 insertions(+), 7 deletions(-)
+ create mode 100644 ext/soap/tests/http_status_line_no_code.phpt
+
+diff --git a/ext/soap/php_http.c b/ext/soap/php_http.c
+index e908644..9ec6b71 100644
+--- a/ext/soap/php_http.c
++++ b/ext/soap/php_http.c
+@@ -924,14 +924,14 @@ try_again:
+ 			if (tmp != NULL) {
+ 				tmp++;
+ 				http_status = atoi(tmp);
+-			}
+-			tmp = strstr(tmp," ");
+-			if (tmp != NULL) {
+-				tmp++;
+-				if (http_msg) {
+-					efree(http_msg);
++				tmp = strstr(tmp," ");
++				if (tmp != NULL) {
++					tmp++;
++					if (http_msg) {
++						efree(http_msg);
++					}
++					http_msg = estrdup(tmp);
+ 				}
+-				http_msg = estrdup(tmp);
+ 			}
+ 			efree(http_version);
+ 
+diff --git a/ext/soap/tests/http_status_line_no_code.phpt b/ext/soap/tests/http_status_line_no_code.phpt
+new file mode 100644
+index 0000000..85b67fb
+--- /dev/null
++++ b/ext/soap/tests/http_status_line_no_code.phpt
+@@ -0,0 +1,34 @@
++--TEST--
++SoapClient: malformed HTTP status line without status code must not crash
++--EXTENSIONS--
++soap
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++$server = stream_socket_server("tcp://127.0.0.1:64327", $errno, $errstr);
++phpt_notify();
++$conn = stream_socket_accept($server);
++while (($line = fgets($conn)) !== false) {
++	if ($line === "\r\n" || $line === "\n") {
++		break;
++	}
++}
++fwrite($conn, "HTTP/1.1\r\nContent-Type: text/xml\r\nContent-Length: 0\r\n\r\n");
++fclose($conn);
++CODE;
++
++$clientCode = <<<'CODE'
++phpt_wait();
++$client = new SoapClient(null, array(
++	'location' => 'http://127.0.0.1:64327',
++	'uri' => 'http://testuri.org',
++	'connection_timeout' => 3,
++));
++var_dump($client->__doRequest('<x/>', 'http://127.0.0.1:64327', 'T', 1));
++CODE;
++
++include sprintf('%s/../../openssl/tests/ServerClientTestCase.inc', __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECT--
++string(0) ""

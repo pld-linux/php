@@ -1,0 +1,94 @@
+Subject: [PATCH] mysqlnd: initialise text protocol row fields before decoding
+
+php_mysqlnd_rowp_read_text_protocol_aux() created every field with
+MAKE_STD_ZVAL(), which sets the refcount but leaves the type uninitialised.
+When a field fails to decode (length pointing after the end of the packet),
+the function returns FAIL with the remaining fields untouched. The caller
+keeps them and later frees them, and a repeated fetch of the buffered row
+returns them, both acting on whatever type and value the recycled
+allocation held (heap disclosure of stale strings, frees of stale pointers).
+
+Create the fields with ALLOC_INIT_ZVAL() (IS_NULL, refcount 1), as the binary
+protocol decoder already NULLs all fields on failure. PHP 7.0+ is not
+affected: row zval arrays are zero-filled (IS_UNDEF) there.
+
+PLD-only fix, no upstream commit (5.6-specific code).
+---
+ .../tests/mysqlnd-text-row-uninit-free.phpt   | 54 +++++++++++++++++++
+ ext/mysqlnd/mysqlnd_wireprotocol.c            |  3 +-
+ 2 files changed, 56 insertions(+), 1 deletion(-)
+
+diff --git a/ext/mysqli/tests/mysqlnd-text-row-uninit-free.phpt b/ext/mysqli/tests/mysqlnd-text-row-uninit-free.phpt
+new file mode 100644
+index 00000000..08847067
+--- /dev/null
++++ b/ext/mysqli/tests/mysqlnd-text-row-uninit-free.phpt
+@@ -0,0 +1,54 @@
++--TEST--
++mysqlnd: text protocol row that fails to decode must not leave uninitialised fields
++--SKIPIF--
++<?php
++require_once('skipif.inc');
++if (!stristr(mysqli_get_client_info(), "mysqlnd")) die('SKIP mysqlnd only test');
++?>
++--FILE--
++<?php
++require_once 'fake_server.inc';
++
++$port = getenv('MYSQLI_TEST_FAKE_SERVER_PORT') ?: 33305;
++
++$process = run_fake_server_in_background('query_response_row_field_len', $port);
++$process->wait();
++
++$conn = new mysqli("127.0.0.1", "root", "", "", $port);
++$result = $conn->query("SELECT strval, strval FROM data");
++
++/* Leave freed string zvals on the allocator's free list, so that an
++ * uninitialised field would pick up a stale string type. */
++$junk = array();
++for ($i = 0; $i < 64; $i++) {
++    $junk[] = str_repeat(chr(65 + $i % 26), 40 + $i);
++}
++unset($junk);
++
++/* The second field's length points past the end of the packet. */
++var_dump($result->fetch_row());
++/* The row is already marked as decoded, the field that failed must be NULL. */
++$row = $result->fetch_row();
++var_dump(!is_array($row) || $row[1] === null);
++
++$result->free();
++$conn->close();
++$process->terminate();
++
++print "done!";
++?>
++--EXPECTF--
++[*] Server started
++[*] Connection established
++[*] Sending - Server Greeting: %s
++[*] Received: %s
++[*] Sending - Server OK: %s
++[*] Received: %s
++[*] Sending - Malicious Query Response for data strval field [field length over-read]: %s
++
++Warning: mysqli_result::fetch_row(): Malformed server packet. Field length pointing after end of packet in %s on line %d
++
++Warning: mysqli_result::fetch_row(): Error while reading a row in %s on line %d
++bool(false)
++bool(true)
++done!
+diff --git a/ext/mysqlnd/mysqlnd_wireprotocol.c b/ext/mysqlnd/mysqlnd_wireprotocol.c
+index fe632634..64687574 100644
+--- a/ext/mysqlnd/mysqlnd_wireprotocol.c
++++ b/ext/mysqlnd/mysqlnd_wireprotocol.c
+@@ -1732,7 +1732,8 @@ php_mysqlnd_rowp_read_text_protocol_aux(MYSQLND_MEMORY_POOL_CHUNK * row_buffer,
+ 
+ 	for (i = 0, current_field = start_field; current_field < end_field; current_field++, i++) {
+ 		DBG_INF("Directly creating zval");
+-		MAKE_STD_ZVAL(*current_field);
++		/* IS_NULL, so the caller can free all fields if decoding fails half-way */
++		ALLOC_INIT_ZVAL(*current_field);
+ 		if (!*current_field) {
+ 			DBG_RETURN(FAIL);
+ 		}

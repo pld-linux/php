@@ -1,0 +1,72 @@
+From: rfussenegger <richard.fussenegger@trivago.com>
+Date: Fri, 30 Sep 2016 10:49:08 +0200
+Subject: Fix bug #69899
+
+Origin: https://github.com/php/php-src/commit/bd75f9e61375c7632bb55b0d49b470ecd94e8ec7
+Bug: https://bugs.php.net/bug.php?id=69899
+---
+ ext/mysqli/tests/bug69899.phpt | 38 ++++++++++++++++++++++++++++++++++++++
+ ext/mysqlnd/mysqlnd_ps.c       |  5 +++--
+ 2 files changed, 41 insertions(+), 2 deletions(-)
+ create mode 100644 ext/mysqli/tests/bug69899.phpt
+
+diff --git a/ext/mysqli/tests/bug69899.phpt b/ext/mysqli/tests/bug69899.phpt
+new file mode 100644
+index 0000000..177b5e3
+--- /dev/null
++++ b/ext/mysqli/tests/bug69899.phpt
+@@ -0,0 +1,38 @@
++--TEST--
++Bug #69899: Segfault on stmt close after free_result with mysqlnd.
++--DESCRIPTION--
++The segfault happens only if the database connection was already closed and
++free_result is called on a prepared statement followed by closing that
++statement. This is due to mysqlnd_stmt::free_result (mysqlnd_ps.c) which
++unconditionally sets the connection of the statement to ready, despite the fact
++that it might already be closed.
++--SKIPIF--
++<?php
++require_once __DIR__ . '/skipif.inc';
++require_once __DIR__ . '/skipifconnectfailure.inc';
++require_once __DIR__ . '/connect.inc';
++if (!$IS_MYSQLND) {
++	die('mysqlnd only');
++}
++?>
++--FILE--
++<?php
++
++require_once __DIR__ . '/connect.inc';
++
++mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
++
++$mysqli = new mysqli($host, $user, $passwd, $db, $port, $socket);
++$stmt   = $mysqli->prepare('SELECT 1');
++
++var_dump(
++	$mysqli->close(),
++	$stmt->free_result(),
++	$stmt->close()
++);
++
++?>
++--EXPECT--
++bool(true)
++NULL
++bool(true)
+diff --git a/ext/mysqlnd/mysqlnd_ps.c b/ext/mysqlnd/mysqlnd_ps.c
+index e3bfc7b..5ed2ff0 100644
+--- a/ext/mysqlnd/mysqlnd_ps.c
++++ b/ext/mysqlnd/mysqlnd_ps.c
+@@ -1975,8 +1975,9 @@ MYSQLND_METHOD(mysqlnd_stmt, free_result)(MYSQLND_STMT * const s TSRMLS_DC)
+ 		stmt->state = MYSQLND_STMT_PREPARED;
+ 	}
+ 
+-	/* Line is free! */
+-	CONN_SET_STATE(stmt->conn, CONN_READY);
++	if (CONN_GET_STATE(stmt->conn) != CONN_QUIT_SENT) {
++		CONN_SET_STATE(stmt->conn, CONN_READY);
++	}
+ 
+ 	DBG_RETURN(PASS);
+ }

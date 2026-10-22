@@ -1,0 +1,104 @@
+From: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 12:26:39 +0200
+Subject: [PATCH] mysqlnd: check the greet packet holds the second scramble part
+
+When anything follows the 13 pad bytes, php_mysqlnd_greet_read() copies
+the 12 byte second part of the 4.1 scramble without checking that the
+packet holds it, reading up to 11 bytes past the packet (and past the
+2048 byte stack buffer for a packet of that size). Without
+CLIENT_PLUGIN_AUTH nothing later rejects the packet, so those bytes end
+up in the scramble the password is hashed with: without the check the auth
+response differs from run to run for the same greeting. Upstream and the
+ELTS CVE-2025-1218 fix keep the unchecked copy.
+PLD: 7.2: taken from packages/php branch PHP_7_1
+---
+ ext/mysqli/tests/fake_server.inc                  | 14 +++++++
+ .../ghsa-r6x9-5r99-36j7-greet-scramble-part2.phpt | 42 +++++++++++++++++++++
+ ext/mysqlnd/mysqlnd_wireprotocol.c                |  1 +
+ 3 files changed, 57 insertions(+)
+
+diff --git a/ext/mysqli/tests/fake_server.inc b/ext/mysqli/tests/fake_server.inc
+index 6639204d..3d935481 100644
+--- a/ext/mysqli/tests/fake_server.inc
++++ b/ext/mysqli/tests/fake_server.inc
+@@ -1291,6 +1291,20 @@ function my_mysqli_test_ok_warning_count_over_read(my_mysqli_fake_server_conn $c
+     $conn->read();
+ }
+ 
++function my_mysqli_test_greet_scramble_part2_over_read(my_mysqli_fake_server_conn $conn): void
++{
++    $p = $conn->packet_generator->server_greetings();
++    $p->packet_length = "370000";
++    // No CLIENT_PLUGIN_AUTH, so nothing after the scramble makes the client bail
++    $p->extended_server_capabilities = my_mysqli_fake_packet_generator::create_packet_item(0b1000000111110111);
++    // 1 byte of the 12 byte second scramble part
++    $p->mariadb_extended_server_capabilities_salt = "6c";
++    $p->mariadb_extended_server_capabilities_auth_plugin = "";
++
++    $conn->send($p->to_bytes(), "Malicious Server Greeting");
++    $conn->read();
++}
++
+ function my_mysqli_test_ok_message_len_past_packet(my_mysqli_fake_server_conn $conn): void
+ {
+     $p1 = $conn->packet_generator->server_ok("01");
+diff --git a/ext/mysqli/tests/ghsa-r6x9-5r99-36j7-greet-scramble-part2.phpt b/ext/mysqli/tests/ghsa-r6x9-5r99-36j7-greet-scramble-part2.phpt
+new file mode 100644
+index 00000000..71d8265e
+--- /dev/null
++++ b/ext/mysqli/tests/ghsa-r6x9-5r99-36j7-greet-scramble-part2.phpt
+@@ -0,0 +1,42 @@
++--TEST--
++GREET packet ending inside the second scramble part must not be read past its end
++--SKIPIF--
++<?php
++if (!extension_loaded('mysqli')) die('skip mysqli extension not available');
++?>
++--FILE--
++<?php
++require_once 'fake_server.inc';
++
++$servername = "127.0.0.1";
++$username = "root";
++$password = "secret";
++
++mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
++$process = run_fake_server_in_background('greet_scramble_part2_over_read');
++$process->wait();
++
++try {
++    $conn = new mysqli($servername, $username, $password, "", 33305);
++} catch (Exception $e) {
++    echo $e->getMessage() . PHP_EOL;
++}
++
++$process->terminate();
++
++print "done!";
++?>
++--EXPECTF--
++[*] Server started
++[*] Connection established
++[*] Sending - Malicious Server Greeting: 370000000a352e352e352d31302e352e31382d4d6172696144420003000000473e3f6047257c6700fef7080200f781150000000000000f0000006c
++
++Warning: mysqli::__construct(): Premature end of data (mysqlnd_wireprotocol.c:%d) in %s on line %d
++
++Warning: mysqli::__construct(): GREET packet shorter than expected in %s on line %d
++
++Warning: mysqli::__construct(): Error while reading greeting packet. PID=%d in %s on line %d
++
++Warning: mysqli::__construct(): [%d]  (trying to connect via (%s
++
++done!
+diff --git a/ext/mysqlnd/mysqlnd_wireprotocol.c b/ext/mysqlnd/mysqlnd_wireprotocol.c
+index f3c3fabc..5a9aa610 100644
+--- a/ext/mysqlnd/mysqlnd_wireprotocol.c
++++ b/ext/mysqlnd/mysqlnd_wireprotocol.c
+@@ -443,6 +443,7 @@ php_mysqlnd_greet_read(void * _packet)
+ 	p+= 13;
+ 
+ 	if ((size_t) (p - buf) < packet->header.size) {
++		BAIL_IF_NOT_ENOUGH_DATA_EX(SCRAMBLE_LENGTH - SCRAMBLE_LENGTH_323);
+ 		/* auth_plugin_data is split into two parts */
+ 		memcpy(packet->authentication_plugin_data.s + SCRAMBLE_LENGTH_323, p, SCRAMBLE_LENGTH - SCRAMBLE_LENGTH_323);
+ 		p+= SCRAMBLE_LENGTH - SCRAMBLE_LENGTH_323;

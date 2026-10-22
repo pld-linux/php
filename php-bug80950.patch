@@ -1,0 +1,69 @@
+From b800f40b2eb1984d6ed9589ed7279be932c38632 Mon Sep 17 00:00:00 2001
+From: Nikita Popov <nikita.ppv@gmail.com>
+Date: Thu, 22 Oct 2026 10:45:42 +0200
+Subject: [PATCH] Fixed bug #80950 (Variables become null in if statements)
+
+Opcache func info claimed curl_exec() never returns true, so inside
+"if (true === $data)" the optimizer replaced $data with null.
+The test is PLD-written (upstream has none), from the bug's reproducer.
+
+Origin: upstream, https://github.com/php/php-src/commit/a1fdfa700bfefa347f0347c0fe49dd34badf9ac0
+Bug: https://bugs.php.net/80950
+PLD: 7.2: taken from packages/php branch PHP_7_1
+---
+ ext/opcache/Optimizer/zend_func_info.c |  2 +-
+ ext/opcache/tests/bug80950.phpt        | 33 ++++++++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/ext/opcache/Optimizer/zend_func_info.c b/ext/opcache/Optimizer/zend_func_info.c
+index af9cfa83..d23f28ce 100644
+--- a/ext/opcache/Optimizer/zend_func_info.c
++++ b/ext/opcache/Optimizer/zend_func_info.c
+@@ -1016,7 +1016,7 @@ static const func_info_t func_infos[] = {
+ 	F1("curl_version",                          MAY_BE_NULL | MAY_BE_FALSE | MAY_BE_ARRAY | MAY_BE_ARRAY_KEY_STRING | MAY_BE_ARRAY_OF_LONG | MAY_BE_ARRAY_OF_STRING | MAY_BE_ARRAY_OF_ARRAY),
+ 	F0("curl_setopt",                           MAY_BE_NULL | MAY_BE_FALSE | MAY_BE_TRUE),
+ 	F0("curl_setopt_array",                     MAY_BE_NULL | MAY_BE_FALSE | MAY_BE_TRUE),
+-	FN("curl_exec",                             MAY_BE_NULL | MAY_BE_FALSE | MAY_BE_STRING),
++	FN("curl_exec",                             MAY_BE_NULL | MAY_BE_FALSE | MAY_BE_TRUE | MAY_BE_STRING),
+ 	F1("curl_getinfo",                          MAY_BE_NULL | MAY_BE_FALSE | MAY_BE_STRING | MAY_BE_LONG | MAY_BE_DOUBLE | MAY_BE_ARRAY | MAY_BE_ARRAY_KEY_ANY | MAY_BE_ARRAY_OF_ANY),
+ 	F1("curl_error",                            MAY_BE_NULL | MAY_BE_STRING),
+ 	F0("curl_errno",                            MAY_BE_NULL | MAY_BE_LONG),
+diff --git a/ext/opcache/tests/bug80950.phpt b/ext/opcache/tests/bug80950.phpt
+new file mode 100644
+index 00000000..34b37ddc
+--- /dev/null
++++ b/ext/opcache/tests/bug80950.phpt
+@@ -0,0 +1,33 @@
++--TEST--
++Bug #80950 (Variables become null in if statements)
++--INI--
++opcache.enable=1
++opcache.enable_cli=1
++opcache.optimization_level=-1
++opcache.file_update_protection=0
++--SKIPIF--
++<?php
++require_once('skipif.inc');
++if (!extension_loaded('curl')) die('skip curl extension not available');
++?>
++--FILE--
++<?php
++function foo() {
++	$ch = curl_init('file://' . __FILE__);
++	curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
++	ob_start();
++	$data = curl_exec($ch);
++	ob_end_clean();
++	var_dump($data);
++	if (true === $data) {
++		if (null === $data) {
++			var_dump('in1', $data);
++		}
++	}
++	var_dump($data);
++}
++foo();
++?>
++--EXPECT--
++bool(true)
++bool(true)

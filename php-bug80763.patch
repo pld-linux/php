@@ -1,0 +1,107 @@
+From 02dc8bf922421c765cfdf98bd3b5125192f803e9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 11:00:39 +0200
+Subject: [PATCH] Fix #80763: msgfmt_format() does not accept DateTime
+ references
+
+MessageFormatter::format() returns false when an argument is a reference
+(e.g. after array_walk() or foreach by reference) and is a DateTime
+("invalid PHP type for date") or is not used by the pattern.
+
+Includes the follow-up GH-8364 fix (dereference every value). The test
+uses a closure instead of the 7.4 arrow function.
+
+Origin: backport, https://github.com/php/php-src/commit/84b615284218736f4fe2450a5f43ef61f2a78901
+Origin: upstream, https://github.com/php/php-src/commit/f5d9e7c031dd6f76a9970212d1627499a83ca2e3
+Bug: https://bugs.php.net/80763
+Bug: https://github.com/php/php-src/issues/8364
+PLD: 7.2: taken from packages/php branch PHP_7_3
+---
+ ext/intl/common/common_date.cpp          |  4 ++++
+ ext/intl/msgformat/msgformat_helpers.cpp |  1 +
+ ext/intl/tests/bug80763.phpt             | 16 ++++++++++++++++
+ ext/intl/tests/gh8364.phpt               | 20 ++++++++++++++++++++
+ 4 files changed, 41 insertions(+)
+
+diff --git a/ext/intl/common/common_date.cpp b/ext/intl/common/common_date.cpp
+index 4da00b02..dcd3d8ab 100644
+--- a/ext/intl/common/common_date.cpp
++++ b/ext/intl/common/common_date.cpp
+@@ -179,6 +179,7 @@ U_CFUNC double intl_zval_to_millis(zval *z, intl_error *err, const char *func)
+ 		return ZEND_NAN;
+ 	}
+ 
++try_again:
+ 	switch (Z_TYPE_P(z)) {
+ 	case IS_STRING:
+ 		type = is_numeric_string(Z_STRVAL_P(z), Z_STRLEN_P(z), &lv, &rv, 0);
+@@ -231,6 +232,9 @@ U_CFUNC double intl_zval_to_millis(zval *z, intl_error *err, const char *func)
+ 			efree(message);
+ 		}
+ 		break;
++	case IS_REFERENCE:
++		z = Z_REFVAL_P(z);
++		goto try_again;
+ 	default:
+ 		spprintf(&message, 0, "%s: invalid PHP type for date", func);
+ 		intl_errors_set(err, U_ILLEGAL_ARGUMENT_ERROR,
+diff --git a/ext/intl/msgformat/msgformat_helpers.cpp b/ext/intl/msgformat/msgformat_helpers.cpp
+index 3e9b0d7f..8fa63469 100644
+--- a/ext/intl/msgformat/msgformat_helpers.cpp
++++ b/ext/intl/msgformat/msgformat_helpers.cpp
+@@ -417,6 +417,7 @@ U_CFUNC void umsg_format_helper(MessageFormatter_object *mfo,
+ 	zend_ulong		 num_index;
+ 
+ 	ZEND_HASH_FOREACH_KEY_VAL(args, num_index, str_index, elem) {
++		ZVAL_DEREF(elem);
+ 		Formattable& formattable = fargs[argNum];
+ 		UnicodeString& key = farg_names[argNum];
+ 		Formattable::Type argType = Formattable::kObject, //unknown
+diff --git a/ext/intl/tests/bug80763.phpt b/ext/intl/tests/bug80763.phpt
+new file mode 100644
+index 00000000..ed7fc16a
+--- /dev/null
++++ b/ext/intl/tests/bug80763.phpt
+@@ -0,0 +1,16 @@
++--TEST--
++Bug #80763 (msgfmt_format() does not accept DateTime references)
++--SKIPIF--
++<?php
++if (!extension_loaded('intl')) die('skip intl extension not available');
++?>
++--FILE--
++<?php
++$today = new DateTime('2021-02-17 12:00:00');
++$formatter = new \MessageFormatter('en_US', 'Today is {today, date, full}.');
++$params = ['today' => $today];
++array_walk($params, function () { return 1; });
++var_dump($formatter->format($params));
++?>
++--EXPECT--
++string(38) "Today is Wednesday, February 17, 2021."
+diff --git a/ext/intl/tests/gh8364.phpt b/ext/intl/tests/gh8364.phpt
+new file mode 100644
+index 00000000..74a0b562
+--- /dev/null
++++ b/ext/intl/tests/gh8364.phpt
+@@ -0,0 +1,20 @@
++--TEST--
++Bug GH-8364 (msgfmt_format $values may not support references)
++--SKIPIF--
++<?php
++if (!extension_loaded("intl")) die("skip intl extension not available");
++?>
++--FILE--
++<?php
++$formatter = new MessageFormatter('en', 'translate {0}');
++$args = ['string', 'string'];
++foreach ($args as &$arg) {
++//     do nothing;
++}
++$result = $formatter->format($args);
++var_dump($result);
++var_dump(intl_get_error_code());
++?>
++--EXPECT--
++string(16) "translate string"
++int(0)

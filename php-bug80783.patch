@@ -1,0 +1,156 @@
+From bccca0b53aa60a62e2988c750fc73c02d109e642 Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Thu, 25 Feb 2021 14:38:42 +0100
+Subject: [PATCH] Fix #80783: PDO ODBC truncates BLOB records at every 256th
+ byte
+
+It is not guaranteed, that the driver inserts only a single NUL byte at
+the end of the buffer.  Apparently, there is no way to find out the
+actual data length in the buffer after calling `SQLGetData()`, so we
+adjust after the next `SQLGetData()` call.
+
+We also prevent PDO::ODBC_ATTR_ASSUME_UTF8 from fetching garbage, by
+fetching all chunks with the same C type.
+
+Closes GH-6716.
+PLD: applied with fuzz 2
+PLD: 7.2: taken from packages/php branch PHP_7_1
+---
+ ext/pdo_odbc/odbc_stmt.c          | 20 +++++++++++++++-----
+ ext/pdo_odbc/tests/bug80783.phpt  | 32 ++++++++++++++++++++++++++++++++
+ ext/pdo_odbc/tests/bug80783a.phpt | 33 +++++++++++++++++++++++++++++++++
+ 3 files changed, 80 insertions(+), 5 deletions(-)
+
+diff --git a/ext/pdo_odbc/odbc_stmt.c b/ext/pdo_odbc/odbc_stmt.c
+index d31940b8..67d99d7b 100644
+--- a/ext/pdo_odbc/odbc_stmt.c
++++ b/ext/pdo_odbc/odbc_stmt.c
+@@ -653,6 +653,7 @@ static int odbc_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *le
+ 
+ 	/* if it is a column containing "long" data, perform late binding now */
+ 	if (C->is_long) {
++		SQLLEN orig_fetched_len = SQL_NULL_DATA;
+ 		zend_ulong used = 0;
+ 		char *buf;
+ 		RETCODE rc;
+@@ -663,18 +664,20 @@ static int odbc_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *le
+ 
+ 		rc = SQLGetData(S->stmt, colno+1, C->is_unicode ? SQL_C_BINARY : SQL_C_CHAR, C->data,
+  			256, &C->fetched_len);
++		orig_fetched_len = C->fetched_len;
+ 
+-		if (rc == SQL_SUCCESS) {
++		if (rc == SQL_SUCCESS && C->fetched_len < 256) {
+ 			/* all the data fit into our little buffer;
+ 			 * jump down to the generic bound data case */
+ 			goto in_data;
+ 		}
+ 
+-		if (rc == SQL_SUCCESS_WITH_INFO) {
++		if (rc == SQL_SUCCESS_WITH_INFO || rc == SQL_SUCCESS) {
+ 			/* this is a 'long column'
+ 
+ 			 read the column in 255 byte blocks until the end of the column is reached, reassembling those blocks
+-			 in order into the output buffer
++			 in order into the output buffer; 255 bytes are an optimistic assumption, since the driver may assert
++			 more or less NUL bytes at the end; we cater to that later, if actual length information is available
+ 
+ 			 this loop has to work whether or not SQLGetData() provides the total column length.
+ 			 calling SQLDescribeCol() or other, specifically to get the column length, then doing a single read
+@@ -688,10 +691,17 @@ static int odbc_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *le
+ 			do {
+ 				C->fetched_len = 0;
+ 				/* read block. 256 bytes => 255 bytes are actually read, the last 1 is NULL */
+-				rc = SQLGetData(S->stmt, colno+1, SQL_C_CHAR, buf2, 256, &C->fetched_len);
++				rc = SQLGetData(S->stmt, colno+1, C->is_unicode ? SQL_C_BINARY : SQL_C_CHAR, buf2, 256, &C->fetched_len);
++
++				/* adjust `used` in case we have length info from the driver */
++				if (orig_fetched_len >= 0 && C->fetched_len >= 0) {
++					SQLLEN fixed_used = orig_fetched_len - C->fetched_len;
++					ZEND_ASSERT(fixed_used <= used + 1);
++					used = fixed_used;
++				}
+ 
+ 				/* resize output buffer and reassemble block */
+-				if (rc==SQL_SUCCESS_WITH_INFO) {
++				if (rc==SQL_SUCCESS_WITH_INFO || (rc==SQL_SUCCESS && C->fetched_len > 255)) {
+ 					/* point 5, in section "Retrieving Data with SQLGetData" in http://msdn.microsoft.com/en-us/library/windows/desktop/ms715441(v=vs.85).aspx
+ 					 states that if SQL_SUCCESS_WITH_INFO, fetched_len will be > 255 (greater than buf2's size)
+ 					 (if a driver fails to follow that and wrote less than 255 bytes to buf2, this will AV or read garbage into buf) */
+diff --git a/ext/pdo_odbc/tests/bug80783.phpt b/ext/pdo_odbc/tests/bug80783.phpt
+new file mode 100644
+index 00000000..9794c25a
+--- /dev/null
++++ b/ext/pdo_odbc/tests/bug80783.phpt
+@@ -0,0 +1,32 @@
++--TEST--
++Bug #80783 (PDO ODBC truncates BLOB records at every 256th byte)
++--SKIPIF--
++<?php
++if (!extension_loaded('pdo_odbc')) die('skip pdo_odbc extension not available');
++require 'ext/pdo/tests/pdo_test.inc';
++PDOTest::skip();
++?>
++--FILE--
++<?php
++require 'ext/pdo/tests/pdo_test.inc';
++$db = PDOTest::test_factory(dirname(__FILE__) . '/common.phpt');
++$db->exec("CREATE TABLE bug80783 (name IMAGE)");
++
++$string = str_repeat("0123456789", 50);
++$db->exec("INSERT INTO bug80783 VALUES('$string')");
++
++$stmt = $db->prepare("SELECT name FROM bug80783");
++$stmt->bindColumn(1, $data, PDO::PARAM_LOB);
++$stmt->execute();
++$stmt->fetch(PDO::FETCH_BOUND);
++
++var_dump($data === bin2hex($string));
++?>
++--CLEAN--
++<?php
++require 'ext/pdo/tests/pdo_test.inc';
++$db = PDOTest::test_factory(dirname(__FILE__) . '/common.phpt');
++$db->exec("DROP TABLE bug80783");
++?>
++--EXPECT--
++bool(true)
+diff --git a/ext/pdo_odbc/tests/bug80783a.phpt b/ext/pdo_odbc/tests/bug80783a.phpt
+new file mode 100644
+index 00000000..f9e123ae
+--- /dev/null
++++ b/ext/pdo_odbc/tests/bug80783a.phpt
+@@ -0,0 +1,33 @@
++--TEST--
++Bug #80783 (PDO ODBC truncates BLOB records at every 256th byte)
++--SKIPIF--
++<?php
++if (!extension_loaded('pdo_odbc')) die('skip pdo_odbc extension not available');
++require 'ext/pdo/tests/pdo_test.inc';
++PDOTest::skip();
++?>
++--FILE--
++<?php
++require 'ext/pdo/tests/pdo_test.inc';
++$db = PDOTest::test_factory(dirname(__FILE__) . '/common.phpt');
++$db->exec("CREATE TABLE bug80783a (name NVARCHAR(MAX))");
++
++$string = str_repeat("0123456789", 50);
++$db->exec("INSERT INTO bug80783a VALUES('$string')");
++
++$stmt = $db->prepare("SELECT name FROM bug80783a");
++$stmt->setAttribute(PDO::ODBC_ATTR_ASSUME_UTF8, true);
++$stmt->bindColumn(1, $data, PDO::PARAM_STR);
++$stmt->execute();
++$stmt->fetch(PDO::FETCH_BOUND);
++
++var_dump($data === $string);
++?>
++--CLEAN--
++<?php
++require 'ext/pdo/tests/pdo_test.inc';
++$db = PDOTest::test_factory(dirname(__FILE__) . '/common.phpt');
++$db->exec("DROP TABLE bug80783a");
++?>
++--EXPECT--
++bool(true)

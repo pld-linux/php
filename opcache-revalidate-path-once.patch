@@ -1,0 +1,21 @@
+Make opcache.revalidate_path cover include_once/require_once too: they take a ready
+cached script from persistent_zend_resolve_path() and skip the open(), so on an SHM
+cache shared by several uids one account can run another's cached script past the
+LSM profile or open_basedir. No-op with the default revalidate_path=0.
+---
+ ext/opcache/ZendAccelerator.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/opcache/ZendAccelerator.c b/ext/opcache/ZendAccelerator.c
+index 58016ce1..f9c1a658 100644
+--- a/ext/opcache/ZendAccelerator.c
++++ b/ext/opcache/ZendAccelerator.c
+@@ -2166,7 +2166,7 @@ static zend_string* persistent_zend_resolve_path(const char *filename, int filen
+ 			if (resolved_path) {
+ 				/* lookup by real path */
+ 				zend_accel_hash_entry *bucket = zend_accel_hash_find_entry(&ZCSG(hash), resolved_path);
+-				if (bucket) {
++				if (bucket && !ZCG(accel_directives).revalidate_path) {
+ 					zend_persistent_script *persistent_script = (zend_persistent_script *)bucket->data;
+ 					if (!persistent_script->corrupted) {
+ 						if (key) {

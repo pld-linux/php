@@ -1,0 +1,29 @@
+From: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 12:41:15 +0200
+Subject: [PATCH] mysqlnd: stop mnd_pestrndup() at the length before reading a byte
+
+_mysqlnd_pestrndup() tested *p before the remaining length, so a string
+not NUL-terminated within length (every length-prefixed server string:
+OK packet and auth response messages) had the byte after it read. For a
+message that ends the packet that byte is outside the packet (and past
+the command buffer when the packet fills it); valgrind reports it as an
+uninitialised read on the new OK packet message test. Check the length
+first.
+PLD: 7.2: taken from packages/php branch PHP_7_1
+---
+ ext/mysqlnd/mysqlnd_alloc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/mysqlnd/mysqlnd_alloc.c b/ext/mysqlnd/mysqlnd_alloc.c
+index 5ee2d453..088817be 100644
+--- a/ext/mysqlnd/mysqlnd_alloc.c
++++ b/ext/mysqlnd/mysqlnd_alloc.c
+@@ -591,7 +591,7 @@ static char * _mysqlnd_pestrndup(const char * const ptr, size_t length, zend_boo
+ 		size_t l = length;
+ 		char * p = (char *) ptr;
+ 		char * dest = (char *) FAKE_PTR(ret);
+-		while (*p && l--) {
++		while (l-- && *p) {
+ 			*dest++ = *p++;
+ 		}
+ 		*dest = '\0';

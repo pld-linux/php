@@ -1,0 +1,236 @@
+From a240265aad12779d8dce73c038ec1eadc242cef1 Mon Sep 17 00:00:00 2001
+From: Maksim Nikulin <mnikulin@plesk.com>
+Date: Wed, 24 Jul 2019 16:50:57 +0700
+Subject: [PATCH] Fix #74083: master PHP-fpm is stopped on multiple reloads
+
+A SIGUSR2 arriving while the re-executed master has not yet installed its
+handlers kills the master; signals are now blocked until the handlers are set.
+
+Origin: backport, https://github.com/php/php-src/commit/ae5154c6c6af7ba7c592f8af006b7cadd0d66d6e
+Origin: upstream, https://github.com/php/php-src/commit/2f9f40915606f34b177b722d50a7ed4ce43adfc7
+Origin: upstream, https://github.com/php/php-src/commit/d537ae73e0b20b8844ed5326b32e9fec435b5ded
+Bug: https://bugs.php.net/74083
+PLD: 7.2: taken from packages/php branch PHP_7_1
+---
+ sapi/fpm/fpm/fpm_main.c                        | 10 +++
+ sapi/fpm/fpm/fpm_process_ctl.c                 |  4 ++
+ sapi/fpm/fpm/fpm_signals.c                     | 53 ++++++++++++++++
+ sapi/fpm/fpm/fpm_signals.h                     |  3 +
+ sapi/fpm/tests/bug74083-concurrent-reload.phpt | 77 ++++++++++++++++++++++++
+ 5 files changed, 147 insertions(+)
+
+diff --git a/sapi/fpm/fpm/fpm_main.c b/sapi/fpm/fpm/fpm_main.c
+index b0e6226d..dcb57373 100644
+--- a/sapi/fpm/fpm/fpm_main.c
++++ b/sapi/fpm/fpm/fpm_main.c
+@@ -104,6 +104,7 @@ int __riscosify_control = __RISCOSIFY_STRICT_UNIX_SPECS;
+ #include "fpm.h"
+ #include "fpm_request.h"
+ #include "fpm_status.h"
++#include "fpm_signals.h"
+ #include "fpm_conf.h"
+ #include "fpm_php.h"
+ #include "fpm_log.h"
+@@ -1604,6 +1605,15 @@ int main(int argc, char *argv[])
+ 								closes it.  in apache|apxs mode apache
+ 								does that for us!  thies@thieso.net
+ 								20000419 */
++
++	/* Subset of signals from fpm_signals_init_main() to avoid unexpected death during early init
++		or during reload just after execvp() or fork */
++	int init_signal_array[] = { SIGUSR1, SIGUSR2, SIGCHLD };
++	if (0 > fpm_signals_init_mask(init_signal_array, sizeof(init_signal_array)/sizeof(init_signal_array[0])) ||
++	    0 > fpm_signals_block()) {
++		zlog(ZLOG_WARNING, "Could die in the case of too early reload signal");
++	}
++	zlog(ZLOG_DEBUG, "Blocked some signals");
+ #endif
+ #endif
+ 
+diff --git a/sapi/fpm/fpm/fpm_process_ctl.c b/sapi/fpm/fpm/fpm_process_ctl.c
+index f99ec241..a9136c74 100644
+--- a/sapi/fpm/fpm/fpm_process_ctl.c
++++ b/sapi/fpm/fpm/fpm_process_ctl.c
+@@ -78,6 +78,10 @@ static void fpm_pctl_exit() /* {{{ */
+ 
+ static void fpm_pctl_exec() /* {{{ */
+ {
++	zlog(ZLOG_DEBUG, "Blocking some signals before reexec");
++	if (0 > fpm_signals_block()) {
++		zlog(ZLOG_WARNING, "concurrent reloads may be unstable");
++	}
+ 
+ 	zlog(ZLOG_NOTICE, "reloading: execvp(\"%s\", {\"%s\""
+ 			"%s%s%s" "%s%s%s" "%s%s%s" "%s%s%s" "%s%s%s"
+diff --git a/sapi/fpm/fpm/fpm_signals.c b/sapi/fpm/fpm/fpm_signals.c
+index 4c9f9664..ab9ab1d8 100644
+--- a/sapi/fpm/fpm/fpm_signals.c
++++ b/sapi/fpm/fpm/fpm_signals.c
+@@ -20,6 +20,7 @@
+ #include "zlog.h"
+ 
+ static int sp[2];
++static sigset_t block_sigset;
+ 
+ const char *fpm_signal_names[NSIG + 1] = {
+ #ifdef SIGHUP
+@@ -211,6 +212,11 @@ int fpm_signals_init_main() /* {{{ */
+ 		zlog(ZLOG_SYSERROR, "failed to init signals: sigaction()");
+ 		return -1;
+ 	}
++
++	zlog(ZLOG_DEBUG, "Unblocking all signals");
++	if (0 > fpm_signals_unblock()) {
++		return -1;
++	}
+ 	return 0;
+ }
+ /* }}} */
+@@ -251,3 +257,50 @@ int fpm_signals_get_fd() /* {{{ */
+ 	return sp[0];
+ }
+ /* }}} */
++
++int fpm_signals_init_mask(int *signum_array, size_t size) /* {{{ */
++{
++	size_t i = 0;
++	if (0 > sigemptyset(&block_sigset)) {
++		zlog(ZLOG_SYSERROR, "failed to prepare signal block mask: sigemptyset()");
++		return -1;
++	}
++	for (i = 0; i < size; ++i) {
++		int sig_i = signum_array[i];
++		if (0 > sigaddset(&block_sigset, sig_i)) {
++			if (sig_i <= NSIG && fpm_signal_names[sig_i] != NULL) {
++				zlog(ZLOG_SYSERROR, "failed to prepare signal block mask: sigaddset(%s)",
++						fpm_signal_names[sig_i]);
++			} else {
++				zlog(ZLOG_SYSERROR, "failed to prepare signal block mask: sigaddset(%d)", sig_i);
++			}
++			return -1;
++		}
++	}
++	return 0;
++}
++/* }}} */
++
++int fpm_signals_block() /* {{{ */
++{
++	if (0 > sigprocmask(SIG_BLOCK, &block_sigset, NULL)) {
++		zlog(ZLOG_SYSERROR, "failed to block signals");
++		return -1;
++	}
++	return 0;
++}
++/* }}} */
++
++int fpm_signals_unblock() /* {{{ */
++{
++	/* Ensure that during reload after upgrade all signals are unblocked.
++		block_sigset could have different value before execve() */
++	sigset_t all_signals;
++	sigfillset(&all_signals);
++	if (0 > sigprocmask(SIG_UNBLOCK, &all_signals, NULL)) {
++		zlog(ZLOG_SYSERROR, "failed to unblock signals");
++		return -1;
++	}
++	return 0;
++}
++/* }}} */
+diff --git a/sapi/fpm/fpm/fpm_signals.h b/sapi/fpm/fpm/fpm_signals.h
+index 759a4e31..a18460f0 100644
+--- a/sapi/fpm/fpm/fpm_signals.h
++++ b/sapi/fpm/fpm/fpm_signals.h
+@@ -9,6 +9,9 @@
+ int fpm_signals_init_main();
+ int fpm_signals_init_child();
+ int fpm_signals_get_fd();
++int fpm_signals_init_mask(int *signum_array, size_t size);
++int fpm_signals_block();
++int fpm_signals_unblock();
+ 
+ extern const char *fpm_signal_names[NSIG + 1];
+ 
+diff --git a/sapi/fpm/tests/bug74083-concurrent-reload.phpt b/sapi/fpm/tests/bug74083-concurrent-reload.phpt
+new file mode 100644
+index 00000000..8b4b690e
+--- /dev/null
++++ b/sapi/fpm/tests/bug74083-concurrent-reload.phpt
+@@ -0,0 +1,77 @@
++--TEST--
++Concurrent reload signals should not kill PHP-FPM master process. (Bug: #74083)
++--SKIPIF--
++<?php
++include "skipif.inc";
++if (getenv("SKIP_SLOW_TESTS")) die("skip slow test");
++?>
++--FILE--
++<?php
++
++require_once "tester.inc";
++
++$cfg = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++pid = {{FILE:PID}}
++process_control_timeout=1
++[unconfined]
++listen = {{ADDR}}
++ping.path = /ping
++ping.response = pong
++pm = dynamic
++pm.max_children = 5
++pm.start_servers = 1
++pm.min_spare_servers = 1
++pm.max_spare_servers = 1
++EOT;
++
++$code = <<<EOT
++<?php
++/* empty */
++EOT;
++
++$tester = new FPM\Tester($cfg, $code);
++$tester->start();
++$tester->expectLogStartNotices();
++$tester->ping('{{ADDR}}');
++
++/* Vary interval between concurrent reload requests
++    since performance of test instance is not known in advance */
++$max_interval = 25000;
++$step = 1000;
++$pid = $tester->getPid();
++for ($interval = 0; $interval < $max_interval; $interval += $step) {
++    exec("kill -USR2 $pid", $out, $killExitCode);
++    if ($killExitCode) {
++        echo "ERROR: master process is dead\n";
++        break;
++    }
++    usleep($interval);
++}
++echo "Reached interval $interval us with $step us steps\n";
++$tester->expectLogNotice('Reloading in progress ...');
++/* Consume mix of 'Reloading in progress ...' and 'reloading: .*' */
++$tester->getLogLines(2000);
++
++$tester->signal('USR2');
++$tester->expectLogNotice('Reloading in progress ...');
++$tester->expectLogNotice('reloading: .*');
++$tester->expectLogNotice('using inherited socket fd=\d+, "127.0.0.1:\d+"');
++$tester->expectLogStartNotices();
++$tester->ping('{{ADDR}}');
++
++$tester->terminate();
++$tester->expectLogTerminatingNotices();
++$tester->close();
++
++?>
++Done
++--EXPECT--
++Reached interval 25000 us with 1000 us steps
++Done
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>

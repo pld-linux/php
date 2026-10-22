@@ -1,0 +1,215 @@
+From f971fd3e2145cb64553c88ad91024fc39f4bccda Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:56:05 +0200
+Subject: [PATCH] Fix #78680: mysqlnd pam plugin missing terminating null
+
+mysql_clear_password sends the password without the trailing NUL the
+protocol requires, so PAM logins to MariaDB (pam) and Percona
+(auth_pam_compat) fail.
+
+Includes two upstream follow-ups: GH-11440 (same missing NUL in the
+sha256_password clear text over SSL path) and GH-24293 (NULL dereference
+with an empty password after an auth switch, introduced by the #78680
+change); the GH-24293 test is adapted to 7.3's fake_server.inc.
+
+Origin: backport, https://github.com/php/php-src/commit/3646604203d80bc0f6a124aa2ac5c448229327ea
+Origin: upstream, https://github.com/php/php-src/commit/94127c53aabd13921814101dd05770d8c7f12b3b
+Origin: backport, https://github.com/php/php-src/commit/3c1a0727162784b89d78eb494185444d75917e95
+Bug: https://bugs.php.net/78680
+Bug: https://github.com/php/php-src/issues/11440
+Bug: https://github.com/php/php-src/issues/24293
+---
+ ext/mysqli/tests/fake_server.inc      | 17 +++++++++
+ ext/mysqli/tests/gh24293.phpt         | 35 ++++++++++++++++++
+ ext/mysqli/tests/mysqli_auth_pam.phpt | 52 +++++++++++++++++++++++----
+ ext/mysqlnd/mysqlnd_auth.c            | 17 +++++----
+ 4 files changed, 109 insertions(+), 12 deletions(-)
+ create mode 100644 ext/mysqli/tests/gh24293.phpt
+
+diff --git a/ext/mysqli/tests/fake_server.inc b/ext/mysqli/tests/fake_server.inc
+index bf557904..231f5d34 100644
+--- a/ext/mysqli/tests/fake_server.inc
++++ b/ext/mysqli/tests/fake_server.inc
+@@ -1155,6 +1155,23 @@ function my_mysqli_test_cached_sha2_switch_unterminated(my_mysqli_fake_server_co
+     $conn->read(65536);
+ }
+ 
++function my_mysqli_test_auth_switch_clear_password(my_mysqli_fake_server_conn $conn): void
++{
++    $p = new my_mysqli_fake_packet();
++    $p->packet_length = "2b0000";
++    $p->packet_number = "02";
++    $p->response_code = "fe";
++    $p->auth_plugin_name = bin2hex('mysql_clear_password' . chr(0));
++    // servers always send a fresh scramble with the switch request
++    $p->auth_plugin_data = "473e3f6047257c676c6b55463f49335f686c643100";
++
++    $conn->send_server_greetings();
++    $conn->read();
++    $conn->send($p->to_bytes(), "Auth Switch Request [mysql_clear_password]");
++    $conn->read();
++    $conn->send($conn->packet_generator->server_ok("04")->to_bytes(), "Server OK");
++}
++
+ function my_mysqli_test_chg_user_response_empty(my_mysqli_fake_server_conn $conn): void
+ {
+     $p = $conn->packet_generator->server_ok("01");
+diff --git a/ext/mysqli/tests/gh24293.phpt b/ext/mysqli/tests/gh24293.phpt
+new file mode 100644
+index 00000000..b5b00ce0
+--- /dev/null
++++ b/ext/mysqli/tests/gh24293.phpt
+@@ -0,0 +1,35 @@
++--TEST--
++GH-24293 (Segfault on connect with an empty password to a MariaDB PAM account)
++--SKIPIF--
++<?php
++if (!extension_loaded('mysqli')) die('skip mysqli extension not available');
++?>
++--FILE--
++<?php
++require_once 'fake_server.inc';
++
++$port = 33305;
++$servername = "127.0.0.1";
++$username = "root";
++$password = "";
++
++$process = run_fake_server_in_background('auth_switch_clear_password', $port);
++$process->wait();
++
++$conn = new mysqli($servername, $username, $password, "", $port);
++$conn->close();
++
++$process->terminate(true);
++
++print "done!";
++?>
++--EXPECTF--
++[*] Server started
++[*] Connection established
++[*] Sending - Server Greeting: 580000000a352e352e352d31302e352e31382d4d6172696144420003000000473e3f6047257c6700fef7080200ff81150000000000000f0000006c6b55463f49335f686c6431006d7973716c5f6e61746976655f70617373776f7264
++[*] Received: 6900000185a21a00000000c0080000000000000000000000000000000000000000000000726f6f7400006d7973716c5f6e61746976655f70617373776f7264002c0c5f636c69656e745f6e616d65076d7973716c6e640c5f7365727665725f686f7374093132372e302e302e31
++[*] Sending - Auth Switch Request [mysql_clear_password]: 2b000002fe6d7973716c5f636c6561725f70617373776f726400473e3f6047257c676c6b55463f49335f686c643100
++[*] Received: 0100000300
++[*] Sending - Server OK: 0700000400000002000000
++[*] Server finished
++done!
+diff --git a/ext/mysqli/tests/mysqli_auth_pam.phpt b/ext/mysqli/tests/mysqli_auth_pam.phpt
+index 86c5c480..8dbdcbd4 100644
+--- a/ext/mysqli/tests/mysqli_auth_pam.phpt
++++ b/ext/mysqli/tests/mysqli_auth_pam.phpt
+@@ -19,8 +19,8 @@ if (!$res = $link->query("SHOW PLUGINS"))
+ 
+ $have_pam = false;
+ while ($row = $res->fetch_assoc()) {
+-	if (isset($row['Name']) && ('mysql_clear_password' == $row['Name'])) {
+-		$have_pam = true;
++    if (isset($row['Name']) && in_array($row['Name'], array('pam', 'authentication_pam', 'auth_pam_compat'))) {
++        $have_pam = $row['Name'];
+ 		break;
+ 	}
+ }
+@@ -29,12 +29,54 @@ $res->close();
+ if (!$have_pam)
+   die("SKIP Server PAM plugin not installed");
+ 
++if ($have_pam == 'pam') {
++    /* MariaDB - needs system variable pam_use_cleartext_plugin=ON to be set */
++    if (!$res = mysqli_query($link, 'SHOW GLOBAL VARIABLES LIKE "pam_use_cleartext_plugin"'))
++        die(sprintf("SKIP MariaDB probe of GLOBAL VARIABLES failed [%d] %s\n",
++                    mysqli_errno($link), mysqli_error($link)));
++    $pam_use_cleartext_plugin = mysqli_fetch_row($res);
++    mysqli_free_result($res);
++    if (!$pam_use_cleartext_plugin or $pam_use_cleartext_plugin[1]!='ON')
++        die("SKIP Server setting pam_use_cleartext_plugin!=ON");
++
++    $pam_service = file_get_contents('/etc/pam.d/mysql');
++} elseif ($have_pam == 'authentication_pam') {
++    /*
++       required MySQL syntax:
++       https://dev.mysql.com/doc/refman/8.0/en/pam-pluggable-authentication.html#pam-pluggable-authentication-usage
++    */
++    $have_pam .= " AS 'mysql-unix'";
++    $pam_service = file_get_contents('/etc/pam.d/mysql-unix');
++} else {
++    $pam_service = file_get_contents('/etc/pam.d/mysql');
++}
++$auth = 0;
++$account = 0;
++foreach (explode("\n", $pam_service) as $line)
++{
++    if (preg_match('/^auth/', $line)) {
++        $auth = 1;
++    } elseif (preg_match('/^account/', $line)) {
++        $account = 1;
++    }
++}
++if (!$auth) {
++    die("SKIP pam service file missing 'auth' directive");
++}
++if (!$account) {
++    die("SKIP pam service file missing 'account' directive");
++}
++
++if (!posix_getpwnam('pamtest')) {
++    die("SKIP no pamtest user");
++}
++/* Password of user 'pamtest' should be set to 'pamtest' */
+ 
+ mysqli_query($link, 'DROP USER pamtest');
+ mysqli_query($link, 'DROP USER pamtest@localhost');
+ 
+-if (!mysqli_query($link, 'CREATE USER pamtest@"%" IDENTIFIED WITH mysql_clear_password') ||
+-	!mysqli_query($link, 'CREATE USER pamtest@"localhost" IDENTIFIED WITH mysql_clear_password')) {
++if (!mysqli_query($link, "CREATE USER pamtest@'%' IDENTIFIED WITH $have_pam") ||
++    !mysqli_query($link, "CREATE USER pamtest@'localhost' IDENTIFIED WITH $have_pam")) {
+ 	printf("skip Cannot create second DB user [%d] %s", mysqli_errno($link), mysqli_error($link));
+ 	mysqli_close($link);
+ 	die("skip CREATE USER failed");
+@@ -88,6 +130,4 @@ max_execution_time=240
+ 	mysqli_query($link, 'DROP USER pamtest@localhost');
+ ?>
+ --EXPECTF--
+-Warning: mysqli_real_connect(): (28000/1045): Access denied for user %s
+-[001] Cannot connect to the server using host=%s
+ done!
+diff --git a/ext/mysqlnd/mysqlnd_auth.c b/ext/mysqlnd/mysqlnd_auth.c
+index 2c50c1fd..3e14e686 100644
+--- a/ext/mysqlnd/mysqlnd_auth.c
++++ b/ext/mysqlnd/mysqlnd_auth.c
+@@ -620,10 +620,12 @@ mysqlnd_pam_auth_get_auth_data(struct st_mysqlnd_authentication_plugin * self,
+ 	zend_uchar * ret = NULL;
+ 
+ 	/* copy pass*/
+-	if (passwd && passwd_len) {
+-		ret = (zend_uchar*) zend_strndup(passwd, passwd_len);
+-	}
+-	*auth_data_len = passwd_len;
++	ret = (zend_uchar*) zend_strndup(passwd, passwd_len);
++	/*
++	  Trailing null required. bug#78680
++	  https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_authentication_methods_clear_text_password.html
++	*/
++	*auth_data_len = passwd_len + 1;
+ 
+ 	return ret;
+ }
+@@ -767,9 +769,12 @@ mysqlnd_sha256_auth_get_auth_data(struct st_mysqlnd_authentication_plugin * self
+ 	if (conn->vio->data->ssl) {
+ 		DBG_INF("simple clear text under SSL");
+ 		/* clear text under SSL */
+-		*auth_data_len = passwd_len;
+-		ret = malloc(passwd_len);
++		/* NUL termination byte required: https://dev.mysql.com/doc/dev/mysql-server/latest/page_protocol_connection_phase_authentication_methods_clear_text_password.html
++		 * (this is similar to bug #78680, but now as GH-11440) */
++		*auth_data_len = passwd_len + 1;
++		ret = malloc(passwd_len + 1);
+ 		memcpy(ret, passwd, passwd_len);
++		ret[passwd_len] = '\0';
+ 	} else {
+ 		*auth_data_len = 0;
+ 		server_public_key = mysqlnd_sha256_get_rsa_key(conn, session_options, pfc_data);
+-- 
+2.56.0
+

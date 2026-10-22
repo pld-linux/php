@@ -1,0 +1,159 @@
+From: Florian Weimer <fweimer@redhat.com>
+Subject: Port various autoconf bits to C99 compilers
+
+gcc >= 14 rejects implicit int and implicit declarations, so run-time
+configure tests fail silently; PHP_TEST_WRITE_STDOUT fails and CLI/CGI write
+through stdio instead of write(2).
+
+Origin: backport, https://github.com/php/php-src/commit/aeaab8ee3e52f74c042a861e394437d6554b36be
+Backported to the 7.3 acinclude.m4 layout via https://github.com/inode64/inode64-overlay (0060_php-7.3.33-gcc14.patch), configure parts only
+---
+diff --git a/Zend/Zend.m4 b/Zend/Zend.m4
+index 8b13b7e0..87569fa7 100644
+--- a/Zend/Zend.m4
++++ b/Zend/Zend.m4
+@@ -109,6 +109,7 @@ AC_MSG_CHECKING(whether double cast to long preserves least significant bits)
+ 
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <limits.h>
++#include <stdlib.h>
+ 
+ int main()
+ {
+@@ -221,6 +222,7 @@ AC_MSG_CHECKING(for MM alignment and log values)
+ 
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <stdio.h>
++#include <stdlib.h>
+ 
+ typedef union _mm_align_test {
+   void *ptr;
+diff --git a/acinclude.m4 b/acinclude.m4
+index 8961c03d..a775a8c7 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -1154,7 +1154,7 @@ AC_CACHE_CHECK(for type of reentrant time-related functions, ac_cv_time_r_type,[
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <time.h>
+ 
+-main() {
++int main() {
+ char buf[27];
+ struct tm t;
+ time_t old = 0;
+@@ -1170,7 +1170,7 @@ return (1);
+ ],[
+   AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <time.h>
+-main() {
++int main() {
+   struct tm t, *s;
+   time_t old = 0;
+   char buf[27], *p;
+@@ -1930,7 +1930,7 @@ AC_DEFUN([PHP_CHECK_FUNC_LIB],[
+   if test "$found" = "yes"; then
+     ac_libs=$LIBS
+     LIBS="$LIBS -l$2"
+-    AC_RUN_IFELSE([AC_LANG_SOURCE([[main() { return (0); }]])],[found=yes],[found=no],[found=no])
++    AC_RUN_IFELSE([AC_LANG_SOURCE([[int main() { return (0); }]])],[found=yes],[found=no],[found=no])
+     LIBS=$ac_libs
+   fi
+ 
+@@ -2929,7 +2929,7 @@ AC_DEFUN([PHP_TEST_WRITE_STDOUT],[
+ 
+ #define TEXT "This is the test message -- "
+ 
+-main()
++int main()
+ {
+   int n;
+ 
+diff --git a/build/libtool.m4 b/build/libtool.m4
+index 099a8799..97cd7902 100644
+--- a/build/libtool.m4
++++ b/build/libtool.m4
+@@ -945,6 +945,7 @@ else
+ #endif
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ 
+ #ifdef RTLD_GLOBAL
+ #  define LT_DLGLOBAL		RTLD_GLOBAL
+diff --git a/configure.ac b/configure.ac
+index a82caabb..2bd3c6f9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -721,6 +721,8 @@ AC_CACHE_CHECK([for getaddrinfo], ac_cv_func_getaddrinfo,
+ #include <string.h>
+ #include <netdb.h>
+ #include <sys/types.h>
++#include <string.h>
++#include <stdlib.h>
+ #ifndef AF_INET
+ # include <sys/socket.h>
+ #endif
+diff --git a/ext/standard/config.m4 b/ext/standard/config.m4
+index 5637d374..8a593656 100644
+--- a/ext/standard/config.m4
++++ b/ext/standard/config.m4
+@@ -73,6 +73,9 @@ AC_CACHE_CHECK(for standard DES crypt, ac_cv_crypt_des,[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char *encrypted = crypt("rasmuslerdorf","rl");
+@@ -100,6 +103,9 @@ AC_CACHE_CHECK(for extended DES crypt, ac_cv_crypt_ext_des,[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char *encrypted = crypt("rasmuslerdorf","_J9..rasm");
+@@ -127,6 +133,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[15], answer[40];
+@@ -164,6 +173,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[30], answer[70];
+@@ -198,6 +210,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[21], answer[21+86];
+@@ -231,6 +246,9 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <crypt.h>
+ #endif
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ int main() {
+ #if HAVE_CRYPT
+ 	char salt[21], answer[21+43];

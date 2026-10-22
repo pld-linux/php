@@ -1,0 +1,41 @@
+From f6e6706f7b590c5907ad2635a3fe4793627537bd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:46:01 +0200
+Subject: [PATCH] Fix #81283: shmop can't read beyond 2147483647 bytes
+
+Reads are capped at INT_MAX, and the int length truncates size - start for
+segments over 2 GiB (sign-extended into zend_string_init(): heap overflow).
+
+Origin: upstream, https://github.com/php/php-src/commit/387c0de98312d576868bf45e8c7b2d4f2ab3c738
+Origin: backport, https://github.com/php/php-src/commit/64cf7b2dbade0d3001d79be3a49e42d9dbc1aa66
+Bug: https://bugs.php.net/81283
+Bug: https://github.com/php/php-src/pull/22425
+---
+ ext/shmop/shmop.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ext/shmop/shmop.c b/ext/shmop/shmop.c
+index 1509b80b..c7d37ccc 100644
+--- a/ext/shmop/shmop.c
++++ b/ext/shmop/shmop.c
+@@ -235,7 +235,7 @@ PHP_FUNCTION(shmop_read)
+ 	zend_long start, count;
+ 	struct php_shmop *shmop;
+ 	char *startaddr;
+-	int bytes;
++	zend_long bytes;
+ 	zend_string *return_string;
+ 
+ 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "rll", &shmid, &start, &count) == FAILURE) {
+@@ -251,7 +251,7 @@ PHP_FUNCTION(shmop_read)
+ 		RETURN_FALSE;
+ 	}
+ 
+-	if (count < 0 || start > (INT_MAX - count) || start + count > shmop->size) {
++	if (count < 0 || start > (ZEND_LONG_MAX - count) || start + count > shmop->size) {
+ 		php_error_docref(NULL, E_WARNING, "count is out of range");
+ 		RETURN_FALSE;
+ 	}
+-- 
+2.56.0
+

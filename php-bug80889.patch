@@ -1,0 +1,174 @@
+From 8f9719ed1d4d9f7223afc9d9ef0bc9e1f06d6106 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 11:02:11 +0200
+Subject: [PATCH] Fix #80889: Cannot set save handler when save_handler is
+ invalid
+
+If session.save_handler names a missing module (e.g. "redis" without
+the extension), session_set_save_handler() does not switch it to
+"user", so the user handler is never used and session_start() fails.
+
+Includes the upstream amendment covering the callable variant.
+
+Origin: upstream, https://github.com/php/php-src/commit/06bfada99bcff9bd2e3a5e959effa2237c07939b
+Origin: upstream, https://github.com/php/php-src/commit/838951c2d6612efbf6adeb5b1abc7fced808dc39
+Bug: https://bugs.php.net/80889
+---
+ ext/session/session.c            | 33 ++++++++++++++--------------
+ ext/session/tests/bug80889.phpt  | 37 ++++++++++++++++++++++++++++++++
+ ext/session/tests/bug80889a.phpt | 35 ++++++++++++++++++++++++++++++
+ 3 files changed, 88 insertions(+), 17 deletions(-)
+ create mode 100644 ext/session/tests/bug80889.phpt
+ create mode 100644 ext/session/tests/bug80889a.phpt
+
+diff --git a/ext/session/session.c b/ext/session/session.c
+index a78798fb..ecfa25a7 100644
+--- a/ext/session/session.c
++++ b/ext/session/session.c
+@@ -1936,13 +1936,24 @@ static PHP_FUNCTION(session_module_name)
+ }
+ /* }}} */
+ 
++static inline void set_user_save_handler_ini(void) {
++	zend_string *ini_name, *ini_val;
++
++	ini_name = zend_string_init("session.save_handler", sizeof("session.save_handler") - 1, 0);
++	ini_val = zend_string_init("user", sizeof("user") - 1, 0);
++	PS(set_handler) = 1;
++	zend_alter_ini_entry(ini_name, ini_val, PHP_INI_USER, PHP_INI_STAGE_RUNTIME);
++	PS(set_handler) = 0;
++	zend_string_release_ex(ini_val, 0);
++	zend_string_release_ex(ini_name, 0);
++}
++
+ /* {{{ proto bool session_set_save_handler(string open, string close, string read, string write, string destroy, string gc, string create_sid)
+    Sets user-level functions */
+ static PHP_FUNCTION(session_set_save_handler)
+ {
+ 	zval *args = NULL;
+ 	int i, num_args, argc = ZEND_NUM_ARGS();
+-	zend_string *ini_name, *ini_val;
+ 
+ 	if (PS(session_status) == php_session_active) {
+ 		php_error_docref(NULL, E_WARNING, "Cannot change save handler when session is active");
+@@ -2044,14 +2055,8 @@ static PHP_FUNCTION(session_set_save_handler)
+ 			remove_user_shutdown_function("session_shutdown", sizeof("session_shutdown") - 1);
+ 		}
+ 
+-		if (PS(mod) && PS(session_status) != php_session_active && PS(mod) != &ps_mod_user) {
+-			ini_name = zend_string_init("session.save_handler", sizeof("session.save_handler") - 1, 0);
+-			ini_val = zend_string_init("user", sizeof("user") - 1, 0);
+-			PS(set_handler) = 1;
+-			zend_alter_ini_entry(ini_name, ini_val, PHP_INI_USER, PHP_INI_STAGE_RUNTIME);
+-			PS(set_handler) = 0;
+-			zend_string_release_ex(ini_val, 0);
+-			zend_string_release_ex(ini_name, 0);
++		if (PS(session_status) != php_session_active && (!PS(mod) || PS(mod) != &ps_mod_user)) {
++			set_user_save_handler_ini();
+ 		}
+ 
+ 		RETURN_TRUE;
+@@ -2079,14 +2084,8 @@ static PHP_FUNCTION(session_set_save_handler)
+ 		}
+ 	}
+ 
+-	if (PS(mod) && PS(mod) != &ps_mod_user) {
+-		ini_name = zend_string_init("session.save_handler", sizeof("session.save_handler") - 1, 0);
+-		ini_val = zend_string_init("user", sizeof("user") - 1, 0);
+-		PS(set_handler) = 1;
+-		zend_alter_ini_entry(ini_name, ini_val, PHP_INI_USER, PHP_INI_STAGE_RUNTIME);
+-		PS(set_handler) = 0;
+-		zend_string_release_ex(ini_val, 0);
+-		zend_string_release_ex(ini_name, 0);
++	if (!PS(mod) || PS(mod) != &ps_mod_user) {
++		set_user_save_handler_ini();
+ 	}
+ 
+ 	for (i = 0; i < argc; i++) {
+diff --git a/ext/session/tests/bug80889.phpt b/ext/session/tests/bug80889.phpt
+new file mode 100644
+index 00000000..78e1a6ab
+--- /dev/null
++++ b/ext/session/tests/bug80889.phpt
+@@ -0,0 +1,37 @@
++--TEST--
++Bug #80889 (Cannot set save handler when save_handler is invalid)
++--SKIPIF--
++<?php include('skipif.inc'); ?>
++--INI--
++session.save_handler=whatever
++--FILE--
++<?php
++class DummyHandler implements SessionHandlerInterface {
++    public function open($savePath, $sessionName) {
++        return true;
++    }
++    public function close() {
++        return true;
++    }
++    public function read($id) {
++        return '';
++    }
++    public function write($id, $data) {
++        return true;
++    }
++    public function destroy($id) {
++        return true;
++    }
++    public function gc($maxlifetime) {
++        return true;
++    }
++}
++
++$initHandler = ini_get('session.save_handler');
++session_set_save_handler(new DummyHandler());
++$setHandler = ini_get('session.save_handler');
++var_dump($initHandler, $setHandler);
++?>
++--EXPECT--
++string(8) "whatever"
++string(4) "user"
+diff --git a/ext/session/tests/bug80889a.phpt b/ext/session/tests/bug80889a.phpt
+new file mode 100644
+index 00000000..ff0c0253
+--- /dev/null
++++ b/ext/session/tests/bug80889a.phpt
+@@ -0,0 +1,35 @@
++--TEST--
++Bug #80889 (Cannot set save handler when save_handler is invalid)
++--SKIPIF--
++<?php include('skipif.inc'); ?>
++--INI--
++session.save_handler=whatever
++--FILE--
++<?php
++$initHandler = ini_get('session.save_handler');
++session_set_save_handler(
++    function ($savePath, $sessionName) {
++        return true;
++    },
++    function () {
++        return true;
++    },
++    function ($id) {
++        return '';
++    },
++    function ($id, $data) {
++        return true;
++    },
++    function ($id) {
++        return true;
++    },
++    function ($maxlifetime) {
++        return true;
++    }
++);
++$setHandler = ini_get('session.save_handler');
++var_dump($initHandler, $setHandler);
++?>
++--EXPECT--
++string(8) "whatever"
++string(4) "user"
+-- 
+2.56.0
+

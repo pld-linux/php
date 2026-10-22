@@ -1,0 +1,31 @@
+From 8b7c799de4af9f56d5912ada9af5f9e13ea53ede Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Thu, 22 Oct 2026 10:42:54 +0200
+Subject: [PATCH] Fix #74960: Heap buffer overflow via str_repeat
+
+concat_function() only checked the sum against SIZE_MAX, so a result length
+near SIZE_MAX wrapped the zend_string allocation size and memcpy() overran it.
+ZSTR_MAX_LEN itself is already defined by php-zstr_max_len.patch.
+
+Origin: backport, https://github.com/php/php-src/commit/760ff841a14160f25348f7969985cb8a2c4da3cc
+Bug: https://bugs.php.net/74960
+---
+ Zend/zend_operators.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Zend/zend_operators.c b/Zend/zend_operators.c
+index 277f7c0d..5c45b09c 100644
+--- a/Zend/zend_operators.c
++++ b/Zend/zend_operators.c
+@@ -1847,7 +1847,7 @@ ZEND_API int ZEND_FASTCALL concat_function(zval *result, zval *op1, zval *op2) /
+ 		size_t result_len = op1_len + op2_len;
+ 		zend_string *result_str;
+ 
+-		if (UNEXPECTED(op1_len > SIZE_MAX - op2_len)) {
++		if (UNEXPECTED(op1_len > ZSTR_MAX_LEN - op2_len)) {
+ 			zend_throw_error(NULL, "String size overflow");
+ 			zval_ptr_dtor_str(&op1_copy);
+ 			zval_ptr_dtor_str(&op2_copy);
+-- 
+2.56.0
+

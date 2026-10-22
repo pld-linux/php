@@ -1,0 +1,110 @@
+From: Jakub Zelenka <bukka@php.net>
+Date: Sat, 23 Sep 2023 21:03:31 +0100
+Subject: Fix bug #75708: getimagesize with "&$imageinfo" fails on
+ StreamWrappers
+
+Origin: https://github.com/php/php-src/commit/52aa0d9ecc7ab8b0b74f142e7c1020caa281fbba
+Bug: https://github.com/php/php-src/pull/12444
+Bug: https://bugs.php.net/bug.php?id=75708
+---
+ ext/standard/image.c                   | 16 +++++++++-
+ ext/standard/tests/image/bug75708.phpt | 56 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 71 insertions(+), 1 deletion(-)
+ create mode 100644 ext/standard/tests/image/bug75708.phpt
+
+diff --git a/ext/standard/image.c b/ext/standard/image.c
+index fc4d6bd..fda4054 100644
+--- a/ext/standard/image.c
++++ b/ext/standard/image.c
+@@ -434,6 +434,20 @@ static int php_skip_variable(php_stream * stream)
+ }
+ /* }}} */
+ 
++static size_t php_read_stream_all_chunks(php_stream *stream, char *buffer, size_t length)
++{
++	size_t read_total = 0;
++	do {
++		ssize_t read_now = php_stream_read(stream, buffer, length - read_total);
++		read_total += read_now;
++		if (read_now < stream->chunk_size && read_total != length) {
++			return 0;
++		}
++	} while (read_total < length);
++
++	return read_total;
++}
++
+ /* {{{ php_read_APP
+  */
+ static int php_read_APP(php_stream * stream, unsigned int marker, zval *info)
+@@ -451,7 +465,7 @@ static int php_read_APP(php_stream * stream, unsigned int marker, zval *info)
+ 
+ 	buffer = emalloc(length);
+ 
+-	if (php_stream_read(stream, buffer, (zend_long) length) != length) {
++	if (php_read_stream_all_chunks(stream, buffer, length) != length) {
+ 		efree(buffer);
+ 		return 0;
+ 	}
+diff --git a/ext/standard/tests/image/bug75708.phpt b/ext/standard/tests/image/bug75708.phpt
+new file mode 100644
+index 0000000..956a99b
+--- /dev/null
++++ b/ext/standard/tests/image/bug75708.phpt
+@@ -0,0 +1,56 @@
++--TEST--
++Bug #75708 (getimagesize with "&$imageinfo" fails on StreamWrappers)
++--FILE--
++<?php
++
++class FSStreamWrapper {
++    function stream_open($file, $mode) {
++        $this->handle = fopen(str_replace('fs://', __DIR__ . '/', $file), $mode);
++        return true;
++    }
++    function stream_read($count) {
++        return fread($this->handle, $count);
++    }
++    function stream_eof() {
++        return feof($this->handle);
++    }
++    function stream_seek($offset, $whence) {
++        return fseek($this->handle, $offset, $whence) === 0;
++    }
++    function stream_stat() {
++        return fstat($this->handle);
++    }
++    function url_stat($file) {
++        return stat(str_replace('fs://', '', $file));
++    }
++    function stream_tell() {
++        return ftell($this->handle);
++    }
++    function stream_close() {
++        fclose($this->handle);
++    }
++}
++
++stream_register_wrapper('fs', 'FSStreamWrapper');
++
++var_dump(getimagesize('fs://bug75708.jpg', $info));
++
++?>
++--EXPECT--
++array(7) {
++  [0]=>
++  int(10)
++  [1]=>
++  int(10)
++  [2]=>
++  int(2)
++  [3]=>
++  string(22) "width="10" height="10""
++  ["bits"]=>
++  int(8)
++  ["channels"]=>
++  int(3)
++  ["mime"]=>
++  string(10) "image/jpeg"
++}
++

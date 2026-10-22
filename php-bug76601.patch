@@ -1,0 +1,276 @@
+From a97a8c4493597f89af470f2097021a841df28a09 Mon Sep 17 00:00:00 2001
+From: Maksim Nikulin <mnikulin@plesk.com>
+Date: Mon, 21 Oct 2019 14:23:29 +0700
+Subject: [PATCH] Fix #76601: Partially working php-fpm after incomplete reload
+
+A child forked during a reload can receive SIGQUIT/SIGTERM before it installs
+its own handlers; the inherited master handler ignores them and reload hangs.
+
+Origin: upstream, https://github.com/php/php-src/commit/e37bd5dcc2e8f269c6031d86429311c8cf243060
+Bug: https://bugs.php.net/76601
+---
+ sapi/fpm/fpm/fpm_children.c                   |  9 ++
+ sapi/fpm/fpm/fpm_main.c                       |  6 +-
+ sapi/fpm/fpm/fpm_signals.c                    | 42 +++++++--
+ sapi/fpm/fpm/fpm_signals.h                    |  3 +-
+ .../tests/bug76601-reload-child-signals.phpt  | 92 +++++++++++++++++++
+ 5 files changed, 140 insertions(+), 12 deletions(-)
+ create mode 100644 sapi/fpm/tests/bug76601-reload-child-signals.phpt
+
+diff --git a/sapi/fpm/fpm/fpm_children.c b/sapi/fpm/fpm/fpm_children.c
+index 68c493d7..c0956658 100644
+--- a/sapi/fpm/fpm/fpm_children.c
++++ b/sapi/fpm/fpm/fpm_children.c
+@@ -404,6 +404,11 @@ int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop, int nb_to
+ 			return 2;
+ 		}
+ 
++		zlog(ZLOG_DEBUG, "blocking signals before child birth");
++		if (0 > fpm_signals_child_block()) {
++			zlog(ZLOG_WARNING, "child may miss signals");
++		}
++
+ 		pid = fork();
+ 
+ 		switch (pid) {
+@@ -415,12 +420,16 @@ int fpm_children_make(struct fpm_worker_pool_s *wp, int in_event_loop, int nb_to
+ 				return 0;
+ 
+ 			case -1 :
++				zlog(ZLOG_DEBUG, "unblocking signals");
++				fpm_signals_unblock();
+ 				zlog(ZLOG_SYSERROR, "fork() failed");
+ 
+ 				fpm_resources_discard(child);
+ 				return 2;
+ 
+ 			default :
++				zlog(ZLOG_DEBUG, "unblocking signals, child born");
++				fpm_signals_unblock();
+ 				child->pid = pid;
+ 				fpm_clock_get(&child->started);
+ 				fpm_parent_resources_use(child);
+diff --git a/sapi/fpm/fpm/fpm_main.c b/sapi/fpm/fpm/fpm_main.c
+index 459375ce..85b80bd2 100644
+--- a/sapi/fpm/fpm/fpm_main.c
++++ b/sapi/fpm/fpm/fpm_main.c
+@@ -1586,11 +1586,7 @@ int main(int argc, char *argv[])
+ 								does that for us!  thies@thieso.net
+ 								20000419 */
+ 
+-	/* Subset of signals from fpm_signals_init_main() to avoid unexpected death during early init
+-		or during reload just after execvp() or fork */
+-	int init_signal_array[] = { SIGUSR1, SIGUSR2, SIGCHLD };
+-	if (0 > fpm_signals_init_mask(init_signal_array, sizeof(init_signal_array)/sizeof(init_signal_array[0])) ||
+-	    0 > fpm_signals_block()) {
++	if (0 > fpm_signals_init_mask() || 0 > fpm_signals_block()) {
+ 		zlog(ZLOG_WARNING, "Could die in the case of too early reload signal");
+ 	}
+ 	zlog(ZLOG_DEBUG, "Blocked some signals");
+diff --git a/sapi/fpm/fpm/fpm_signals.c b/sapi/fpm/fpm/fpm_signals.c
+index 922d4b1a..d3214b3d 100644
+--- a/sapi/fpm/fpm/fpm_signals.c
++++ b/sapi/fpm/fpm/fpm_signals.c
+@@ -20,6 +20,7 @@
+ 
+ static int sp[2];
+ static sigset_t block_sigset;
++static sigset_t child_block_sigset;
+ 
+ const char *fpm_signal_names[NSIG + 1] = {
+ #ifdef SIGHUP
+@@ -166,8 +167,11 @@ static void sig_handler(int signo) /* {{{ */
+ 	int saved_errno;
+ 
+ 	if (fpm_globals.parent_pid != getpid()) {
+-		/* prevent a signal race condition when child process
+-			have not set up it's own signal handler yet */
++		/* Avoid using of signal handlers from the master process in a worker
++			before the child sets up its own signal handlers.
++			Normally it is prevented by the sigprocmask() calls
++			around fork(). This execution branch is a last resort trap
++			that has no protection against #76601. */
+ 		return;
+ 	}
+ 
+@@ -247,6 +251,10 @@ int fpm_signals_init_child() /* {{{ */
+ 	}
+ 
+ 	zend_signal_init();
++
++	if (0 > fpm_signals_unblock()) {
++		return -1;
++	}
+ 	return 0;
+ }
+ /* }}} */
+@@ -257,16 +265,23 @@ int fpm_signals_get_fd() /* {{{ */
+ }
+ /* }}} */
+ 
+-int fpm_signals_init_mask(int *signum_array, size_t size) /* {{{ */
++int fpm_signals_init_mask() /* {{{ */
+ {
++	/* Subset of signals from fpm_signals_init_main() and fpm_got_signal()
++		blocked to avoid unexpected death during early init
++		or during reload just after execvp() or fork */
++	int init_signal_array[] = { SIGUSR1, SIGUSR2, SIGCHLD };
++	size_t size = sizeof(init_signal_array)/sizeof(init_signal_array[0]);
+ 	size_t i = 0;
+-	if (0 > sigemptyset(&block_sigset)) {
++	if (0 > sigemptyset(&block_sigset) ||
++	    0 > sigemptyset(&child_block_sigset)) {
+ 		zlog(ZLOG_SYSERROR, "failed to prepare signal block mask: sigemptyset()");
+ 		return -1;
+ 	}
+ 	for (i = 0; i < size; ++i) {
+-		int sig_i = signum_array[i];
+-		if (0 > sigaddset(&block_sigset, sig_i)) {
++		int sig_i = init_signal_array[i];
++		if (0 > sigaddset(&block_sigset, sig_i) ||
++		    0 > sigaddset(&child_block_sigset, sig_i)) {
+ 			if (sig_i <= NSIG && fpm_signal_names[sig_i] != NULL) {
+ 				zlog(ZLOG_SYSERROR, "failed to prepare signal block mask: sigaddset(%s)",
+ 						fpm_signal_names[sig_i]);
+@@ -276,6 +291,11 @@ int fpm_signals_init_mask(int *signum_array, size_t size) /* {{{ */
+ 			return -1;
+ 		}
+ 	}
++	if (0 > sigaddset(&child_block_sigset, SIGTERM) ||
++	    0 > sigaddset(&child_block_sigset, SIGQUIT)) {
++		zlog(ZLOG_SYSERROR, "failed to prepare child signal block mask: sigaddset()");
++		return -1;
++	}
+ 	return 0;
+ }
+ /* }}} */
+@@ -290,6 +310,16 @@ int fpm_signals_block() /* {{{ */
+ }
+ /* }}} */
+ 
++int fpm_signals_child_block() /* {{{ */
++{
++	if (0 > sigprocmask(SIG_BLOCK, &child_block_sigset, NULL)) {
++		zlog(ZLOG_SYSERROR, "failed to block child signals");
++		return -1;
++	}
++	return 0;
++}
++/* }}} */
++
+ int fpm_signals_unblock() /* {{{ */
+ {
+ 	/* Ensure that during reload after upgrade all signals are unblocked.
+diff --git a/sapi/fpm/fpm/fpm_signals.h b/sapi/fpm/fpm/fpm_signals.h
+index 6ce7277c..f453fa4f 100644
+--- a/sapi/fpm/fpm/fpm_signals.h
++++ b/sapi/fpm/fpm/fpm_signals.h
+@@ -8,8 +8,9 @@
+ int fpm_signals_init_main();
+ int fpm_signals_init_child();
+ int fpm_signals_get_fd();
+-int fpm_signals_init_mask(int *signum_array, size_t size);
++int fpm_signals_init_mask();
+ int fpm_signals_block();
++int fpm_signals_child_block();
+ int fpm_signals_unblock();
+ 
+ extern const char *fpm_signal_names[NSIG + 1];
+diff --git a/sapi/fpm/tests/bug76601-reload-child-signals.phpt b/sapi/fpm/tests/bug76601-reload-child-signals.phpt
+new file mode 100644
+index 00000000..b4e99b7e
+--- /dev/null
++++ b/sapi/fpm/tests/bug76601-reload-child-signals.phpt
+@@ -0,0 +1,92 @@
++--TEST--
++FPM: bug76601 children should not ignore signals during concurrent reloads
++--SKIPIF--
++<?php
++include "skipif.inc";
++if (getenv("SKIP_SLOW_TESTS")) die("skip slow test");
++?>
++--FILE--
++<?php
++
++require_once "tester.inc";
++
++$cfg = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++pid = {{FILE:PID}}
++; some value twice greater than tester->getLogLines() timeout
++process_control_timeout=10
++[unconfined]
++listen = {{ADDR}}
++; spawn children immediately after reload
++pm = static
++pm.max_children = 10
++EOT;
++
++$code = <<<EOT
++<?php
++/* empty */
++EOT;
++
++/*
++ * If a child miss SIGQUIT then reload process should stuck
++ * for at least process_control_timeout that is set greater
++ * than timout in log reading functions.
++ *
++ * Alternative way is to set log_level=debug and filter result of
++ * $tester->getLogLines(2000) for lines containing SIGKILL
++ * 
++ *     [22-Oct-2019 03:28:19.532703] DEBUG: pid 21315, fpm_pctl_kill_all(), line 161: [pool unconfined] sending signal 9 SIGKILL to child 21337
++ *     [22-Oct-2019 03:28:19.533471] DEBUG: pid 21315, fpm_children_bury(), line 259: [pool unconfined] child 21337 exited on signal 9 (SIGKILL) after 1.003055 seconds from start
++ * 
++ * but it has less probability of failure detection. Additionally it requires more
++ * $tester->expectLogNotice() around last reload due to presence of debug messages.
++ */
++
++$tester = new FPM\Tester($cfg, $code);
++$tester->start();
++$tester->expectLogStartNotices();
++
++/* Vary interval between concurrent reload requests
++    since performance of test instance is not known in advance */
++$max_interval = 25000;
++$step = 1000;
++$pid = $tester->getPid();
++for ($interval = 0; $interval < $max_interval; $interval += $step) {
++    exec("kill -USR2 $pid", $out, $killExitCode);
++    if ($killExitCode) {
++        echo "ERROR: master process is dead\n";
++        break;
++    }
++    usleep($interval);
++}
++echo "Reached interval $interval us with $step us steps\n";
++$tester->expectLogNotice('Reloading in progress ...');
++/* Consume mix of 'Reloading in progress ...' and 'reloading: .*' */
++$skipped = $tester->getLogLines(2000);
++
++$tester->signal('USR2');
++$tester->expectLogNotice('Reloading in progress ...');
++/* When a child ignores SIGQUIT, the following expectation fails due to timeout. */
++if (!$tester->expectLogNotice('reloading: .*')) {
++    /* for troubleshooting */
++    echo "Skipped messages\n";
++    echo implode('', $skipped);
++}
++$tester->expectLogNotice('using inherited socket fd=\d+, "127.0.0.1:\d+"');
++$tester->expectLogStartNotices();
++
++$tester->terminate();
++$tester->expectLogTerminatingNotices();
++$tester->close();
++
++?>
++Done
++--EXPECT--
++Reached interval 25000 us with 1000 us steps
++Done
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>

@@ -1,0 +1,108 @@
+From 4dbb59df11d00287e7abbbceecebb962e023afa0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 11:02:36 +0200
+Subject: [PATCH] Fix #80915: Taking a reference to $_SERVER hides its values
+ from phpinfo()
+
+Once a superglobal is a reference (e.g. $r =& $_SERVER, common in
+frameworks), phpinfo() silently omits its whole section; nested
+references inside it are printed as a bare "Array".
+
+Includes the follow-up fix for #81048 (dereference contained values).
+
+Origin: upstream, https://github.com/php/php-src/commit/206fd35a98375522a53818ec4ef6e0585b1055dd
+Origin: upstream, https://github.com/php/php-src/commit/36b9bdeeeca066909e2fd687dc5a2089b0112bb0
+Bug: https://bugs.php.net/80915
+Bug: https://bugs.php.net/81048
+---
+ ext/standard/info.c              |  3 ++-
+ ext/standard/tests/bug80915.phpt | 20 ++++++++++++++++++++
+ ext/standard/tests/bug81048.phpt | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 50 insertions(+), 1 deletion(-)
+ create mode 100644 ext/standard/tests/bug80915.phpt
+ create mode 100644 ext/standard/tests/bug81048.phpt
+
+diff --git a/ext/standard/info.c b/ext/standard/info.c
+index b4887d6e..073bb8fb 100644
+--- a/ext/standard/info.c
++++ b/ext/standard/info.c
+@@ -196,7 +196,7 @@ static void php_print_gpcse_array(char *name, uint32_t name_length)
+ 	key = zend_string_init(name, name_length, 0);
+ 	zend_is_auto_global(key);
+ 
+-	if ((data = zend_hash_find(&EG(symbol_table), key)) != NULL && (Z_TYPE_P(data) == IS_ARRAY)) {
++	if ((data = zend_hash_find_deref(&EG(symbol_table), key)) != NULL && (Z_TYPE_P(data) == IS_ARRAY)) {
+ 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), num_key, string_key, tmp) {
+ 			if (!sapi_module.phpinfo_as_text) {
+ 				php_info_print("<tr>");
+@@ -222,6 +222,7 @@ static void php_print_gpcse_array(char *name, uint32_t name_length)
+ 			} else {
+ 				php_info_print(" => ");
+ 			}
++			ZVAL_DEREF(tmp);
+ 			if (Z_TYPE_P(tmp) == IS_ARRAY) {
+ 				if (!sapi_module.phpinfo_as_text) {
+ 					zend_string *str = zend_print_zval_r_to_str(tmp, 0);
+diff --git a/ext/standard/tests/bug80915.phpt b/ext/standard/tests/bug80915.phpt
+new file mode 100644
+index 00000000..5b6c0001
+--- /dev/null
++++ b/ext/standard/tests/bug80915.phpt
+@@ -0,0 +1,20 @@
++--TEST--
++Bug #80915: Taking a reference to $_SERVER hides its values from phpinfo()
++--FILE--
++<?php
++
++$_ENV = [];
++$_SERVER = [ 'test' => 'test' ];
++
++$reference =& $_SERVER;
++
++phpinfo(INFO_VARIABLES);
++
++?>
++--EXPECT--
++phpinfo()
++
++PHP Variables
++
++Variable => Value
++$_SERVER['test'] => test
+diff --git a/ext/standard/tests/bug81048.phpt b/ext/standard/tests/bug81048.phpt
+new file mode 100644
+index 00000000..2f36a277
+--- /dev/null
++++ b/ext/standard/tests/bug81048.phpt
+@@ -0,0 +1,28 @@
++--TEST--
++Bug #81048 (phpinfo(INFO_VARIABLES) "Array to string conversion")
++--FILE--
++<?php
++
++$_ENV = [];
++$_SERVER = ['foo' => ['bar' => ['baz' => 'qux']]];
++
++array_walk_recursive($_SERVER, function($value, $key) {
++    // NOP
++});
++
++phpinfo(INFO_VARIABLES);
++?>
++--EXPECT--
++phpinfo()
++
++PHP Variables
++
++Variable => Value
++$_SERVER['foo'] => Array
++(
++    [bar] => Array
++        (
++            [baz] => qux
++        )
++
++)
+-- 
+2.56.0
+

@@ -1,0 +1,194 @@
+From 8a980a6716a60750fe2ec925147685c46a9512b9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:45:26 +0200
+Subject: [PATCH] Fix #80849: HTTP Status header truncation
+
+In CGI and FPM a status line longer than the 1 KiB header buffer loses
+its trailing CRLF, so the next response header is glued onto Status.
+
+The FPM test needs Response::expectHeader() from 7.4's response.inc.
+
+Origin: backport, https://github.com/php/php-src/commit/a054ef2aadd52238eb85d2e4c2b2b989e554a705
+Bug: https://bugs.php.net/80849
+---
+ sapi/cgi/cgi_main.c              |  9 +++----
+ sapi/cgi/tests/bug80849-cgi.phpt | 10 ++++++++
+ sapi/fpm/fpm/fpm_main.c          |  9 +++----
+ sapi/fpm/tests/bug80849-fpm.phpt | 40 ++++++++++++++++++++++++++++++++
+ sapi/fpm/tests/response.inc      | 12 ++++++++++
+ 5 files changed, 72 insertions(+), 8 deletions(-)
+ create mode 100644 sapi/cgi/tests/bug80849-cgi.phpt
+ create mode 100644 sapi/fpm/tests/bug80849-fpm.phpt
+
+diff --git a/sapi/cgi/cgi_main.c b/sapi/cgi/cgi_main.c
+index 98b8001b..da31dff2 100644
+--- a/sapi/cgi/cgi_main.c
++++ b/sapi/cgi/cgi_main.c
+@@ -398,7 +398,7 @@ static int sapi_cgi_send_headers(sapi_headers_struct *sapi_headers)
+ 
+ 		if (CGIG(rfc2616_headers) && SG(sapi_headers).http_status_line) {
+ 			char *s;
+-			len = slprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH, "%s\r\n", SG(sapi_headers).http_status_line);
++			len = slprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH, "%s", SG(sapi_headers).http_status_line);
+ 			if ((s = strchr(SG(sapi_headers).http_status_line, ' '))) {
+ 				response_status = atoi((s + 1));
+ 			}
+@@ -415,7 +415,7 @@ static int sapi_cgi_send_headers(sapi_headers_struct *sapi_headers)
+ 				(s - SG(sapi_headers).http_status_line) >= 5 &&
+ 				strncasecmp(SG(sapi_headers).http_status_line, "HTTP/", 5) == 0
+ 			) {
+-				len = slprintf(buf, sizeof(buf), "Status:%s\r\n", s);
++				len = slprintf(buf, sizeof(buf), "Status:%s", s);
+ 				response_status = atoi((s + 1));
+ 			} else {
+ 				h = (sapi_header_struct*)zend_llist_get_first_ex(&sapi_headers->headers, &pos);
+@@ -438,9 +438,9 @@ static int sapi_cgi_send_headers(sapi_headers_struct *sapi_headers)
+ 						err++;
+ 					}
+ 					if (err->str) {
+-						len = slprintf(buf, sizeof(buf), "Status: %d %s\r\n", SG(sapi_headers).http_response_code, err->str);
++						len = slprintf(buf, sizeof(buf), "Status: %d %s", SG(sapi_headers).http_response_code, err->str);
+ 					} else {
+-						len = slprintf(buf, sizeof(buf), "Status: %d\r\n", SG(sapi_headers).http_response_code);
++						len = slprintf(buf, sizeof(buf), "Status: %d", SG(sapi_headers).http_response_code);
+ 					}
+ 				}
+ 			}
+@@ -448,6 +448,7 @@ static int sapi_cgi_send_headers(sapi_headers_struct *sapi_headers)
+ 
+ 		if (!has_status) {
+ 			PHPWRITE_H(buf, len);
++			PHPWRITE_H("\r\n", 2);
+ 			ignore_status = 1;
+ 		}
+ 	}
+diff --git a/sapi/cgi/tests/bug80849-cgi.phpt b/sapi/cgi/tests/bug80849-cgi.phpt
+new file mode 100644
+index 00000000..ed396aea
+--- /dev/null
++++ b/sapi/cgi/tests/bug80849-cgi.phpt
+@@ -0,0 +1,10 @@
++--TEST--
++Bug #80849 (HTTP Status header truncation)
++--CGI--
++--FILE--
++<?php
++header('HTTP/1.1 201 ' . str_repeat('A', 1014), true);
++?>
++--EXPECTHEADERS--
++Status: 201 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++--EXPECT--
+diff --git a/sapi/fpm/fpm/fpm_main.c b/sapi/fpm/fpm/fpm_main.c
+index 85d83593..c13fcc66 100644
+--- a/sapi/fpm/fpm/fpm_main.c
++++ b/sapi/fpm/fpm/fpm_main.c
+@@ -335,7 +335,7 @@ static int sapi_cgi_send_headers(sapi_headers_struct *sapi_headers) /* {{{ */
+ 
+ 		if (CGIG(rfc2616_headers) && SG(sapi_headers).http_status_line) {
+ 			char *s;
+-			len = slprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH, "%s\r\n", SG(sapi_headers).http_status_line);
++			len = slprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH, "%s", SG(sapi_headers).http_status_line);
+ 			if ((s = strchr(SG(sapi_headers).http_status_line, ' '))) {
+ 				response_status = atoi((s + 1));
+ 			}
+@@ -352,7 +352,7 @@ static int sapi_cgi_send_headers(sapi_headers_struct *sapi_headers) /* {{{ */
+ 				(s - SG(sapi_headers).http_status_line) >= 5 &&
+ 				strncasecmp(SG(sapi_headers).http_status_line, "HTTP/", 5) == 0
+ 			) {
+-				len = slprintf(buf, sizeof(buf), "Status:%s\r\n", s);
++				len = slprintf(buf, sizeof(buf), "Status:%s", s);
+ 				response_status = atoi((s + 1));
+ 			} else {
+ 				h = (sapi_header_struct*)zend_llist_get_first_ex(&sapi_headers->headers, &pos);
+@@ -375,9 +375,9 @@ static int sapi_cgi_send_headers(sapi_headers_struct *sapi_headers) /* {{{ */
+ 						err++;
+ 					}
+ 					if (err->str) {
+-						len = slprintf(buf, sizeof(buf), "Status: %d %s\r\n", SG(sapi_headers).http_response_code, err->str);
++						len = slprintf(buf, sizeof(buf), "Status: %d %s", SG(sapi_headers).http_response_code, err->str);
+ 					} else {
+-						len = slprintf(buf, sizeof(buf), "Status: %d\r\n", SG(sapi_headers).http_response_code);
++						len = slprintf(buf, sizeof(buf), "Status: %d", SG(sapi_headers).http_response_code);
+ 					}
+ 				}
+ 			}
+@@ -385,6 +385,7 @@ static int sapi_cgi_send_headers(sapi_headers_struct *sapi_headers) /* {{{ */
+ 
+ 		if (!has_status) {
+ 			PHPWRITE_H(buf, len);
++			PHPWRITE_H("\r\n", 2);
+ 			ignore_status = 1;
+ 		}
+ 	}
+diff --git a/sapi/fpm/tests/bug80849-fpm.phpt b/sapi/fpm/tests/bug80849-fpm.phpt
+new file mode 100644
+index 00000000..abe17936
+--- /dev/null
++++ b/sapi/fpm/tests/bug80849-fpm.phpt
+@@ -0,0 +1,40 @@
++--TEST--
++Bug #80849 (HTTP Status header truncation)
++--SKIPIF--
++<?php include "skipif.inc"; ?>
++--FILE--
++<?php
++require_once "tester.inc";
++
++$cfg = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++[unconfined]
++listen = {{ADDR}}
++pm = dynamic
++pm.max_children = 5
++pm.start_servers = 1
++pm.min_spare_servers = 1
++pm.max_spare_servers = 3
++EOT;
++
++$code = <<<EOT
++<?php
++header('HTTP/1.1 201 ' . str_repeat('A', 1014), true);
++EOT;
++
++$tester = new FPM\Tester($cfg, $code);
++$tester->start();
++$tester->expectLogStartNotices();
++$tester
++    ->request()
++    ->expectHeader('Status', '201 ' . str_repeat('A', 1011));
++$tester->terminate();
++$tester->close();
++?>
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>
++--EXPECT--
+diff --git a/sapi/fpm/tests/response.inc b/sapi/fpm/tests/response.inc
+index 54f85bcf..e38712f8 100644
+--- a/sapi/fpm/tests/response.inc
++++ b/sapi/fpm/tests/response.inc
+@@ -98,6 +98,18 @@ class Response
+         return $this->expectBody('');
+     }
+ 
++    /**
++     * @param string $name
++     * @param string $value
++     * @return Response
++     */
++    public function expectHeader($name, $value)
++    {
++        $this->checkHeader($name, $value);
++
++        return $this;
++    }
++
+     /**
+      * @param string $contentType
+      * @return string|null
+-- 
+2.56.0
+

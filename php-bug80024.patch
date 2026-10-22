@@ -1,0 +1,500 @@
+From 538aba8af0e56aa9d387dd5e9d488122f9d6f234 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:59:02 +0200
+Subject: [PATCH] Fix bug #80024: Duplication of info about inherited socket
+ after pool removing
+
+When a reload drops the socket count below a 128-socket set boundary,
+the stale FPM_SOCKETS_<n> env var survives the re-exec and the next
+reload imports the old sockets again (duplicated, leaked fds).
+
+The test needs the tester.inc/logtool.inc reload helpers from the same
+upstream commit (included).
+
+Origin: upstream, https://github.com/php/php-src/commit/c483b59124bda89f86d8a54bcbdb8e5b89fa40ea
+Bug: https://bugs.php.net/80024
+---
+ sapi/fpm/fpm/fpm_sockets.c                    |  28 ++--
+ .../tests/bug68391-conf-include-order.phpt    |   7 +-
+ .../bug80024-socket-reduced-inherit.phpt      |  49 +++++++
+ sapi/fpm/tests/logtool.inc                    |  39 +++++-
+ sapi/fpm/tests/tester.inc                     | 124 +++++++++++++++---
+ 5 files changed, 209 insertions(+), 38 deletions(-)
+ create mode 100644 sapi/fpm/tests/bug80024-socket-reduced-inherit.phpt
+
+diff --git a/sapi/fpm/fpm/fpm_sockets.c b/sapi/fpm/fpm/fpm_sockets.c
+index aaa16cc8..c9c0acc7 100644
+--- a/sapi/fpm/fpm/fpm_sockets.c
++++ b/sapi/fpm/fpm/fpm_sockets.c
+@@ -39,6 +39,16 @@ static struct fpm_array_s sockets_list;
+ 
+ enum { FPM_GET_USE_SOCKET = 1, FPM_STORE_SOCKET = 2, FPM_STORE_USE_SOCKET = 3 };
+ 
++static inline void fpm_sockets_get_env_name(char *envname, unsigned idx) /* {{{ */
++{
++	if (!idx) {
++		strcpy(envname, "FPM_SOCKETS");
++	} else {
++		sprintf(envname, "FPM_SOCKETS_%d", idx);
++	}
++}
++/* }}} */
++
+ static void fpm_sockets_cleanup(int which, void *arg) /* {{{ */
+ {
+ 	unsigned i;
+@@ -82,13 +92,11 @@ static void fpm_sockets_cleanup(int which, void *arg) /* {{{ */
+ 
+ 	if (env_value) {
+ 		for (i = 0; i < socket_set_count; i++) {
+-			if (!i) {
+-				strcpy(envname, "FPM_SOCKETS");
+-			} else {
+-				sprintf(envname, "FPM_SOCKETS_%d", i);
+-			}
++			fpm_sockets_get_env_name(envname, i);
+ 			setenv(envname, env_value + socket_set[i], 1);
+ 		}
++		fpm_sockets_get_env_name(envname, socket_set_count);
++		unsetenv(envname);
+ 		free(env_value);
+ 	}
+ 
+@@ -373,7 +381,7 @@ int fpm_sockets_init_main() /* {{{ */
+ {
+ 	unsigned i, lq_len;
+ 	struct fpm_worker_pool_s *wp;
+-	char sockname[32];
++	char envname[32];
+ 	char sockpath[256];
+ 	char *inherited;
+ 	struct listening_socket_s *ls;
+@@ -384,12 +392,8 @@ int fpm_sockets_init_main() /* {{{ */
+ 
+ 	/* import inherited sockets */
+ 	for (i = 0; i < FPM_ENV_SOCKET_SET_MAX; i++) {
+-		if (!i) {
+-			strcpy(sockname, "FPM_SOCKETS");
+-		} else {
+-			sprintf(sockname, "FPM_SOCKETS_%d", i);
+-		}
+-		inherited = getenv(sockname);
++		fpm_sockets_get_env_name(envname, i);
++		inherited = getenv(envname);
+ 		if (!inherited) {
+ 			break;
+ 		}
+diff --git a/sapi/fpm/tests/bug68391-conf-include-order.phpt b/sapi/fpm/tests/bug68391-conf-include-order.phpt
+index 012a978f..3fd4ac1d 100644
+--- a/sapi/fpm/tests/bug68391-conf-include-order.phpt
++++ b/sapi/fpm/tests/bug68391-conf-include-order.phpt
+@@ -16,7 +16,7 @@ log_level = notice
+ include = {{INCLUDE:CONF}}
+ EOT;
+ 
+-$cfgPoolTemplate = <<<EOT
++$cfg['poolTemplate'] = <<<EOT
+ [%name%]
+ listen = {{ADDR[%name%]}}
+ user = foo
+@@ -24,10 +24,7 @@ pm = ondemand
+ pm.max_children = 5
+ EOT;
+ 
+-$names = ['cccc', 'aaaa', 'eeee', 'dddd', 'bbbb'];
+-foreach($names as $name) {
+-    $cfg[$name] = str_replace('%name%', $name, $cfgPoolTemplate);
+-}
++$cfg['names'] = ['cccc', 'aaaa', 'eeee', 'dddd', 'bbbb'];
+ 
+ $tester = new FPM\Tester($cfg);
+ $tester->start();
+diff --git a/sapi/fpm/tests/bug80024-socket-reduced-inherit.phpt b/sapi/fpm/tests/bug80024-socket-reduced-inherit.phpt
+new file mode 100644
+index 00000000..9c05471b
+--- /dev/null
++++ b/sapi/fpm/tests/bug80024-socket-reduced-inherit.phpt
+@@ -0,0 +1,49 @@
++--TEST--
++FPM: bug80024 - Duplication of info about inherited socket after pool removing
++--SKIPIF--
++<?php include "skipif.inc"; ?>
++--FILE--
++<?php
++
++require_once "tester.inc";
++
++$cfg['main'] = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++pid = {{FILE:PID}}
++include = {{INCLUDE:CONF}}
++EOT;
++
++$cfg['poolTemplate'] = <<<EOT
++[pool_%index%]
++listen = {{ADDR:UDS[pool_%index%]}}
++pm = ondemand
++pm.start_servers = 2
++pm.min_spare_servers = 1
++pm.max_spare_servers = 3
++pm.max_children = 5
++EOT;
++
++$cfg['count'] = 129;
++
++$tester = new FPM\Tester($cfg);
++$tester->start();
++$tester->expectLogStartNotices();
++$cfg['count'] = 128;
++$tester->reload($cfg);
++$tester->expectLogReloadingNotices(129);
++$tester->reload();
++$tester->expectLogReloadingNotices(128);
++$tester->terminate();
++$tester->expectLogTerminatingNotices();
++$tester->close();
++
++?>
++Done
++--EXPECT--
++Done
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>
+diff --git a/sapi/fpm/tests/logtool.inc b/sapi/fpm/tests/logtool.inc
+index 12744033..57f8e878 100644
+--- a/sapi/fpm/tests/logtool.inc
++++ b/sapi/fpm/tests/logtool.inc
+@@ -9,6 +9,12 @@ class LogTool
+     const P_PREFIX_STDOUT = '\[pool unconfined\] child \d+ said into stdout: ';
+     const FINAL_SUFFIX = ', pipe is closed';
+ 
++    const DEBUG = 'DEBUG';
++    const NOTICE = 'NOTICE';
++    const WARNING = 'WARNING';
++    const ERROR = 'ERROR';
++    const ALERT = 'ALERT';
++
+     /**
+      * @var string
+      */
+@@ -278,6 +284,28 @@ class LogTool
+         return true;
+     }
+ 
++    /**
++     * @param array $lines
++     * @return bool
++     */
++    public function expectReloadingLines(array $lines)
++    {
++        if (
++            !$this->expectNotice($lines[0], 'Reloading in progress ...') ||
++            !$this->expectNotice($lines[1], 'reloading: .*')
++        ) {
++            return false;
++        }
++
++        for ($i = 2; $i < count($lines) - 2; $i++) {
++            if (!$this->expectNotice($lines[$i], 'using inherited socket fd=\d+, "[^"]+"')) {
++                return false;
++            }
++        }
++
++        return $this->expectStartingLines(array_splice($lines, $i));
++    }
++
+     /**
+      * @param array $lines
+      * @return bool
+@@ -364,7 +392,7 @@ class LogTool
+      */
+     public function expectDebug(string $line, string $expectedMessage, $pool = null)
+     {
+-        return $this->expectEntry('DEBUG', $line, $expectedMessage, $pool);
++        return $this->expectEntry(self::DEBUG, $line, $expectedMessage, $pool);
+     }
+ 
+     /**
+@@ -375,7 +403,7 @@ class LogTool
+      */
+     public function expectNotice(string $line, string $expectedMessage, $pool = null)
+     {
+-        return $this->expectEntry('NOTICE', $line, $expectedMessage, $pool);
++        return $this->expectEntry(self::NOTICE, $line, $expectedMessage, $pool);
+     }
+ 
+     /**
+@@ -386,7 +414,7 @@ class LogTool
+      */
+     public function expectWarning(string $line, string $expectedMessage, $pool = null)
+     {
+-        return $this->expectEntry('WARNING', $line, $expectedMessage, $pool);
++        return $this->expectEntry(self::WARNING, $line, $expectedMessage, $pool);
+     }
+ 
+     /**
+@@ -397,7 +425,7 @@ class LogTool
+      */
+     public function expectError(string $line, string $expectedMessage, $pool = null)
+     {
+-        return $this->expectEntry('ERROR', $line, $expectedMessage, $pool);
++        return $this->expectEntry(self::ERROR, $line, $expectedMessage, $pool);
+     }
+ 
+     /**
+@@ -408,10 +436,9 @@ class LogTool
+      */
+     public function expectAlert(string $line, string $expectedMessage, $pool = null)
+     {
+-        return $this->expectEntry('ALERT', $line, $expectedMessage, $pool);
++        return $this->expectEntry(self::ALERT, $line, $expectedMessage, $pool);
+     }
+ 
+-
+     /**
+      * @param string $msg
+      * @return bool
+diff --git a/sapi/fpm/tests/tester.inc b/sapi/fpm/tests/tester.inc
+index 59a6aad3..9d4b9222 100644
+--- a/sapi/fpm/tests/tester.inc
++++ b/sapi/fpm/tests/tester.inc
+@@ -72,7 +72,7 @@ class Tester
+     /**
+      * Configuration template
+      *
+-     * @var string
++     * @var string|array
+      */
+     private $configTemplate;
+ 
+@@ -152,7 +152,14 @@ class Tester
+                 unlink($filePath);
+             }
+         }
+-        // clean config files
++
++        self::cleanConfigFiles();
++    }
++
++    /**
++     * Clean config files
++     */
++    static public function cleanConfigFiles() {
+         if (is_dir(self::CONF_DIR)) {
+             foreach(glob(self::CONF_DIR . '/*.conf') as $name) {
+                 unlink($name);
+@@ -742,6 +749,12 @@ class Tester
+             }
+         }
+ 
++        if ($this->debug) {
++            foreach ($lines as $line) {
++                echo "LOG LINE: " . $line;
++            }
++        }
++
+         return $lines;
+     }
+ 
+@@ -755,6 +768,24 @@ class Tester
+         return $lines[0] ?? '';
+     }
+ 
++    /**
++     * Reload FPM by sending USR2 signal and optionally change config before that.
++     *
++     * @param string|array $configTemplate
++     * @return string
++     * @throws \Exception
++     */
++    public function reload($configTemplate = null)
++    {
++        if (!is_null($configTemplate)) {
++            self::cleanConfigFiles();
++            $this->configTemplate = $configTemplate;
++            $this->createConfig();
++        }
++
++        return $this->signal('USR2');
++    }
++
+     /**
+      * Send signal to the supplied PID or the server PID.
+      *
+@@ -808,14 +839,13 @@ class Tester
+                 throw new \Exception('The config template array has to have main config');
+             }
+             $mainTemplate = $configTemplates['main'];
+-            unset($configTemplates['main']);
+             if (!is_dir(self::CONF_DIR)) {
+                 mkdir(self::CONF_DIR);
+             }
+-            foreach ($configTemplates as $name => $configTemplate) {
++            foreach ($this->createPoolConfigs($configTemplates) as $name => $poolConfig) {
+                 $this->makeFile(
+                     'conf',
+-                    $this->processTemplate($configTemplate),
++                    $this->processTemplate($poolConfig),
+                     self::CONF_DIR,
+                     $name
+                 );
+@@ -827,6 +857,36 @@ class Tester
+         return $this->makeFile($extension, $this->processTemplate($mainTemplate));
+     }
+ 
++    /**
++     * Create pool config templates.
++     *
++     * @param array $configTemplates
++     * @return array
++     * @throws \Exception
++     */
++    private function createPoolConfigs(array $configTemplates)
++    {
++        if (!isset($configTemplates['poolTemplate'])) {
++            unset($configTemplates['main']);
++            return $configTemplates;
++        }
++        $poolTemplate = $configTemplates['poolTemplate'];
++        $configs = [];
++        if (isset($configTemplates['count'])) {
++            $start = $configTemplates['start'] ?? 1;
++            for ($i = $start;  $i < $start + $configTemplates['count']; $i++) {
++                $configs[$i] = str_replace('%index%', $i, $poolTemplate);
++            }
++        } elseif (isset($configTemplates['names'])) {
++            foreach($configTemplates['names'] as $name) {
++                $configs[$name] = str_replace('%name%', $name, $poolTemplate);
++            }
++        } else {
++            throw new \Exception('The config template requires count or names if poolTemplate set');
++        }
++        return $configs;
++    }
++
+     /**
+      * Process template string.
+      *
+@@ -1120,6 +1180,16 @@ class Tester
+         $this->logTool->checkTruncatedMessage($this->response->getErrorData());
+     }
+ 
++    /**
++     * Expect reloading lines to be logged.
++     *
++     * @param int $socketCount
++     */
++    public function expectLogReloadingNotices($socketCount = 1)
++    {
++        $this->logTool->expectReloadingLines($this->getLogLines($socketCount + 4));
++    }
++
+     /**
+      * Expect starting lines to be logged.
+      */
+@@ -1186,16 +1256,36 @@ class Tester
+         return $this->logTool->checkWrappedMessage($logLines, false, true, $is_stderr);
+     }
+ 
++    /**
++     * Expect log entry.
++     *
++     * @param string $type The log type
++     * @param string $message The expected message
++     * @param string|null $pool The pool for pool prefixed log entry
++     * @param int $count The number of items
++     * @return bool
++     */
++    private function expectLogEntry(string $type, string $message, $pool = null, $count = 1)
++    {
++        for ($i = 0; $i < $count; $i++) {
++            if (!$this->logTool->expectEntry($type, $this->getLastLogLine(), $message, $pool)) {
++                return false;
++            }
++        }
++        return true;
++    }
++
+     /**
+      * Expect a log debug message.
+      *
+      * @param string $message
+      * @param string|null $pool
++     * @param int $count
+      * @return bool
+      */
+-    public function expectLogDebug(string $message, $pool = null)
++    public function expectLogDebug(string $message, $pool = null, $count = 1)
+     {
+-        return $this->logTool->expectDebug($this->getLastLogLine(), $message, $pool);
++        return $this->expectLogEntry(LogTool::DEBUG, $message, $pool, $count);
+     }
+ 
+     /**
+@@ -1203,11 +1293,12 @@ class Tester
+      *
+      * @param string $message
+      * @param string|null $pool
++     * @param int $count
+      * @return bool
+      */
+-    public function expectLogNotice(string $message, $pool = null)
++    public function expectLogNotice(string $message, $pool = null, $count = 1)
+     {
+-        return $this->logTool->expectNotice($this->getLastLogLine(), $message, $pool);
++        return $this->expectLogEntry(LogTool::NOTICE, $message, $pool, $count);
+     }
+ 
+     /**
+@@ -1215,11 +1306,12 @@ class Tester
+      *
+      * @param string $message
+      * @param string|null $pool
++     * @param int $count
+      * @return bool
+      */
+-    public function expectLogWarning(string $message, $pool = null)
++    public function expectLogWarning(string $message, $pool = null, $count = 1)
+     {
+-        return $this->logTool->expectWarning($this->getLastLogLine(), $message, $pool);
++        return $this->expectLogEntry(LogTool::WARNING, $message, $pool, $count);
+     }
+ 
+     /**
+@@ -1227,11 +1319,12 @@ class Tester
+      *
+      * @param string $message
+      * @param string|null $pool
++     * @param int $count
+      * @return bool
+      */
+-    public function expectLogError(string $message, $pool = null)
++    public function expectLogError(string $message, $pool = null, $count = 1)
+     {
+-        return $this->logTool->expectError($this->getLastLogLine(), $message, $pool);
++        return $this->expectLogEntry(LogTool::ERROR, $message, $pool, $count);
+     }
+ 
+     /**
+@@ -1239,11 +1332,12 @@ class Tester
+      *
+      * @param string $message
+      * @param string|null $pool
++     * @param int $count
+      * @return bool
+      */
+-    public function expectLogAlert(string $message, $pool = null)
++    public function expectLogAlert(string $message, $pool = null, $count = 1)
+     {
+-        return $this->logTool->expectAlert($this->getLastLogLine(), $message, $pool);
++        return $this->expectLogEntry(LogTool::ALERT, $message, $pool, $count);
+     }
+ 
+     /**
+-- 
+2.56.0
+

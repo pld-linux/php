@@ -129,8 +129,8 @@
 %define		orgname		php
 %define		ver_suffix	86
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
-%define		subver		RC2
-%define		rel		0.4
+%define		subver		RC4
+%define		rel		0.5
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -148,7 +148,7 @@ Group:		Libraries
 #XSource0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 # XSource0-md5:	b78bb233fa181461a6069c90d95a94a4
 Source0:	https://downloads.php.net/~mbeccati/php-%{version}%{subver}.tar.xz
-# Source0-md5:	62e9d8759ccbf41610c4810d8403421c
+# Source0-md5:	9ab7ed17a84f49387fbad09c50f5b4a4
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini

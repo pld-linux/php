@@ -1,0 +1,27 @@
+From 869e0838cc5766c371a3fc61b5142264b06aff7f Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Thu, 22 Oct 2026 10:43:56 +0200
+Subject: [PATCH] Fix #72595: php_output_handler_append illegal write access
+
+handler->buffer.size + grow_max was not checked for overflow, so a huge
+output buffer could be reallocated too small and overwritten by memcpy().
+
+Origin: upstream, https://github.com/php/php-src/commit/a942cf5b028728cf9e8d1fb4bd72b6b94f6843a3
+Bug: https://bugs.php.net/72595
+---
+ main/output.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/main/output.c b/main/output.c
+index 577266d2..cbd85211 100644
+--- a/main/output.c
++++ b/main/output.c
+@@ -887,7 +887,7 @@ static inline int php_output_handler_append(php_output_handler *handler, const p
+ 			size_t grow_buf = PHP_OUTPUT_HANDLER_INITBUF_SIZE(buf->used - (handler->buffer.size - handler->buffer.used));
+ 			size_t grow_max = MAX(grow_int, grow_buf);
+ 
+-			handler->buffer.data = erealloc(handler->buffer.data, handler->buffer.size + grow_max);
++			handler->buffer.data = safe_erealloc(handler->buffer.data, 1, handler->buffer.size, grow_max);
+ 			handler->buffer.size += grow_max;
+ 		}
+ 		memcpy(handler->buffer.data + handler->buffer.used, buf->data, buf->used);

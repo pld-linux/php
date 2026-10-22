@@ -1,0 +1,43 @@
+From b7cdb588dc061804af4f71a4cfb2f9e85d573aba Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Thu, 22 Oct 2026 10:46:10 +0200
+Subject: [PATCH] Fix #74604: Out of bounds in php_pcre_replace_impl
+
+The guarded preg_replace() buffer growth could still exceed ZSTR_MAX_LEN,
+so zend_string_alloc()/extend() wrapped the allocation size.
+Also takes the 2x growth from #81243 (a6b43086) that upstream's lines are
+based on; ZSTR_MAX_OVERHEAD comes from php-zstr_max_len.patch.
+
+Origin: backport, https://github.com/php/php-src/commit/712fc54e856d3d8e80a7d074a2733bc6b3a27e90
+Bug: https://bugs.php.net/74604
+Bug: https://nvd.nist.gov/vuln/detail/CVE-2017-9118
+PLD: 7.1: applied by hand to the pcre1 replace loop
+---
+ ext/pcre/php_pcre.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ext/pcre/php_pcre.c b/ext/pcre/php_pcre.c
+index ada7d165..7edfc6b6 100644
+--- a/ext/pcre/php_pcre.c
++++ b/ext/pcre/php_pcre.c
+@@ -1319,7 +1319,7 @@ PHPAPI zend_string *php_pcre_replace_impl(pcre_cache_entry *pce, zend_string *su
+ 				}
+ 
+ 				if (new_len >= alloc_len) {
+-					alloc_len = zend_safe_address_guarded(2, new_len, alloc_len);
++					alloc_len = zend_safe_address_guarded(2, new_len, ZSTR_MAX_OVERHEAD) - ZSTR_MAX_OVERHEAD;
+ 					if (result == NULL) {
+ 						result = zend_string_alloc(alloc_len, 0);
+ 					} else {
+@@ -1362,9 +1362,9 @@ PHPAPI zend_string *php_pcre_replace_impl(pcre_cache_entry *pce, zend_string *su
+ 				/* Use custom function to get replacement string and its length. */
+ 				eval_result = preg_do_repl_func(replace_val, subject, offsets, subpat_names, count, mark);
+ 				ZEND_ASSERT(eval_result);
+-				new_len = zend_safe_address_guarded(1, ZSTR_LEN(eval_result), new_len);
++				new_len = zend_safe_address_guarded(1, ZSTR_LEN(eval_result) + ZSTR_MAX_OVERHEAD, new_len) -ZSTR_MAX_OVERHEAD;
+ 				if (new_len >= alloc_len) {
+-					alloc_len = zend_safe_address_guarded(2, new_len, alloc_len);
++					alloc_len = zend_safe_address_guarded(2, new_len, ZSTR_MAX_OVERHEAD) - ZSTR_MAX_OVERHEAD;
+ 					if (result == NULL) {
+ 						result = zend_string_alloc(alloc_len, 0);
+ 					} else {

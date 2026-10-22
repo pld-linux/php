@@ -151,7 +151,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.1.33
-Release:	28
+Release:	29
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -321,6 +321,48 @@ Patch285:	php-cve-2026-109618-session.patch
 # test infrastructure the backported firebird and openssl SAN tests need
 Patch286:	php-tests-firebird-payload-server.patch
 Patch287:	php-tests-openssl-certgen.patch
+# memory limit error raised at a safe point as in 8.2 (https://github.com/php/php-src/commit/3584a98bda0f), not _exit(1)
+Patch288:	php-cve-2026-109618-delayed-oom.patch
+Patch289:	php-cve-2025-1218.patch
+# php-cve-2024-8929.patch frees row fields that the result set still owns when a row fails to decode
+Patch290:	php-cve-2025-1218-row-undef.patch
+# mysqlnd over-reads still present upstream
+Patch291:	php-mysqlnd-ok-message-len.patch
+Patch292:	php-mysqlnd-greet-scramble.patch
+Patch293:	php-mysqlnd-pestrndup.patch
+# Patch294+: upstream fixes that never reached 7.1, as backported for PHP 7.3
+Patch294:	php-bug80783.patch
+Patch295:	php-dateperiod-construct.patch
+Patch296:	php-bug74960.patch
+Patch297:	php-bug72146.patch
+Patch298:	php-bug72595.patch
+Patch299:	php-bug80950.patch
+Patch300:	php-bug66783.patch
+Patch301:	php-bug73533.patch
+Patch302:	php-bug66049.patch
+Patch303:	php-bug81294.patch
+Patch304:	php-bug81283.patch
+Patch305:	php-bug79812.patch
+Patch306:	php-bug80713.patch
+Patch307:	php-bug80747.patch
+Patch308:	php-bug80880.patch
+Patch309:	php-bug74083.patch
+Patch310:	php-fpm-timer-reregister.patch
+Patch311:	php-bug80849.patch
+Patch312:	php-bug81252.patch
+Patch313:	php-bug81305.patch
+Patch314:	php-bug53467.patch
+Patch315:	php-bug74779.patch
+Patch316:	php-bug80838.patch
+Patch317:	php-bug80024.patch
+Patch318:	php-bug80763.patch
+Patch319:	php-bug80915.patch
+Patch320:	php-gh18953.patch
+Patch321:	php-bug74544.patch
+Patch322:	php-bug74604.patch
+Patch323:	php-bug76601.patch
+Patch324:	php-bug78680.patch
+Patch325:	php-bug77934.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2243,6 +2285,44 @@ cp -p php.ini-production php.ini
 %patch -P285 -p1
 %patch -P286 -p1
 %patch -P287 -p1
+%patch -P288 -p1
+%patch -P289 -p1
+%patch -P290 -p1
+%patch -P291 -p1
+%patch -P292 -p1
+%patch -P293 -p1
+%patch -P294 -p1
+%patch -P295 -p1
+%patch -P296 -p1
+%patch -P297 -p1
+%patch -P298 -p1
+%patch -P299 -p1
+%patch -P300 -p1
+%patch -P301 -p1
+%patch -P302 -p1
+%patch -P303 -p1
+%patch -P304 -p1
+%patch -P305 -p1
+%patch -P306 -p1
+%patch -P307 -p1
+%patch -P308 -p1
+%patch -P309 -p1
+%patch -P310 -p1
+%patch -P311 -p1
+%patch -P312 -p1
+%patch -P313 -p1
+%patch -P314 -p1
+%patch -P315 -p1
+%patch -P316 -p1
+%patch -P317 -p1
+%patch -P318 -p1
+%patch -P319 -p1
+%patch -P320 -p1
+%patch -P321 -p1
+%patch -P322 -p1
+%patch -P323 -p1
+%patch -P324 -p1
+%patch -P325 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

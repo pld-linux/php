@@ -1,0 +1,58 @@
+From 38a0efa1103f2d9204bb7e79db01cb9bedc1017b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:44:45 +0200
+Subject: [PATCH] Fix #81294: Segfault when removing a filter
+
+Flushing a filter chain called the first filter's callback for every
+filter in the chain, with the wrong filter's state: segfault/memory misuse.
+
+Origin: upstream, https://github.com/php/php-src/commit/1fa26eccbaec3dc6ce645db144f08f46b63c1d59
+Bug: https://bugs.php.net/81294
+---
+ ext/standard/tests/filters/bug81294.phpt | 24 ++++++++++++++++++++++++
+ main/streams/filter.c                    |  2 +-
+ 2 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/ext/standard/tests/filters/bug81294.phpt b/ext/standard/tests/filters/bug81294.phpt
+new file mode 100644
+index 00000000..195d17b6
+--- /dev/null
++++ b/ext/standard/tests/filters/bug81294.phpt
+@@ -0,0 +1,24 @@
++--TEST--
++Bug #81294 (Segfault when removing a filter)
++--SKIPIF--
++<?php
++if (!extension_loaded('zlib')) die("skip zlib extension not available");
++?>
++--FILE--
++<?php
++$f = fopen(__DIR__ . "/bug81294.txt", "wb+");
++$flt1 = stream_filter_append($f, "zlib.deflate", STREAM_FILTER_WRITE);
++$flt2 = stream_filter_append($f, "string.rot13", STREAM_FILTER_WRITE);
++fwrite($f, "test");
++stream_filter_remove($flt1);
++fwrite($f, "test");
++stream_filter_remove($flt2);
++rewind($f);
++var_dump(urlencode(fread($f, 1024)));
++?>
++--CLEAN--
++<?php
++@unlink(__DIR__ . "/bug81294.txt");
++?>
++--EXPECT--
++string(16) "%2BV-.%01%00grfg"
+diff --git a/main/streams/filter.c b/main/streams/filter.c
+index b2e2dab8..21f2b78b 100644
+--- a/main/streams/filter.c
++++ b/main/streams/filter.c
+@@ -447,7 +447,7 @@ PHPAPI int _php_stream_filter_flush(php_stream_filter *filter, int finish)
+ 	for(current = filter; current; current = current->next) {
+ 		php_stream_filter_status_t status;
+ 
+-		status = filter->fops->filter(stream, current, inp, outp, NULL, flags);
++		status = current->fops->filter(stream, current, inp, outp, NULL, flags);
+ 		if (status == PSFS_FEED_ME) {
+ 			/* We've flushed the data far enough */
+ 			return SUCCESS;

@@ -1,0 +1,125 @@
+From: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 12:21:30 +0200
+Subject: [PATCH] mysqlnd: bound the OK packet message by the packet size
+
+php_mysqlnd_ok_read() capped the message length by the size of the
+network command buffer, not by the packet, so a server could announce a
+longer message than it sent and have the client copy stale cmd_buffer
+bytes (earlier replies, the client's own commands) past the packet into
+mysqli::$info. Upstream and the ELTS CVE-2025-1218 fix keep that line.
+
+Reject such a packet the way the CVE-2024-8929 auth response path does
+("OK packet message length is past the packet size") instead of
+clamping, so a malformed reply fails the command. This was the only
+buf_len based cap left in mysqlnd_wireprotocol.c; the error-line,
+rset header and auth response readers already bound by the packet.
+---
+ ext/mysqli/tests/fake_server.inc                  | 23 +++++++++++
+ ...99-36j7-ok-packet-message-len-past-packet.phpt | 46 +++++++++++++++++++++
+ ext/mysqlnd/mysqlnd_wireprotocol.c                |  7 +++-
+ 3 files changed, 75 insertions(+), 1 deletion(-)
+
+diff --git a/ext/mysqli/tests/fake_server.inc b/ext/mysqli/tests/fake_server.inc
+index c85c65ef..6639204d 100644
+--- a/ext/mysqli/tests/fake_server.inc
++++ b/ext/mysqli/tests/fake_server.inc
+@@ -1291,6 +1291,29 @@ function my_mysqli_test_ok_warning_count_over_read(my_mysqli_fake_server_conn $c
+     $conn->read();
+ }
+ 
++function my_mysqli_test_ok_message_len_past_packet(my_mysqli_fake_server_conn $conn): void
++{
++    $p1 = $conn->packet_generator->server_ok("01");
++    $p1->packet_length = "280000";
++    $p1->message_len = "20";
++    $p1->message = my_mysqli_fake_packet_generator::create_packet_item('previous-reply-secret-0123456789');
++
++    // Message length 32 with only 1 byte of message in the packet
++    $p2 = $conn->packet_generator->server_ok("01");
++    $p2->packet_length = "090000";
++    $p2->message_len = "20";
++    $p2->message = my_mysqli_fake_packet_generator::create_packet_item('x');
++
++    $conn->send_server_greetings();
++    $conn->read();
++    $conn->send_server_ok();
++    $conn->read();
++    $conn->send($p1->to_bytes(), "OK with message");
++    $conn->read();
++    $conn->send($p2->to_bytes(), "Malicious OK with message length past the packet");
++    $conn->read();
++}
++
+ function my_mysqli_test_eof_warning_count_over_read(my_mysqli_fake_server_conn $conn): void
+ {
+     $p = $conn->packet_generator->server_eof();
+diff --git a/ext/mysqli/tests/ghsa-r6x9-5r99-36j7-ok-packet-message-len-past-packet.phpt b/ext/mysqli/tests/ghsa-r6x9-5r99-36j7-ok-packet-message-len-past-packet.phpt
+new file mode 100644
+index 00000000..b5d554b1
+--- /dev/null
++++ b/ext/mysqli/tests/ghsa-r6x9-5r99-36j7-ok-packet-message-len-past-packet.phpt
+@@ -0,0 +1,46 @@
++--TEST--
++OK packet message length past the packet must not copy stale buffer bytes into mysqli::$info
++--SKIPIF--
++<?php
++if (!extension_loaded('mysqli')) die('skip mysqli extension not available');
++?>
++--FILE--
++<?php
++require_once 'fake_server.inc';
++
++$servername = "127.0.0.1";
++$username = "root";
++$password = "";
++
++$process = run_fake_server_in_background('ok_message_len_past_packet');
++$process->wait();
++
++$conn = new mysqli($servername, $username, $password, "", 33305);
++var_dump($conn->select_db("php_test"));
++var_dump($conn->info);
++var_dump($conn->select_db("php_test"));
++var_dump($conn->info);
++
++$process->terminate();
++
++print "done!";
++?>
++--EXPECTF--
++[*] Server started
++[*] Connection established
++[*] Sending - Server Greeting: 580000000a352e352e352d31302e352e31382d4d6172696144420003000000473e3f6047257c6700fef7080200ff81150000000000000f0000006c6b55463f49335f686c6431006d7973716c5f6e61746976655f70617373776f7264
++[*] Received: 530000018da20a00000000c0080000000000000000000000000000000000000000000000726f6f740000006d7973716c5f6e61746976655f70617373776f726400150c5f636c69656e745f6e616d65076d7973716c6e64
++[*] Sending - Server OK: 0700000200000002000000
++[*] Received: 09000000027068705f74657374
++[*] Sending - OK with message: 28000001000000020000002070726576696f75732d7265706c792d7365637265742d30313233343536373839
++bool(true)
++string(32) "previous-reply-secret-0123456789"
++[*] Received: 09000000027068705f74657374
++[*] Sending - Malicious OK with message length past the packet: 09000001000000020000002078
++
++Warning: mysqli::select_db(): OK packet message length is past the packet size in %s on line %d
++
++Warning: mysqli::select_db(): Error while reading INIT_DB's response packet. PID=%d in %s on line %d
++bool(false)
++string(32) "previous-reply-secret-0123456789"
++done!
+diff --git a/ext/mysqlnd/mysqlnd_wireprotocol.c b/ext/mysqlnd/mysqlnd_wireprotocol.c
+index 27ca0fbc..36bb6c4d 100644
+--- a/ext/mysqlnd/mysqlnd_wireprotocol.c
++++ b/ext/mysqlnd/mysqlnd_wireprotocol.c
+@@ -979,7 +979,12 @@ php_mysqlnd_ok_read(void * _packet)
+ 		if (UNEXPECTED(net_len == MYSQLND_INVALID_NET_FIELD_LENGTH)) {
+ 			BAIL_PREMATURE_END;
+ 		}
+-		packet->message_len = MIN(net_len, buf_len - (p - begin));
++		if (packet->header.size - (p - begin) < net_len) {
++			DBG_ERR_FMT("OK packet message length is past the packet size");
++			php_error_docref(NULL, E_WARNING, "OK packet message length is past the packet size");
++			DBG_RETURN(FAIL);
++		}
++		packet->message_len = net_len;
+ 		packet->message = mnd_pestrndup((char *)p, packet->message_len, FALSE);
+ 	} else {
+ 		packet->message = NULL;

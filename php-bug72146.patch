@@ -1,0 +1,47 @@
+From 9b24c87a7ed33a8de37f7001464adce4ebb18601 Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Thu, 22 Oct 2026 10:43:44 +0200
+Subject: [PATCH] Fix #72146: Integer overflow on substr_replace
+
+With array arguments, from + length could overflow zend_long (length up to
+PHP_INT_MAX), skip the clamp and drive a huge allocation/out-of-bounds copy.
+
+Origin: upstream, https://github.com/php/php-src/commit/33f8dfb15a34893d8311683db69ea857e66b8c90
+Bug: https://bugs.php.net/72146
+---
+ ext/standard/string.c                    |  4 +++-
+ ext/standard/tests/strings/bug72146.phpt | 11 +++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/ext/standard/string.c b/ext/standard/string.c
+index 758d908e..8063e3f3 100644
+--- a/ext/standard/string.c
++++ b/ext/standard/string.c
+@@ -2592,7 +2592,9 @@ PHP_FUNCTION(substr_replace)
+ 				}
+ 			}
+ 
+-			if ((f + l) > (zend_long)ZSTR_LEN(orig_str)) {
++			ZEND_ASSERT(0 <= f && f <= ZEND_LONG_MAX);
++			ZEND_ASSERT(0 <= l && l <= ZEND_LONG_MAX);
++			if (((size_t) f + l) > ZSTR_LEN(orig_str)) {
+ 				l = ZSTR_LEN(orig_str) - f;
+ 			}
+ 
+diff --git a/ext/standard/tests/strings/bug72146.phpt b/ext/standard/tests/strings/bug72146.phpt
+new file mode 100644
+index 00000000..72b33257
+--- /dev/null
++++ b/ext/standard/tests/strings/bug72146.phpt
+@@ -0,0 +1,11 @@
++--TEST--
++Bug #72146 (Integer overflow on substr_replace)
++--FILE--
++<?php 
++var_dump(substr_replace(["ABCDE"], "123", 3, PHP_INT_MAX));
++?>
++--EXPECT--
++array(1) {
++  [0]=>
++  string(6) "ABC123"
++}

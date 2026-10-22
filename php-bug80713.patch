@@ -1,0 +1,31 @@
+From 3a1a2120ec8d83fb758c5d160cecf0abcbefacb5 Mon Sep 17 00:00:00 2001
+From: Nikita Popov <nikita.ppv@gmail.com>
+Date: Tue, 16 Feb 2021 15:26:31 +0100
+Subject: [PATCH] Fix #80713: SegFault when disabling ATTR_EMULATE_PREPARES and
+ MySQL 8.0
+
+A premature EOF in result field metadata was accepted, leaving the field's
+sname NULL; read_metadata() then dereferences it and crashes.
+
+Origin: upstream, https://github.com/php/php-src/commit/9552cf6b84b73de38c152b97cc8d30ac3509d4a5
+Bug: https://bugs.php.net/80713
+---
+ ext/mysqlnd/mysqlnd_wireprotocol.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/ext/mysqlnd/mysqlnd_wireprotocol.c b/ext/mysqlnd/mysqlnd_wireprotocol.c
+index 320b097e..1b91028e 100644
+--- a/ext/mysqlnd/mysqlnd_wireprotocol.c
++++ b/ext/mysqlnd/mysqlnd_wireprotocol.c
+@@ -1394,8 +1394,9 @@ php_mysqlnd_rset_field_read(void * _packet)
+ 		DBG_RETURN(PASS);
+ 	} else if (EODATA_MARKER == *p && packet->header.size < 8) {
+ 		/* Premature EOF. That should be COM_FIELD_LIST. But we don't support COM_FIELD_LIST anymore, thus this should not happen */
+-		DBG_INF("Premature EOF. That should be COM_FIELD_LIST");
+-		DBG_RETURN(PASS);
++		DBG_ERR("Premature EOF. That should be COM_FIELD_LIST");
++		php_error_docref(NULL, E_WARNING, "Premature EOF in result field metadata");
++		DBG_RETURN(FAIL);
+ 	}
+ 
+ 	meta = packet->metadata;

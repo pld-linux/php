@@ -1,0 +1,31 @@
+From 625e43988b3ec15d3f293943c6a6a5e40a218ddc Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Tue, 6 Apr 2021 12:44:42 +0200
+Subject: [PATCH] Fix #80880: SSL_read on shutdown, ftp/proc_open
+
+ftp_close() warns "SSL_read on shutdown" when the server drops the connection
+without a close_notify alert (SSL_ERROR_SYSCALL), which is common and harmless.
+
+Origin: upstream, https://github.com/php/php-src/commit/9688071679a7084c82716aa1275b8965590ea759
+Bug: https://bugs.php.net/80880
+---
+ ext/ftp/ftp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/ext/ftp/ftp.c b/ext/ftp/ftp.c
+index 367aab63..5f9c0108 100644
+--- a/ext/ftp/ftp.c
++++ b/ext/ftp/ftp.c
+@@ -1789,6 +1789,12 @@ static void ftp_ssl_shutdown(ftpbuf_t *ftp, php_socket_t fd, SSL *ssl_handle) {
+ 					/* SSL wants a write. Really odd. Let's bail out. */
+ 					done = 1;
+ 					break;
++				case SSL_ERROR_SYSCALL:
++					/* most likely the peer closed the connection without
++					   sending a close_notify shutdown alert;
++					   bail out to avoid raising a spurious warning */
++					done = 1;
++					break;
+ 				default:
+ 					if ((sslerror = ERR_get_error())) {
+ 						ERR_error_string_n(sslerror, buf, sizeof(buf));

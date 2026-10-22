@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	42
+%define		rel	43
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -340,8 +340,9 @@ Patch308:	php-cve-2025-1219.patch
 Patch309:	php-cve-2025-1734.patch
 Patch310:	php-cve-2025-1736.patch
 Patch311:	php-cve-2025-1861.patch
-# CVE-2026-109618, CVE-2026-109619: upstream minimal mitigation for EOL branches, 5.6 port from
+# CVE-2026-109618, CVE-2026-109619: 5.6 port from
 # https://github.com/shivammathur/php-src-backports/commit/b18ab39d35ca71365193143283fa621d45628156
+# with the soft memory limit and session upload progress parts of upstream 3584a98bda0f ported (see PLD: lines)
 Patch400:	php-cve-2026-109618.patch
 # Patch410+: 5.6 ports of upstream fixes no 5.6 tree carries; each names its upstream commit
 Patch410:	php-cve-2025-1220.patch

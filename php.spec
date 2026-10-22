@@ -150,7 +150,7 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.2.34
+Version:	8.2.35
 Release:	%{rel}
 Epoch:		4
 # All files licensed under PHP version 3.01, except
@@ -159,7 +159,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	568f00e36ae9f987bb235c4ab6049042
+# Source0-md5:	cc0eb90f075ce2a7444db390c5edb696
 #Source0:	https://downloads.php.net/~pierrick/php-%{version}%{subver}.tar.xz
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
@@ -246,6 +246,7 @@ BuildRequires:	libpng-devel >= 1.0.8
 %{?with_intl:BuildRequires:	libstdc++-devel}
 BuildRequires:	libtool >= 2:2.4.6
 %{?with_webp:BuildRequires:	libwebp-devel >= 0.2.0}
+BuildRequires:	libxcrypt-devel
 BuildRequires:	libxml2-devel >= 1:2.9.0
 %{?with_xsl:BuildRequires:	libxslt-devel >= 1.1.0}
 %{?with_zip:BuildRequires:	libzip-devel >= 1.7.1}
@@ -2451,6 +2452,7 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libphp_common.a
 
 # install CGI/FCGI
 %if %{with cgi}
@@ -2511,6 +2513,7 @@ cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/cli.d/php.ini
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/apache2handler.d/php.ini
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.a
 %endif
 
 # ensure that paths are correct for current php version and arch

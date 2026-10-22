@@ -213,7 +213,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
 +		char *str = emalloc(len + 1); \
 +		BN_bn2bin(_bn, (unsigned char*)str); \
 +		str[len] = 0; \
-+		add_assoc_stringl(&_array, #_name, str, len, 0); \
++		add_assoc_stringl(_array, #_name, str, len, 0); \
 +	} \
 +} while (0);
 +
@@ -221,7 +221,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
 +
 +#define OPENSSL_PKEY_SET_BN(_data, _name) do { \
 +	zval **bn; \
-+	if (zend_hash_find(Z_ARRVAL_PP(_data), #_name, sizeof(#_name), (void**)bn) == SUCCESS && \
++	if (zend_hash_find(Z_ARRVAL_PP(_data), #_name, sizeof(#_name), (void**)&bn) == SUCCESS && \
 +			Z_TYPE_PP(bn) == IS_STRING) { \
 +		_name = BN_bin2bn( \
 +				(unsigned char*)Z_STRVAL_PP(bn), \
@@ -424,7 +424,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  						if (EVP_PKEY_assign_DH(pkey, dh)) {
  							RETURN_RESOURCE(zend_list_insert(pkey, le_key TSRMLS_CC));
  						}
-@@ -3397,25 +3562,32 @@
+@@ -3397,25 +3562,33 @@
  	/*TODO: Use the real values once the openssl constants are used 
  	 * See the enum at the top of this file
  	 */
@@ -453,14 +453,15 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
 +				ktype = OPENSSL_KEYTYPE_RSA;
 +
 +				if (rsa != NULL) {
-+					zval z_rsa;
++					zval *z_rsa;
 +					const BIGNUM *n, *e, *d, *p, *q, *dmp1, *dmq1, *iqmp;
 +
 +					RSA_get0_key(rsa, &n, &e, &d);
 +					RSA_get0_factors(rsa, &p, &q);
 +					RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
 +
-+					array_init(&z_rsa);
++					ALLOC_INIT_ZVAL(z_rsa);
++					array_init(z_rsa);
 +					OPENSSL_PKEY_GET_BN(z_rsa, n);
 +					OPENSSL_PKEY_GET_BN(z_rsa, e);
 +					OPENSSL_PKEY_GET_BN(z_rsa, d);
@@ -469,12 +470,12 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
 +					OPENSSL_PKEY_GET_BN(z_rsa, dmp1);
 +					OPENSSL_PKEY_GET_BN(z_rsa, dmq1);
 +					OPENSSL_PKEY_GET_BN(z_rsa, iqmp);
-+					add_assoc_zval(return_value, "rsa", &z_rsa);
++					add_assoc_zval(return_value, "rsa", z_rsa);
 +				}
  			}
  
  			break;	
-@@ -3423,37 +3595,47 @@
+@@ -3423,37 +3596,49 @@
  		case EVP_PKEY_DSA2:
  		case EVP_PKEY_DSA3:
  		case EVP_PKEY_DSA4:
@@ -496,19 +497,20 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
 +				ktype = OPENSSL_KEYTYPE_DSA;
 +
 +				if (dsa != NULL) {
-+					zval z_dsa;
++					zval *z_dsa;
 +					const BIGNUM *p, *q, *g, *priv_key, *pub_key;
 +
 +					DSA_get0_pqg(dsa, &p, &q, &g);
 +					DSA_get0_key(dsa, &pub_key, &priv_key);
 +
-+					array_init(&z_dsa);
++					ALLOC_INIT_ZVAL(z_dsa);
++					array_init(z_dsa);
 +					OPENSSL_PKEY_GET_BN(z_dsa, p);
 +					OPENSSL_PKEY_GET_BN(z_dsa, q);
 +					OPENSSL_PKEY_GET_BN(z_dsa, g);
 +					OPENSSL_PKEY_GET_BN(z_dsa, priv_key);
 +					OPENSSL_PKEY_GET_BN(z_dsa, pub_key);
-+					add_assoc_zval(return_value, "dsa", &z_dsa);
++					add_assoc_zval(return_value, "dsa", z_dsa);
 +				}
  			}
  			break;
@@ -531,25 +533,26 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
 +				ktype = OPENSSL_KEYTYPE_DH;
 +
 +				if (dh != NULL) {
-+					zval z_dh;
++					zval *z_dh;
 +					const BIGNUM *p, *q, *g, *priv_key, *pub_key;
 +
 +					DH_get0_pqg(dh, &p, &q, &g);
 +					DH_get0_key(dh, &pub_key, &priv_key);
 +
-+					array_init(&z_dh);
++					ALLOC_INIT_ZVAL(z_dh);
++					array_init(z_dh);
 +					OPENSSL_PKEY_GET_BN(z_dh, p);
 +					OPENSSL_PKEY_GET_BN(z_dh, g);
 +					OPENSSL_PKEY_GET_BN(z_dh, priv_key);
 +					OPENSSL_PKEY_GET_BN(z_dh, pub_key);
-+					add_assoc_zval(return_value, "dh", &z_dh);
++					add_assoc_zval(return_value, "dh", z_dh);
 +				}
  			}
 -
  			break;
  #ifdef HAVE_EVP_PKEY_EC
  		case EVP_PKEY_EC:
-@@ -3981,13 +4163,13 @@
+@@ -3981,13 +4166,13 @@
  	cryptedlen = EVP_PKEY_size(pkey);
  	cryptedbuf = emalloc(cryptedlen + 1);
  
@@ -565,7 +568,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  						padding) == cryptedlen);
  			break;
  		default:
-@@ -4039,13 +4221,13 @@
+@@ -4039,13 +4224,13 @@
  	cryptedlen = EVP_PKEY_size(pkey);
  	crypttemp = emalloc(cryptedlen + 1);
  
@@ -581,7 +584,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  					padding);
  			if (cryptedlen != -1) {
  				cryptedbuf = emalloc(cryptedlen + 1);
-@@ -4104,13 +4286,13 @@
+@@ -4104,13 +4289,13 @@
  	cryptedlen = EVP_PKEY_size(pkey);
  	cryptedbuf = emalloc(cryptedlen + 1);
  
@@ -598,7 +601,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  						padding) == cryptedlen);
  			break;
  		default:
-@@ -4163,13 +4345,13 @@
+@@ -4163,13 +4348,13 @@
  	cryptedlen = EVP_PKEY_size(pkey);
  	crypttemp = emalloc(cryptedlen + 1);
  
@@ -615,7 +618,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  					padding);
  			if (cryptedlen != -1) {
  				cryptedbuf = emalloc(cryptedlen + 1);
-@@ -4233,7 +4415,7 @@
+@@ -4233,7 +4418,7 @@
  	long keyresource = -1;
  	char * data;
  	int data_len;
@@ -624,7 +627,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	zval *method = NULL;
  	long signature_algo = OPENSSL_ALGO_SHA1;
  	const EVP_MD *mdtype;
-@@ -4266,9 +4448,11 @@
+@@ -4266,9 +4451,11 @@
  	siglen = EVP_PKEY_size(pkey);
  	sigbuf = emalloc(siglen + 1);
  
@@ -639,7 +642,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  		zval_dtor(signature);
  		sigbuf[siglen] = '\0';
  		ZVAL_STRINGL(signature, (char *)sigbuf, siglen, 0);
-@@ -4277,7 +4461,7 @@
+@@ -4277,7 +4464,7 @@
  		efree(sigbuf);
  		RETVAL_FALSE;
  	}
@@ -648,7 +651,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	if (keyresource == -1) {
  		EVP_PKEY_free(pkey);
  	}
-@@ -4290,8 +4474,8 @@
+@@ -4290,8 +4477,8 @@
  {
  	zval **key;
  	EVP_PKEY *pkey;
@@ -659,7 +662,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	const EVP_MD *mdtype;
  	long keyresource = -1;
  	char * data;	int data_len;
-@@ -4325,10 +4509,13 @@
+@@ -4325,10 +4512,13 @@
  		RETURN_FALSE;
  	}
  
@@ -677,7 +680,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  
  	if (keyresource == -1) {
  		EVP_PKEY_free(pkey);
-@@ -4352,7 +4539,7 @@
+@@ -4352,7 +4542,7 @@
  	char *method =NULL;
  	int method_len = 0;
  	const EVP_CIPHER *cipher;
@@ -686,7 +689,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  
  	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "szza/|s", &data, &data_len, &sealdata, &ekeys, &pubkeys, &method, &method_len) == FAILURE) {
  		return;
-@@ -4399,9 +4586,10 @@
+@@ -4399,9 +4589,10 @@
  		i++;
  	}
  
@@ -699,7 +702,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  		goto clean_exit;
  	}
  
-@@ -4411,17 +4599,17 @@
+@@ -4411,17 +4602,17 @@
  	iv = ivlen ? emalloc(ivlen + 1) : NULL;
  #endif
  	/* allocate one byte extra to make room for \0 */
@@ -722,7 +725,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  
  	if (len1 + len2 > 0) {
  		zval_dtor(sealdata);
-@@ -4450,7 +4638,7 @@
+@@ -4450,7 +4641,7 @@
  		efree(buf);
  	}
  	RETVAL_LONG(len1 + len2);
@@ -731,7 +734,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  
  clean_exit:
  	for (i=0; i<nkeys; i++) {
-@@ -4477,7 +4665,7 @@
+@@ -4477,7 +4668,7 @@
  	int len1, len2;
  	unsigned char *buf;
  	long keyresource = -1;
@@ -740,7 +743,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	char * data;	int data_len;
  	char * ekey;	int ekey_len;
  	char *method =NULL;
-@@ -4503,27 +4691,26 @@
+@@ -4503,27 +4694,26 @@
  	} else {
  		cipher = EVP_rc4();
  	}
@@ -780,7 +783,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  }
  /* }}} */
  
-@@ -4831,7 +5018,7 @@
+@@ -4831,7 +5021,7 @@
  	char *data, *method;
  	int data_len, method_len;
  	const EVP_MD *mdtype;
@@ -789,7 +792,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	int siglen;
  	unsigned char *sigbuf;
  
-@@ -4847,9 +5034,10 @@
+@@ -4847,9 +5037,10 @@
  	siglen = EVP_MD_size(mdtype);
  	sigbuf = emalloc(siglen + 1);
  
@@ -803,7 +806,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  		if (raw_output) {
  			sigbuf[siglen] = '\0';
  			RETVAL_STRINGL((char *)sigbuf, siglen, 0);
-@@ -4865,6 +5053,8 @@
+@@ -4865,6 +5056,8 @@
  		efree(sigbuf);
  		RETVAL_FALSE;
  	}
@@ -812,7 +815,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  }
  /* }}} */
  
-@@ -4910,7 +5100,7 @@
+@@ -4910,7 +5103,7 @@
  	char *data, *method, *password, *iv = "";
  	int data_len, method_len, password_len, iv_len = 0, max_iv_len;
  	const EVP_CIPHER *cipher_type;
@@ -821,7 +824,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	int i=0, outlen, keylen;
  	unsigned char *outbuf, *key;
  	zend_bool free_iv;
-@@ -4924,6 +5114,12 @@
+@@ -4924,6 +5117,12 @@
  		RETURN_FALSE;
  	}
  
@@ -834,7 +837,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	keylen = EVP_CIPHER_key_length(cipher_type);
  	if (keylen > password_len) {
  		key = emalloc(keylen);
-@@ -4942,19 +5138,19 @@
+@@ -4942,19 +5141,19 @@
  	outlen = data_len + EVP_CIPHER_block_size(cipher_type);
  	outbuf = emalloc(outlen + 1);
  
@@ -860,7 +863,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  		outlen += i;
  		if (options & OPENSSL_RAW_DATA) {
  			outbuf[outlen] = '\0';
-@@ -4977,7 +5173,7 @@
+@@ -4977,7 +5176,7 @@
  	if (free_iv) {
  		efree(iv);
  	}
@@ -869,7 +872,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  }
  /* }}} */
  
-@@ -4989,7 +5185,7 @@
+@@ -4989,7 +5188,7 @@
  	char *data, *method, *password, *iv = "";
  	int data_len, method_len, password_len, iv_len = 0;
  	const EVP_CIPHER *cipher_type;
@@ -878,7 +881,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	int i, outlen, keylen;
  	unsigned char *outbuf, *key;
  	int base64_str_len;
-@@ -5011,10 +5207,17 @@
+@@ -5011,10 +5210,17 @@
  		RETURN_FALSE;
  	}
  
@@ -896,7 +899,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  			RETURN_FALSE;
  		}
  		data_len = base64_str_len;
-@@ -5035,17 +5238,17 @@
+@@ -5035,17 +5241,17 @@
  	outlen = data_len + EVP_CIPHER_block_size(cipher_type);
  	outbuf = emalloc(outlen + 1);
  
@@ -920,7 +923,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  		outlen += i;
  		outbuf[outlen] = '\0';
  		RETVAL_STRINGL((char *)outbuf, outlen, 0);
-@@ -5062,7 +5265,7 @@
+@@ -5062,7 +5268,7 @@
  	if (base64_str) {
  		efree(base64_str);
  	}
@@ -929,7 +932,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  }
  /* }}} */
  
-@@ -5100,6 +5303,7 @@
+@@ -5100,6 +5306,7 @@
  	zval *key;
  	char *pub_str;
  	int pub_len;
@@ -937,7 +940,7 @@ diff -ur php-5.5.38.org/ext/openssl/openssl.c php-5.5.38/ext/openssl/openssl.c
  	EVP_PKEY *pkey;
  	BIGNUM *pub;
  	char *data;
-@@ -5109,14 +5313,18 @@
+@@ -5109,14 +5316,18 @@
  		return;
  	}
  	ZEND_FETCH_RESOURCE(pkey, EVP_PKEY *, &key, -1, "OpenSSL key", le_key);

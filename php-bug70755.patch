@@ -1,0 +1,21 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Tue Dec 8 00:10:07 2015 -0800
+Subject: [PATCH] Fixed bug #70755: fpm_log.c memory leak and buffer overflow
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/f4521b3631b5910003febea386bfdcbf47d031b6
+---
+diff --git a/sapi/fpm/fpm/fpm_log.c b/sapi/fpm/fpm/fpm_log.c
+--- a/sapi/fpm/fpm/fpm_log.c
++++ b/sapi/fpm/fpm/fpm_log.c
+@@ -446,6 +446,11 @@ int fpm_log_write(char *log_format TSRMLS_DC) /* {{{ */
+ 				b += len2;
+ 				len += len2;
+ 			}
++			if (len >= FPM_LOG_BUFFER) {
++				zlog(ZLOG_NOTICE, "the log buffer is full (%d). The access log request has been truncated.", FPM_LOG_BUFFER);
++				len = FPM_LOG_BUFFER;
++				break;
++			}
+ 			continue;
+ 		}
+ 

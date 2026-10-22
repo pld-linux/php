@@ -1,0 +1,79 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Mon Jul 25 15:58:59 2022 +0200
+Subject: [PATCH] Fix #81726: phar wrapper: DOS when using quine gzip file
+
+The phar wrapper needs to uncompress the file; the uncompressed file
+might be compressed, so the wrapper implementation loops. This raises
+potential DOS issues regarding too deep or even infinite recursion (the
+latter are called compressed file quines[1]). We avoid that by
+introducing a recursion limit; we choose the somewhat arbitrary limit
+`3`.
+
+This issue has been reported by real_as3617 and gPayl0ad.
+
+[1] <https://honno.dev/gzip-quine/>
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/f899a8ad9ef4352c0cac1131a0766f066f6d5532
+---
+diff --git a/ext/phar/phar.c b/ext/phar/phar.c
+--- a/ext/phar/phar.c
++++ b/ext/phar/phar.c
+@@ -1569,6 +1569,7 @@ static int phar_open_from_fp(php_stream* fp, char *fname, int fname_len, char *a
+ 	const char gz_magic[] = "\x1f\x8b\x08";
+ 	const char bz_magic[] = "BZh";
+ 	char *pos, test = '\0';
++	int recursion_count = 3; // arbitrary limit to avoid too deep or even infinite recursion
+ 	const int window_size = 1024;
+ 	char buffer[1024 + sizeof(token)]; /* a 1024 byte window + the size of the halt_compiler token (moving window) */
+ 	const long readsize = sizeof(buffer) - sizeof(token);
+@@ -1596,7 +1597,7 @@ static int phar_open_from_fp(php_stream* fp, char *fname, int fname_len, char *a
+ 			MAPPHAR_ALLOC_FAIL("internal corruption of phar \"%s\" (truncated entry)")
+ 		}
+ 
+-		if (!test) {
++		if (!test && recursion_count) {
+ 			test = '\1';
+ 			pos = buffer+tokenlen;
+ 			if (!memcmp(pos, gz_magic, 3)) {
+@@ -1658,6 +1659,10 @@ static int phar_open_from_fp(php_stream* fp, char *fname, int fname_len, char *a
+ 
+ 				/* now, start over */
+ 				test = '\0';
++				if (!--recursion_count) {
++					MAPPHAR_ALLOC_FAIL("unable to decompress gzipped phar archive \"%s\"");
++					break;
++				}
+ 				continue;
+ 			} else if (!memcmp(pos, bz_magic, 3)) {
+ 				php_stream_filter *filter;
+@@ -1696,6 +1701,10 @@ static int phar_open_from_fp(php_stream* fp, char *fname, int fname_len, char *a
+ 
+ 				/* now, start over */
+ 				test = '\0';
++				if (!--recursion_count) {
++					MAPPHAR_ALLOC_FAIL("unable to decompress bzipped phar archive \"%s\"");
++					break;
++				}
+ 				continue;
+ 			}
+ 
+diff --git a/ext/phar/tests/bug81726.phpt b/ext/phar/tests/bug81726.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug81726.phpt
+@@ -0,0 +1,15 @@
++--TEST--
++Bug #81726 (phar wrapper: DOS when using quine gzip file)
++--SKIPIF--
++<?php
++die("skip currently unavailable bug81726.gz");
++if (!extension_loaded("phar")) die("skip phar extension not available");
++if (!extension_loaded("zlib")) die("skip zlib extension not available");
++?>
++--FILE--
++<?php
++var_dump(fopen("phar://" . __DIR__ . "/bug81726.gz", "r"));
++?>
++--EXPECTF--
++Warning: fopen(phar://%s): failed to open stream: unable to decompress gzipped phar archive "%s" in %s on line %d
++bool(false)

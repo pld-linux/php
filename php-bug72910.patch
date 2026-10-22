@@ -1,0 +1,28 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Thu Sep 1 23:27:06 2016 -0700
+Subject: [PATCH] Fix bug #72910
+
+Backported from 5.6.26 by Remi.
+
+Merge upstream patch from https://github.com/kkos/oniguruma/commit/65bdf2a0d160d06556415e5f396a75f6b11bad5c
+
+From b570c506815212c7702bfb0046e87d541e171eb7 Mon Sep 17 00:00:00 2001
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun, 4 Sep 2016 19:13:22 -0700
+Subject: [PATCH] Sync fix for bug #72910 with current upstream
+
+Source: Remi Collet scl-php55, https://git.remirepo.net/cgit/rpms/scl-php55/php.git/tree/bug72910.patch
+5.4: the bundled Oniguruma names it utf8_mbc_to_code() and uses enc_len()
+---
+diff --git a/ext/mbstring/oniguruma/enc/utf8.c b/ext/mbstring/oniguruma/enc/utf8.c
+--- a/ext/mbstring/oniguruma/enc/utf8.c
++++ b/ext/mbstring/oniguruma/enc/utf8.c
+@@ -95,6 +95,8 @@ utf8_mbc_to_code(const UChar* p, const UChar* end)
+   OnigCodePoint n;
+ 
+   len = enc_len(ONIG_ENCODING_UTF8, p);
++  if (len > end - p) len = end - p;
++
+   c = *p++;
+   if (len > 1) {
+     len--;

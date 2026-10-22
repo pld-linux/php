@@ -1,0 +1,19 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Fri Sep 20 19:02:22 2019 +0200
+Subject: [PATCH] Fix #78559: Heap buffer overflow in mb_eregi
+
+We backport kkos/oniguruma@d3e402928b6eb3327f8f7d59a9edfa622fec557b.
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/958287aeadb3a43cc3c8868ade98a04522e40779
+---
+diff --git a/ext/mbstring/oniguruma/regexec.c b/ext/mbstring/oniguruma/regexec.c
+--- a/ext/mbstring/oniguruma/regexec.c
++++ b/ext/mbstring/oniguruma/regexec.c
+@@ -2961,6 +2961,7 @@ str_lower_case_match(OnigEncoding enc, int ambig_flag,
+     lowlen = ONIGENC_MBC_TO_NORMALIZE(enc, ambig_flag, &p, end, lowbuf);
+     q = lowbuf;
+     while (lowlen > 0) {
++      if (t >= tend)    return 0;
+       if (*t++ != *q++) {
+ 	return 0;
+       }

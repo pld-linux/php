@@ -1,0 +1,43 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon Apr 18 22:20:22 2016 -0700
+Subject: [PATCH] Fix for bug #71912 (libgd: signedness vulnerability)
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/7cd11ba75e0f552ffaff91909aaff97c56cb10d4
+PLD: test placed in ext/gd/tests as upstream has it; in the top-level tests/ dir php-tests would install it unpackaged
+Binary test fixtures not included: ext/gd/tests/invalid_neg_size.gd2
+---
+diff --git a/ext/gd/libgd/gd_gd2.c b/ext/gd/libgd/gd_gd2.c
+--- a/ext/gd/libgd/gd_gd2.c
++++ b/ext/gd/libgd/gd_gd2.c
+@@ -150,6 +150,9 @@ static int _gd2GetHeader(gdIOCtxPtr in, int *sx, int *sy, int *cs, int *vers, in
+ 			if (gdGetInt(&cidx[i].size, in) != 1) {
+ 				goto fail1;
+ 			}
++			if (cidx[i].offset < 0 || cidx[i].size < 0) {
++				goto fail1;
++			}
+ 		}
+ 		*chunkIdx = cidx;
+ 	}
+diff --git a/ext/gd/tests/bug71912.phpt b/ext/gd/tests/bug71912.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug71912.phpt
+@@ -0,0 +1,16 @@
++--TEST--
++Bug #71912 (libgd: signedness vulnerability)
++--SKIPIF--
++<?php
++        if(!extension_loaded('gd')){ die('skip gd extension not available'); }
++        if(!function_exists('imagecreatefromgd2')) die('skip imagecreatefromgd2() not available');
++?>
++--FILE--
++<?php
++imagecreatefromgd2(__DIR__."/invalid_neg_size.gd2");
++?>
++OK
++--EXPECTF--
++
++Warning: imagecreatefromgd2(): '%s/invalid_neg_size.gd2' is not a valid GD2 file in %s/bug71912.php on line %d
++OK
+\ No newline at end of file

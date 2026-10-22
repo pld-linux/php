@@ -1,0 +1,62 @@
+From: Sara Golemon <pollita@php.net>
+Date: Tue Oct 11 21:14:25 2016 -0700
+Subject: [PATCH] Clear FG(user_stream_current_filename) when bailing out
+
+If a userwrapper opener E_ERRORs then FG(user_stream_current_filename)
+would remain set until the next request and would not be pointing
+at unallocated memory.
+
+Catch the bailout, clear the variable, then continue bailing.
+
+Closes https://bugs.php.net/bug.php?id=73188
+
+Source: upstream https://github.com/php/php-src/commit/43ccf23d70 (5.6.28)
+---
+diff --git a/ext/standard/tests/streams/user-stream-error.phpt b/ext/standard/tests/streams/user-stream-error.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/streams/user-stream-error.phpt
+@@ -0,0 +1,16 @@
++--TEST--
++E_ERROR during UserStream Open
++--FILE--
++<?php
++
++class FailStream {
++  public function stream_open($path, $mode, $options, &$opened_path) {
++    _some_undefined_function();
++  }
++}
++stream_wrapper_register('mystream', 'FailStream');
++fopen('mystream://foo', 'r');
++echo 'Done';
++
++--EXPECTF--
++Fatal error: Call to undefined function _some_undefined_function() in %s/user-stream-error.php on line %d
+diff --git a/main/streams/userspace.c b/main/streams/userspace.c
+--- a/main/streams/userspace.c
++++ b/main/streams/userspace.c
+@@ -393,12 +393,17 @@ static php_stream *user_wrapper_opener(php_stream_wrapper *wrapper, char *filena
+ 	MAKE_STD_ZVAL(zfuncname);
+ 	ZVAL_STRING(zfuncname, USERSTREAM_OPEN, 1);
+ 
+-	call_result = call_user_function_ex(NULL,
+-			&us->object,
+-			zfuncname,
+-			&zretval,
+-			4, args,
+-			0, NULL	TSRMLS_CC);
++	zend_try {
++		call_result = call_user_function_ex(NULL,
++				&us->object,
++				zfuncname,
++				&zretval,
++				4, args,
++				0, NULL	TSRMLS_CC);
++	} zend_catch {
++		FG(user_stream_current_filename) = NULL;
++		zend_bailout();
++	} zend_end_try();
+ 
+ 	if (call_result == SUCCESS && zretval != NULL && zval_is_true(zretval)) {
+ 		/* the stream is now open! */

@@ -1,0 +1,81 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Wed Jan 2 00:36:30 2019 -0800
+Subject: [PATCH] Fix more issues with encodilng length
+
+Should fix bug #77381, bug #77382, bug #77385, bug #77394.
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/8960ff028003ee02239b9ba331a544fb023d43f6
+---
+diff --git a/ext/mbstring/oniguruma/enc/utf16_be.c b/ext/mbstring/oniguruma/enc/utf16_be.c
+--- a/ext/mbstring/oniguruma/enc/utf16_be.c
++++ b/ext/mbstring/oniguruma/enc/utf16_be.c
+@@ -145,6 +145,7 @@ utf16be_mbc_to_normalize(OnigAmbigType flag, const UChar** pp, const UChar* end,
+   else {
+     int len;
+     len = EncLen_UTF16[*p];
++    if (*pp + len > end) len = end - *pp;
+     if (lower != p) {
+       int i;
+       for (i = 0; i < len; i++) {
+diff --git a/ext/mbstring/oniguruma/enc/utf16_le.c b/ext/mbstring/oniguruma/enc/utf16_le.c
+--- a/ext/mbstring/oniguruma/enc/utf16_le.c
++++ b/ext/mbstring/oniguruma/enc/utf16_le.c
+@@ -145,6 +145,7 @@ utf16le_mbc_to_normalize(OnigAmbigType flag, const UChar** pp, const UChar* end,
+   }
+   else {
+     int len = EncLen_UTF16[*(p+1)];
++    if (*pp + len > end) len = end - *pp;
+     if (lower != p) {
+       int i;
+       for (i = 0; i < len; i++) {
+diff --git a/ext/mbstring/oniguruma/enc/utf32_be.c b/ext/mbstring/oniguruma/enc/utf32_be.c
+--- a/ext/mbstring/oniguruma/enc/utf32_be.c
++++ b/ext/mbstring/oniguruma/enc/utf32_be.c
+@@ -104,6 +104,7 @@ utf32be_mbc_to_normalize(OnigAmbigType flag, const UChar** pp, const UChar* end,
+   }
+   else {
+     int len = 4;
++    if (*pp + len > end) len = end - *pp;
+     if (lower != p) {
+       int i;
+       for (i = 0; i < len; i++) {
+diff --git a/ext/mbstring/oniguruma/enc/utf32_le.c b/ext/mbstring/oniguruma/enc/utf32_le.c
+--- a/ext/mbstring/oniguruma/enc/utf32_le.c
++++ b/ext/mbstring/oniguruma/enc/utf32_le.c
+@@ -103,6 +103,7 @@ utf32le_mbc_to_normalize(OnigAmbigType flag, const UChar** pp, const UChar* end,
+   }
+   else {
+     int len = 4;
++    if (*pp + len > end) len = end - *pp;
+     if (lower != p) {
+       int i;
+       for (i = 0; i < len; i++) {
+diff --git a/ext/mbstring/oniguruma/enc/utf8.c b/ext/mbstring/oniguruma/enc/utf8.c
+--- a/ext/mbstring/oniguruma/enc/utf8.c
++++ b/ext/mbstring/oniguruma/enc/utf8.c
+@@ -235,7 +235,7 @@ utf8_mbc_to_normalize(OnigAmbigType flag, const UChar** pp, const UChar* end, UC
+   else {
+     int len;
+ 
+-    if (*p == 195) { /* 195 == '\303' */
++    if (*p == 195 && p + 1 < end) { /* 195 == '\303' */
+       int c = *(p + 1);
+       if (c >= 128) {
+         if (c <= (UChar )'\236' &&  /* upper */
+@@ -251,6 +251,7 @@ utf8_mbc_to_normalize(OnigAmbigType flag, const UChar** pp, const UChar* end, UC
+     }
+ 
+     len = enc_len(ONIG_ENCODING_UTF8, p);
++    if (*pp + len > end) len = end - *pp;
+     if (lower != p) {
+       int i;
+       for (i = 0; i < len; i++) {
+@@ -276,7 +277,7 @@ utf8_is_mbc_ambiguous(OnigAmbigType flag, const UChar** pp, const UChar* end)
+   else {
+     (*pp) += enc_len(ONIG_ENCODING_UTF8, p);
+ 
+-    if (*p == 195) { /* 195 == '\303' */
++    if (*p == 195 && p + 1 < end) { /* 195 == '\303' */
+       int c = *(p + 1);
+       if (c >= 128) {
+         if ((flag & ONIGENC_AMBIGUOUS_MATCH_NONASCII_CASE) != 0) {

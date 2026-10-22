@@ -1,0 +1,80 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Tue Aug 2 01:08:42 2016 -0700
+Subject: [PATCH] Fix bug #72663 - destroy broken object when unserializing
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/63a1371dd53382cc8e393e2cc4e92d1eb2d65d9e
+---
+diff --git a/ext/standard/tests/strings/bug72663.phpt b/ext/standard/tests/strings/bug72663.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/strings/bug72663.phpt
+@@ -0,0 +1,26 @@
++--TEST--
++Bug #72663: Create an Unexpected Object and Don't Invoke __wakeup() in Deserialization
++--FILE--
++<?php
++class obj implements Serializable {
++    var $data;
++    function serialize() {
++        return serialize($this->data);
++    }
++    function unserialize($data) {
++        $this->data = unserialize($data);
++    }
++}
++
++$inner = 'a:1:{i:0;O:9:"Exception":2:{s:7:"'."\0".'*'."\0".'file";R:4;}';
++$exploit = 'a:2:{i:0;C:3:"obj":'.strlen($inner).':{'.$inner.'}i:1;R:4;}';
++
++$data = unserialize($exploit);
++echo $data[1];
++?>
++DONE
++--EXPECTF--
++Notice: unserialize(): Unexpected end of serialized data in %sbug72663.php on line %d
++
++Notice: unserialize(): Error at offset 46 of 47 bytes in %sbug72663.php on line %d
++DONE
+\ No newline at end of file
+diff --git a/ext/standard/tests/strings/bug72663_3.phpt b/ext/standard/tests/strings/bug72663_3.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/strings/bug72663_3.phpt
+@@ -0,0 +1,18 @@
++--TEST--
++Bug #72663: Create an Unexpected Object and Don't Invoke __wakeup() in Deserialization
++--FILE--
++<?php
++class obj {
++	var $ryat;
++	function __wakeup() {
++		$this->ryat = str_repeat('A', 0x112);
++	}
++}
++
++$poc = 'O:8:"stdClass":1:{i:0;O:3:"obj":1:{s:4:"ryat";R:1;';
++unserialize($poc);
++?>
++DONE
++--EXPECTF--
++Notice: unserialize(): Error at offset 50 of 50 bytes in %sbug72663_3.php on line %d
++DONE
+diff --git a/ext/standard/var_unserializer.re b/ext/standard/var_unserializer.re
+--- a/ext/standard/var_unserializer.re
++++ b/ext/standard/var_unserializer.re
+@@ -443,6 +443,15 @@ static inline int object_common2(UNSERIALIZE_PARAMETER, long elements)
+ 	}
+ 
+ 	if (!process_nested_data(UNSERIALIZE_PASSTHRU, Z_OBJPROP_PP(rval), elements, 1)) {
++		/* We've got partially constructed object on our hands here. Wipe it. */
++		if(Z_TYPE_PP(rval) == IS_OBJECT) {
++			zend_hash_clean(Z_OBJPROP_PP(rval));
++		}
++		ZVAL_NULL(*rval);
++		return 0;
++	}
++
++	if (Z_TYPE_PP(rval) != IS_OBJECT) {
+ 		return 0;
+ 	}
+ 

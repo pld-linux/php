@@ -1,0 +1,42 @@
+From: Jakub Zelenka <bukka@php.net>
+Date: Sun Aug 14 13:52:59 2016 +0100
+Subject: [PATCH] Fixed bug #72787 (json_decode reads out of bounds)
+
+Source: upstream https://github.com/php/php-src/commit/9f1d962ed6 (5.6.26)
+---
+diff --git a/ext/json/json.c b/ext/json/json.c
+--- a/ext/json/json.c
++++ b/ext/json/json.c
+@@ -676,6 +676,12 @@ PHP_JSON_API void php_json_decode_ex(zval *return_value, char *str, int str_len,
+ 		RETURN_NULL();
+ 	}
+ 
++	if (depth > INT_MAX) {
++		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Depth must be lower than %d", INT_MAX);
++		efree(utf16);
++		RETURN_NULL();
++	}
++
+ 	ALLOC_INIT_ZVAL(z);
+ 	jp = new_JSON_parser(depth);
+ 	if (parse_JSON_ex(jp, z, utf16, utf16_len, options TSRMLS_CC)) {
+diff --git a/ext/json/tests/bug72787.phpt b/ext/json/tests/bug72787.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/json/tests/bug72787.phpt
+@@ -0,0 +1,15 @@
++--TEST--
++Bug #72787 (json_decode reads out of bounds)
++--SKIPIF--
++<?php if (!extension_loaded("json")) print "skip"; ?>
++<?php if (PHP_INT_SIZE != 8) die("skip this test is for 64bit platform only"); ?>
++--FILE--
++<?php
++
++var_dump(json_decode('[]', false, 0x100000000));
++
++?>
++--EXPECTF--
++
++Warning: json_decode(): Depth must be lower than %d in %s on line %d
++NULL

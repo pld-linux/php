@@ -1,0 +1,43 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat Jan 16 20:43:43 2016 -0800
+Subject: [PATCH] Fix bug #71391: NULL Pointer Dereference in phar_tar_setupmetadata()
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/7010274c63daee68ddabe41e5e9e1dabc5c55217
+Binary test fixtures not included: ext/phar/tests/bug71391.tar
+---
+diff --git a/ext/phar/tar.c b/ext/phar/tar.c
+--- a/ext/phar/tar.c
++++ b/ext/phar/tar.c
+@@ -870,6 +870,9 @@ static int phar_tar_setupmetadata(void *pDest, void *argument TSRMLS_DC) /* {{{
+ 
+ 	if (entry->filename_len >= sizeof(".phar/.metadata") && !memcmp(entry->filename, ".phar/.metadata", sizeof(".phar/.metadata")-1)) {
+ 		if (entry->filename_len == sizeof(".phar/.metadata.bin")-1 && !memcmp(entry->filename, ".phar/.metadata.bin", sizeof(".phar/.metadata.bin")-1)) {
++			if (entry->phar->metadata == NULL) {
++				return ZEND_HASH_APPLY_REMOVE;
++			}
+ 			return phar_tar_setmetadata(entry->phar->metadata, entry, error TSRMLS_CC);
+ 		}
+ 		/* search for the file this metadata entry references */
+diff --git a/ext/phar/tests/bug71391.phpt b/ext/phar/tests/bug71391.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug71391.phpt
+@@ -0,0 +1,18 @@
++--TEST--
++Phar: bug #71391: NULL Pointer Dereference in phar_tar_setupmetadata()
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip"); ?>
++--FILE--
++<?php
++// duplicate since the tar will change
++copy(__DIR__."/bug71391.tar", __DIR__."/bug71391.test.tar");
++$p = new PharData(__DIR__."/bug71391.test.tar");
++$p->delMetaData();
++?>
++DONE
++--CLEAN--
++<?php
++unlink(__DIR__."/bug71391.test.tar");
++?>
++--EXPECT--
++DONE

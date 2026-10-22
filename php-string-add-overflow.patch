@@ -1,0 +1,30 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon May 9 22:17:20 2016 -0700
+Subject: [PATCH] Add check for string overflow to all string add operations
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/f146d3ee0aeec77b25e9720b1802fb5cb7be32ed
+---
+diff --git a/Zend/zend_operators.c b/Zend/zend_operators.c
+--- a/Zend/zend_operators.c
++++ b/Zend/zend_operators.c
+@@ -1199,6 +1199,10 @@ ZEND_API int add_char_to_string(zval *result, const zval *op1, const zval *op2)
+ 	int length = Z_STRLEN_P(op1) + 1;
+ 	char *buf;
+ 
++	if (UNEXPECTED(length < 0)) {
++		zend_error(E_ERROR, "String size overflow");
++	}
++
+ 	if (IS_INTERNED(Z_STRVAL_P(op1))) {
+ 		buf = (char *) emalloc(length + 1);
+ 		memcpy(buf, Z_STRVAL_P(op1), Z_STRLEN_P(op1));
+@@ -1218,6 +1222,9 @@ ZEND_API int add_string_to_string(zval *result, const zval *op1, const zval *op2
+ 	int length = Z_STRLEN_P(op1) + Z_STRLEN_P(op2);
+ 	char *buf;
+ 
++	if (UNEXPECTED(length < 0)) {
++		zend_error(E_ERROR, "String size overflow");
++	}
+ 	if (IS_INTERNED(Z_STRVAL_P(op1))) {
+ 		buf = (char *) emalloc(length+1);
+ 		memcpy(buf, Z_STRVAL_P(op1), Z_STRLEN_P(op1));

@@ -1,0 +1,25 @@
+From: Anatol Belski <ab@php.net>
+Date: Thu Jan 14 17:42:28 2016 +0100
+Subject: [PATCH] Fixed bug #70979 crash with bad soap request
+
+The error handler is overloaded with the SOAP one. However the SOAP
+handler eventually wants to access some of its globals. This won't
+work as long as the SOAP globals aren't initialized. The use case
+is when an error is thrown before RINIT went through. As the call
+order is arbitrary, the safest is to wait when all the modules
+called their RINIT.
+
+Source: upstream https://github.com/php/php-src/commit/4308c868f9 (5.6.18)
+---
+diff --git a/ext/soap/soap.c b/ext/soap/soap.c
+--- a/ext/soap/soap.c
++++ b/ext/soap/soap.c
+@@ -2173,7 +2173,7 @@ static void soap_error_handler(int error_num, const char *error_filename, const
+ 	_old_http_response_code = SG(sapi_headers).http_response_code;
+ 	_old_http_status_line = SG(sapi_headers).http_status_line;
+ 
+-	if (!SOAP_GLOBAL(use_soap_error_handler) || !EG(objects_store).object_buckets) {
++	if (!PG(modules_activated) || !SOAP_GLOBAL(use_soap_error_handler) || !EG(objects_store).object_buckets) {
+ 		call_old_error_handler(error_num, error_filename, error_lineno, format, args);
+ 		return;
+ 	}

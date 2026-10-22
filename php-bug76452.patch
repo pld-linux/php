@@ -1,0 +1,99 @@
+From: Ben Ramsey <ramsey@php.net>
+Date: Tue Jun 7 09:59:17 2022 -0500
+Subject: [PATCH] Fix #76452: Crash while parsing blob data in firebird_fetch_blob
+
+This reapplies 286162e9b03071c4308e7e92597bca4239f49d89 to the PHP-8.1 (and up)
+branches, fixing what might have been caused by a bad merge conflict resolution.
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/92cdf07417e944ef277c3cfdeb1122ca0139388e
+---
+diff --git a/ext/pdo_firebird/firebird_driver.c b/ext/pdo_firebird/firebird_driver.c
+--- a/ext/pdo_firebird/firebird_driver.c
++++ b/ext/pdo_firebird/firebird_driver.c
+@@ -240,21 +240,31 @@ static long firebird_handle_doer(pdo_dbh_t *dbh, const char *sql, long sql_len T
+ 	/* execute the statement */
+ 	if (isc_dsql_execute2(H->isc_status, &H->tr, &stmt, PDO_FB_SQLDA_VERSION, &in_sqlda, &out_sqlda)) {
+ 		RECORD_ERROR(dbh);
+-		return -1;
++		ret = -1;
++		goto free_statement;
+ 	}
+ 	
+ 	/* find out how many rows were affected */
+ 	if (isc_dsql_sql_info(H->isc_status, &stmt, sizeof(info_count), const_cast(info_count),
+ 			sizeof(result),	result)) {
+ 		RECORD_ERROR(dbh);
+-		return -1;
++		ret = -1;
++		goto free_statement;
+ 	}
+ 
+ 	if (result[0] == isc_info_sql_records) {
+ 		unsigned i = 3, result_size = isc_vax_integer(&result[1],2);
+-
++		if (result_size > sizeof(result)) {
++			ret = -1;
++			goto free_statement;
++		}
+ 		while (result[i] != isc_info_end && i < result_size) {
+ 			short len = (short)isc_vax_integer(&result[i+1],2);
++			/* bail out on bad len */
++			if (len != 1 && len != 2 && len != 4) {
++				ret = -1;
++				goto free_statement;
++			}
+ 			if (result[i] != isc_info_req_select_count) {
+ 				ret += isc_vax_integer(&result[i+3],len);
+ 			}
+@@ -267,6 +277,12 @@ static long firebird_handle_doer(pdo_dbh_t *dbh, const char *sql, long sql_len T
+ 		RECORD_ERROR(dbh);
+ 	}
+ 
++free_statement:
++
++	if (isc_dsql_free_statement(H->isc_status, &stmt, DSQL_drop)) {
++		RECORD_ERROR(dbh);
++	}
++
+ 	return ret;
+ }
+ /* }}} */
+diff --git a/ext/pdo_firebird/firebird_statement.c b/ext/pdo_firebird/firebird_statement.c
+--- a/ext/pdo_firebird/firebird_statement.c
++++ b/ext/pdo_firebird/firebird_statement.c
+@@ -120,8 +120,14 @@ static int firebird_stmt_execute(pdo_stmt_t *stmt TSRMLS_DC) /* {{{ */
+ 				}
+ 				if (result[0] == isc_info_sql_records) {
+ 					unsigned i = 3, result_size = isc_vax_integer(&result[1], 2);
++					if (result_size > sizeof(result)) {
++						goto error;
++					}
+ 					while (result[i] != isc_info_end && i < result_size) {
+ 						short len = (short) isc_vax_integer(&result[i + 1], 2);
++						if (len != 1 && len != 2 && len != 4) {
++							goto error;
++						}
+ 						if (result[i] != isc_info_req_select_count) {
+ 							affected_rows += isc_vax_integer(&result[i + 3], len);
+ 						}
+@@ -145,6 +151,7 @@ static int firebird_stmt_execute(pdo_stmt_t *stmt TSRMLS_DC) /* {{{ */
+ 		return 1;
+ 	} while (0);
+ 
++error:
+ 	RECORD_ERROR(stmt);	
+ 
+ 	return 0;
+@@ -267,6 +274,12 @@ static int firebird_fetch_blob(pdo_stmt_t *stmt, int colno, char **ptr, /* {{{ *
+ 		unsigned short seg_len;
+ 		ISC_STATUS stat;
+ 
++		/* prevent overflow */
++		if (*len == ULONG_MAX) {
++			result = 0;
++			goto fetch_blob_end;
++		}
++
+ 		*ptr = S->fetch_buf[colno] = erealloc(*ptr, *len+1);
+ 	
+ 		for (cur_len = stat = 0; (!stat || stat == isc_segment) && cur_len < *len; cur_len += seg_len) {

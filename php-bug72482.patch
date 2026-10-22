@@ -1,0 +1,229 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Tue Oct 25 15:14:22 2016 +0200
+Subject: [PATCH] Fix #72482: Ilegal write/read access caused by gdImageAALine overflow
+
+Instead of rolling our own bounds check we use clip_1d() as it's done
+in gdImageLine() and in external libgd. We must not pass the image
+width and height, respectively, but rather the largest ordinate value
+that is allowed to be accessed, i.e. width-1 and height-1,
+respectively.
+
+Upstream: https://github.com/php/php-src/commit/6499581af76cfe986e12330faabb3a7c36d45ffc
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/04c0a62755ec9b95ef144c01eab46a216dcaffef
+Binary test fixtures not included: ext/gd/tests/bug72482_2.png
+---
+diff --git a/ext/gd/libgd/gd.c b/ext/gd/libgd/gd.c
+--- a/ext/gd/libgd/gd.c
++++ b/ext/gd/libgd/gd.c
+@@ -1104,7 +1104,7 @@ void gdImageLine (gdImagePtr im, int x1, int y1, int x2, int y2, int color)
+ 	}
+ 
+ 	/* 2.0.10: Nick Atty: clip to edges of drawing rectangle, return if no points need to be drawn */
+-	if (!clip_1d(&x1,&y1,&x2,&y2,gdImageSX(im)) || !clip_1d(&y1,&x1,&y2,&x2,gdImageSY(im))) {
++	if (!clip_1d(&x1,&y1,&x2,&y2,gdImageSX(im)-1) || !clip_1d(&y1,&x1,&y2,&x2,gdImageSY(im)-1)) {
+ 		return;
+ 	}
+ 
+@@ -1288,55 +1288,10 @@ void gdImageAALine (gdImagePtr im, int x1, int y1, int x2, int y2, int col)
+ 	long x, y, inc;
+ 	long dx, dy,tmp;
+ 
+-	if (y1 < 0 && y2 < 0) {
+-		return;
+-	}
+-	if (y1 < 0) {
+-		x1 += (y1 * (x1 - x2)) / (y2 - y1);
+-		y1 = 0;
+-	}
+-	if (y2 < 0) {
+-		x2 += (y2 * (x1 - x2)) / (y2 - y1);
+-		y2 = 0;
+-	}
+-
+-	/* bottom edge */
+-	if (y1 >= im->sy && y2 >= im->sy) {
+-		return;
+-	}
+-	if (y1 >= im->sy) {
+-		x1 -= ((im->sy - y1) * (x1 - x2)) / (y2 - y1);
+-		y1 = im->sy - 1;
+-	}
+-	if (y2 >= im->sy) {
+-		x2 -= ((im->sy - y2) * (x1 - x2)) / (y2 - y1);
+-		y2 = im->sy - 1;
+-	}
+-
+-	/* left edge */
+-	if (x1 < 0 && x2 < 0) {
+-		return;
+-	}
+-	if (x1 < 0) {
+-		y1 += (x1 * (y1 - y2)) / (x2 - x1);
+-		x1 = 0;
+-	}
+-	if (x2 < 0) {
+-		y2 += (x2 * (y1 - y2)) / (x2 - x1);
+-		x2 = 0;
+-	}
+-	/* right edge */
+-	if (x1 >= im->sx && x2 >= im->sx) {
++	/* 2.0.10: Nick Atty: clip to edges of drawing rectangle, return if no points need to be drawn */
++	if (!clip_1d(&x1,&y1,&x2,&y2,gdImageSX(im)-1) || !clip_1d(&y1,&x1,&y2,&x2,gdImageSY(im)-1)) {
+ 		return;
+ 	}
+-	if (x1 >= im->sx) {
+-		y1 -= ((im->sx - x1) * (y1 - y2)) / (x2 - x1);
+-		x1 = im->sx - 1;
+-	}
+-	if (x2 >= im->sx) {
+-		y2 -= ((im->sx - x2) * (y1 - y2)) / (x2 - x1);
+-		x2 = im->sx - 1;
+-	}
+ 
+ 	dx = x2 - x1;
+ 	dy = y2 - y1;
+diff --git a/ext/gd/tests/bug72482.phpt b/ext/gd/tests/bug72482.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug72482.phpt
+@@ -0,0 +1,19 @@
++--TEST--
++Bug #72482 (Ilegal write/read access caused by gdImageAALine overflow)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++?>
++--FILE--
++<?php
++$img = imagecreatetruecolor(13, 1007);
++imageantialias($img, true);
++imageline($img, 0, 0, 1073745919, 1073745919, 4096);
++
++$img = imagecreatetruecolor(100, 100);
++imageantialias($img, true);
++imageline($img, 1094795585, 0, 2147483647, 255, 0xff);
++?>
++===DONE===
++--EXPECT--
++===DONE===
+diff --git a/ext/gd/tests/bug72482_2.phpt b/ext/gd/tests/bug72482_2.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug72482_2.phpt
+@@ -0,0 +1,21 @@
++--TEST--
++Bug 72482 (Ilegal write/read access caused by gdImageAALine overflow)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++?>
++--FILE--
++<?php
++require_once __DIR__ . DIRECTORY_SEPARATOR . 'func.inc';
++
++$im = imagecreatetruecolor(10, 10);
++imagefilledrectangle($im, 0, 0, 9, 9, imagecolorallocate($im, 255, 255, 255));
++imageantialias($im, true);
++imageline($im, 0, 0, 10, 10, imagecolorallocate($im, 0, 0, 0));
++
++test_image_equals_file(__DIR__ . DIRECTORY_SEPARATOR . 'bug72482_2.png', $im);
++?>
++===DONE===
++--EXPECT--
++The images are equal.
++===DONE===
+diff --git a/ext/gd/tests/func.inc b/ext/gd/tests/func.inc
+--- a/ext/gd/tests/func.inc
++++ b/ext/gd/tests/func.inc
+@@ -59,3 +59,90 @@ function get_libxpm_version()
+ 	return $version;
+ }
+ 
++/**
++ * Tests that an in-memory image equals a PNG file.
++ *
++ * It checks for equal image sizes, and whether any pixels are different.
++ * The textual result is printed, so the EXPECT section should contain the line
++ * "The images are equal."
++ *
++ * If the PNG file does not exists, or the images are not equal, a diagnostic
++ * message is printed, and the actual file is stored right beside the temporary
++ * .php test file with the extension .out.png, to be able to manually inspect
++ * the result.
++ *
++ * @param string $filename
++ * @param resource $actual
++ * @return void
++ */
++function test_image_equals_file($filename, $actual)
++{
++	if (!file_exists($filename)) {
++		echo "The expected image does not exist.\n";
++		save_actual_image($actual);
++		return;
++	}
++	$actual = test_to_truecolor($actual);
++	$expected = imagecreatefrompng($filename);
++	$expected = test_to_truecolor($expected);
++	$exp_x = imagesx($expected);
++	$exp_y = imagesy($expected);
++	$act_x = imagesx($actual);
++	$act_y = imagesy($actual);
++	if ($exp_x != $act_x || $exp_y != $act_y) {
++		echo "The image size differs: expected {$exp_x}x{$exp_y}, got {$act_x}x{$act_y}.\n";
++		save_actual_image($actual);
++		return;
++	}
++	$pixels_changed = 0;
++	for ($y = 0; $y < $exp_y; $y++) {
++		for ($x = 0; $x < $exp_x; $x ++) {
++			$exp_c = imagecolorat($expected, $x, $y);
++			$act_c = imagecolorat($actual, $x, $y);
++			if ($exp_c != $act_c) {
++				$pixels_changed++;
++			}
++		}
++	}
++	if (!$pixels_changed) {
++		echo "The images are equal.\n";
++	} else {
++		echo "The images differ in {$pixels_changed} pixels.\n";
++		save_actual_image($actual);
++	}
++}
++
++/**
++ * Returns the truecolor version of an image.
++ *
++ * @param resource $image
++ * @return resource
++ */
++function test_to_truecolor($image)
++{
++	if (imageistruecolor($image)) {
++		return $image;
++	} else {
++		$width = imagesx($image);
++		$height = imagesy($image);
++		$result = imagecreatetruecolor($width, $height);
++		imagecopy($result, $image, 0,0, 0,0, $width, $height);
++		return $result;
++	}
++}
++
++/**
++ * Saves an actual image to disk.
++ *
++ * The image is saved right beside the temporary .php test file with the
++ * extension .out.png.
++ *
++ * @param resource $image
++ * @return void
++ */
++function save_actual_image($image)
++{
++	$pathinfo = pathinfo($_SERVER['SCRIPT_FILENAME']);
++	$filename = "{$pathinfo['dirname']}/{$pathinfo['filename']}.out.png";
++	imagepng($image, $filename);
++}

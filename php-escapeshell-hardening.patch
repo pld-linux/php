@@ -1,0 +1,157 @@
+From: Anatol Belski <ab@php.net>
+Date: Thu Jan 28 13:45:43 2016 +0100
+Subject: [PATCH] backport the escapeshell* functions hardening branch
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/957c4b9b16f201e1e2dec39da4787bd769174ddd
+---
+diff --git a/ext/standard/basic_functions.c b/ext/standard/basic_functions.c
+--- a/ext/standard/basic_functions.c
++++ b/ext/standard/basic_functions.c
+@@ -3617,6 +3617,7 @@ PHP_MINIT_FUNCTION(basic) /* {{{ */
+ #ifdef PHP_CAN_SUPPORT_PROC_OPEN
+ 	PHP_MINIT(proc_open)(INIT_FUNC_ARGS_PASSTHRU);
+ #endif
++	PHP_MINIT(exec)(INIT_FUNC_ARGS_PASSTHRU);
+ 
+ 	PHP_MINIT(user_streams)(INIT_FUNC_ARGS_PASSTHRU);
+ 	PHP_MINIT(imagetypes)(INIT_FUNC_ARGS_PASSTHRU);
+diff --git a/ext/standard/exec.c b/ext/standard/exec.c
+--- a/ext/standard/exec.c
++++ b/ext/standard/exec.c
+@@ -46,10 +46,53 @@
+ #include <fcntl.h>
+ #endif
+ 
+-#if HAVE_NICE && HAVE_UNISTD_H
++#if HAVE_UNISTD_H
+ #include <unistd.h>
+ #endif
+ 
++#if HAVE_LIMITS_H
++#include <limits.h>
++#endif
++
++#ifdef PHP_WIN32
++# include "win32/php_stdint.h"
++#else
++# if HAVE_INTTYPES_H
++#  include <inttypes.h>
++# elif HAVE_STDINT_H
++#  include <stdint.h>
++# endif
++#endif
++
++static int cmd_max_len;
++
++/* {{{ PHP_MINIT_FUNCTION(exec) */
++PHP_MINIT_FUNCTION(exec)
++{
++#ifdef _SC_ARG_MAX
++	cmd_max_len = sysconf(_SC_ARG_MAX);
++	if (-1 == cmd_max_len) {
++#ifdef _POSIX_ARG_MAX
++               cmd_max_len = _POSIX_ARG_MAX;
++#else
++               cmd_max_len = 4096;
++#endif
++       }
++#elif defined(ARG_MAX)
++	cmd_max_len = ARG_MAX;
++#elif defined(PHP_WIN32)
++	/* Executed commands will run through cmd.exe. As long as it's the case,
++		it's just the constant limit.*/
++	cmd_max_len = 8192;
++#else
++	/* This is just an arbitrary value for the fallback case. */
++	cmd_max_len = 4096;
++#endif
++
++	return SUCCESS;
++}
++/* }}} */
++
+ /* {{{ php_exec
+  * If type==0, only last line of output is returned (exec)
+  * If type==1, all lines will be printed and last lined returned (system)
+@@ -244,13 +287,20 @@ PHP_FUNCTION(passthru)
+ */
+ PHPAPI char *php_escape_shell_cmd(char *str)
+ {
+-	register int x, y, l = strlen(str);
++	register int x, y;
++	size_t l = strlen(str);
++	uint64_t estimate = (2 * (uint64_t)l) + 1;
+ 	char *cmd;
+ 	char *p = NULL;
+-	size_t estimate = (2 * l) + 1;
+ 
+ 	TSRMLS_FETCH();
+ 
++	/* max command line length - two single quotes - \0 byte length */
++	if (l > cmd_max_len - 2 - 1) {
++		php_error_docref(NULL TSRMLS_CC, E_ERROR, "Command exceeds the allowed length of %d bytes", cmd_max_len);
++		return NULL;
++	}
++
+ 	cmd = safe_emalloc(2, l, 1);
+ 
+ 	for (x = 0, y = 0; x < l; x++) {
+@@ -322,6 +372,12 @@ PHPAPI char *php_escape_shell_cmd(char *str)
+ 	}
+ 	cmd[y] = '\0';
+ 
++	if (y - 1 > cmd_max_len) {
++		php_error_docref(NULL TSRMLS_CC, E_ERROR, "Escaped command exceeds the allowed length of %d bytes", cmd_max_len);
++		efree(cmd);
++		return NULL;
++	}
++
+ 	if ((estimate - y) > 4096) {
+ 		/* realloc if the estimate was way overill
+ 		 * Arbitrary cutoff point of 4096 */
+@@ -336,12 +392,19 @@ PHPAPI char *php_escape_shell_cmd(char *str)
+  */
+ PHPAPI char *php_escape_shell_arg(char *str)
+ {
+-	int x, y = 0, l = strlen(str);
++	int x, y = 0;
++	size_t l = strlen(str);
+ 	char *cmd;
+-	size_t estimate = (4 * l) + 3;
++	uint64_t estimate = (4 * (uint64_t)l) + 3;
+ 
+ 	TSRMLS_FETCH();
+ 
++	/* max command line length - two single quotes - \0 byte length */
++	if (l > cmd_max_len - 2 - 1) {
++		php_error_docref(NULL TSRMLS_CC, E_ERROR, "Argument exceeds the allowed length of %d bytes", cmd_max_len);
++		return NULL;
++	}
++
+ 	cmd = safe_emalloc(4, l, 3); /* worst case */
+ 
+ #ifdef PHP_WIN32
+@@ -396,6 +459,12 @@ PHPAPI char *php_escape_shell_arg(char *str)
+ #endif
+ 	cmd[y] = '\0';
+ 
++	if (y - 1 > cmd_max_len) {
++		php_error_docref(NULL TSRMLS_CC, E_ERROR, "Escaped argument exceeds the allowed length of %d bytes", cmd_max_len);
++		efree(cmd);
++		return NULL;
++	}
++
+ 	if ((estimate - y) > 4096) {
+ 		/* realloc if the estimate was way overill
+ 		 * Arbitrary cutoff point of 4096 */
+diff --git a/ext/standard/exec.h b/ext/standard/exec.h
+--- a/ext/standard/exec.h
++++ b/ext/standard/exec.h
+@@ -33,6 +33,7 @@ PHP_FUNCTION(proc_close);
+ PHP_FUNCTION(proc_terminate);
+ PHP_FUNCTION(proc_nice);
+ PHP_MINIT_FUNCTION(proc_open);
++PHP_MINIT_FUNCTION(exec);
+ 
+ PHPAPI char *php_escape_shell_cmd(char *);
+ PHPAPI char *php_escape_shell_arg(char *);

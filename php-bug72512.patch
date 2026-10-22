@@ -1,0 +1,33 @@
+From: Pierre Joye <pajoye@php.net>
+Date: Mon Jul 4 10:35:20 2016 +0200
+Subject: [PATCH] Fixed bug #72512 gdImageTrueColorToPaletteBody allows arbitrary write/read access
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/d20c9a3618b7f16dd8049ed8dad7c4a10c43a214
+---
+diff --git a/ext/gd/libgd/gd.c b/ext/gd/libgd/gd.c
+--- a/ext/gd/libgd/gd.c
++++ b/ext/gd/libgd/gd.c
+@@ -595,15 +595,18 @@ void gdImageColorDeallocate (gdImagePtr im, int color)
+ 
+ void gdImageColorTransparent (gdImagePtr im, int color)
+ {
++	if (color < 0) {
++		return;
++	}
++
+ 	if (!im->trueColor) {
++		if((color >= gdMaxColors)) {
++			return;
++		}
+ 		if (im->transparent != -1) {
+ 			im->alpha[im->transparent] = gdAlphaOpaque;
+ 		}
+-		if (color > -1 && color < im->colorsTotal && color < gdMaxColors) {
+-			im->alpha[color] = gdAlphaTransparent;
+-		} else {
+-			return;
+-		}
++		im->alpha[color] = gdAlphaTransparent;
+ 	}
+ 	im->transparent = color;
+ }

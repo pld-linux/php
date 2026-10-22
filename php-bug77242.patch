@@ -1,0 +1,35 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat Dec 29 17:56:36 2018 -0800
+Subject: [PATCH] Fix bug #77242 (heap out of bounds read in xmlrpc_decode())
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/0f2314ccedb6680c8df98f6bc4879397d426444f
+---
+diff --git a/ext/xmlrpc/libxmlrpc/xml_element.c b/ext/xmlrpc/libxmlrpc/xml_element.c
+--- a/ext/xmlrpc/libxmlrpc/xml_element.c
++++ b/ext/xmlrpc/libxmlrpc/xml_element.c
+@@ -723,6 +723,9 @@ xml_element* xml_elem_parse_buf(const char* in_buf, int len, XML_ELEM_INPUT_OPTI
+          long byte_idx = XML_GetCurrentByteIndex(parser);
+ /*         int byte_total = XML_GetCurrentByteCount(parser); */
+          const char * error_str = XML_ErrorString(err_code);
++         if(byte_idx > len) {
++             byte_idx = len;
++         }
+          if(byte_idx >= 0) {
+              snprintf(buf, 
+                       sizeof(buf),
+diff --git a/ext/xmlrpc/tests/bug77242.phpt b/ext/xmlrpc/tests/bug77242.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/xmlrpc/tests/bug77242.phpt
+@@ -0,0 +1,10 @@
++--TEST--
++Bug #77242 (heap out of bounds read in xmlrpc_decode())
++--SKIPIF--
++<?php if (!extension_loaded("xmlrpc")) print "skip"; ?>
++--FILE--
++<?php
++var_dump(xmlrpc_decode(base64_decode("PD94bWwgdmVyc2lvbmVuY29kaW5nPSJJU084ODU5NyKkpKSkpKSkpKSkpKSkpKSkpKSkpKSk")));
++?>
++--EXPECT--
++NULL
+\ No newline at end of file

@@ -1,0 +1,42 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Wed Aug 10 00:14:58 2016 -0700
+Subject: [PATCH] Fix bug #72730 - imagegammacorrect allows arbitrary write access
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/84dd1d396e2d93ed60f91fc07ce63b773309fb28
+---
+diff --git a/ext/gd/gd.c b/ext/gd/gd.c
+--- a/ext/gd/gd.c
++++ b/ext/gd/gd.c
+@@ -3180,6 +3180,11 @@ PHP_FUNCTION(imagegammacorrect)
+ 		return;
+ 	}
+ 
++	if ( input <= 0.0 || output <= 0.0 ) {
++		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Gamma values should be positive");
++		RETURN_FALSE;
++	}
++
+ 	ZEND_FETCH_RESOURCE(im, gdImagePtr, &IM, -1, "Image", le_gd);
+ 
+ 	if (gdImageTrueColor(im))	{
+diff --git a/ext/gd/tests/bug72730.phpt b/ext/gd/tests/bug72730.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug72730.phpt
+@@ -0,0 +1,15 @@
++--TEST--
++Bug #72730: imagegammacorrect allows arbitrary write access
++--SKIPIF--
++<?php 
++if (!function_exists("imagecreatetruecolor")) die("skip");
++?>
++--FILE--
++<?php
++$img =  imagecreatetruecolor(1, 1);
++imagegammacorrect($img, -1, 1337);
++?>
++DONE
++--EXPECTF--
++Warning: imagegammacorrect(): Gamma values should be positive in %sbug72730.php on line %d
++DONE
+\ No newline at end of file

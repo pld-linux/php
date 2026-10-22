@@ -1,0 +1,21 @@
+From: Anatol Belski <ab@php.net>
+Date: Mon Mar 28 00:45:19 2016 +0200
+Subject: [PATCH] Fixed bug #71527 Buffer over-write in finfo_open with malformed magic file
+
+The actual fix is applying the upstream patch from
+https://github.com/file/file/commit/6713ca45e7757297381f4b4cdb9cf5e624a9ad36
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/2c2ab294ee0150d38fab5c6dfcdef7eb7793ca5c
+---
+diff --git a/ext/fileinfo/libmagic/funcs.c b/ext/fileinfo/libmagic/funcs.c
+--- a/ext/fileinfo/libmagic/funcs.c
++++ b/ext/fileinfo/libmagic/funcs.c
+@@ -414,7 +414,7 @@ file_check_mem(struct magic_set *ms, unsigned int level)
+ 	size_t len;
+ 
+ 	if (level >= ms->c.len) {
+-		len = (ms->c.len += 20) * sizeof(*ms->c.li);
++		len = (ms->c.len = 20 + level) * sizeof(*ms->c.li);
+ 		ms->c.li = CAST(struct level_info *, (ms->c.li == NULL) ?
+ 		    emalloc(len) :
+ 		    erealloc(ms->c.li, len));

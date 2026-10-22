@@ -1,6 +1,6 @@
 --- php-4.3.3RC3/ext/standard/info.c.orig	2003-06-19 18:43:41.000000000 +0200
 +++ php-4.3.3RC3/ext/standard/info.c	2003-08-16 21:37:18.705836072 +0200
-@@ -518,6 +518,21 @@
+@@ -518,6 +518,19 @@
  			zend_html_puts(zend_version, strlen(zend_version) TSRMLS_CC);
  		}
  		php_info_print_box_end();
@@ -8,9 +8,7 @@
 +		php_info_print_box_start(0);
 +		if (expose_php && !sapi_module.phpinfo_as_text) {
 +			PUTS("<a href=\"http://www.pld-linux.org/\"><img src=\"");
-+			if (SG(request_info).request_uri) {
-+				PUTS(SG(request_info).request_uri);
-+			}
++			php_info_print_request_uri(TSRMLS_C);
 +			PUTS("?="PLD_LOGO_GUID"\" border=\"0\" align=\"right\" alt=\"PLD logo\"></a>\n");
 +		}
 +		PUTS("This server is using PLD Linux.");

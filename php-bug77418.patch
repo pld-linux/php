@@ -1,0 +1,81 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Jan 6 23:31:15 2019 -0800
+Subject: [PATCH] Fix bug #77418 - Heap overflow in utf32be_mbc_to_code
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/d656a88f3e4edba7d029e163b55739287c81fc9d
+---
+diff --git a/ext/mbstring/oniguruma/enc/utf16_be.c b/ext/mbstring/oniguruma/enc/utf16_be.c
+--- a/ext/mbstring/oniguruma/enc/utf16_be.c
++++ b/ext/mbstring/oniguruma/enc/utf16_be.c
+@@ -79,11 +79,13 @@ utf16be_mbc_to_code(const UChar* p, const UChar* end)
+   OnigCodePoint code;
+ 
+   if (UTF16_IS_SURROGATE_FIRST(*p)) {
++    if (end - p < 4) return 0;
+     code = ((((p[0] - 0xd8) << 2) + ((p[1] & 0xc0) >> 6) + 1) << 16)
+          + ((((p[1] & 0x3f) << 2) + (p[2] - 0xdc)) << 8)
+          + p[3];
+   }
+   else {
++    if (end - p < 2) return 0;
+     code = p[0] * 256 + p[1];
+   }
+   return code;
+diff --git a/ext/mbstring/oniguruma/enc/utf16_le.c b/ext/mbstring/oniguruma/enc/utf16_le.c
+--- a/ext/mbstring/oniguruma/enc/utf16_le.c
++++ b/ext/mbstring/oniguruma/enc/utf16_le.c
+@@ -82,11 +82,13 @@ utf16le_is_mbc_newline(const UChar* p, const UChar* end)
+ static OnigCodePoint
+ utf16le_mbc_to_code(const UChar* p, const UChar* end)
+ {
++  if (end - p < 2) return 0;
+   OnigCodePoint code;
+   UChar c0 = *p;
+   UChar c1 = *(p+1);
+ 
+   if (UTF16_IS_SURROGATE_FIRST(c1)) {
++    if (end - p < 4) return 0;
+     code = ((((c1 - 0xd8) << 2) + ((c0  & 0xc0) >> 6) + 1) << 16)
+          + ((((c0 & 0x3f) << 2) + (p[3] - 0xdc)) << 8)
+          + p[2];
+diff --git a/ext/mbstring/oniguruma/enc/utf32_be.c b/ext/mbstring/oniguruma/enc/utf32_be.c
+--- a/ext/mbstring/oniguruma/enc/utf32_be.c
++++ b/ext/mbstring/oniguruma/enc/utf32_be.c
+@@ -56,6 +56,7 @@ utf32be_is_mbc_newline(const UChar* p, const UChar* end)
+ static OnigCodePoint
+ utf32be_mbc_to_code(const UChar* p, const UChar* end)
+ {
++  if (end - p < 4) return 0;
+   return (OnigCodePoint )(((p[0] * 256 + p[1]) * 256 + p[2]) * 256 + p[3]);
+ }
+ 
+diff --git a/ext/mbstring/oniguruma/enc/utf32_le.c b/ext/mbstring/oniguruma/enc/utf32_le.c
+--- a/ext/mbstring/oniguruma/enc/utf32_le.c
++++ b/ext/mbstring/oniguruma/enc/utf32_le.c
+@@ -56,6 +56,7 @@ utf32le_is_mbc_newline(const UChar* p, const UChar* end)
+ static OnigCodePoint
+ utf32le_mbc_to_code(const UChar* p, const UChar* end)
+ {
++  if (end - p < 4) return 0;
+   return (OnigCodePoint )(((p[3] * 256 + p[2]) * 256 + p[1]) * 256 + p[0]);
+ }
+ 
+diff --git a/ext/mbstring/tests/bug77418.phpt b/ext/mbstring/tests/bug77418.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/mbstring/tests/bug77418.phpt
+@@ -0,0 +1,14 @@
++--TEST--
++Bug #77371 (Heap overflow in utf32be_mbc_to_code)
++--SKIPIF--
++<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
++--FILE--
++<?php
++mb_regex_encoding("UTF-32");
++var_dump(mb_split("\x00\x00\x00\x5c\x00\x00\x00B","000000000000000000000000000000"));
++?>
++--EXPECT--
++array(1) {
++  [0]=>
++  string(30) "000000000000000000000000000000"
++}

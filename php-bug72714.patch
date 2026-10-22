@@ -1,0 +1,133 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Tue Aug 16 20:36:33 2016 +0200
+Subject: [PATCH] Fix #72714: _xml_startElementHandler() segmentation fault
+
+The issue is caused by an integer overflow when the `long` passed as
+XML_OPTION_SKIP_TAGSTART is assigned to `xml_parser::toffset` which is
+declared as `int`. We can simply work around this issue, by clipping
+resulting negative values to 0 (and raising a notice in this case), because
+the reasonable range for this value is certainly catered to by positive
+`int`s.
+
+Source: upstream https://github.com/php/php-src/commit/9164dc11e2 (5.6.25); it also covers
+GHSA-wg4p-4hqh-c3g9, whose fix completes this one for PHP 7+ only
+---
+diff --git a/ext/xml/tests/bug72714.phpt b/ext/xml/tests/bug72714.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/xml/tests/bug72714.phpt
+@@ -0,0 +1,35 @@
++--TEST--
++Bug #72714 (_xml_startElementHandler() segmentation fault)
++--SKIPIF--
++<?php
++if (!extension_loaded('xml')) die('skip xml extension not available');
++?>
++--FILE--
++<?php
++function startElement($parser, $name, $attribs) {
++    var_dump($name);
++}
++
++function endElement($parser, $name) {}
++
++function parse($tagstart) {
++    $xml = '<ns1:total>867</ns1:total>';
++
++    $xml_parser = xml_parser_create();
++    xml_set_element_handler($xml_parser, 'startElement', 'endElement');
++
++    xml_parser_set_option($xml_parser, XML_OPTION_SKIP_TAGSTART, $tagstart);
++    xml_parse($xml_parser, $xml);
++
++    xml_parser_free($xml_parser);
++}
++
++parse(3015809298423721);
++parse(20);
++?>
++===DONE===
++--EXPECTF--
++Notice: xml_parser_set_option(): tagstart ignored in %s%ebug72714.php on line %d
++string(9) "NS1:TOTAL"
++string(0) ""
++===DONE===
+diff --git a/ext/xml/xml.c b/ext/xml/xml.c
+--- a/ext/xml/xml.c
++++ b/ext/xml/xml.c
+@@ -66,6 +66,10 @@ ZEND_GET_MODULE(xml)
+ #endif /* COMPILE_DL_XML */
+ /* }}} */
+ 
++
++#define SKIP_TAGSTART(str) ((str) + (parser->toffset > strlen(str) ? strlen(str) : + parser->toffset))
++
++
+ /* {{{ function prototypes */
+ PHP_MINIT_FUNCTION(xml);
+ PHP_MINFO_FUNCTION(xml);
+@@ -784,7 +788,7 @@ void _xml_startElementHandler(void *userData, const XML_Char *name, const XML_Ch
+ 
+ 		if (parser->startElementHandler) {
+ 			args[0] = _xml_resource_zval(parser->index);
+-			args[1] = _xml_string_zval(((char *) tag_name) + parser->toffset);
++			args[1] = _xml_string_zval(SKIP_TAGSTART((char *) tag_name));
+ 			MAKE_STD_ZVAL(args[2]);
+ 			array_init(args[2]);
+ 
+@@ -815,9 +819,9 @@ void _xml_startElementHandler(void *userData, const XML_Char *name, const XML_Ch
+ 				array_init(tag);
+ 				array_init(atr);
+ 
+-				_xml_add_to_info(parser,((char *) tag_name) + parser->toffset);
++				_xml_add_to_info(parser,SKIP_TAGSTART((char *) tag_name));
+ 
+-				add_assoc_string(tag,"tag",((char *) tag_name) + parser->toffset,1); /* cast to avoid gcc-warning */
++				add_assoc_string(tag,"tag",SKIP_TAGSTART((char *) tag_name),1);
+ 				add_assoc_string(tag,"type","open",1);
+ 				add_assoc_long(tag,"level",parser->level);
+ 
+@@ -869,7 +873,7 @@ void _xml_endElementHandler(void *userData, const XML_Char *name)
+ 
+ 		if (parser->endElementHandler) {
+ 			args[0] = _xml_resource_zval(parser->index);
+-			args[1] = _xml_string_zval(((char *) tag_name) + parser->toffset);
++			args[1] = _xml_string_zval(SKIP_TAGSTART((char *) tag_name));
+ 
+ 			if ((retval = xml_call_handler(parser, parser->endElementHandler, parser->endElementPtr, 2, args))) {
+ 				zval_ptr_dtor(&retval);
+@@ -886,9 +890,9 @@ void _xml_endElementHandler(void *userData, const XML_Char *name)
+ 
+ 				array_init(tag);
+ 				  
+-				_xml_add_to_info(parser,((char *) tag_name) + parser->toffset);
++				_xml_add_to_info(parser,SKIP_TAGSTART((char *) tag_name));
+ 
+-				add_assoc_string(tag,"tag",((char *) tag_name) + parser->toffset,1); /* cast to avoid gcc-warning */
++				add_assoc_string(tag,"tag",SKIP_TAGSTART((char *) tag_name),1);
+ 				add_assoc_string(tag,"type","close",1);
+ 				add_assoc_long(tag,"level",parser->level);
+ 				  
+@@ -989,9 +993,9 @@ void _xml_characterDataHandler(void *userData, const XML_Char *s, int len)
+ 
+ 						array_init(tag);
+ 
+-						_xml_add_to_info(parser,parser->ltags[parser->level-1] + parser->toffset);
++						_xml_add_to_info(parser,SKIP_TAGSTART(parser->ltags[parser->level-1]));
+ 
+-						add_assoc_string(tag,"tag",parser->ltags[parser->level-1] + parser->toffset,1);
++						add_assoc_string(tag,"tag",SKIP_TAGSTART(parser->ltags[parser->level-1]),1);
+ 						add_assoc_string(tag,"value",decoded_value,0);
+ 						add_assoc_string(tag,"type","cdata",1);
+ 						add_assoc_long(tag,"level",parser->level);
+@@ -1632,6 +1636,10 @@ PHP_FUNCTION(xml_parser_set_option)
+ 		case PHP_XML_OPTION_SKIP_TAGSTART:
+ 			convert_to_long_ex(val);
+ 			parser->toffset = Z_LVAL_PP(val);
++			if (parser->toffset < 0) {
++				php_error_docref(NULL TSRMLS_CC, E_NOTICE, "tagstart ignored");
++				parser->toffset = 0;
++			}
+ 			break;
+ 		case PHP_XML_OPTION_SKIP_WHITE:
+ 			convert_to_long_ex(val);

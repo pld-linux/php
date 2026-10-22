@@ -1,0 +1,41 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Apr 24 23:50:57 2016 -0700
+Subject: [PATCH] Fix bug #72099: xml_parse_into_struct segmentation fault
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/aec9a773e31482d5b62fe7c546d06d746e920ba8
+---
+diff --git a/ext/xml/tests/bug72099.phpt b/ext/xml/tests/bug72099.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/xml/tests/bug72099.phpt
+@@ -0,0 +1,17 @@
++--TEST--
++Bug #72099: xml_parse_into_struct segmentation fault
++--SKIPIF--
++<?php
++require_once("skipif.inc");
++?>
++--FILE--
++<?php
++$var1=xml_parser_create_ns();
++$var2=str_repeat("a", 10);
++$var3=[];
++$var4=[];
++xml_parse_into_struct($var1, $var2, $var3, $var4);
++var_dump($var3);
++--EXPECT--
++array(0) {
++}
+\ No newline at end of file
+diff --git a/ext/xml/xml.c b/ext/xml/xml.c
+--- a/ext/xml/xml.c
++++ b/ext/xml/xml.c
+@@ -984,7 +984,7 @@ void _xml_characterDataHandler(void *userData, const XML_Char *s, int len)
+ 						}
+ 					}
+ 
+-					if (parser->level <= XML_MAXLEVEL) {
++					if (parser->level <= XML_MAXLEVEL && parser->level > 0) {
+ 						MAKE_STD_ZVAL(tag);
+ 
+ 						array_init(tag);

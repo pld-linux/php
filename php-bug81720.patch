@@ -1,0 +1,123 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Tue May 17 12:59:23 2022 +0200
+Subject: [PATCH] Fix #81720: Uninitialized array in pg_query_params() leading to RCE
+
+We must not free parameters which we haven't initialized yet.
+
+We also fix the not directly related issue, that we checked for the
+wrong value being `NULL`, potentially causing a segfault.
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/5d3fbd6e0a3dc2ad02416a1ec737e3f928e9cd43
+---
+diff --git a/ext/pgsql/pgsql.c b/ext/pgsql/pgsql.c
+--- a/ext/pgsql/pgsql.c
++++ b/ext/pgsql/pgsql.c
+@@ -1859,7 +1859,7 @@ PHP_FUNCTION(pg_query_params)
+ 		for(i = 0; i < num_params; i++) {
+ 			if (zend_hash_get_current_data(Z_ARRVAL_P(pv_param_arr), (void **) &tmp) == FAILURE) {
+ 				php_error_docref(NULL TSRMLS_CC, E_WARNING,"Error getting parameter");
+-				_php_pgsql_free_params(params, num_params);
++				_php_pgsql_free_params(params, i);
+ 				RETURN_FALSE;
+ 			}
+ 
+@@ -1872,7 +1872,7 @@ PHP_FUNCTION(pg_query_params)
+ 				if (Z_TYPE(tmp_val) != IS_STRING) {
+ 					php_error_docref(NULL TSRMLS_CC, E_WARNING,"Error converting parameter");
+ 					zval_dtor(&tmp_val);
+-					_php_pgsql_free_params(params, num_params);
++					_php_pgsql_free_params(params, i);
+ 					RETURN_FALSE;
+ 				}
+ 				params[i] = estrndup(Z_STRVAL(tmp_val), Z_STRLEN(tmp_val));
+@@ -2066,7 +2066,7 @@ PHP_FUNCTION(pg_execute)
+ 		for(i = 0; i < num_params; i++) {
+ 			if (zend_hash_get_current_data(Z_ARRVAL_P(pv_param_arr), (void **) &tmp) == FAILURE) {
+ 				php_error_docref(NULL TSRMLS_CC, E_WARNING,"Error getting parameter");
+-				_php_pgsql_free_params(params, num_params);
++				_php_pgsql_free_params(params, i);
+ 				RETURN_FALSE;
+ 			}
+ 
+@@ -2079,7 +2079,7 @@ PHP_FUNCTION(pg_execute)
+ 				if (Z_TYPE(tmp_val) != IS_STRING) {
+ 					php_error_docref(NULL TSRMLS_CC, E_WARNING,"Error converting parameter");
+ 					zval_dtor(&tmp_val);
+-					_php_pgsql_free_params(params, num_params);
++					_php_pgsql_free_params(params, i);
+ 					RETURN_FALSE;
+ 				}
+ 				params[i] = estrndup(Z_STRVAL(tmp_val), Z_STRLEN(tmp_val));
+@@ -4738,7 +4738,7 @@ PHP_FUNCTION(pg_send_query_params)
+ 		for(i = 0; i < num_params; i++) {
+ 			if (zend_hash_get_current_data(Z_ARRVAL_P(pv_param_arr), (void **) &tmp) == FAILURE) {
+ 				php_error_docref(NULL TSRMLS_CC, E_WARNING,"Error getting parameter");
+-				_php_pgsql_free_params(params, num_params);
++				_php_pgsql_free_params(params, i);
+ 				RETURN_FALSE;
+ 			}
+ 
+@@ -4751,7 +4751,7 @@ PHP_FUNCTION(pg_send_query_params)
+ 				if (Z_TYPE(tmp_val) != IS_STRING) {
+ 					php_error_docref(NULL TSRMLS_CC, E_WARNING,"Error converting parameter");
+ 					zval_dtor(&tmp_val);
+-					_php_pgsql_free_params(params, num_params);
++					_php_pgsql_free_params(params, i);
+ 					RETURN_FALSE;
+ 				}
+ 				params[i] = estrndup(Z_STRVAL(tmp_val), Z_STRLEN(tmp_val));
+@@ -4893,7 +4893,7 @@ PHP_FUNCTION(pg_send_execute)
+ 		for(i = 0; i < num_params; i++) {
+ 			if (zend_hash_get_current_data(Z_ARRVAL_P(pv_param_arr), (void **) &tmp) == FAILURE) {
+ 				php_error_docref(NULL TSRMLS_CC, E_WARNING,"Error getting parameter");
+-				_php_pgsql_free_params(params, num_params);
++				_php_pgsql_free_params(params, i);
+ 				RETURN_FALSE;
+ 			}
+ 
+@@ -4906,7 +4906,7 @@ PHP_FUNCTION(pg_send_execute)
+ 				if (Z_TYPE(tmp_val) != IS_STRING) {
+ 					php_error_docref(NULL TSRMLS_CC, E_WARNING,"Error converting parameter");
+ 					zval_dtor(&tmp_val);
+-					_php_pgsql_free_params(params, num_params);
++					_php_pgsql_free_params(params, i);
+ 					RETURN_FALSE;
+ 				}
+ 				params[i] = estrndup(Z_STRVAL(tmp_val), Z_STRLEN(tmp_val));
+diff --git a/ext/pgsql/tests/bug81720.phpt b/ext/pgsql/tests/bug81720.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/pgsql/tests/bug81720.phpt
+@@ -0,0 +1,31 @@
++--TEST--
++Bug #81720 (Uninitialized array in pg_query_params() leading to RCE)
++--SKIPIF--
++<?php include("skipif.inc"); ?>
++--FILE--
++<?php
++include('config.inc');
++
++$conn = pg_connect($conn_str);
++set_error_handler(function ($severity, $message) {
++    throw new Exception($message);
++});
++
++try {
++    pg_query_params($conn, 'SELECT $1, $2', array(1, new stdClass()));
++} catch (Exception $ex) {
++    echo $ex->getMessage(), PHP_EOL;
++}
++
++try {
++    pg_send_prepare($conn, "my_query", 'SELECT $1, $2');
++    pg_get_result($conn);
++    pg_send_execute($conn, "my_query", array(1, new stdClass()));
++} catch (Exception $ex) {
++    echo $ex->getMessage(), PHP_EOL;
++}
++restore_error_handler();
++?>
++--EXPECT--
++Object of class stdClass could not be converted to string
++Object of class stdClass could not be converted to string
+\ No newline at end of file

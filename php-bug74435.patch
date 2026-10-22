@@ -1,0 +1,55 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Tue Jun 20 16:45:42 2017 +0200
+Subject: [PATCH] Fix #74435: Buffer over-read into uninitialized memory
+
+The stack allocated color map buffers were not zeroed before usage, and
+so undefined palette indexes could cause information leakage.
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/2d6a5b9ac7b683dd3a6374a67e478c5ff745351d
+Binary test fixtures not included: ext/gd/tests/bug74435.gif
+---
+diff --git a/ext/gd/libgd/gd_gif_in.c b/ext/gd/libgd/gd_gif_in.c
+--- a/ext/gd/libgd/gd_gif_in.c
++++ b/ext/gd/libgd/gd_gif_in.c
+@@ -147,6 +147,9 @@ gdImagePtr gdImageCreateFromGifCtx(gdIOCtxPtr fd) /* {{{ */
+ 	int haveGlobalColormap;
+ 	gdImagePtr im = 0;
+ 
++	memset(ColorMap, 0, 3 * MAXCOLORMAPSIZE);
++	memset(localColorMap, 0, 3 * MAXCOLORMAPSIZE);
++
+ 	/*1.4//imageNumber = 1; */
+ 	if (! ReadOK(fd,buf,6)) {
+ 		return 0;
+diff --git a/ext/gd/tests/bug74435.phpt b/ext/gd/tests/bug74435.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug74435.phpt
+@@ -0,0 +1,27 @@
++--TEST--
++Bug #74435 (Buffer over-read into uninitialized memory)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++?>
++--FILE--
++<?php
++$im = imagecreatefromgif(__DIR__ . DIRECTORY_SEPARATOR . 'bug74435.gif');
++var_dump($im);
++$width = imagesx($im);
++$height = imagesy($im);
++for ($i = 0; $i < $width; $i += 16) {
++    for ($j = 0; $j < $height; $j += 16) {
++        if (($index = imagecolorat($im, $i, $j)) >= 2) {
++            list($red, $green, $blue, $alpha) = array_values(imagecolorsforindex($im, $index));
++            if ($red !== 0 || $green !== 0 || $blue !== 0 || $alpha !== 0) {
++                echo "unexpected color at ($i, $j)\n";
++            }
++        }
++    }
++}
++?>
++===DONE===
++--EXPECTF--
++resource(%d) of type (gd)
++===DONE===

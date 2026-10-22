@@ -1,0 +1,43 @@
+From: Kalle Sommer Nielsen <kalle@php.net>
+Date: Sat Aug 6 10:17:49 2016 +0200
+Subject: [PATCH] Check the return value of dbconvert() in mssql_guid_string(), as it may return -1 in case the conversion failed. In that case false is returned.
+
+Also initialize buffer and buffer2 to NULL, which should fix bug #72039 (Use of uninitialised value on mssql_guid_string).
+
+This only applies to 5.6, as we do not have mssql in 7.0 anymore
+
+Source: upstream https://github.com/php/php-src/commit/5e2b8349b4 (5.6.29), array initializers as in 5.6.40
+---
+diff --git a/ext/mssql/php_mssql.c b/ext/mssql/php_mssql.c
+--- a/ext/mssql/php_mssql.c
++++ b/ext/mssql/php_mssql.c
+@@ -2230,21 +2230,24 @@ PHP_FUNCTION(mssql_guid_string)
+ 	char *binary;
+ 	int binary_len;
+ 	zend_bool sf = 0;
+-	char buffer[32+1];
+-	char buffer2[36+1];
++	char buffer[32+1] = { 0 };
+ 
+ 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|b", &binary, &binary_len, &sf) == FAILURE) {
+ 		return;
+ 	}
+ 
+-	dbconvert(NULL, SQLBINARY, (BYTE*) binary, MIN(16, binary_len), SQLCHAR, buffer, -1);
++	if (dbconvert(NULL, SQLBINARY, (BYTE*) binary, MIN(16, binary_len), SQLCHAR, buffer, (DBINT) -1) == -1) {
++		php_error_docref(NULL TSRMLS_CC, E_WARNING, "could not convert binary string to GUID string");
++		RETURN_FALSE;
++	}
+ 
+ 	if (sf) {
+ 		php_strtoupper(buffer, 32);
+ 		RETURN_STRING(buffer, 1);
+-	}
+-	else {
++	} else {
+ 		int i;
++		char buffer2[36+1] = { 0 };
++
+ 		/* FIXME this works only on little endian machine */
+ 		for (i=0; i<4; i++) {
+ 			buffer2[2*i] = buffer[6-2*i];

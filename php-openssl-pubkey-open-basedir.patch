@@ -1,0 +1,24 @@
+From: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date: Thu Oct 22 10:27:34 2026 +0200
+Subject: [PATCH] openssl: check open_basedir before reading a public key file
+
+php_openssl_evp_from_zval() falls back to reading a "file://" argument as a
+PEM public key when it is not a certificate; unlike the private key branch it
+opened the file without the open_basedir check that the certificate attempt
+had just refused.
+
+Source: PLD
+---
+diff --git a/ext/openssl/openssl.c b/ext/openssl/openssl.c
+--- a/ext/openssl/openssl.c
++++ b/ext/openssl/openssl.c
+@@ -2890,6 +2890,9 @@ static EVP_PKEY * php_openssl_evp_from_zval(zval ** val, int public_key, char *
+ 				/* not a X509 certificate, try to retrieve public key */
+ 				BIO* in;
+ 				if (filename) {
++					if (php_openssl_open_base_dir_chk(filename TSRMLS_CC)) {
++						TMP_CLEAN;
++					}
+ 					in = BIO_new_file(filename, "r");
+ 				} else {
+ 					in = BIO_new_mem_buf(Z_STRVAL_PP(val), Z_STRLEN_PP(val));

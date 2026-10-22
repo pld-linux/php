@@ -1,0 +1,17 @@
+From: libnex <emmanuel.law@gmail.com>
+Date: Mon May 29 13:13:52 2017 +0000
+Subject: [PATCH] Fixed bug #73473: Stack Buffer Overflow in msgfmt_parse_message
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/821d75fe7ab33bd6eefc219199fbcff50c9cdb2c
+---
+diff --git a/ext/intl/msgformat/msgformat_parse.c b/ext/intl/msgformat/msgformat_parse.c
+--- a/ext/intl/msgformat/msgformat_parse.c
++++ b/ext/intl/msgformat/msgformat_parse.c
+@@ -110,6 +110,7 @@ PHP_FUNCTION( msgfmt_parse_message )
+ 		RETURN_FALSE;
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(slocale_len);
+ 	msgformat_data_init(&mfo->mf_data TSRMLS_CC);
+ 
+ 	if(pattern && pattern_len) {

@@ -1,0 +1,18 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat Jun 18 21:04:33 2016 -0700
+Subject: [PATCH] Fix bug #72298	pass2_no_dither out-of-bounds access
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/d0b7b70b467079515d9f2301c18c4ae8b0c12961
+---
+diff --git a/ext/gd/libgd/gd_topal.c b/ext/gd/libgd/gd_topal.c
+--- a/ext/gd/libgd/gd_topal.c
++++ b/ext/gd/libgd/gd_topal.c
+@@ -1329,7 +1329,7 @@ pass2_no_dither (j_decompress_ptr cinfo,
+ 	  /* If the pixel is transparent, we assign it the palette index that
+ 	   * will later be added at the end of the palette as the transparent
+ 	   * index. */
+-	  if ((oim->transparent >= 0) && (oim->transparent == *(inptr - 1)))
++	  if ((oim->transparent >= 0) && (oim->transparent == *inptr))
+ 	    {
+ 	      *outptr++ = nim->colorsTotal;
+ 	      inptr++;

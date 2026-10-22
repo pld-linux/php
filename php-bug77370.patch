@@ -1,0 +1,41 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat Dec 29 19:51:24 2018 -0800
+Subject: [PATCH] Fix bug #77370 - check that we do not read past buffer end when parsing multibytes
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/0a45012ff384b8f06258b2470357dded882ab624
+---
+diff --git a/ext/mbstring/oniguruma/regparse.c b/ext/mbstring/oniguruma/regparse.c
+--- a/ext/mbstring/oniguruma/regparse.c
++++ b/ext/mbstring/oniguruma/regparse.c
+@@ -262,11 +262,13 @@ strdup_with_null(OnigEncoding enc, UChar* s, UChar* end)
+ #define PINC       do { \
+   pfetch_prev = p; \
+   p += ONIGENC_MBC_ENC_LEN(enc, p); \
++  if(UNEXPECTED(p > end)) p = end; \
+ } while (0)
+ #define PFETCH(c)  do { \
+   c = ONIGENC_MBC_TO_CODE(enc, p, end); \
+   pfetch_prev = p; \
+   p += ONIGENC_MBC_ENC_LEN(enc, p); \
++  if(UNEXPECTED(p > end)) p = end; \
+ } while (0)
+ 
+ #define PPEEK        (p < end ? ONIGENC_MBC_TO_CODE(enc, p, end) : PEND_VALUE)
+diff --git a/ext/mbstring/tests/bug77370.phpt b/ext/mbstring/tests/bug77370.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/mbstring/tests/bug77370.phpt
+@@ -0,0 +1,13 @@
++--TEST--
++Bug #77370 (Buffer overflow on mb regex functions - fetch_token)
++--SKIPIF--
++<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
++--FILE--
++<?php
++var_dump(mb_split("   \xfd",""));
++?>
++--EXPECT--
++array(1) {
++  [0]=>
++  string(0) ""
++}

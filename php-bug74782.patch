@@ -1,0 +1,396 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Jul 2 13:29:37 2017 -0700
+Subject: [PATCH] Fix bug #74782: remove file name from output to avoid XSS
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/eab11d45719c7e3905f6acbf4382ff8c000b2811
+---
+diff --git a/ext/phar/shortarc.php b/ext/phar/shortarc.php
+--- a/ext/phar/shortarc.php
++++ b/ext/phar/shortarc.php
+@@ -74,7 +74,7 @@ if (@(isset($_SERVER['REQUEST_URI']) && isset($_SERVER['REQUEST_METHOD']) && ($_
+     $a = realpath(Extract_Phar::$temp . DIRECTORY_SEPARATOR . $pt);
+     if (!$a || strlen(dirname($a)) < strlen(Extract_Phar::$temp)) {
+         header('HTTP/1.0 404 Not Found');
+-        echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File ", $pt, " Not Found</h1>\n </body>\n</html>";
++        echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File Not Found</h1>\n </body>\n</html>";
+         exit;
+     }
+     $b = pathinfo($a);
+diff --git a/ext/phar/stub.h b/ext/phar/stub.h
+--- a/ext/phar/stub.h
++++ b/ext/phar/stub.h
+@@ -22,13 +22,13 @@ static inline void phar_get_stub(const char *index_php, const char *web, size_t
+ {
+ 	static const char newstub0[] = "<?php\n\n$web = '";
+ 	static const char newstub1_0[] = "';\n\nif (in_array('phar', stream_get_wrappers()) && class_exists('Phar', 0)) {\nPhar::interceptFileFuncs();\nset_include_path('phar://' . __FILE__ . PATH_SEPARATOR . get_include_path());\nPhar::webPhar(null, $web);\ninclude 'phar://' . __FILE__ . '/' . Extract_Phar::START;\nreturn;\n}\n\nif (@(isset($_SERVER['REQUEST_URI']) && isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'GET' || $_SERVER['REQUEST_METHOD'] == 'POST'))) {\nExtract_Phar::go(true);\n$mimes = array(\n'phps' => 2,\n'c' => 'text/plain',\n'cc' => 'text/plain',\n'cpp' => 'text/plain',\n'c++' => 'text/plain',\n'dtd' => 'text/plain',\n'h' => 'text/plain',\n'log' => 'text/plain',\n'rng' => 'text/plain',\n'txt' => 'text/plain',\n'xsd' => 'text/plain',\n'php' => 1,\n'inc' => 1,\n'avi' => 'video/avi',\n'bmp' => 'image/bmp',\n'css' => 'text/css',\n'gif' => 'image/gif',\n'htm' => 'text/html',\n'html' => 'text/html',\n'htmls' => 'text/html',\n'ico' => 'image/x-ico',\n'jpe' => 'image/jpeg',\n'jpg' => 'image/jpeg',\n'jpeg' => 'image/jpeg',\n'js' => 'application/x-javascript',\n'midi' => 'audio/midi',\n'mid' => 'audio/midi',\n'mod' => 'audio/mod',\n'mov' => 'movie/quicktime',\n'mp3' => 'audio/mp3',\n'mpg' => 'video/mpeg',\n'mpeg' => 'video/mpeg',\n'pdf' => 'application/pdf',\n'png' => 'image/png',\n'swf' => 'application/shockwave-flash',\n'tif' => 'image/tiff',\n'tiff' => 'image/tiff',\n'wav' => 'audio/wav',\n'xbm' => 'image/xbm',\n'xml' => 'text/xml',\n);\n\nheader(\"Cache-Control: no-cache, must-revalidate\");\nheader(\"Pragma: no-cache\");\n\n$basename = basename(__FILE__);\nif (!strpos($_SERVER['REQUEST_URI'], $basename)) {\nchdir(Extract_Phar::$temp);\ninclude $web;\nreturn;\n}\n$pt = substr($_SERVER['REQUEST_URI'], strpos($_SERVER['REQUEST_URI'], $basename) + strlen($basename));\nif (!$pt || $pt == '/') {\n$pt = $web;\nheader('HTTP/1.1 301 Moved Permanently');\nheader('Location: ' . $_SERVER['REQUEST_URI'] . '/' . $pt);\nexit;\n}\n$a = realpath(Extract_Phar::$temp . DIRECTORY_SEPARATOR . $pt);\nif (!$a || strlen(dirname($a)) < strlen(";
+-	static const char newstub1_1[] = "Extract_Phar::$temp)) {\nheader('HTTP/1.0 404 Not Found');\necho \"<html>\\n <head>\\n  <title>File Not Found<title>\\n </head>\\n <body>\\n  <h1>404 - File \", $pt, \" Not Found</h1>\\n </body>\\n</html>\";\nexit;\n}\n$b = pathinfo($a);\nif (!isset($b['extension'])) {\nheader('Content-Type: text/plain');\nheader('Content-Length: ' . filesize($a));\nreadfile($a);\nexit;\n}\nif (isset($mimes[$b['extension']])) {\nif ($mimes[$b['extension']] === 1) {\ninclude $a;\nexit;\n}\nif ($mimes[$b['extension']] === 2) {\nhighlight_file($a);\nexit;\n}\nheader('Content-Type: ' .$mimes[$b['extension']]);\nheader('Content-Length: ' . filesize($a));\nreadfile($a);\nexit;\n}\n}\n\nclass Extract_Phar\n{\nstatic $temp;\nstatic $origdir;\nconst GZ = 0x1000;\nconst BZ2 = 0x2000;\nconst MASK = 0x3000;\nconst START = '";
++	static const char newstub1_1[] = "Extract_Phar::$temp)) {\nheader('HTTP/1.0 404 Not Found');\necho \"<html>\\n <head>\\n  <title>File Not Found<title>\\n </head>\\n <body>\\n  <h1>404 - File Not Found</h1>\\n </body>\\n</html>\";\nexit;\n}\n$b = pathinfo($a);\nif (!isset($b['extension'])) {\nheader('Content-Type: text/plain');\nheader('Content-Length: ' . filesize($a));\nreadfile($a);\nexit;\n}\nif (isset($mimes[$b['extension']])) {\nif ($mimes[$b['extension']] === 1) {\ninclude $a;\nexit;\n}\nif ($mimes[$b['extension']] === 2) {\nhighlight_file($a);\nexit;\n}\nheader('Content-Type: ' .$mimes[$b['extension']]);\nheader('Content-Length: ' . filesize($a));\nreadfile($a);\nexit;\n}\n}\n\nclass Extract_Phar\n{\nstatic $temp;\nstatic $origdir;\nconst GZ = 0x1000;\nconst BZ2 = 0x2000;\nconst MASK = 0x3000;\nconst START = '";
+ 	static const char newstub2[] = "';\nconst LEN = ";
+ 	static const char newstub3_0[] = ";\n\nstatic function go($return = false)\n{\n$fp = fopen(__FILE__, 'rb');\nfseek($fp, self::LEN);\n$L = unpack('V', $a = (binary)fread($fp, 4));\n$m = (binary)'';\n\ndo {\n$read = 8192;\nif ($L[1] - strlen($m) < 8192) {\n$read = $L[1] - strlen($m);\n}\n$last = (binary)fread($fp, $read);\n$m .= $last;\n} while (strlen($last) && strlen($m) < $L[1]);\n\nif (strlen($m) < $L[1]) {\ndie('ERROR: manifest length read was \"' .\nstrlen($m) .'\" should be \"' .\n$L[1] . '\"');\n}\n\n$info = self::_unpack($m);\n$f = $info['c'];\n\nif ($f & self::GZ) {\nif (!function_exists('gzinflate')) {\ndie('Error: zlib extension is not enabled -' .\n' gzinflate() function needed for zlib-compressed .phars');\n}\n}\n\nif ($f & self::BZ2) {\nif (!function_exists('bzdecompress')) {\ndie('Error: bzip2 extension is not enabled -' .\n' bzdecompress() function needed for bz2-compressed .phars');\n}\n}\n\n$temp = self::tmpdir();\n\nif (!$temp || !is_writable($temp)) {\n$sessionpath = session_save_path();\nif (strpos ($sessionpath, \";\") !== false)\n$sessionpath = substr ($sessionpath, strpos ($sessionpath, \";\")+1);\nif (!file_exists($sessionpath) || !is_dir($sessionpath)) {\ndie('Could not locate temporary directory to extract phar');\n}\n$temp = $sessionpath;\n}\n\n$temp .= '/pharextract/'.basename(__FILE__, '.phar');\nself::$temp = $temp;\nself::$origdir = getcwd();\n@mkdir($temp, 0777, true);\n$temp = realpath($temp);\n\nif (!file_exists($temp . DIRECTORY_SEPARATOR . md5_file(__FILE__))) {\nself::_removeTmpFiles($temp, getcwd());\n@mkdir($temp, 0777, true);\n@file_put_contents($temp . '/' . md5_file(__FILE__), '');\n\nforeach ($info['m'] as $path => $file) {\n$a = !file_exists(dirname($temp . '/' . $path));\n@mkdir(dirname($temp . '/' . $path), 0777, true);\nclearstatcache();\n\nif ($path[strlen($path) - 1] == '/') {\n@mkdir($temp . '/' . $path, 0777);\n} else {\nfile_put_contents($temp . '/' . $path, self::extractFile($path, $file, $fp));\n@chmod($temp . '/' . $path, 0666);\n}\n}\n}\n\nchdir($temp);\n\nif (!$return) {\ninclude self::ST";
+ 	static const char newstub3_1[] = "ART;\n}\n}\n\nstatic function tmpdir()\n{\nif (strpos(PHP_OS, 'WIN') !== false) {\nif ($var = getenv('TMP') ? getenv('TMP') : getenv('TEMP')) {\nreturn $var;\n}\nif (is_dir('/temp') || mkdir('/temp')) {\nreturn realpath('/temp');\n}\nreturn false;\n}\nif ($var = getenv('TMPDIR')) {\nreturn $var;\n}\nreturn realpath('/tmp');\n}\n\nstatic function _unpack($m)\n{\n$info = unpack('V', substr($m, 0, 4));\n $l = unpack('V', substr($m, 10, 4));\n$m = substr($m, 14 + $l[1]);\n$s = unpack('V', substr($m, 0, 4));\n$o = 0;\n$start = 4 + $s[1];\n$ret['c'] = 0;\n\nfor ($i = 0; $i < $info[1]; $i++) {\n $len = unpack('V', substr($m, $start, 4));\n$start += 4;\n $savepath = substr($m, $start, $len[1]);\n$start += $len[1];\n   $ret['m'][$savepath] = array_values(unpack('Va/Vb/Vc/Vd/Ve/Vf', substr($m, $start, 24)));\n$ret['m'][$savepath][3] = sprintf('%u', $ret['m'][$savepath][3]\n& 0xffffffff);\n$ret['m'][$savepath][7] = $o;\n$o += $ret['m'][$savepath][2];\n$start += 24 + $ret['m'][$savepath][5];\n$ret['c'] |= $ret['m'][$savepath][4] & self::MASK;\n}\nreturn $ret;\n}\n\nstatic function extractFile($path, $entry, $fp)\n{\n$data = '';\n$c = $entry[2];\n\nwhile ($c) {\nif ($c < 8192) {\n$data .= @fread($fp, $c);\n$c = 0;\n} else {\n$c -= 8192;\n$data .= @fread($fp, 8192);\n}\n}\n\nif ($entry[4] & self::GZ) {\n$data = gzinflate($data);\n} elseif ($entry[4] & self::BZ2) {\n$data = bzdecompress($data);\n}\n\nif (strlen($data) != $entry[0]) {\ndie(\"Invalid internal .phar file (size error \" . strlen($data) . \" != \" .\n$stat[7] . \")\");\n}\n\nif ($entry[3] != sprintf(\"%u\", crc32((binary)$data) & 0xffffffff)) {\ndie(\"Invalid internal .phar file (checksum error)\");\n}\n\nreturn $data;\n}\n\nstatic function _removeTmpFiles($temp, $origdir)\n{\nchdir($temp);\n\nforeach (glob('*') as $f) {\nif (file_exists($f)) {\nis_dir($f) ? @rmdir($f) : @unlink($f);\nif (file_exists($f) && is_dir($f)) {\nself::_removeTmpFiles($f, getcwd());\n}\n}\n}\n\n@rmdir($temp);\nclearstatcache();\nchdir($origdir);\n}\n}\n\nExtract_Phar::go();\n__HALT_COMPIL";
+ 	static const char newstub3_2[] = "ER(); ?>";
+ 
+-	static const int newstub_len = 6665;
++	static const int newstub_len = 6655;
+ 
+ 	*len = spprintf(stub, name_len + web_len + newstub_len, "%s%s%s%s%s%s%d%s%s%s", newstub0, web, newstub1_0, newstub1_1, index_php, newstub2, name_len + web_len + newstub_len, newstub3_0, newstub3_1, newstub3_2);
+ }
+diff --git a/ext/phar/tests/cache_list/copyonwrite11.phar.phpt b/ext/phar/tests/cache_list/copyonwrite11.phar.phpt
+--- a/ext/phar/tests/cache_list/copyonwrite11.phar.phpt
++++ b/ext/phar/tests/cache_list/copyonwrite11.phar.phpt
+@@ -18,5 +18,5 @@ echo strlen($p2->getStub()),"\n";
+ echo "ok\n";
+ __HALT_COMPILER(); ?>
+ "
+-6685
++6675
+ ok
+\ No newline at end of file
+diff --git a/ext/phar/tests/phar_commitwrite.phpt b/ext/phar/tests/phar_commitwrite.phpt
+--- a/ext/phar/tests/phar_commitwrite.phpt
++++ b/ext/phar/tests/phar_commitwrite.phpt
+@@ -29,7 +29,7 @@ unlink(dirname(__FILE__) . '/brandnewphar.phar');
+ __HALT_COMPILER();
+ ?>
+ --EXPECT--
+-int(6683)
++int(6673)
+ string(200) "<?php
+ function __autoload($class)
+ {
+diff --git a/ext/phar/tests/phar_convert_repeated.phpt b/ext/phar/tests/phar_convert_repeated.phpt
+--- a/ext/phar/tests/phar_convert_repeated.phpt
++++ b/ext/phar/tests/phar_convert_repeated.phpt
+@@ -123,7 +123,7 @@ NULL
+ bool(true)
+ bool(false)
+ bool(false)
+-int(6683)
++int(6673)
+ NULL
+ ================= convertToZip() =====================
+ bool(false)
+diff --git a/ext/phar/tests/phar_create_in_cwd.phpt b/ext/phar/tests/phar_create_in_cwd.phpt
+--- a/ext/phar/tests/phar_create_in_cwd.phpt
++++ b/ext/phar/tests/phar_create_in_cwd.phpt
+@@ -32,7 +32,7 @@ __HALT_COMPILER();
+ unlink(dirname(__FILE__) . '/brandnewphar.phar');
+ ?>
+ --EXPECT--
+-int(6683)
++int(6673)
+ string(200) "<?php
+ function __autoload($class)
+ {
+diff --git a/ext/phar/tests/phar_createdefaultstub.phpt b/ext/phar/tests/phar_createdefaultstub.phpt
+--- a/ext/phar/tests/phar_createdefaultstub.phpt
++++ b/ext/phar/tests/phar_createdefaultstub.phpt
+@@ -34,7 +34,7 @@ echo $e->getMessage() . "\n";
+ ?>
+ ===DONE===
+ --EXPECT--
+-string(6683) "<?php
++string(6673) "<?php
+ 
+ $web = 'index.php';
+ 
+@@ -110,7 +110,7 @@ exit;
+ $a = realpath(Extract_Phar::$temp . DIRECTORY_SEPARATOR . $pt);
+ if (!$a || strlen(dirname($a)) < strlen(Extract_Phar::$temp)) {
+ header('HTTP/1.0 404 Not Found');
+-echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File ", $pt, " Not Found</h1>\n </body>\n</html>";
++echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File Not Found</h1>\n </body>\n</html>";
+ exit;
+ }
+ $b = pathinfo($a);
+@@ -144,7 +144,7 @@ const GZ = 0x1000;
+ const BZ2 = 0x2000;
+ const MASK = 0x3000;
+ const START = 'index.php';
+-const LEN = 6685;
++const LEN = 6675;
+ 
+ static function go($return = false)
+ {
+@@ -328,7 +328,7 @@ Extract_Phar::go();
+ __HALT_COMPILER(); ?>"
+ ============================================================================
+ ============================================================================
+-string(6694) "<?php
++string(6684) "<?php
+ 
+ $web = 'index.php';
+ 
+@@ -404,7 +404,7 @@ exit;
+ $a = realpath(Extract_Phar::$temp . DIRECTORY_SEPARATOR . $pt);
+ if (!$a || strlen(dirname($a)) < strlen(Extract_Phar::$temp)) {
+ header('HTTP/1.0 404 Not Found');
+-echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File ", $pt, " Not Found</h1>\n </body>\n</html>";
++echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File Not Found</h1>\n </body>\n</html>";
+ exit;
+ }
+ $b = pathinfo($a);
+@@ -438,7 +438,7 @@ const GZ = 0x1000;
+ const BZ2 = 0x2000;
+ const MASK = 0x3000;
+ const START = 'my/custom/thingy.php';
+-const LEN = 6696;
++const LEN = 6686;
+ 
+ static function go($return = false)
+ {
+@@ -622,7 +622,7 @@ Extract_Phar::go();
+ __HALT_COMPILER(); ?>"
+ ============================================================================
+ ============================================================================
+-int(7074)
++int(7064)
+ ============================================================================
+ ============================================================================
+ Illegal filename passed in for stub creation, was 401 characters long, and only 400 or less is allowed
+@@ -630,7 +630,7 @@ Illegal filename passed in for stub creation, was 401 characters long, and only
+ ============================================================================
+ ============================================================================
+ ============================================================================
+-string(6696) "<?php
++string(6686) "<?php
+ 
+ $web = 'the/web.php';
+ 
+@@ -706,7 +706,7 @@ exit;
+ $a = realpath(Extract_Phar::$temp . DIRECTORY_SEPARATOR . $pt);
+ if (!$a || strlen(dirname($a)) < strlen(Extract_Phar::$temp)) {
+ header('HTTP/1.0 404 Not Found');
+-echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File ", $pt, " Not Found</h1>\n </body>\n</html>";
++echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File Not Found</h1>\n </body>\n</html>";
+ exit;
+ }
+ $b = pathinfo($a);
+@@ -740,7 +740,7 @@ const GZ = 0x1000;
+ const BZ2 = 0x2000;
+ const MASK = 0x3000;
+ const START = 'my/custom/thingy.php';
+-const LEN = 6698;
++const LEN = 6688;
+ 
+ static function go($return = false)
+ {
+@@ -924,6 +924,6 @@ Extract_Phar::go();
+ __HALT_COMPILER(); ?>"
+ ============================================================================
+ ============================================================================
+-int(7074)
++int(7064)
+ Illegal web filename passed in for stub creation, was 401 characters long, and only 400 or less is allowed
+ ===DONE===
+diff --git a/ext/phar/tests/phar_offset_check.phpt b/ext/phar/tests/phar_offset_check.phpt
+--- a/ext/phar/tests/phar_offset_check.phpt
++++ b/ext/phar/tests/phar_offset_check.phpt
+@@ -70,8 +70,8 @@ var_dump($phar->getAlias());
+ Entry .phar/stub.php does not exist
+ Entry .phar/alias.txt does not exist
+ Cannot set stub ".phar/stub.php" directly in phar "%sphar_offset_check.phar.php", use setStub
+-int(6685)
+-int(6685)
++int(6675)
++int(6675)
+ Cannot set alias ".phar/alias.txt" directly in phar "%sphar_offset_check.phar.php", use setAlias
+ string(5) "susan"
+ string(5) "susan"
+diff --git a/ext/phar/tests/phar_setdefaultstub.phpt b/ext/phar/tests/phar_setdefaultstub.phpt
+--- a/ext/phar/tests/phar_setdefaultstub.phpt
++++ b/ext/phar/tests/phar_setdefaultstub.phpt
+@@ -54,7 +54,7 @@ try {
+ unlink(dirname(__FILE__) . '/' . basename(__FILE__, '.clean.php') . '.phar');
+ ?>
+ --EXPECT--
+-string(6685) "<?php
++string(6675) "<?php
+ 
+ $web = 'index.php';
+ 
+@@ -130,7 +130,7 @@ exit;
+ $a = realpath(Extract_Phar::$temp . DIRECTORY_SEPARATOR . $pt);
+ if (!$a || strlen(dirname($a)) < strlen(Extract_Phar::$temp)) {
+ header('HTTP/1.0 404 Not Found');
+-echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File ", $pt, " Not Found</h1>\n </body>\n</html>";
++echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File Not Found</h1>\n </body>\n</html>";
+ exit;
+ }
+ $b = pathinfo($a);
+@@ -164,7 +164,7 @@ const GZ = 0x1000;
+ const BZ2 = 0x2000;
+ const MASK = 0x3000;
+ const START = 'index.php';
+-const LEN = 6685;
++const LEN = 6675;
+ 
+ static function go($return = false)
+ {
+@@ -349,7 +349,7 @@ __HALT_COMPILER(); ?>
+ "
+ ============================================================================
+ ============================================================================
+-string(6696) "<?php
++string(6686) "<?php
+ 
+ $web = 'index.php';
+ 
+@@ -425,7 +425,7 @@ exit;
+ $a = realpath(Extract_Phar::$temp . DIRECTORY_SEPARATOR . $pt);
+ if (!$a || strlen(dirname($a)) < strlen(Extract_Phar::$temp)) {
+ header('HTTP/1.0 404 Not Found');
+-echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File ", $pt, " Not Found</h1>\n </body>\n</html>";
++echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File Not Found</h1>\n </body>\n</html>";
+ exit;
+ }
+ $b = pathinfo($a);
+@@ -459,7 +459,7 @@ const GZ = 0x1000;
+ const BZ2 = 0x2000;
+ const MASK = 0x3000;
+ const START = 'my/custom/thingy.php';
+-const LEN = 6696;
++const LEN = 6686;
+ 
+ static function go($return = false)
+ {
+@@ -644,7 +644,7 @@ __HALT_COMPILER(); ?>
+ "
+ ============================================================================
+ ============================================================================
+-string(6698) "<?php
++string(6688) "<?php
+ 
+ $web = 'the/web.php';
+ 
+@@ -720,7 +720,7 @@ exit;
+ $a = realpath(Extract_Phar::$temp . DIRECTORY_SEPARATOR . $pt);
+ if (!$a || strlen(dirname($a)) < strlen(Extract_Phar::$temp)) {
+ header('HTTP/1.0 404 Not Found');
+-echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File ", $pt, " Not Found</h1>\n </body>\n</html>";
++echo "<html>\n <head>\n  <title>File Not Found<title>\n </head>\n <body>\n  <h1>404 - File Not Found</h1>\n </body>\n</html>";
+ exit;
+ }
+ $b = pathinfo($a);
+@@ -754,7 +754,7 @@ const GZ = 0x1000;
+ const BZ2 = 0x2000;
+ const MASK = 0x3000;
+ const START = 'my/custom/thingy.php';
+-const LEN = 6698;
++const LEN = 6688;
+ 
+ static function go($return = false)
+ {
+@@ -939,6 +939,6 @@ __HALT_COMPILER(); ?>
+ "
+ ============================================================================
+ ============================================================================
+-int(7076)
++int(7066)
+ Illegal filename passed in for stub creation, was 401 characters long, and only 400 or less is allowed
+ ===DONE===
+diff --git a/ext/phar/tests/tar/phar_convert_phar.phpt b/ext/phar/tests/tar/phar_convert_phar.phpt
+--- a/ext/phar/tests/tar/phar_convert_phar.phpt
++++ b/ext/phar/tests/tar/phar_convert_phar.phpt
+@@ -47,12 +47,12 @@ __HALT_COMPILER();
+ ?>
+ --EXPECT--
+ bool(false)
+-int(6683)
++int(6673)
+ bool(true)
+ string(60) "<?php // tar-based phar archive stub file
+ __HALT_COMPILER();"
+ bool(true)
+-int(6683)
++int(6673)
+ bool(true)
+-int(6683)
++int(6673)
+ ===DONE===
+diff --git a/ext/phar/tests/tar/phar_convert_phar2.phpt b/ext/phar/tests/tar/phar_convert_phar2.phpt
+--- a/ext/phar/tests/tar/phar_convert_phar2.phpt
++++ b/ext/phar/tests/tar/phar_convert_phar2.phpt
+@@ -49,14 +49,14 @@ __HALT_COMPILER();
+ ?>
+ --EXPECT--
+ bool(false)
+-int(6683)
++int(6673)
+ bool(true)
+ string(60) "<?php // tar-based phar archive stub file
+ __HALT_COMPILER();"
+ bool(true)
+ int(4096)
+-int(6683)
++int(6673)
+ bool(true)
+ bool(true)
+-int(6683)
++int(6673)
+ ===DONE===
+diff --git a/ext/phar/tests/tar/phar_convert_phar3.phpt b/ext/phar/tests/tar/phar_convert_phar3.phpt
+--- a/ext/phar/tests/tar/phar_convert_phar3.phpt
++++ b/ext/phar/tests/tar/phar_convert_phar3.phpt
+@@ -49,14 +49,14 @@ __HALT_COMPILER();
+ ?>
+ --EXPECT--
+ bool(false)
+-int(6683)
++int(6673)
+ bool(true)
+ string(60) "<?php // tar-based phar archive stub file
+ __HALT_COMPILER();"
+ bool(true)
+ int(8192)
+-int(6683)
++int(6673)
+ bool(true)
+ bool(true)
+-int(6683)
++int(6673)
+ ===DONE===
+diff --git a/ext/phar/tests/tar/phar_convert_phar4.phpt b/ext/phar/tests/tar/phar_convert_phar4.phpt
+--- a/ext/phar/tests/tar/phar_convert_phar4.phpt
++++ b/ext/phar/tests/tar/phar_convert_phar4.phpt
+@@ -54,7 +54,7 @@ __HALT_COMPILER();
+ ?>
+ --EXPECT--
+ bool(false)
+-int(6683)
++int(6673)
+ string(2) "hi"
+ bool(true)
+ string(60) "<?php // tar-based phar archive stub file
+@@ -62,10 +62,10 @@ __HALT_COMPILER();"
+ string(2) "hi"
+ bool(true)
+ int(4096)
+-int(6683)
++int(6673)
+ string(2) "hi"
+ bool(true)
+ bool(true)
+-int(6683)
++int(6673)
+ string(2) "hi"
+ ===DONE===
+diff --git a/ext/phar/tests/zip/phar_convert_phar.phpt b/ext/phar/tests/zip/phar_convert_phar.phpt
+--- a/ext/phar/tests/zip/phar_convert_phar.phpt
++++ b/ext/phar/tests/zip/phar_convert_phar.phpt
+@@ -46,12 +46,12 @@ __HALT_COMPILER();
+ ?>
+ --EXPECT--
+ bool(false)
+-int(6683)
++int(6673)
+ bool(true)
+ string(60) "<?php // zip-based phar archive stub file
+ __HALT_COMPILER();"
+ bool(true)
+-int(6683)
++int(6673)
+ bool(true)
+-int(6683)
++int(6673)
+ ===DONE===

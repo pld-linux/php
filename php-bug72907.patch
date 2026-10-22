@@ -1,0 +1,148 @@
+From: Xinchen Hui <laruence@gmail.com>
+Date: Sun Aug 21 17:10:10 2016 +0800
+Subject: [PATCH] Fixed bug #72907 (null pointer deref, segfault in gc_remove_zval_from_buffer (zend_gc.c:260))
+
+Source: upstream https://github.com/php/php-src/commit/b740bb3987 (5.6.26)
+PLD: test expects no notice for the undefined property: 5.4 reports none in a compound assignment
+---
+diff --git a/Zend/tests/bug72907.phpt b/Zend/tests/bug72907.phpt
+new file mode 100644
+--- /dev/null
++++ b/Zend/tests/bug72907.phpt
+@@ -0,0 +1,16 @@
++--TEST--
++Bug #72907 (null pointer deref, segfault in gc_remove_zval_from_buffer (zend_gc.c:260))
++--FILE--
++<?php
++
++$a = 0;
++
++($a->a = &$E) + ($b = $a->b->i -= 0);
++
++?>
++--EXPECTF--
++Warning: Attempt to modify property of non-object in %sbug72907.php on line %d
++
++Warning: Attempt to modify property of non-object in %sbug72907.php on line %d
++
++Warning: Creating default object from empty value in %sbug72907.php on line %d
+diff --git a/Zend/zend_execute.c b/Zend/zend_execute.c
+--- a/Zend/zend_execute.c
++++ b/Zend/zend_execute.c
+@@ -510,9 +510,7 @@ static void zend_assign_to_variable_reference(zval **variable_ptr_ptr, zval **va
+ 	zval *variable_ptr = *variable_ptr_ptr;
+ 	zval *value_ptr = *value_ptr_ptr;
+ 
+-	if (variable_ptr == &EG(error_zval) || value_ptr == &EG(error_zval)) {
+-		variable_ptr_ptr = &EG(uninitialized_zval_ptr);
+-	} else if (variable_ptr != value_ptr) {
++	if (variable_ptr != value_ptr) {
+ 		if (!PZVAL_IS_REF(value_ptr)) {
+ 			/* break it away */
+ 			Z_DELREF_P(value_ptr);
+diff --git a/Zend/zend_vm_def.h b/Zend/zend_vm_def.h
+--- a/Zend/zend_vm_def.h
++++ b/Zend/zend_vm_def.h
+@@ -1802,11 +1802,14 @@ ZEND_VM_HANDLER(39, ZEND_ASSIGN_REF, VAR|CV, VAR|CV)
+ 	if ((OP2_TYPE == IS_VAR && UNEXPECTED(value_ptr_ptr == NULL)) ||
+ 	    (OP1_TYPE == IS_VAR && UNEXPECTED(variable_ptr_ptr == NULL))) {
+ 		zend_error_noreturn(E_ERROR, "Cannot create references to/from string offsets nor overloaded objects");
+-	}
+-	zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
+-
+-	if (OP2_TYPE == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
+-		Z_DELREF_PP(variable_ptr_ptr);
++	} else if ((OP2_TYPE == IS_VAR && UNEXPECTED(*value_ptr_ptr == &EG(error_zval))) ||
++		(OP1_TYPE == IS_VAR && UNEXPECTED(*variable_ptr_ptr == &EG(error_zval)))) {
++		variable_ptr_ptr = &EG(uninitialized_zval_ptr);
++	} else {
++		zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
++		if (OP2_TYPE == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
++			Z_DELREF_PP(variable_ptr_ptr);
++		}
+ 	}
+ 
+ 	if (RETURN_VALUE_USED(opline)) {
+diff --git a/Zend/zend_vm_execute.h b/Zend/zend_vm_execute.h
+--- a/Zend/zend_vm_execute.h
++++ b/Zend/zend_vm_execute.h
+@@ -17755,11 +17755,14 @@ static int ZEND_FASTCALL  ZEND_ASSIGN_REF_SPEC_VAR_VAR_HANDLER(ZEND_OPCODE_HANDL
+ 	if ((IS_VAR == IS_VAR && UNEXPECTED(value_ptr_ptr == NULL)) ||
+ 	    (IS_VAR == IS_VAR && UNEXPECTED(variable_ptr_ptr == NULL))) {
+ 		zend_error_noreturn(E_ERROR, "Cannot create references to/from string offsets nor overloaded objects");
+-	}
+-	zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
+-
+-	if (IS_VAR == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
+-		Z_DELREF_PP(variable_ptr_ptr);
++	} else if ((IS_VAR == IS_VAR && UNEXPECTED(*value_ptr_ptr == &EG(error_zval))) ||
++		(IS_VAR == IS_VAR && UNEXPECTED(*variable_ptr_ptr == &EG(error_zval)))) {
++		variable_ptr_ptr = &EG(uninitialized_zval_ptr);
++	} else {
++		zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
++		if (IS_VAR == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
++			Z_DELREF_PP(variable_ptr_ptr);
++		}
+ 	}
+ 
+ 	if (RETURN_VALUE_USED(opline)) {
+@@ -20884,11 +20887,14 @@ static int ZEND_FASTCALL  ZEND_ASSIGN_REF_SPEC_VAR_CV_HANDLER(ZEND_OPCODE_HANDLE
+ 	if ((IS_CV == IS_VAR && UNEXPECTED(value_ptr_ptr == NULL)) ||
+ 	    (IS_VAR == IS_VAR && UNEXPECTED(variable_ptr_ptr == NULL))) {
+ 		zend_error_noreturn(E_ERROR, "Cannot create references to/from string offsets nor overloaded objects");
+-	}
+-	zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
+-
+-	if (IS_CV == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
+-		Z_DELREF_PP(variable_ptr_ptr);
++	} else if ((IS_CV == IS_VAR && UNEXPECTED(*value_ptr_ptr == &EG(error_zval))) ||
++		(IS_VAR == IS_VAR && UNEXPECTED(*variable_ptr_ptr == &EG(error_zval)))) {
++		variable_ptr_ptr = &EG(uninitialized_zval_ptr);
++	} else {
++		zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
++		if (IS_CV == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
++			Z_DELREF_PP(variable_ptr_ptr);
++		}
+ 	}
+ 
+ 	if (RETURN_VALUE_USED(opline)) {
+@@ -33222,11 +33228,14 @@ static int ZEND_FASTCALL  ZEND_ASSIGN_REF_SPEC_CV_VAR_HANDLER(ZEND_OPCODE_HANDLE
+ 	if ((IS_VAR == IS_VAR && UNEXPECTED(value_ptr_ptr == NULL)) ||
+ 	    (IS_CV == IS_VAR && UNEXPECTED(variable_ptr_ptr == NULL))) {
+ 		zend_error_noreturn(E_ERROR, "Cannot create references to/from string offsets nor overloaded objects");
+-	}
+-	zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
+-
+-	if (IS_VAR == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
+-		Z_DELREF_PP(variable_ptr_ptr);
++	} else if ((IS_VAR == IS_VAR && UNEXPECTED(*value_ptr_ptr == &EG(error_zval))) ||
++		(IS_CV == IS_VAR && UNEXPECTED(*variable_ptr_ptr == &EG(error_zval)))) {
++		variable_ptr_ptr = &EG(uninitialized_zval_ptr);
++	} else {
++		zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
++		if (IS_VAR == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
++			Z_DELREF_PP(variable_ptr_ptr);
++		}
+ 	}
+ 
+ 	if (RETURN_VALUE_USED(opline)) {
+@@ -36078,11 +36087,14 @@ static int ZEND_FASTCALL  ZEND_ASSIGN_REF_SPEC_CV_CV_HANDLER(ZEND_OPCODE_HANDLER
+ 	if ((IS_CV == IS_VAR && UNEXPECTED(value_ptr_ptr == NULL)) ||
+ 	    (IS_CV == IS_VAR && UNEXPECTED(variable_ptr_ptr == NULL))) {
+ 		zend_error_noreturn(E_ERROR, "Cannot create references to/from string offsets nor overloaded objects");
+-	}
+-	zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
+-
+-	if (IS_CV == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
+-		Z_DELREF_PP(variable_ptr_ptr);
++	} else if ((IS_CV == IS_VAR && UNEXPECTED(*value_ptr_ptr == &EG(error_zval))) ||
++		(IS_CV == IS_VAR && UNEXPECTED(*variable_ptr_ptr == &EG(error_zval)))) {
++		variable_ptr_ptr = &EG(uninitialized_zval_ptr);
++	} else {
++		zend_assign_to_variable_reference(variable_ptr_ptr, value_ptr_ptr TSRMLS_CC);
++		if (IS_CV == IS_VAR && opline->extended_value == ZEND_RETURNS_NEW) {
++			Z_DELREF_PP(variable_ptr_ptr);
++		}
+ 	}
+ 
+ 	if (RETURN_VALUE_USED(opline)) {

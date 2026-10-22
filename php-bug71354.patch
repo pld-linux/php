@@ -1,0 +1,36 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Wed Jan 13 16:32:29 2016 -0800
+Subject: [PATCH] Fix bug #71354 - remove UMR when size is 0
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/32d59bee3a41f1c6a7f99be7a53a014058684fe5
+Binary test fixtures not included: ext/phar/tests/bug71354.tar
+---
+diff --git a/ext/phar/phar_object.c b/ext/phar/phar_object.c
+--- a/ext/phar/phar_object.c
++++ b/ext/phar/phar_object.c
+@@ -4977,6 +4977,7 @@ PHP_METHOD(PharFileInfo, getContent)
+ 
+ 	phar_seek_efp(link, 0, SEEK_SET, 0, 0 TSRMLS_CC);
+ 	Z_TYPE_P(return_value) = IS_STRING;
++	Z_STRVAL_P(return_value) = NULL;
+ 	Z_STRLEN_P(return_value) = php_stream_copy_to_mem(fp, &(Z_STRVAL_P(return_value)), link->uncompressed_filesize, 0);
+ 
+ 	if (!Z_STRVAL_P(return_value)) {
+diff --git a/ext/phar/tests/bug71354.phpt b/ext/phar/tests/bug71354.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug71354.phpt
+@@ -0,0 +1,13 @@
++--TEST--
++Phar: bug #71354: Heap corruption in tar/zip/phar parser.
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip"); ?>
++--FILE--
++<?php
++$p = new PharData(__DIR__."/bug71354.tar");
++var_dump($p['aaaa']->getContent());
++?>
++DONE
++--EXPECT--
++string(0) ""
++DONE

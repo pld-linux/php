@@ -1,0 +1,19 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Thu Aug 11 23:36:25 2016 -0700
+Subject: [PATCH] Fix for bug #72807 - do not produce strings with negative length
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/5f34577d9bdab058751efb6b3610a2ef884d09a3
+---
+diff --git a/Zend/zend_API.h b/Zend/zend_API.h
+--- a/Zend/zend_API.h
++++ b/Zend/zend_API.h
+@@ -571,6 +571,9 @@ END_EXTERN_C()
+ 		const char *__s=(s);				\
+ 		zval *__z = (z);					\
+ 		Z_STRLEN_P(__z) = strlen(__s);		\
++		if (UNEXPECTED(Z_STRLEN_P(__z) < 0)) { \
++			zend_error(E_ERROR, "String size overflow"); \
++		} \
+ 		Z_STRVAL_P(__z) = (duplicate?estrndup(__s, Z_STRLEN_P(__z)):(char*)__s);\
+ 		Z_TYPE_P(__z) = IS_STRING;			\
+ 	} while (0)

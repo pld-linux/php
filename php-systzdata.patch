@@ -55,7 +55,7 @@ r1: initial revision
 -	/* skip ID */
 -	*tzf += 4;
 -	
-+        if (memcmp(tzf, "TZif", 4) == 0) {
++        if (memcmp(*tzf, "TZif", 4) == 0) {
 +                *tzf += 20;
 +                return;
 +        }

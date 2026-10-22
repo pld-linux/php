@@ -1,0 +1,62 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Tue Oct 11 13:30:52 2016 -0700
+Subject: [PATCH] Fix bug #73293 - NULL pointer dereference in SimpleXMLElement::asXML()
+
+Upstream: https://github.com/php/php-src/commit/96a8cf8e1b5dc1b0c708bb5574e0d6727cc56d9e
+
+Upstream: https://github.com/php/php-src/commit/4ef79370a82d6c92f4ea0cd462274ba24e007f56
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/1268024a78b659751065c72089f0c4f55b6e63f1
+---
+diff --git a/Zend/zend_API.h b/Zend/zend_API.h
+--- a/Zend/zend_API.h
++++ b/Zend/zend_API.h
+@@ -648,7 +648,7 @@ END_EXTERN_C()
+ 		}                                   \
+ 		RETURN_FALSE;                       \
+ 	}                                       \
+-	RETVAL_STRINGL((s), __len, (dup)); \
++	RETVAL_STRINGL((s), (int)__len, (dup)); \
+ } while (0)
+ 
+ #define SET_VAR_STRING(n, v) {																				\
+diff --git a/ext/simplexml/simplexml.c b/ext/simplexml/simplexml.c
+--- a/ext/simplexml/simplexml.c
++++ b/ext/simplexml/simplexml.c
+@@ -1412,9 +1412,15 @@ SXE_METHOD(asXML)
+ 	if (node) {
+ 		if (node->parent && (XML_DOCUMENT_NODE == node->parent->type)) {
+ 			xmlDocDumpMemoryEnc((xmlDocPtr) sxe->document->ptr, &strval, &strval_len, ((xmlDocPtr) sxe->document->ptr)->encoding);
+-			RETVAL_STRINGL((char *)strval, strval_len, 1);
++			if (!strval) {
++				RETVAL_FALSE;
++			} else {
++				RETVAL_STRINGL((char *)strval, strval_len, 1);
++			}
+ 			xmlFree(strval);
+ 		} else {
++			char *return_content;
++			size_t return_len;
+ 			/* Should we be passing encoding information instead of NULL? */
+ 			outbuf = xmlAllocOutputBuffer(NULL);
+ 
+@@ -1425,10 +1431,17 @@ SXE_METHOD(asXML)
+ 			xmlNodeDumpOutput(outbuf, (xmlDocPtr) sxe->document->ptr, node, 0, 0, ((xmlDocPtr) sxe->document->ptr)->encoding);
+ 			xmlOutputBufferFlush(outbuf);
+ #ifdef LIBXML2_NEW_BUFFER
+-			RETVAL_STRINGL((char *)xmlOutputBufferGetContent(outbuf), xmlOutputBufferGetSize(outbuf), 1);
++			return_content = (char *)xmlOutputBufferGetContent(outbuf);
++			return_len = xmlOutputBufferGetSize(outbuf);
+ #else
+-			RETVAL_STRINGL((char *)outbuf->buffer->content, outbuf->buffer->use, 1);
++			return_content = (char *)outbuf->buffer->content;
++			return_len = outbuf->buffer->use;
+ #endif
++			if (!return_content) {
++				RETVAL_FALSE;
++			} else {
++				RETVAL_STRINGL_CHECK(return_content, return_len, 1);
++			}
+ 			xmlOutputBufferClose(outbuf);
+ 		}
+ 	} else {

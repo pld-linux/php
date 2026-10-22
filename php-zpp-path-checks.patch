@@ -1,0 +1,31 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Jan 15 17:31:08 2017 -0800
+Subject: [PATCH] Update more functions with path check
+
+Source: upstream https://github.com/php/php-src/commit/0ab1af7d3e (shipped in 5.6.30)
+5.4: no CURLFile (ext/curl/curl_file.c), that hunk left out
+---
+diff --git a/ext/exif/exif.c b/ext/exif/exif.c
+--- a/ext/exif/exif.c
++++ b/ext/exif/exif.c
+@@ -4260,7 +4260,7 @@ PHP_FUNCTION(exif_imagetype)
+ 	php_stream * stream;
+  	int itype = 0;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &imagefile, &imagefile_len) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "p", &imagefile, &imagefile_len) == FAILURE) {
+ 		return;
+ 	}
+ 
+diff --git a/ext/zip/php_zip.c b/ext/zip/php_zip.c
+--- a/ext/zip/php_zip.c
++++ b/ext/zip/php_zip.c
+@@ -2439,7 +2439,7 @@ static ZIPARCHIVE_METHOD(extractTo)
+ 		RETURN_FALSE;
+ 	}
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|z", &pathto, &pathto_len, &zval_files) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "p|z", &pathto, &pathto_len, &zval_files) == FAILURE) {
+ 		return;
+ 	}
+ 

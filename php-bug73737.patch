@@ -1,0 +1,36 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat Dec 31 19:31:49 2016 -0800
+Subject: [PATCH] Fix bug #73737 FPE when parsing a tag format
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/8a32d3cc52778b1024524dc8f49acc5bbb95bfdd
+Binary test fixtures not included: ext/exif/tests/bug73737.tiff
+---
+diff --git a/ext/exif/exif.c b/ext/exif/exif.c
+--- a/ext/exif/exif.c
++++ b/ext/exif/exif.c
+@@ -1313,7 +1313,7 @@ static size_t exif_convert_any_to_int(void *value, int format, int motorola_inte
+ 			if (s_den == 0) {
+ 				return 0;
+ 			} else {
+-				return php_ifd_get32s(value, motorola_intel) / s_den;
++				return (size_t)((double)php_ifd_get32s(value, motorola_intel) / s_den);
+ 			}
+ 
+ 		case TAG_FMT_SSHORT:    return php_ifd_get16u(value, motorola_intel);
+diff --git a/ext/exif/tests/bug73737.phpt b/ext/exif/tests/bug73737.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/exif/tests/bug73737.phpt
+@@ -0,0 +1,12 @@
++--TEST--
++Bug #73737 (Crash when parsing a tag format)
++--SKIPIF--
++<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
++--FILE--
++<?php
++	$exif = exif_thumbnail(__DIR__ . '/bug73737.tiff');
++	var_dump($exif);
++?>
++--EXPECTF--
++Warning: exif_thumbnail(bug73737.tiff): Error in TIFF: filesize(x0030) less than start of IFD dir(x10102) in %s line %d
++bool(false)

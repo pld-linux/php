@@ -1,0 +1,79 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Tue Oct 4 22:40:09 2016 -0700
+Subject: [PATCH] Bug #73218: add mitigation for ICU int overflow
+
+Upstream: https://github.com/php/php-src/commit/d946d102936525bc7dcd01f3827d0a6e0bb971b0
+
+Upstream: https://github.com/php/php-src/commit/b26b02b2df95eaa647ea3f4e7b42bd11eea4ed2c
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/afe6111796579a7db8869117334669067c86c0a9
+PLD: with the locale_methods.c checks of upstream f3e3ede804, the 7.0 commit of this fix; the 5.4 branch left them out
+---
+diff --git a/ext/intl/locale/locale_methods.c b/ext/intl/locale/locale_methods.c
+--- a/ext/intl/locale/locale_methods.c
++++ b/ext/intl/locale/locale_methods.c
+@@ -404,6 +404,8 @@ static void get_icu_value_src_php( char* tag_name, INTERNAL_FUNCTION_PARAMETERS)
+ 		loc_name = INTL_G(default_locale);
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(strlen(loc_name));
++
+ 	/* Call ICU get */
+ 	tag_value = get_icu_value_internal( loc_name , tag_name , &result ,0);
+ 
+@@ -1167,6 +1169,7 @@ PHP_FUNCTION(locale_get_all_variants)
+ 		loc_name = INTL_G(default_locale);
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(strlen(loc_name));
+ 
+ 	array_init( return_value );
+ 
+@@ -1277,6 +1280,9 @@ PHP_FUNCTION(locale_filter_matches)
+ 		RETURN_TRUE;
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(strlen(loc_range));
++	INTL_CHECK_LOCALE_LEN(strlen(lang_tag));
++
+ 	if( boolCanonical ){
+ 		/* canonicalize loc_range */
+ 		can_loc_range=get_icu_value_internal( loc_range , LOC_CANONICALIZE_TAG , &result , 0);
+@@ -1559,6 +1565,8 @@ PHP_FUNCTION(locale_lookup)
+ 		loc_range = INTL_G(default_locale);
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(strlen(loc_range));
++
+ 	hash_arr = HASH_OF(arr);
+ 
+ 	if( !hash_arr || zend_hash_num_elements( hash_arr ) == 0 ) {
+diff --git a/ext/intl/resourcebundle/resourcebundle_class.c b/ext/intl/resourcebundle/resourcebundle_class.c
+--- a/ext/intl/resourcebundle/resourcebundle_class.c
++++ b/ext/intl/resourcebundle/resourcebundle_class.c
+@@ -107,6 +107,13 @@ static void resourcebundle_ctor(INTERNAL_FUNCTION_PARAMETERS)
+ 		locale = INTL_G(default_locale);
+ 	}
+ 
++	if (bundlename_len >= MAXPATHLEN) {
++		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,	"Bundle name too long", 0 TSRMLS_CC );
++		zval_dtor(return_value);
++		ZVAL_NULL(return_value);
++		RETURN_NULL();
++	}
++
+ 	if (fallback) {
+ 		rb->me = ures_open(bundlename, locale, &INTL_DATA_ERROR_CODE(rb));
+ 	} else {
+@@ -330,6 +337,11 @@ PHP_FUNCTION( resourcebundle_locales )
+ 		RETURN_FALSE;
+ 	}
+ 
++	if (bundlename_len >= MAXPATHLEN) {
++		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,	"resourcebundle_locales: bundle name too long", 0 TSRMLS_CC );
++		RETURN_FALSE;
++	}
++
+ 	if(bundlename_len == 0) {
+ 		// fetch default locales list
+ 		bundlename = NULL;

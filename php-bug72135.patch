@@ -1,0 +1,21 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun May 15 23:26:51 2016 -0700
+Subject: [PATCH] Fix bug #72135 - don't create strings with lengths outside int range
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/58f65ae455ac70bb5749e8451901954536f4e6ae
+---
+diff --git a/ext/standard/html.c b/ext/standard/html.c
+--- a/ext/standard/html.c
++++ b/ext/standard/html.c
+@@ -1423,6 +1423,11 @@ encode_amp:
+ 	}
+ 	replaced[len] = '\0';
+ 	*newlen = len;
++	if(len > INT_MAX) {
++		zend_error_noreturn(E_ERROR, "Escaped string is too long");
++		efree(replaced);
++		return NULL;
++	}
+ 
+ 	return replaced;
+ }

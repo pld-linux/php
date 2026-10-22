@@ -1,0 +1,20 @@
+From: Anatol Belski <ab@php.net>
+Date: Thu Nov 3 17:03:23 2016 +0100
+Subject: [PATCH] Fixed bug #73418 Integer Overflow in "_php_imap_mail" leads to crash
+
+Upstream: https://github.com/php/php-src/commit/99b242a6d093bca1f64084866b4491061de57553
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/e8874668f42b6105a4cfce2747e0d61056a94b53
+---
+diff --git a/ext/imap/php_imap.c b/ext/imap/php_imap.c
+--- a/ext/imap/php_imap.c
++++ b/ext/imap/php_imap.c
+@@ -3894,7 +3894,7 @@ int _php_imap_mail(char *to, char *subject, char *message, char *headers, char *
+ 	char *tsm_errmsg = NULL;
+ 	ADDRESS *addr;
+ 	char *bufferTo = NULL, *bufferCc = NULL, *bufferBcc = NULL, *bufferHeader = NULL;
+-	int offset, bufferLen = 0;
++	size_t offset, bufferLen = 0;
+ 	size_t bt_len;
+ 
+ 	if (headers) {

@@ -1,0 +1,101 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Wed Aug 17 00:41:31 2016 +0200
+Subject: [PATCH] #72085: SEGV on unknown address zif_xml_parse
+
+We better make sure that the ZVALs we're accessing as arrays are indeed
+arrays.
+
+Source: upstream https://github.com/php/php-src/commit/1bb92d5212 (5.6.26)
+---
+diff --git a/ext/xml/tests/bug72085.phpt b/ext/xml/tests/bug72085.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/xml/tests/bug72085.phpt
+@@ -0,0 +1,74 @@
++--TEST--
++Bug #72085 (SEGV on unknown address zif_xml_parse)
++--SKIPIF--
++<?php
++if (!extension_loaded('xml')) die('skip xml extension not available');
++?>
++--FILE--
++<?php
++$var1 = xml_parser_create_ns();
++xml_set_element_handler($var1, new Exception(""), 4096);
++xml_parse($var1,  str_repeat("<a>", 10));
++?>
++===DONE===
++--EXPECTF--
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++
++Warning: Invalid callback exception 'Exception' in %s%ebug72085.php:%d
++Stack trace:
++#0 {main}, no array or string given in %s%ebug72085.php on line %d
++
++Warning: xml_parse(): Unable to call handler in %s%ebug72085.php on line %d
++===DONE===
+diff --git a/ext/xml/xml.c b/ext/xml/xml.c
+--- a/ext/xml/xml.c
++++ b/ext/xml/xml.c
+@@ -539,7 +539,8 @@ static zval *xml_call_handler(xml_parser *parser, zval *handler, zend_function *
+ 
+ 			if (Z_TYPE_P(handler) == IS_STRING) {
+ 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to call handler %s()", Z_STRVAL_P(handler));
+-			} else if (zend_hash_index_find(Z_ARRVAL_P(handler), 0, (void **) &obj) == SUCCESS &&
++			} else if (Z_TYPE_P(handler) == IS_ARRAY &&
++					   zend_hash_index_find(Z_ARRVAL_P(handler), 0, (void **) &obj) == SUCCESS &&
+ 					   zend_hash_index_find(Z_ARRVAL_P(handler), 1, (void **) &method) == SUCCESS &&
+ 					   Z_TYPE_PP(obj) == IS_OBJECT &&
+ 					   Z_TYPE_PP(method) == IS_STRING) {

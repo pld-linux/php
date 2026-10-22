@@ -1,0 +1,168 @@
+From: Tjerk Meesters <tjerk@muvee.com>
+Date: Sat Sep 21 16:45:20 2013 +0800
+Subject: [PATCH] Fix #65729: CN_match gives false positive when wildcard is used
+
+The wildcard check took any certificate CN "*.<x>" as a match when ".<x>"
+occurred at the first dot of the expected name, so "*.bank.co" matched
+"www.bank.com" and "*.test.com" matched "foo.test.com.sg".
+
+Source: upstream https://github.com/php/php-src/pull/465 (5.6.0), squashed:
+8915c3fb4f, 8e847b5845, a820c3d6ba, 674dd73f8c, 39c0daeb71, 6106896440
+PLD: matches_wildcard_name() as in 5.6.40 xp_ssl.c, with the GHSA-xr7j-rvgx-xq5p
+(CVE-2026-91767) length fix from https://github.com/php/php-src/commit/78cc82b37a
+and a const wildcard pointer; test kept in its pcntl/CN_match form
+---
+diff --git a/ext/openssl/openssl.c b/ext/openssl/openssl.c
+--- a/ext/openssl/openssl.c
++++ b/ext/openssl/openssl.c
+@@ -4694,6 +4694,40 @@ static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx) /* {{{ */
+ }
+ /* }}} */
+ 
++static zend_bool matches_wildcard_name(const char *subjectname, const char *certname) /* {{{ */
++{
++	const char *wildcard = NULL;
++	size_t prefix_len, suffix_len, subject_len;
++
++	if (strcasecmp(subjectname, certname) == 0) {
++		return 1;
++	}
++
++	/* wildcard, if present, must only be present in the left-most component */
++	if (!(wildcard = strchr(certname, '*')) || memchr(certname, '.', wildcard - certname)) {
++		return 0;
++	}
++
++	/* 1) prefix, if not empty, must match subject */
++	prefix_len = wildcard - certname;
++	if (prefix_len && strncasecmp(subjectname, certname, prefix_len) != 0) {
++		return 0;
++	}
++
++	suffix_len = strlen(wildcard + 1);
++	subject_len = strlen(subjectname);
++	if (suffix_len + prefix_len <= subject_len) {
++		/* 2) suffix must match
++		 * 3) no . between prefix and suffix
++		 **/
++		return strcasecmp(wildcard + 1, subjectname + subject_len - suffix_len) == 0 &&
++			memchr(subjectname + prefix_len, '.', subject_len - suffix_len - prefix_len) == NULL;
++	}
++
++	return 0;
++}
++/* }}} */
++
+ int php_openssl_apply_verification_policy(SSL *ssl, X509 *peer, php_stream *stream TSRMLS_DC) /* {{{ */
+ {
+ 	zval **val = NULL;
+@@ -4746,16 +4780,7 @@ int php_openssl_apply_verification_policy(SSL *ssl, X509 *peer, php_stream *stre
+ 			return FAILURE;
+ 		}
+ 
+-		match = strcasecmp(cnmatch, buf) == 0;
+-		if (!match && strlen(buf) > 3 && buf[0] == '*' && buf[1] == '.') {
+-			/* Try wildcard */
+-
+-			if (strchr(buf+2, '.')) {
+-				char *tmp = strstr(cnmatch, buf+1);
+-
+-				match = tmp && strcasecmp(tmp, buf+2) && tmp == strchr(cnmatch, '.');
+-			}
+-		}
++		match = matches_wildcard_name(cnmatch, buf);
+ 
+ 		if (!match) {
+ 			/* didn't match */
+diff --git a/ext/openssl/tests/bug65729.pem b/ext/openssl/tests/bug65729.pem
+new file mode 100644
+--- /dev/null
++++ b/ext/openssl/tests/bug65729.pem
+@@ -0,0 +1,28 @@
++-----BEGIN CERTIFICATE-----
++MIICCTCCAXICCQDNMI29sowT7TANBgkqhkiG9w0BAQUFADBJMQswCQYDVQQGEwJT
++RzESMBAGA1UECBMJVGVzdHZpbGxlMREwDwYDVQQKEwhkYXRpYmJhdzETMBEGA1UE
++AxQKKi50ZXN0LmNvbTAeFw0xMzA5MjEwNzUyMjRaFw0xNDA5MjEwNzUyMjRaMEkx
++CzAJBgNVBAYTAlNHMRIwEAYDVQQIEwlUZXN0dmlsbGUxETAPBgNVBAoTCGRhdGli
++YmF3MRMwEQYDVQQDFAoqLnRlc3QuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCB
++iQKBgQCdzVnic8K5W4SVbwVuqezcTjeqVLoQ91vVNZB0Jnsuz6q3DoK03oAd1jTe
++Vd0k+MQDbXpHoc37lA4+8z/g5Bs0UXxNx+nkbFTE7Ba2/G24caI9/cOXZPG3UViD
++rtqXKL6h5/umqRG9Dt5liF2MVP9XFAesVC7B8+Ca+PbPlQoYzwIDAQABMA0GCSqG
++SIb3DQEBBQUAA4GBAAS07u/Ke+EhEHidz6CG3Qcr+zg483JKRgZFyGz+YUKyyKKy
++fmLs7JieGJxYQjOmIpj/6X9Gnb2HjIPDnI6A+MV1emXDTnnmsgf2/lZGcthhpZn2
++rMbj9bI0iH6HwOVGtp4ZJA5fB7nj3J+gWNTCQzDDOxwX36d2LL9ua+UMnk/g
++-----END CERTIFICATE-----
++-----BEGIN RSA PRIVATE KEY-----
++MIICXQIBAAKBgQCdzVnic8K5W4SVbwVuqezcTjeqVLoQ91vVNZB0Jnsuz6q3DoK0
++3oAd1jTeVd0k+MQDbXpHoc37lA4+8z/g5Bs0UXxNx+nkbFTE7Ba2/G24caI9/cOX
++ZPG3UViDrtqXKL6h5/umqRG9Dt5liF2MVP9XFAesVC7B8+Ca+PbPlQoYzwIDAQAB
++AoGAeyzTwKPDl5QMRejHQL57GOwlH1vLcXrjv+VzwHZZKQ0IoKM++5fCQYf29KXp
++XPahaluGW2u9sWa8R/7wGcd0Q4RtquGzsgT3+AQsIc5KfIamyOyDaRVM/ymX3fWg
++gHIU7OOzB+ihOU8sHyRIwfbk01/kmrBXLRj8E31sy3i3PIECQQDQQYE+aN7Acrdt
++yN5CaqvbkiCGjRvASlemiTzPosgOtndyp21w1gakJwKYhYDk1N6A6Qb8REMZqM/U
++wFypldV/AkEAwfq6NFuhpGL6hDA7MvlyY1KiZ0cHetPUX+PgdNqy2DA+1Sv4i7gm
++Wd/uA651K7aPXuUaf9dKtPCmZwI4M6SEsQJBALW89HTqP7niYoDEEnITdPaghxHk
++gptERUln6lGo1L1CLus3gSI/JHyMLo+7scgAnEwTD62GRKhX0Ubwt+ymfTECQAY5
++fHYnppU20+EgBxZIqOIFCc8UmWnYmE0Ha/Fz/x8u1SVUBuK84wYpSGL32yyu7ATY
++hzQo/W229zABAzqtAdECQQCUdB7IBFpPnsfv/EUBFX7X/7zAc9JpACmu9It5ju8C
++KIsMuz/02D+TQoJNjdAngBM+4AJDIaGFgTMIfaDMh5L7
++-----END RSA PRIVATE KEY-----
+diff --git a/ext/openssl/tests/bug65729.phpt b/ext/openssl/tests/bug65729.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/openssl/tests/bug65729.phpt
+@@ -0,0 +1,54 @@
++--TEST--
++Bug #65729: CN_match gives false positive when wildcard is used
++--SKIPIF--
++<?php 
++if (!extension_loaded("openssl")) die("skip");
++if (!function_exists('pcntl_fork')) die("skip no fork");
++--FILE--
++<?php
++$context = stream_context_create();
++
++stream_context_set_option($context, 'ssl', 'local_cert', __DIR__ . "/bug65729.pem");
++stream_context_set_option($context, 'ssl', 'allow_self_signed', true);
++$server = stream_socket_server('ssl://127.0.0.1:64321', $errno, $errstr,
++	STREAM_SERVER_BIND|STREAM_SERVER_LISTEN, $context);
++
++$expected_names = array('foo.test.com.sg', 'foo.test.com', 'FOO.TEST.COM', 'foo.bar.test.com');
++
++$pid = pcntl_fork();
++if ($pid == -1) {
++	die('could not fork');
++} else if ($pid) {
++	foreach ($expected_names as $expected_name) {
++		$contextC = stream_context_create(array(
++			'ssl' => array(
++				'verify_peer'		=> true,
++				'allow_self_signed'	=> true,
++				'CN_match'		=> $expected_name,
++			)
++		));
++		var_dump(stream_socket_client("ssl://127.0.0.1:64321", $errno, $errstr, 1,
++		STREAM_CLIENT_CONNECT, $contextC));
++	}
++} else {	
++	@pcntl_wait($status);
++	foreach ($expected_names as $name) {
++		@stream_socket_accept($server, 1);
++	}
++}
++--EXPECTF--
++Warning: stream_socket_client(): Peer certificate CN=`*.test.com' did not match expected CN=`foo.test.com.sg' in %s on line %d
++
++Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
++
++Warning: stream_socket_client(): unable to connect to ssl://127.0.0.1:64321 (Unknown error) in %s on line %d
++bool(false)
++resource(%d) of type (stream)
++resource(%d) of type (stream)
++
++Warning: stream_socket_client(): Peer certificate CN=`*.test.com' did not match expected CN=`foo.bar.test.com' in %s on line %d
++
++Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
++
++Warning: stream_socket_client(): unable to connect to ssl://127.0.0.1:64321 (Unknown error) in %s on line %d
++bool(false)

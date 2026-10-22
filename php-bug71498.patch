@@ -1,0 +1,42 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Feb 21 16:51:05 2016 -0800
+Subject: [PATCH] Fix bug #71498: Out-of-Bound Read in phar_parse_zipfile()
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/fcecc5125ac6bb009479071c656ab4a1b5e37bf9
+Binary test fixtures not included: ext/phar/tests/bug71498.zip
+---
+diff --git a/ext/phar/tests/bug71498.phpt b/ext/phar/tests/bug71498.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug71498.phpt
+@@ -0,0 +1,17 @@
++--TEST--
++Phar: bug #71498: Out-of-Bound Read in phar_parse_zipfile()
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip"); ?>
++--FILE--
++<?php
++try {
++$p = new PharData(__DIR__."/bug71498.zip");
++} catch(UnexpectedValueException $e) {
++	echo $e->getMessage();
++}
++?>
++
++DONE
++--EXPECTF--
++phar error: end of central directory not found in zip-based phar "%s/bug71498.zip"
++DONE
+\ No newline at end of file
+diff --git a/ext/phar/zip.c b/ext/phar/zip.c
+--- a/ext/phar/zip.c
++++ b/ext/phar/zip.c
+@@ -199,7 +199,7 @@ int phar_parse_zipfile(php_stream *fp, char *fname, int fname_len, char *alias,
+ 	}
+ 
+ 	while ((p=(char *) memchr(p + 1, 'P', (size_t) (size - (p + 1 - buf)))) != NULL) {
+-		if (!memcmp(p + 1, "K\5\6", 3)) {
++		if ((p - buf) + sizeof(locator) <= size && !memcmp(p + 1, "K\5\6", 3)) {
+ 			memcpy((void *)&locator, (void *) p, sizeof(locator));
+ 			if (PHAR_GET_16(locator.centraldisk) != 0 || PHAR_GET_16(locator.disknumber) != 0) {
+ 				/* split archives not handled */

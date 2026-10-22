@@ -1,0 +1,171 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Tue Mar 27 21:22:28 2018 -0700
+Subject: [PATCH] Fix #76129 - remove more potential unfiltered outputs for phar
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/cf42f3d43bac411e1ee4faf0d54148f7a27c73a1
+---
+diff --git a/ext/phar/phar_object.c b/ext/phar/phar_object.c
+--- a/ext/phar/phar_object.c
++++ b/ext/phar/phar_object.c
+@@ -340,8 +340,7 @@ static void phar_do_403(char *entry, int entry_len TSRMLS_DC) /* {{{ */
+ 	sapi_header_op(SAPI_HEADER_REPLACE, &ctr TSRMLS_CC);
+ 	sapi_send_headers(TSRMLS_C);
+ 	PHPWRITE("<html>\n <head>\n  <title>Access Denied</title>\n </head>\n <body>\n  <h1>403 - File ", sizeof("<html>\n <head>\n  <title>Access Denied</title>\n </head>\n <body>\n  <h1>403 - File ") - 1);
+-	PHPWRITE(entry, entry_len);
+-	PHPWRITE(" Access Denied</h1>\n </body>\n</html>", sizeof(" Access Denied</h1>\n </body>\n</html>") - 1);
++	PHPWRITE("Access Denied</h1>\n </body>\n</html>", sizeof("Access Denied</h1>\n </body>\n</html>") - 1);
+ }
+ /* }}} */
+ 
+@@ -365,8 +364,7 @@ static void phar_do_404(phar_archive_data *phar, char *fname, int fname_len, cha
+ 	sapi_header_op(SAPI_HEADER_REPLACE, &ctr TSRMLS_CC);
+ 	sapi_send_headers(TSRMLS_C);
+ 	PHPWRITE("<html>\n <head>\n  <title>File Not Found</title>\n </head>\n <body>\n  <h1>404 - File ", sizeof("<html>\n <head>\n  <title>File Not Found</title>\n </head>\n <body>\n  <h1>404 - File ") - 1);
+-	PHPWRITE(entry, entry_len);
+-	PHPWRITE(" Not Found</h1>\n </body>\n</html>",  sizeof(" Not Found</h1>\n </body>\n</html>") - 1);
++	PHPWRITE("Not Found</h1>\n </body>\n</html>",  sizeof("Not Found</h1>\n </body>\n</html>") - 1);
+ }
+ /* }}} */
+ 
+diff --git a/ext/phar/tests/cache_list/frontcontroller10.phpt b/ext/phar/tests/cache_list/frontcontroller10.phpt
+--- a/ext/phar/tests/cache_list/frontcontroller10.phpt
++++ b/ext/phar/tests/cache_list/frontcontroller10.phpt
+@@ -20,6 +20,6 @@ Status: 403 Access Denied
+   <title>Access Denied</title>
+  </head>
+  <body>
+-  <h1>403 - File /hi Access Denied</h1>
++  <h1>403 - File Access Denied</h1>
+  </body>
+ </html>
+diff --git a/ext/phar/tests/cache_list/frontcontroller6.phpt b/ext/phar/tests/cache_list/frontcontroller6.phpt
+--- a/ext/phar/tests/cache_list/frontcontroller6.phpt
++++ b/ext/phar/tests/cache_list/frontcontroller6.phpt
+@@ -18,6 +18,6 @@ Status: 404 Not Found
+   <title>File Not Found</title>
+  </head>
+  <body>
+-  <h1>404 - File /notfound.php Not Found</h1>
++  <h1>404 - File Not Found</h1>
+  </body>
+ </html>
+\ No newline at end of file
+diff --git a/ext/phar/tests/cache_list/frontcontroller8.phpt b/ext/phar/tests/cache_list/frontcontroller8.phpt
+--- a/ext/phar/tests/cache_list/frontcontroller8.phpt
++++ b/ext/phar/tests/cache_list/frontcontroller8.phpt
+@@ -18,6 +18,6 @@ Status: 404 Not Found
+   <title>File Not Found</title>
+  </head>
+  <body>
+-  <h1>404 - File /index.php Not Found</h1>
++  <h1>404 - File Not Found</h1>
+  </body>
+ </html>
+\ No newline at end of file
+diff --git a/ext/phar/tests/frontcontroller10.phpt b/ext/phar/tests/frontcontroller10.phpt
+--- a/ext/phar/tests/frontcontroller10.phpt
++++ b/ext/phar/tests/frontcontroller10.phpt
+@@ -19,6 +19,6 @@ Status: 403 Access Denied
+   <title>Access Denied</title>
+  </head>
+  <body>
+-  <h1>403 - File /hi Access Denied</h1>
++  <h1>403 - File Access Denied</h1>
+  </body>
+ </html>
+diff --git a/ext/phar/tests/frontcontroller6.phpt b/ext/phar/tests/frontcontroller6.phpt
+--- a/ext/phar/tests/frontcontroller6.phpt
++++ b/ext/phar/tests/frontcontroller6.phpt
+@@ -16,6 +16,6 @@ Status: 404 Not Found
+   <title>File Not Found</title>
+  </head>
+  <body>
+-  <h1>404 - File /notfound.php Not Found</h1>
++  <h1>404 - File Not Found</h1>
+  </body>
+ </html>
+\ No newline at end of file
+diff --git a/ext/phar/tests/frontcontroller8.phpt b/ext/phar/tests/frontcontroller8.phpt
+--- a/ext/phar/tests/frontcontroller8.phpt
++++ b/ext/phar/tests/frontcontroller8.phpt
+@@ -16,6 +16,6 @@ Status: 404 Not Found
+   <title>File Not Found</title>
+  </head>
+  <body>
+-  <h1>404 - File /index.php Not Found</h1>
++  <h1>404 - File Not Found</h1>
+  </body>
+ </html>
+\ No newline at end of file
+diff --git a/ext/phar/tests/tar/frontcontroller10.phar.phpt b/ext/phar/tests/tar/frontcontroller10.phar.phpt
+--- a/ext/phar/tests/tar/frontcontroller10.phar.phpt
++++ b/ext/phar/tests/tar/frontcontroller10.phar.phpt
+@@ -19,6 +19,6 @@ Status: 403 Access Denied
+   <title>Access Denied</title>
+  </head>
+  <body>
+-  <h1>403 - File /hi Access Denied</h1>
++  <h1>403 - File Access Denied</h1>
+  </body>
+ </html>
+\ No newline at end of file
+diff --git a/ext/phar/tests/tar/frontcontroller6.phar.phpt b/ext/phar/tests/tar/frontcontroller6.phar.phpt
+--- a/ext/phar/tests/tar/frontcontroller6.phar.phpt
++++ b/ext/phar/tests/tar/frontcontroller6.phar.phpt
+@@ -16,6 +16,6 @@ Status: 404 Not Found
+   <title>File Not Found</title>
+  </head>
+  <body>
+-  <h1>404 - File /notfound.php Not Found</h1>
++  <h1>404 - File Not Found</h1>
+  </body>
+ </html>
+\ No newline at end of file
+diff --git a/ext/phar/tests/tar/frontcontroller8.phar.phpt b/ext/phar/tests/tar/frontcontroller8.phar.phpt
+--- a/ext/phar/tests/tar/frontcontroller8.phar.phpt
++++ b/ext/phar/tests/tar/frontcontroller8.phar.phpt
+@@ -16,6 +16,6 @@ Status: 404 Not Found
+   <title>File Not Found</title>
+  </head>
+  <body>
+-  <h1>404 - File /index.php Not Found</h1>
++  <h1>404 - File Not Found</h1>
+  </body>
+ </html>
+\ No newline at end of file
+diff --git a/ext/phar/tests/zip/frontcontroller10.phar.phpt b/ext/phar/tests/zip/frontcontroller10.phar.phpt
+--- a/ext/phar/tests/zip/frontcontroller10.phar.phpt
++++ b/ext/phar/tests/zip/frontcontroller10.phar.phpt
+@@ -19,6 +19,6 @@ Status: 403 Access Denied
+   <title>Access Denied</title>
+  </head>
+  <body>
+-  <h1>403 - File /hi Access Denied</h1>
++  <h1>403 - File Access Denied</h1>
+  </body>
+ </html>
+\ No newline at end of file
+diff --git a/ext/phar/tests/zip/frontcontroller6.phar.phpt b/ext/phar/tests/zip/frontcontroller6.phar.phpt
+--- a/ext/phar/tests/zip/frontcontroller6.phar.phpt
++++ b/ext/phar/tests/zip/frontcontroller6.phar.phpt
+@@ -17,6 +17,6 @@ Status: 404 Not Found
+   <title>File Not Found</title>
+  </head>
+  <body>
+-  <h1>404 - File /notfound.php Not Found</h1>
++  <h1>404 - File Not Found</h1>
+  </body>
+ </html>
+\ No newline at end of file
+diff --git a/ext/phar/tests/zip/frontcontroller8.phar.phpt b/ext/phar/tests/zip/frontcontroller8.phar.phpt
+--- a/ext/phar/tests/zip/frontcontroller8.phar.phpt
++++ b/ext/phar/tests/zip/frontcontroller8.phar.phpt
+@@ -16,6 +16,6 @@ Status: 404 Not Found
+   <title>File Not Found</title>
+  </head>
+  <body>
+-  <h1>404 - File /index.php Not Found</h1>
++  <h1>404 - File Not Found</h1>
+  </body>
+ </html>
+\ No newline at end of file

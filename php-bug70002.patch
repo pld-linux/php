@@ -1,0 +1,26 @@
+From: Anatol Belski <ab@php.net>
+Date: Tue Jul 28 17:41:38 2015 +0200
+Subject: [PATCH] Fixed bug #70002 TS issues with temporary dir handling
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/8cd09e8a5ac6781a985600414e816bda45c852ab
+---
+diff --git a/main/php_open_temporary_file.c b/main/php_open_temporary_file.c
+--- a/main/php_open_temporary_file.c
++++ b/main/php_open_temporary_file.c
+@@ -176,7 +176,15 @@ static int php_do_open_temporary_file(const char *path, const char *pfx, char **
+ /* }}} */
+ 
+ /* Cache the chosen temporary directory. */
+-static char* temporary_directory;
++static
++#ifdef ZTS
++#ifdef PHP_WIN32
++__declspec(thread)
++#elif defined(__GNUC__)
++__thread
++#endif
++#endif
++char* temporary_directory;
+ 
+ PHPAPI void php_shutdown_temporary_directory(void)
+ {

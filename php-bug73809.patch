@@ -1,0 +1,71 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Tue Dec 1 14:20:39 2020 +0100
+Subject: [PATCH] Fix #73809: Phar Zip parse crash - mmap fail
+
+Phar signatures practically are of limited size; for the MD5 and SHA
+hashes the size is fixed (at most 64 bytes for SHA512); for OpenSSL
+public keys there is no size limit in theory, but "64 KiB ought to be
+good enough for anybody".  So we check for that limit, to avoid fatal
+errors due to out of memory conditions.
+
+Since it is neither possible to have the signature compressed in the
+ZIP archive, nor is it possible to manually add a signature via Phar,
+we use ZipArchive to create a suitable archive for the test on the fly.
+
+Closes GH-6474.
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/5f81fe863f55bca727f8a5f5d8dcebf345b7e53d
+---
+diff --git a/ext/phar/tests/bug73809.phpt b/ext/phar/tests/bug73809.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug73809.phpt
+@@ -0,0 +1,29 @@
++--TEST--
++Bug #73809 (Phar Zip parse crash - mmap fail)
++--SKIPIF--
++<?php
++if (!extension_loaded('phar')) die('skip phar extension not available');
++if (!extension_loaded('zip')) die('skip zip extension not available');
++?>
++--FILE--
++<?php
++// create the ZIP to be tested
++$zip = new ZipArchive;
++$zip->open('./73809.zip', ZipArchive::CREATE);
++$zip->addFromString('73809.txt', 'yada yada');
++$zip->addFromString('.phar/signature.bin', str_repeat('*', 64 * 1024 + 1));
++var_dump($zip->close());
++
++try {
++    $phar = new PharData('./73809.zip');
++} catch (Exception $ex) {
++    echo $ex->getMessage(), PHP_EOL;
++}
++?>
++--CLEAN--
++<?php
++@unlink('./73809.zip');
++?>
++--EXPECTF--
++bool(true)
++phar error: signatures larger than 64 KiB are not supported in zip-based phar "%s"
+\ No newline at end of file
+diff --git a/ext/phar/zip.c b/ext/phar/zip.c
+--- a/ext/phar/zip.c
++++ b/ext/phar/zip.c
+@@ -410,8 +410,13 @@ foundit:
+ 			off_t now;
+ 			char *sig;
+ 
+-			now = php_stream_tell(fp);
+ 			pefree(entry.filename, entry.is_persistent);
++
++            if (entry.uncompressed_filesize > 0x10000) {
++                PHAR_ZIP_FAIL("signatures larger than 64 KiB are not supported");
++            }
++
++            now = php_stream_tell(fp);
+ 			sigfile = php_stream_fopen_tmpfile();
+ 			if (!sigfile) {
+ 				PHAR_ZIP_FAIL("couldn't open temporary file");

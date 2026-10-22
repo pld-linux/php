@@ -1,0 +1,68 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Mar 3 22:33:38 2019 -0800
+Subject: [PATCH] Fix bug #77586 - phar_tar_writeheaders_int() buffer overflow
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/636632a767a4260c7169c61f927fea014d703e86
+---
+diff --git a/ext/phar/tar.c b/ext/phar/tar.c
+--- a/ext/phar/tar.c
++++ b/ext/phar/tar.c
+@@ -754,7 +754,12 @@ static int phar_tar_writeheaders(void *pDest, void *argument TSRMLS_DC) /* {{{ *
+ 	header.typeflag = entry->tar_type;
+ 
+ 	if (entry->link) {
+-		strncpy(header.linkname, entry->link, strlen(entry->link));
++		if (strlcpy(header.linkname, entry->link, sizeof(header.linkname)) >= sizeof(header.linkname)) {
++			if (fp->error) {
++				spprintf(fp->error, 4096, "tar-based phar \"%s\" cannot be created, link \"%s\" is too long for format", entry->phar->fname, entry->link);
++			}
++			return ZEND_HASH_APPLY_STOP;
++		}
+ 	}
+ 
+ 	strncpy(header.magic, "ustar", sizeof("ustar")-1);
+diff --git a/ext/phar/tests/bug71488.phpt b/ext/phar/tests/bug71488.phpt
+--- a/ext/phar/tests/bug71488.phpt
++++ b/ext/phar/tests/bug71488.phpt
+@@ -12,5 +12,6 @@ DONE
+ <?php
+ @unlink(__DIR__."/bug71488.test");
+ ?>
+---EXPECT--
+-DONE
++--EXPECTF--
++Fatal error: Uncaught exception 'BadMethodCallException' with message 'tar-based phar "%s" cannot be created, link "%s" is too long for format' in %sbug71488.php:%d
++Stack trace:%A
+diff --git a/ext/phar/tests/bug77586.phpt b/ext/phar/tests/bug77586.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug77586.phpt
+@@ -0,0 +1,21 @@
++--TEST--
++Bug #77586 Symbolic link names in tar-formatted phar must be less than 100 bytes.
++--SKIPIF--
++<?php if (!extension_loaded("phar") || true /* blocked by bug 65332 */) die("skip"); ?>
++--FILE--
++<?php
++$dir = __DIR__."/bug77586";
++$phar = new PharData($dir . "/bug77586.tar");
++$phar->buildFromDirectory($dir . "/files");
++?>
++--CLEAN--
++<?php
++$dir = __DIR__."/bug77586";
++unlink($dir . "/bug77586.tar");
++?>
++--EXPECTF--
++Fatal error: Uncaught PharException: tar-based phar "%s/bug77586.tar" cannot be created, link "%s" is too long for format %s
++Stack trace:
++#0 %s/bug77586.php(%d): PharData->buildFromDirectory('%s')
++#1 {main}
++  thrown in %s/bug77586.php %s on line %d
+diff --git a/ext/phar/tests/bug77586/files/link-nktarAMLdJBv7BGYnpzg-ZDycSpWN3Ne3kacltOSE-EqfhStJ1EoBpGuoua6VE-dne29hvpNWXiVbepwIf8-NRHWM9LITLo3nXZnKVNC b/ext/phar/tests/bug77586/files/link-nktarAMLdJBv7BGYnpzg-ZDycSpWN3Ne3kacltOSE-EqfhStJ1EoBpGuoua6VE-dne29hvpNWXiVbepwIf8-NRHWM9LITLo3nXZnKVNC
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug77586/files/link-nktarAMLdJBv7BGYnpzg-ZDycSpWN3Ne3kacltOSE-EqfhStJ1EoBpGuoua6VE-dne29hvpNWXiVbepwIf8-NRHWM9LITLo3nXZnKVNC
+@@ -0,0 +1 @@
++target
+\ No newline at end of file

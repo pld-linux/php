@@ -1,0 +1,65 @@
+From: Pierre Joye <pajoye@php.net>
+Date: Sat Jun 18 20:15:10 2016 +0200
+Subject: [PATCH] Fixed #72339 Integer Overflow in _gd2GetHeader() resulting in heap overflow
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/5c02b91d7b6820857b4ac019a93cff5ae869473b
+---
+diff --git a/ext/gd/libgd/gd_gd2.c b/ext/gd/libgd/gd_gd2.c
+--- a/ext/gd/libgd/gd_gd2.c
++++ b/ext/gd/libgd/gd_gd2.c
+@@ -138,11 +138,17 @@ static int _gd2GetHeader(gdIOCtxPtr in, int *sx, int *sy, int *cs, int *vers, in
+ 	if (gd2_compressed(*fmt)) {
+ 		nc = (*ncx) * (*ncy);
+ 		GD2_DBG(php_gd_error("Reading %d chunk index entries", nc));
++		if (overflow2(sizeof(t_chunk_info), nc)) {
++			goto fail1;
++		}
+ 		sidx = sizeof(t_chunk_info) * nc;
+ 		if (sidx <= 0) {
+ 			goto fail1;
+ 		}
+ 		cidx = gdCalloc(sidx, 1);
++		if (cidx == NULL) {
++			goto fail1;
++		}
+ 		for (i = 0; i < nc; i++) {
+ 			if (gdGetInt(&cidx[i].offset, in) != 1) {
+ 				goto fail1;
+diff --git a/ext/gd/tests/bug72339.phpt b/ext/gd/tests/bug72339.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug72339.phpt
+@@ -0,0 +1,33 @@
++--TEST--
++Bug #72339 Integer Overflow in _gd2GetHeader() resulting in heap overflow 
++--SKIPIF--
++<?php if (!function_exists("imagecreatefromgd2")) print "skip"; ?>
++--FILE--
++<?php
++$fname = dirname(__FILE__) . DIRECTORY_SEPARATOR . "bug72339.gd";
++
++$fh = fopen($fname, "w");
++fwrite($fh, "gd2\x00");
++fwrite($fh, pack("n", 2));
++fwrite($fh, pack("n", 1));
++fwrite($fh, pack("n", 1));
++fwrite($fh, pack("n", 0x40));
++fwrite($fh, pack("n", 2));
++fwrite($fh, pack("n", 0x5AA0)); // Chunks Wide
++fwrite($fh, pack("n", 0x5B00)); // Chunks Vertically
++fwrite($fh, str_repeat("\x41\x41\x41\x41", 0x1000000)); // overflow data
++fclose($fh);
++
++$im = imagecreatefromgd2($fname);
++
++if ($im) {
++	imagedestroy($im);
++}
++unlink($fname);
++
++?>
++--EXPECTF--	
++Warning: imagecreatefromgd2(): gd warning: product of memory allocation multiplication would exceed INT_MAX, failing operation gracefully
++ in %sbug72339.php on line %d
++
++Warning: imagecreatefromgd2(): '%sbug72339.gd' is not a valid GD2 file in %sbug72339.php on line %d

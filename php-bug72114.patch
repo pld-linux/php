@@ -1,0 +1,41 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon May 9 21:55:29 2016 -0700
+Subject: [PATCH] Fix bug #72114 - int/size_t confusion in fread
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/95319620e9bc731b2c59877c3e57837ea41a04bc
+---
+diff --git a/ext/standard/file.c b/ext/standard/file.c
+--- a/ext/standard/file.c
++++ b/ext/standard/file.c
+@@ -1755,6 +1755,12 @@ PHPAPI PHP_FUNCTION(fread)
+ 		RETURN_FALSE;
+ 	}
+ 
++	if (len > INT_MAX) {
++		/* string length is int in 5.x so we can not read more than int */
++		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Length parameter must be no more than %d", INT_MAX);
++		RETURN_FALSE;
++	}
++
+ 	Z_STRVAL_P(return_value) = emalloc(len + 1);
+ 	Z_STRLEN_P(return_value) = php_stream_read(stream, Z_STRVAL_P(return_value), len);
+ 
+diff --git a/ext/standard/tests/file/bug72114.phpt b/ext/standard/tests/file/bug72114.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/file/bug72114.phpt
+@@ -0,0 +1,14 @@
++--TEST--
++Bug #72114 (Integer underflow / arbitrary null write in fread/gzread)
++--SKIPIF--
++<?php if (PHP_INT_SIZE != 8) die("skip this test is for 64bit platform only"); ?>
++--FILE--
++<?php
++ini_set('memory_limit', "2500M");
++$fp = fopen("/dev/zero", "r");
++fread($fp, 2147483648);
++?>
++Done
++--EXPECTF--
++Warning: fread(): Length parameter must be no more than 2147483647 in %s/bug72114.php on line %d
++Done

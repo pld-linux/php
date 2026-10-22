@@ -1,0 +1,74 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon Jul 18 21:44:39 2016 -0700
+Subject: [PATCH] Fix bug #72606: heap-buffer-overflow (write) simplestring_addn simplestring.c
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/ec6344f8e1ab3d2f73b4aef321d13a1e115799be
+---
+diff --git a/ext/xmlrpc/libxmlrpc/simplestring.c b/ext/xmlrpc/libxmlrpc/simplestring.c
+--- a/ext/xmlrpc/libxmlrpc/simplestring.c
++++ b/ext/xmlrpc/libxmlrpc/simplestring.c
+@@ -172,11 +172,15 @@ void simplestring_free(simplestring* string) {
+ }
+ /******/
+ 
++#ifndef SIZE_MAX
++#define SIZE_MAX ((size_t)-1)
++#endif
++
+ /****f* FUNC/simplestring_addn
+  * NAME
+  *   simplestring_addn
+  * SYNOPSIS
+- *   void simplestring_addn(simplestring* string, const char* add, int add_len)
++ *   void simplestring_addn(simplestring* string, const char* add, size_t add_len)
+  * FUNCTION
+  *   copies n characters from source to target string
+  * INPUTS
+@@ -190,18 +194,31 @@ void simplestring_free(simplestring* string) {
+  *   simplestring_add ()
+  * SOURCE
+  */
+-void simplestring_addn(simplestring* target, const char* source, int add_len) {
++void simplestring_addn(simplestring* target, const char* source, size_t add_len) {
++   size_t newsize = target->size, incr = 0;
+    if(target && source) {
+       if(!target->str) {
+          simplestring_init_str(target);
+       }
++
++      if((SIZE_MAX - add_len) < target->len || (SIZE_MAX - add_len - 1) < target->len) {
++	 /* check for overflows, if there's a potential overflow do nothing */
++	 return;
++      }
++
+       if(target->len + add_len + 1 > target->size) {
+          /* newsize is current length + new length */
+-         int newsize = target->len + add_len + 1;
+-         int incr = target->size * 2;
++         newsize = target->len + add_len + 1;
++         incr = target->size * 2;
+ 
+          /* align to SIMPLESTRING_INCR increments */
+-         newsize = newsize - (newsize % incr) + incr;
++	 if (incr) {
++	    newsize = newsize - (newsize % incr) + incr;
++	 }
++	 if(newsize < (target->len + add_len + 1)) {
++	    /* some kind of overflow happened */
++	    return;
++         }
+          target->str = (char*)realloc(target->str, newsize);
+ 
+          target->size = target->str ? newsize : 0;
+diff --git a/ext/xmlrpc/libxmlrpc/simplestring.h b/ext/xmlrpc/libxmlrpc/simplestring.h
+--- a/ext/xmlrpc/libxmlrpc/simplestring.h
++++ b/ext/xmlrpc/libxmlrpc/simplestring.h
+@@ -63,7 +63,7 @@ void simplestring_init(simplestring* string);
+ void simplestring_clear(simplestring* string);
+ void simplestring_free(simplestring* string);
+ void simplestring_add(simplestring* string, const char* add);
+-void simplestring_addn(simplestring* string, const char* add, int add_len);
++void simplestring_addn(simplestring* string, const char* add, size_t add_len);
+ 
+ #ifdef __cplusplus
+ }

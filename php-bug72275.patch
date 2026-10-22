@@ -1,0 +1,19 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon Jun 13 23:12:47 2016 -0700
+Subject: [PATCH] Fix bug #72275: don't allow smart_str to overflow int
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/de635a581ce6c052e612d2683e936a20c5d2ae47
+---
+diff --git a/ext/standard/php_smart_str.h b/ext/standard/php_smart_str.h
+--- a/ext/standard/php_smart_str.h
++++ b/ext/standard/php_smart_str.h
+@@ -63,6 +63,9 @@
+ 		newlen = (d)->len + (n);									\
+ 		if (newlen >= (d)->a) {										\
+ 			(d)->a = newlen + SMART_STR_PREALLOC;					\
++	        if (UNEXPECTED((d)->a >= INT_MAX)) {					\
++                zend_error(E_ERROR, "String size overflow");		\
++            }														\
+ 			SMART_STR_DO_REALLOC(d, what);							\
+ 		}															\
+ 	}																\

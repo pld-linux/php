@@ -1,0 +1,52 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Sep 11 21:19:29 2016 -0700
+Subject: [PATCH] Fix bug #73052 - Memory Corruption in During Deserialized-object Destruction
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/84d6dd9877de2ac14b1c52581105dff744887db9
+---
+diff --git a/Zend/zend_objects_API.c b/Zend/zend_objects_API.c
+--- a/Zend/zend_objects_API.c
++++ b/Zend/zend_objects_API.c
+@@ -307,7 +307,7 @@ ZEND_API void zend_object_store_ctor_failed(zval *zobject TSRMLS_DC)
+ 	zend_object_handle handle = Z_OBJ_HANDLE_P(zobject);
+ 	zend_object_store_bucket *obj_bucket = &EG(objects_store).object_buckets[handle];
+ 	
+-	obj_bucket->bucket.obj.handlers = Z_OBJ_HT_P(zobject);;
++	obj_bucket->bucket.obj.handlers = Z_OBJ_HT_P(zobject);
+ 	obj_bucket->destructor_called = 1;
+ }
+ 
+diff --git a/ext/standard/tests/serialize/bug73052.phpt b/ext/standard/tests/serialize/bug73052.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/serialize/bug73052.phpt
+@@ -0,0 +1,18 @@
++--TEST--
++Bug #73052: Memory Corruption in During Deserialized-object Destruction
++--FILE--
++<?php
++
++class obj {
++    var $ryat;
++    public function __destruct() {
++        $this->ryat = null;
++    }
++}
++
++$poc = 'O:3:"obj":1:{';
++var_dump(unserialize($poc));
++?>
++--EXPECTF--
++Notice: unserialize(): Error at offset 13 of 13 bytes in %sbug73052.php on line %d
++bool(false)
+diff --git a/ext/standard/var_unserializer.re b/ext/standard/var_unserializer.re
+--- a/ext/standard/var_unserializer.re
++++ b/ext/standard/var_unserializer.re
+@@ -479,6 +479,7 @@ static inline int object_common2(UNSERIALIZE_PARAMETER, long elements)
+ 		/* We've got partially constructed object on our hands here. Wipe it. */
+ 		if(Z_TYPE_PP(rval) == IS_OBJECT) {
+ 			zend_hash_clean(Z_OBJPROP_PP(rval));
++			zend_object_store_ctor_failed(*rval TSRMLS_CC);
+ 		}
+ 		ZVAL_NULL(*rval);
+ 		return 0;

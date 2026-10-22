@@ -1,0 +1,48 @@
+From: Christoph M. Becker <cmb@php.net>
+Date: Mon Jul 20 23:24:55 2015 +0200
+Subject: [PATCH] Fix #66387: Stack overflow with imagefilltoborder
+
+The stack overflow is caused by the recursive algorithm in combination with a
+very large negative coordinate passed to gdImageFillToBorder(). As there is
+already a clipping for large positive coordinates to the width and height of
+the image, it seems to be consequent to clip to zero also.
+
+5.4 backport: https://github.com/shivammathur/php-src-backports/commit/bbd1dd5c820685d1d1203e57ca45d4b3dad1bdf2
+---
+diff --git a/ext/gd/libgd/gd.c b/ext/gd/libgd/gd.c
+--- a/ext/gd/libgd/gd.c
++++ b/ext/gd/libgd/gd.c
+@@ -1770,9 +1770,13 @@ void gdImageFillToBorder (gdImagePtr im, int x, int y, int border, int color)
+ 
+ 	if (x >= im->sx) {
+ 		x = im->sx - 1;
++	} else if (x < 0) {
++		x = 0;
+ 	}
+ 	if (y >= im->sy) {
+ 		y = im->sy - 1;
++	} else if (y < 0) {
++		y = 0;
+ 	}
+ 
+ 	for (i = x; i >= 0; i--) {
+diff --git a/ext/gd/tests/bug66387.phpt b/ext/gd/tests/bug66387.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug66387.phpt
+@@ -0,0 +1,15 @@
++--TEST--
++Bug #66387 (Stack overflow with imagefilltoborder)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available!');
++?>
++--FILE--
++<?php
++$im = imagecreatetruecolor(20, 20);
++$c = imagecolorallocate($im, 255, 0, 0);
++imagefilltoborder($im, 0, -999355, $c, $c);
++echo "ready\n";
++?>
++--EXPECT--
++ready

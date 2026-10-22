@@ -1,0 +1,47 @@
+From: Nikita Popov <nikic@php.net>
+Date: Sat Jul 30 15:10:54 2016 +0200
+Subject: [PATCH] Fixed bug #72142
+
+Source: upstream https://github.com/php/php-src/commit/e87ac688d5 (5.6.25)
+---
+diff --git a/ext/wddx/tests/bug72142.phpt b/ext/wddx/tests/bug72142.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/wddx/tests/bug72142.phpt
+@@ -0,0 +1,13 @@
++--TEST--
++Bug #72142: WDDX Packet Injection Vulnerability in wddx_serialize_value()
++--FILE--
++<?php
++
++$wddx = wddx_serialize_value('', '</comment></header><data><struct><var name="php_class_name"><string>stdClass</string></var></struct></data></wddxPacket>');
++var_dump($wddx);
++var_dump(wddx_deserialize($wddx));
++
++?>
++--EXPECT--
++string(301) "<wddxPacket version='1.0'><header><comment>&lt;/comment&gt;&lt;/header&gt;&lt;data&gt;&lt;struct&gt;&lt;var name=&quot;php_class_name&quot;&gt;&lt;string&gt;stdClass&lt;/string&gt;&lt;/var&gt;&lt;/struct&gt;&lt;/data&gt;&lt;/wddxPacket&gt;</comment></header><data><string></string></data></wddxPacket>"
++string(0) ""
+diff --git a/ext/wddx/wddx.c b/ext/wddx/wddx.c
+--- a/ext/wddx/wddx.c
++++ b/ext/wddx/wddx.c
+@@ -374,11 +374,18 @@ void php_wddx_packet_start(wddx_packet *packet, char *comment, int comment_len)
+ {
+ 	php_wddx_add_chunk_static(packet, WDDX_PACKET_S);
+ 	if (comment) {
++		char *escaped;
++		size_t escaped_len;
++		escaped = php_escape_html_entities(
++			comment, comment_len, &escaped_len, 0, ENT_QUOTES, NULL TSRMLS_CC);
++
+ 		php_wddx_add_chunk_static(packet, WDDX_HEADER_S);
+ 		php_wddx_add_chunk_static(packet, WDDX_COMMENT_S);
+-		php_wddx_add_chunk_ex(packet, comment, comment_len);
++		php_wddx_add_chunk_ex(packet, escaped, escaped_len);
+ 		php_wddx_add_chunk_static(packet, WDDX_COMMENT_E);
+ 		php_wddx_add_chunk_static(packet, WDDX_HEADER_E);
++
++		str_efree(escaped);
+ 	} else {
+ 		php_wddx_add_chunk_static(packet, WDDX_HEADER);
+ 	}

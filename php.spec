@@ -147,8 +147,8 @@ Summary(pt_BR.UTF-8):	A linguagem de script PHP
 Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-файлов, выполняемый на сервере
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
-Version:	8.0.28
-Release:	17
+Version:	8.0.30
+Release:	1
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -156,7 +156,7 @@ Epoch:		4
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
 Source0:	https://php.net/distributions/%{orgname}-%{version}.tar.xz
-# Source0-md5:	d2287d86052a3e1c3ad6d184431a88e2
+# Source0-md5:	453206c948d9504b91fcec30fcb59b75
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -203,11 +203,55 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
 Patch72:	openssl.patch
-Patch73:	missing-includes.patch
 Patch74:	icu74.patch
-Patch75:	libxml2-2.12.patch
 Patch76:	types.patch
 Patch77:	opcache-revalidate-path-once.patch
+# post_max_size part of https://github.com/php/php-src/commit/01a40e89fbfc499936e3b05888d8f00bfde886df, missing in the 8.0 minimal fix
+Patch191:	php-cve-2026-109618-post_max_size.patch
+# https://github.com/php/php-src/commit/67259e451d5d58b4842776c5696a66d74e157609, fixes a regression
+# from the libxml2 2.13 backport carried in php-cve-2025-1219.patch
+Patch192:	php-gh14834.patch
+# Patch200+: security backports for EOL 8.0 by Remi Collet, numbered as in
+# https://git.remirepo.net/cgit/rpms/scl-php80/php.git/tree/php.spec
+Patch200:	php-cve-2024-2756.patch
+Patch201:	php-cve-2024-3096.patch
+Patch202:	php-cve-2024-5458.patch
+Patch203:	php-cve-2024-8925.patch
+Patch204:	php-cve-2024-8926.patch
+Patch205:	php-cve-2024-8927.patch
+Patch206:	php-cve-2024-9026.patch
+Patch207:	php-cve-2024-11236.patch
+Patch208:	php-cve-2024-11234.patch
+Patch209:	php-cve-2024-8932.patch
+Patch210:	php-cve-2024-11233.patch
+Patch211:	php-ghsa-4w77-75f9-2c8w.patch
+Patch212:	php-cve-2024-8929.patch
+Patch213:	php-cve-2025-1217.patch
+Patch214:	php-cve-2025-1734.patch
+Patch215:	php-cve-2025-1861.patch
+Patch216:	php-cve-2025-1736.patch
+Patch217:	php-cve-2025-1219.patch
+Patch218:	php-cve-2025-6491.patch
+Patch219:	php-cve-2025-1220.patch
+Patch220:	php-cve-2025-1735.patch
+Patch221:	php-cve-2025-14177.patch
+Patch222:	php-cve-2025-14178.patch
+Patch223:	php-ghsa-www2-q4fc-65wf.patch
+Patch224:	php-cve-2025-14179.patch
+Patch225:	php-cve-2026-6722.patch
+Patch226:	php-cve-2026-7261.patch
+Patch227:	php-cve-2026-7262.patch
+Patch228:	php-cve-2026-6735.patch
+Patch229:	php-cve-2026-7259.patch
+Patch230:	php-cve-2026-7568.patch
+Patch231:	php-cve-2026-7258.patch
+Patch232:	php-cve-2026-14355.patch
+Patch233:	php-cve-2026-9672.patch
+Patch234:	php-cve-2026-17543.patch
+Patch235:	php-cve-2026-7260.patch
+Patch236:	php-gh22643.patch
+Patch237:	php-from-8.2.34-to-8.0.patch
+Patch238:	php-8.0-cve-2026-109618.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -261,6 +305,8 @@ BuildRequires:	pam-devel
 BuildRequires:	pcre2-8-devel >= 10.30
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel}
+# php-cve-2026-7258.patch changes *.re scanners without their generated *.c
+BuildRequires:	re2c >= 0.13.4
 BuildRequires:	readline-devel
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
@@ -1905,11 +1951,50 @@ cp -p php.ini-production php.ini
 #%%patch -P68 -p1 DROP or update to 7.0 APIs
 %patch -P71 -p1 -b .libdb-info
 %patch -P72 -p1
-%patch -P73 -p1
 %patch -P74 -p1
-%patch -P75 -p1
 %patch -P76 -p1
 %patch -P77 -p1
+%patch -P200 -p1
+%patch -P201 -p1
+%patch -P202 -p1
+%patch -P203 -p1
+%patch -P204 -p1
+%patch -P205 -p1
+%patch -P206 -p1
+%patch -P207 -p1
+%patch -P208 -p1
+%patch -P209 -p1
+%patch -P210 -p1
+%patch -P211 -p1
+%patch -P212 -p1
+%patch -P213 -p1
+%patch -P214 -p1
+%patch -P215 -p1
+%patch -P216 -p1
+%patch -P217 -p1
+%patch -P218 -p1
+%patch -P219 -p1
+%patch -P220 -p1
+%patch -P221 -p1
+%patch -P222 -p1
+%patch -P223 -p1
+%patch -P224 -p1
+%patch -P225 -p1
+%patch -P226 -p1
+%patch -P227 -p1
+%patch -P228 -p1
+%patch -P229 -p1
+%patch -P230 -p1
+%patch -P231 -p1
+%patch -P232 -p1
+%patch -P233 -p1
+%patch -P234 -p1
+%patch -P235 -p1
+%patch -P236 -p1
+%patch -P237 -p1
+%patch -P238 -p1
+%patch -P191 -p1
+%patch -P192 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \
@@ -2452,6 +2537,7 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libphp_common.a
 
 # install CGI/FCGI
 %if %{with cgi}
@@ -2512,6 +2598,7 @@ cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/cli.d/php.ini
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/apache2handler.d/php.ini
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.a
 %endif
 
 # ensure that paths are correct for current php version and arch

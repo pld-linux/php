@@ -1,0 +1,29 @@
+From: Guilhem Moulin <guilhem@debian.org>
+Date: Sun, 4 Oct 2026 22:58:09 +0200
+Subject: Backport sapi/fpm/tests/logtool.inc from 8.2
+
+Origin: https://github.com/php/php-src/commit/327bb219867b16e1161da632fba170f46692484b#diff-295bf0dcd228faeaebc60039cd5ad8cacd0ea04618a4f774d4fb6d237ca3f7ee
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0198-Backport-sapi-fpm-tests-logtool.inc-from-8.2.patch
+---
+ sapi/fpm/tests/logtool.inc | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/sapi/fpm/tests/logtool.inc b/sapi/fpm/tests/logtool.inc
+index 219c6fed..9e2f1412 100644
+--- a/sapi/fpm/tests/logtool.inc
++++ b/sapi/fpm/tests/logtool.inc
+@@ -321,8 +321,13 @@ class LogTool
+             $expectedMessage = '\[pool ' . $pool . '\] ' . $expectedMessage;
+         }
+ 
++        // Allow expected message to contain %s and %s for any string or number
++        // as in run-tests.php
++        $expectRe = str_replace('%s', '[^\r\n]+', $expectedMessage);
++        $expectRe = str_replace('%d', '\d+', $expectRe);
++
+         $line = rtrim($line);
+-        $pattern = sprintf('/^%s %s: %s$/', self::P_TIME, $type, $expectedMessage);
++        $pattern = sprintf('/^%s %s: %s$/', self::P_TIME, $type, $expectRe);
+ 
+         if (preg_match($pattern, $line, $matches) === 0) {
+             return $this->error(

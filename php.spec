@@ -151,7 +151,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.1.33
-Release:	27
+Release:	28
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -225,6 +225,102 @@ Patch78:	includes.patch
 Patch79:	configure.patch
 Patch80:	ac_prog_sed.patch
 Patch81:	opcache-revalidate-path-once.patch
+# Patch200+: security backports for EOL 7.1, one file per advisory, in this order:
+# https://github.com/shivammathur/php-src-backports/tree/PHP-7.1-security-backports
+# (also used by Homebrew php@7.1), then Debian ELTS php7.0 7.0.33-0+deb9u26 and
+# php7.3 7.3.31-1~deb10u16, https://deb.freexian.com/extended-lts/pool/main/p/;
+# the source of each part is named in the patch header
+Patch200:	php-cve-2019-18218.patch
+Patch201:	php-cve-2019-11046.patch
+Patch202:	php-cve-2019-11045.patch
+Patch203:	php-cve-2019-11050.patch
+Patch204:	php-cve-2019-11047.patch
+Patch205:	php-bug79091.patch
+Patch206:	php-cve-2020-7059.patch
+Patch207:	php-bug77569.patch
+Patch208:	php-cve-2020-7062.patch
+Patch209:	php-cve-2020-7063.patch
+Patch210:	php-cve-2020-7064.patch
+Patch211:	php-cve-2020-7066.patch
+Patch212:	php-bug79330.patch
+Patch213:	php-cve-2020-7067.patch
+Patch214:	php-cve-2019-11048.patch
+Patch215:	php-cve-2020-7068.patch
+Patch216:	php-bug79877.patch
+Patch217:	php-cve-2020-7069.patch
+Patch218:	php-cve-2020-7070.patch
+Patch219:	php-cve-2020-7071.patch
+Patch220:	php-cve-2021-21702.patch
+Patch221:	php-bug80710.patch
+Patch222:	php-cve-2021-21705.patch
+Patch223:	php-cve-2021-21704.patch
+Patch224:	php-bug81211.patch
+Patch225:	php-cve-2021-21703.patch
+Patch226:	php-cve-2021-21707.patch
+Patch227:	php-cve-2022-31625.patch
+Patch228:	php-cve-2022-31626.patch
+Patch229:	php-cve-2022-31629.patch
+Patch230:	php-cve-2022-31628.patch
+Patch231:	php-cve-2022-31631.patch
+Patch232:	php-cve-2023-0567.patch
+Patch233:	php-cve-2023-0568.patch
+Patch234:	php-cve-2023-0662.patch
+Patch235:	php-cve-2023-3247.patch
+Patch236:	php-cve-2023-3824.patch
+Patch237:	php-cve-2023-3823.patch
+Patch238:	php-cve-2024-2756.patch
+Patch239:	php-cve-2024-3096.patch
+Patch240:	php-cve-2024-5458.patch
+Patch241:	php-cve-2024-8927.patch
+Patch242:	php-cve-2024-8925.patch
+Patch243:	php-cve-2024-11236.patch
+Patch244:	php-zstr_max_len.patch
+Patch245:	php-cve-2024-11234.patch
+Patch246:	php-cve-2024-8932.patch
+Patch247:	php-cve-2024-11233.patch
+Patch248:	php-bug74267.patch
+Patch249:	php-ghsa-4w77-75f9-2c8w.patch
+Patch250:	php-cve-2026-6722.patch
+Patch251:	php-cve-2026-7261.patch
+Patch252:	php-cve-2026-7262.patch
+Patch253:	php-cve-2026-7568.patch
+Patch254:	php-cve-2026-6735.patch
+Patch255:	php-cve-2026-14355.patch
+Patch256:	php-cve-2024-8929.patch
+Patch257:	php-tests-http-server-8.0.patch
+Patch258:	php-tests-openssl-server-8.1.patch
+Patch259:	php-cve-2025-1217.patch
+Patch260:	php-cve-2025-1219.patch
+Patch261:	php-cve-2025-1734.patch
+Patch262:	php-cve-2025-1736.patch
+Patch263:	php-cve-2025-1861.patch
+Patch264:	php-ghsa-wg4p-4hqh-c3g9.patch
+Patch265:	php-cve-2025-1220.patch
+Patch266:	php-cve-2025-1735.patch
+Patch267:	php-cve-2025-6491.patch
+Patch268:	php-cve-2026-7258.patch
+Patch269:	php-cve-2026-9672.patch
+Patch270:	php-cve-2026-17543.patch
+Patch271:	php-cve-2026-7260.patch
+Patch272:	php-cve-2026-92842.patch
+Patch273:	php-tests-fpm-logtool.patch
+Patch274:	php-cve-2026-91768.patch
+Patch275:	php-cve-2026-91769.patch
+Patch276:	php-cve-2026-91767.patch
+Patch277:	php-cve-2026-91766.patch
+Patch278:	php-cve-2026-91765.patch
+Patch279:	php-cve-2025-14181.patch
+Patch280:	php-cve-2026-6103.patch
+Patch281:	php-ghsa-ch8v-r6jh-4vvr.patch
+Patch282:	php-gh23467.patch
+Patch283:	php-cve-2026-109618.patch
+# post_max_size part of https://github.com/php/php-src/commit/01a40e89fbfc499936e3b05888d8f00bfde886df, missing in the minimal EOL fix
+Patch284:	php-cve-2026-109618-post_max_size.patch
+# session part of https://github.com/php/php-src/commit/3584a98bda0f instead of disabling upload progress
+Patch285:	php-cve-2026-109618-session.patch
+# test infrastructure the backported firebird and openssl SAN tests need
+Patch286:	php-tests-firebird-payload-server.patch
+Patch287:	php-tests-openssl-certgen.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -280,6 +376,8 @@ BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	readline-devel
+# security patches change *.re scanners without the generated *.c
+BuildRequires:	re2c >= 0.13.4
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
@@ -2057,6 +2155,94 @@ cp -p php.ini-production php.ini
 %patch -P79 -p1
 %patch -P80 -p1
 %patch -P81 -p1
+%patch -P200 -p1
+%patch -P201 -p1
+%patch -P202 -p1
+%patch -P203 -p1
+%patch -P204 -p1
+%patch -P205 -p1
+%patch -P206 -p1
+%patch -P207 -p1
+%patch -P208 -p1
+%patch -P209 -p1
+%patch -P210 -p1
+%patch -P211 -p1
+%patch -P212 -p1
+%patch -P213 -p1
+%patch -P214 -p1
+%patch -P215 -p1
+%patch -P216 -p1
+%patch -P217 -p1
+%patch -P218 -p1
+%patch -P219 -p1
+%patch -P220 -p1
+%patch -P221 -p1
+%patch -P222 -p1
+%patch -P223 -p1
+%patch -P224 -p1
+%patch -P225 -p1
+%patch -P226 -p1
+%patch -P227 -p1
+%patch -P228 -p1
+%patch -P229 -p1
+%patch -P230 -p1
+%patch -P231 -p1
+%patch -P232 -p1
+%patch -P233 -p1
+%patch -P234 -p1
+%patch -P235 -p1
+%patch -P236 -p1
+%patch -P237 -p1
+%patch -P238 -p1
+%patch -P239 -p1
+%patch -P240 -p1
+%patch -P241 -p1
+%patch -P242 -p1
+%patch -P243 -p1
+%patch -P244 -p1
+%patch -P245 -p1
+%patch -P246 -p1
+%patch -P247 -p1
+%patch -P248 -p1
+%patch -P249 -p1
+%patch -P250 -p1
+%patch -P251 -p1
+%patch -P252 -p1
+%patch -P253 -p1
+%patch -P254 -p1
+%patch -P255 -p1
+%patch -P256 -p1
+%patch -P257 -p1
+%patch -P258 -p1
+%patch -P259 -p1
+%patch -P260 -p1
+%patch -P261 -p1
+%patch -P262 -p1
+%patch -P263 -p1
+%patch -P264 -p1
+%patch -P265 -p1
+%patch -P266 -p1
+%patch -P267 -p1
+%patch -P268 -p1
+%patch -P269 -p1
+%patch -P270 -p1
+%patch -P271 -p1
+%patch -P272 -p1
+%patch -P273 -p1
+%patch -P274 -p1
+%patch -P275 -p1
+%patch -P276 -p1
+%patch -P277 -p1
+%patch -P278 -p1
+%patch -P279 -p1
+%patch -P280 -p1
+%patch -P281 -p1
+%patch -P282 -p1
+%patch -P283 -p1
+%patch -P284 -p1
+%patch -P285 -p1
+%patch -P286 -p1
+%patch -P287 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

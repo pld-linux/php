@@ -1,0 +1,38 @@
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:47:22 +0200
+Subject: [PATCH] Fix #79812: Potential integer overflow in pcntl_exec()
+
+The env pair length is an int and the allocation unchecked; huge keys or
+values truncate it, so the copy runs past the buffer (heap overflow).
+
+Origin: backport, https://github.com/php/php-src/commit/0a36d417e87680afcd9d3108650aaa287524ce30
+Bug: https://bugs.php.net/79812
+PLD: taken from packages/php branch PHP_7_1, php-bug79812.patch
+---
+ ext/pcntl/pcntl.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/ext/pcntl/pcntl.c b/ext/pcntl/pcntl.c
+index 561815f5..2441125c 100644
+--- a/ext/pcntl/pcntl.c
++++ b/ext/pcntl/pcntl.c
+@@ -860,7 +860,7 @@ PHP_FUNCTION(pcntl_exec)
+ 	int envc = 0, envi = 0;
+ 	char **argv = NULL, **envp = NULL;
+ 	char **current_arg, **pair;
+-	int pair_length;
++	size_t pair_length;
+ 	zend_string *key;
+ 	char *path;
+ 	size_t path_len;
+@@ -909,8 +909,9 @@ PHP_FUNCTION(pcntl_exec)
+ 			convert_to_string_ex(element);
+ 
+ 			/* Length of element + equal sign + length of key + null */
++			ZEND_ASSERT(Z_STRLEN_P(element) < SIZE_MAX && ZSTR_LEN(key) < SIZE_MAX);
++			*pair = safe_emalloc(Z_STRLEN_P(element) + 1, sizeof(char), ZSTR_LEN(key) + 1);
+ 			pair_length = Z_STRLEN_P(element) + ZSTR_LEN(key) + 2;
+-			*pair = emalloc(pair_length);
+ 			strlcpy(*pair, ZSTR_VAL(key), ZSTR_LEN(key) + 1);
+ 			strlcat(*pair, "=", pair_length);
+ 			strlcat(*pair, Z_STRVAL_P(element), pair_length);

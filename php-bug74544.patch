@@ -1,0 +1,29 @@
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:37:08 +0200
+Subject: [PATCH] Fix #74544: Integer overflow in mysqli_real_escape_string()
+
+On 32-bit, 2 * len wraps for inputs over 2 GiB; the escaper then writes
+past the undersized buffer (heap overflow).
+
+Origin: upstream, https://github.com/php/php-src/commit/5977610de1aa87630e40a299a2d90fb7cd00bf7c
+Bug: https://bugs.php.net/74544
+Bug: https://nvd.nist.gov/vuln/detail/CVE-2017-9120
+PLD: 7.1: applied by hand, context differs
+PLD: taken from packages/php branch PHP_7_1, php-bug74544.patch
+---
+ ext/mysqli/mysqli_api.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/mysqli/mysqli_api.c b/ext/mysqli/mysqli_api.c
+index 6793fc80..79e69cd0 100644
+--- a/ext/mysqli/mysqli_api.c
++++ b/ext/mysqli/mysqli_api.c
+@@ -1971,7 +1971,7 @@ PHP_FUNCTION(mysqli_real_escape_string) {
+ 	}
+ 	MYSQLI_FETCH_RESOURCE_CONN(mysql, mysql_link, MYSQLI_STATUS_VALID);
+ 
+-	newstr = zend_string_alloc(2 * escapestr_len, 0);
++	newstr = zend_string_safe_alloc(2, escapestr_len, 0, 0);
+ 	ZSTR_LEN(newstr) = mysql_real_escape_string(mysql->mysql, ZSTR_VAL(newstr), escapestr, escapestr_len);
+ 	newstr = zend_string_truncate(newstr, ZSTR_LEN(newstr), 0);
+ 

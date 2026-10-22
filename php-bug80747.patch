@@ -1,0 +1,57 @@
+From: Nikita Popov <nikita.ppv@gmail.com>
+Date: Mon, 15 Feb 2021 15:33:42 +0100
+Subject: [PATCH] Fix #80747: Providing RSA key size < 512 generates key that
+ crash PHP
+
+When RSA_generate_key_ex() fails (e.g. fewer than 512 bits) the empty RSA was still
+assigned to the key, so openssl_pkey_new() returned an unusable key instead of false.
+
+Origin: backport, https://github.com/php/php-src/commit/64b10854643531bcf62a884aaea0bafc57e4f914
+Bug: https://bugs.php.net/80747
+PLD: taken from packages/php branch PHP_7_1, php-bug80747.patch
+PLD: 7.0: 7.0 has no php_openssl_store_errors()
+---
+ ext/openssl/openssl.c           |  5 ++++-
+ ext/openssl/tests/bug80747.phpt | 18 ++++++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/ext/openssl/openssl.c b/ext/openssl/openssl.c
+index 6f5e2007..a686f725 100644
+--- a/ext/openssl/openssl.c
++++ b/ext/openssl/openssl.c
+@@ -3700,7 +3700,10 @@ static EVP_PKEY * php_openssl_generate_private_key(struct php_x509_request * req
+ 						}
+ 						rsaparam = RSA_new();
+ 						PHP_OPENSSL_RAND_ADD_TIME();
+-						RSA_generate_key_ex(rsaparam, req->priv_key_bits, bne, NULL);
++						if (rsaparam == NULL || !RSA_generate_key_ex(rsaparam, req->priv_key_bits, bne, NULL)) {
++							RSA_free(rsaparam);
++							rsaparam = NULL;
++						}
+ 						BN_free(bne);
+ 					}
+ #endif
+diff --git a/ext/openssl/tests/bug80747.phpt b/ext/openssl/tests/bug80747.phpt
+new file mode 100644
+index 00000000..049405ec
+--- /dev/null
++++ b/ext/openssl/tests/bug80747.phpt
+@@ -0,0 +1,18 @@
++--TEST--
++Bug #80747: Providing RSA key size < 512 generates key that crash PHP
++--SKIPIF--
++<?php
++if (!extension_loaded("openssl")) die("skip");
++?>
++--FILE--
++<?php
++
++$conf = array(
++    'config' => __DIR__ . DIRECTORY_SEPARATOR . 'openssl.cnf',
++    'private_key_bits' => 511,
++);
++var_dump(openssl_pkey_new($conf));
++
++?>
++--EXPECT--
++bool(false)

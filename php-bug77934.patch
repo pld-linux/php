@@ -1,0 +1,82 @@
+From: Jakub Zelenka <bukka@php.net>
+Date: Sat, 11 May 2019 19:07:39 +0000
+Subject: [PATCH] Fix bug #77934 (php-fpm kill -USR2 not working)
+
+On reload the master sends SIGQUIT to the children. The child handler
+closes fd 0 to make the blocked accept() fail, but the child accepts on
+fpm_globals.listening_socket (a dup() of the pool socket), so an idle
+child keeps waiting until process_control_timeout runs out and the
+master sends SIGTERM: with process_control_timeout set, every reload
+(kill -USR2) stalls for that long.
+
+Origin: upstream, https://github.com/php/php-src/commit/cc5c51e7f073
+Bug: https://bugs.php.net/77934
+PLD: taken from packages/php branch PHP_7_1, php-bug77934.patch
+---
+ sapi/fpm/fpm/fpm_signals.c                        |  2 +-
+ .../tests/bug77934-reload-process-control.phpt    | 44 +++++++++++++++++++++
+ 2 files changed, 45 insertions(+), 1 deletion(-)
+
+diff --git a/sapi/fpm/fpm/fpm_signals.c b/sapi/fpm/fpm/fpm_signals.c
+index e9f49d9e..6608531d 100644
+--- a/sapi/fpm/fpm/fpm_signals.c
++++ b/sapi/fpm/fpm/fpm_signals.c
+@@ -144,7 +144,7 @@ static void sig_soft_quit(int signo) /* {{{ */
+ 	int saved_errno = errno;
+ 
+ 	/* closing fastcgi listening socket will force fcgi_accept() exit immediately */
+-	close(0);
++	close(fpm_globals.listening_socket);
+ 	if (0 > socket(AF_UNIX, SOCK_STREAM, 0)) {
+ 		zlog(ZLOG_WARNING, "failed to create a new socket");
+ 	}
+diff --git a/sapi/fpm/tests/bug77934-reload-process-control.phpt b/sapi/fpm/tests/bug77934-reload-process-control.phpt
+new file mode 100644
+index 00000000..d223403f
+--- /dev/null
++++ b/sapi/fpm/tests/bug77934-reload-process-control.phpt
+@@ -0,0 +1,44 @@
++--TEST--
++FPM: bug77934 - php-fpm kill -USR2 not working
++--SKIPIF--
++<?php include "skipif.inc"; ?>
++--FILE--
++<?php
++
++require_once "tester.inc";
++
++$cfg = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++pid = {{FILE:PID}}
++process_control_timeout=20
++[unconfined]
++listen = {{ADDR}}
++pm = dynamic
++pm.max_children = 5
++pm.start_servers = 1
++pm.min_spare_servers = 1
++pm.max_spare_servers = 1
++EOT;
++
++$tester = new FPM\Tester($cfg);
++$tester->start();
++$tester->expectLogStartNotices();
++$tester->signal('USR2');
++$tester->expectLogNotice('Reloading in progress ...');
++$tester->expectLogNotice('reloading: .*');
++$tester->expectLogNotice('using inherited socket fd=\d+, "127.0.0.1:\d+"');
++$tester->expectLogStartNotices();
++$tester->terminate();
++$tester->expectLogTerminatingNotices();
++$tester->close();
++
++?>
++Done
++--EXPECT--
++Done
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>

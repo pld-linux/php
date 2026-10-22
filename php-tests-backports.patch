@@ -1,0 +1,809 @@
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Fri, 12 Apr 2019 13:05:16 +0200
+Subject: Fix tests wrt. internationalization
+
+(cherry picked from commit php/php-src@d07a6fdedfa3d894024f33431cad10d6c64d428f)
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0073-Fix-tests-wrt.-internationalization.patch
+
+From: Allen Truong <v-altruo@microsoft.com>
+Date: Tue, 11 Jun 2019 23:40:08 +0200
+Subject: Fixes #3: Updated tests to have less fails due to the test files
+ themselves.
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0086-Fixes-3-Updated-tests-to-have-less-fails-due-to-the-.patch
+
+From: Anatol Belski <ab@php.net>
+Date: Fri, 18 May 2018 18:36:39 +0200
+Subject: Fix Opcache test fails regarding to AppVeyor image update
+
+(cherry picked from php/php-src@6043a2d6f74bf5125573fde198070ac9804d5e6e)
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0096-Fix-Opcache-test-fails-regarding-to-AppVeyor-image-u.patch
+
+From: Dmitry Stogov <dmitry@zend.com>
+Date: Wed, 23 Dec 2015 03:52:01 +0300
+Subject: Fixed test on 32-bit systems
+
+(cherry picked from php/php-src@1e3ab158432f8d97c3561fdfc17b7e4aa3dbdd60)
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0097-Fixed-test-on-32-bit-systems.patch
+
+From: =?utf-8?q?Pedro_Magalh=C3=A3es?= <mail@pmmaga.net>
+Date: Fri, 5 Oct 2018 16:24:55 +0100
+Subject: Remove unstable dns tests
+
+(cherry picked from php/php-src@49835e1436c34dd096915eda13b335bbd84098c0)
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0098-Remove-unstable-dns-tests.patch
+
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Tue, 21 May 2019 11:17:28 +0200
+Subject: Prevent test case failure
+
+If opcache.log_verbosity_level is greater than 1, opcache will raise
+warnings, which will be written to stderr in the default case.  These
+warnings are actually to be expected, but would break the test, so we
+make sure that the log_verbosity_level is 1 when running this test.
+
+(cherry picked from php/php-src@e6a191de1b73c902b631cb8f0f70ed58b81005d4)
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0099-Prevent-test-case-failure.patch
+
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Fri, 30 Aug 2019 16:00:52 +0200
+Subject: Fix module name in test cases
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0100-Fix-module-name-in-test-cases.patch
+
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Fri, 30 Aug 2019 17:15:17 +0200
+Subject: Fix test expectations to match the implementation
+
+Even mysqlnd returns big integers as string on 64bit architectures
+before PHP 7.2.
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0101-Fix-test-expectations-to-match-the-implementation.patch
+
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Tue, 17 Dec 2019 15:26:04 +0100
+Subject: Fix tests
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0109-Fix-tests.patch
+---
+ ext/bcmath/tests/bug72093-win32.phpt              |   2 +-
+ ext/bcmath/tests/bug75178-win32.phpt              |   4 +-
+ ext/curl/tests/check_win_config.phpt              |   2 +-
+ ext/curl/tests/curl_basic_009.phpt                |   6 +-
+ ext/exif/tests/bug76557.phpt                      |   2 +-
+ ext/exif/tests/bug78910.phpt                      |   8 +-
+ ext/opcache/tests/bug66461.phpt                   |   1 +
+ ext/opcache/tests/bug71127.phpt                   |   2 +-
+ ext/opcache/tests/issue0115.phpt                  |   2 +-
+ ext/opcache/tests/issue0149.phpt                  |   2 +-
+ ext/opcache/tests/php_cli_server.inc              |  18 +-
+ ext/pdo_mysql/tests/pdo_mysql_exec.phpt           |   2 +-
+ .../tests/pdo_mysql_stmt_getcolumnmeta.phpt       |  20 +-
+ ext/pdo_pgsql/tests/bug_33876.phpt                |   9 +-
+ ext/pdo_pgsql/tests/copy_from.phpt                |   4 +-
+ ext/pdo_pgsql/tests/copy_to.phpt                  |   4 +-
+ ext/spl/tests/bug54291.phpt                       |   2 +-
+ ext/standard/tests/dns_get_record.phpt            | 202 --------------------
+ .../tests/network/dns_get_record_caa.phpt         |  38 ----
+ .../tests/streams/stream_socket_sendto.phpt       |  58 ------
+ ext/standard/tests/strings/bug65769.phpt          |   8 +-
+ sapi/cli/tests/php_cli_server.inc                 |  10 +-
+ 22 files changed, 61 insertions(+), 345 deletions(-)
+
+diff --git a/ext/bcmath/tests/bug72093-win32.phpt b/ext/bcmath/tests/bug72093-win32.phpt
+index a9b20778..bcea8740 100644
+--- a/ext/bcmath/tests/bug72093-win32.phpt
++++ b/ext/bcmath/tests/bug72093-win32.phpt
+@@ -14,5 +14,5 @@ var_dump(bcpowmod(1, 1.2, 1, 1));
+ ?>
+ --EXPECTF--
+ string(1) "1"
+-string(3) "0.0"
+ bc math warning: non-zero scale in exponent
++string(3) "0.0"
+diff --git a/ext/bcmath/tests/bug75178-win32.phpt b/ext/bcmath/tests/bug75178-win32.phpt
+index bae590fb..c70e3aa8 100644
+--- a/ext/bcmath/tests/bug75178-win32.phpt
++++ b/ext/bcmath/tests/bug75178-win32.phpt
+@@ -14,8 +14,8 @@ var_dump(bcpowmod('4', '4', '3.1', 3));
+ ?>
+ ===DONE===
+ --EXPECT--
++bc math warning: non-zero scale in base
+ string(5) "1.000"
++bc math warning: non-zero scale in modulus
+ string(5) "1.000"
+ ===DONE===
+-bc math warning: non-zero scale in base
+-bc math warning: non-zero scale in modulus
+diff --git a/ext/curl/tests/check_win_config.phpt b/ext/curl/tests/check_win_config.phpt
+index 98f3e92f..9e1ad98a 100644
+--- a/ext/curl/tests/check_win_config.phpt
++++ b/ext/curl/tests/check_win_config.phpt
+@@ -45,7 +45,7 @@ GSSAPI => No
+ KERBEROS5 => Yes
+ UNIX_SOCKETS => No
+ PSL => No
+-Protocols => dict, file, ftp, ftps, gopher, http, https, imap, imaps, ldap, pop3, pop3s, rtsp, scp, sftp, smtp, smtps, telnet, tftp
++Protocols => dict, file, ftp, ftps, gopher, http, https, imap, imaps, ldap, ldaps, pop3, pop3s, rtsp, scp, sftp, smb, smbs, smtp, smtps, telnet, tftp
+ Host => %s-pc-win32
+ SSL Version => OpenSSL/%s
+ ZLib Version => %s
+diff --git a/ext/curl/tests/curl_basic_009.phpt b/ext/curl/tests/curl_basic_009.phpt
+index 529e5900..3b36a785 100644
+--- a/ext/curl/tests/curl_basic_009.phpt
++++ b/ext/curl/tests/curl_basic_009.phpt
+@@ -18,6 +18,6 @@ curl_close($ch);
+ 
+ 
+ ?>
+---EXPECTF--
+-%unicode|string%(%d) "%Srotocol%s"
+-int(1)
++--EXPECTREGEX--
++string\(\d+\) "([^\r\n]*rotocol[^\r\n]+|Could not resolve host: .+)"
++int\(\d\)
+diff --git a/ext/exif/tests/bug76557.phpt b/ext/exif/tests/bug76557.phpt
+index 4553b627..8920de65 100644
+--- a/ext/exif/tests/bug76557.phpt
++++ b/ext/exif/tests/bug76557.phpt
+@@ -70,7 +70,7 @@ Warning: exif_read_data(bug76557.jpg): Process tag(x3030=UndefinedTa): Illegal f
+ 
+ Warning: exif_read_data(bug76557.jpg): Process tag(x3030=UndefinedTa): Illegal format code 0x3030, suppose BYTE in %sbug76557.php on line %d
+ 
+-Warning: exif_read_data(bug76557.jpg): Process tag(x3030=UndefinedTa): Illegal pointer offset(x30303030 + x30303030 = x60606060 > x00EE) in %sbug76557.php on line %d
++Warning: exif_read_data(bug76557.jpg): Process tag(x3030=UndefinedTa): Illegal pointer offset(x30303030 + x30303030 = x60606060 > %s) in %sbug76557.php on line %d
+ 
+ Warning: exif_read_data(bug76557.jpg): File structure corrupted in %sbug76557.php on line %d
+ 
+diff --git a/ext/exif/tests/bug78910.phpt b/ext/exif/tests/bug78910.phpt
+index f5b1c32c..7e40b823 100644
+--- a/ext/exif/tests/bug78910.phpt
++++ b/ext/exif/tests/bug78910.phpt
+@@ -7,11 +7,11 @@ var_dump(exif_read_data('data:image/jpg;base64,TU0AKgAAAAwgICAgAAIBDwAEAAAAAgAAA
+ 
+ ?>
+ --EXPECTF--
+-Notice: exif_read_data(): Read from TIFF: tag(0x927C, MakerNote  ): Illegal format code 0x2020, switching to BYTE in %s on line %d
++Notice: exif_read_data(jpg;base64,TU0AKgAAAAwgICAgAAIBDwAEAAAAAgAAACKSfCAgAAAAAEZVSklGSUxN): Read from TIFF: tag(0x927C, MakerNote  ): Illegal format code 0x2020, switching to BYTE in %s on line %d
+ 
+-Warning: exif_read_data(): Process tag(x927C=MakerNote  ): Illegal format code 0x2020, suppose BYTE in %s on line %d
++Warning: exif_read_data(jpg;base64,TU0AKgAAAAwgICAgAAIBDwAEAAAAAgAAACKSfCAgAAAAAEZVSklGSUxN): Process tag(x927C=MakerNote  ): Illegal format code 0x2020, suppose BYTE in %s on line %d
+ 
+-Warning: exif_read_data(): IFD data too short: 0x0000 offset 0x000C in %s on line %d
++Warning: exif_read_data(jpg;base64,TU0AKgAAAAwgICAgAAIBDwAEAAAAAgAAACKSfCAgAAAAAEZVSklGSUxN): IFD data too short: 0x0000 offset 0x000C in %s on line %d
+ 
+-Warning: exif_read_data(): Invalid TIFF file in %s on line %d
++Warning: exif_read_data(jpg;base64,TU0AKgAAAAwgICAgAAIBDwAEAAAAAgAAACKSfCAgAAAAAEZVSklGSUxN): Invalid TIFF file in %s on line %d
+ bool(false)
+diff --git a/ext/opcache/tests/bug66461.phpt b/ext/opcache/tests/bug66461.phpt
+index 33132abe..2d09feff 100644
+--- a/ext/opcache/tests/bug66461.phpt
++++ b/ext/opcache/tests/bug66461.phpt
+@@ -4,6 +4,7 @@ Bug #66461 (PHP crashes if opcache.interned_strings_buffer=0)
+ opcache.enable=1
+ opcache.enable_cli=1
+ opcache.optimization_level=-1
++opcache.log_verbosity_level=1
+ opcache.file_update_protection=0
+ opcache.interned_strings_buffer=0
+ --SKIPIF--
+diff --git a/ext/opcache/tests/bug71127.phpt b/ext/opcache/tests/bug71127.phpt
+index 5770aea1..0c606097 100644
+--- a/ext/opcache/tests/bug71127.phpt
++++ b/ext/opcache/tests/bug71127.phpt
+@@ -3,7 +3,7 @@ Bug #71127 (Define in auto_prepend_file is overwrite)
+ --INI--
+ opcache.enable=1
+ opcache.enable_cli=1
+-opcache.optimization_level=0xFFFFBFFF
++opcache.optimization_level=0x7FFFBFFF
+ --SKIPIF--
+ <?php if (!extension_loaded('Zend OPcache')) die("skip"); ?>
+ --FILE--
+diff --git a/ext/opcache/tests/issue0115.phpt b/ext/opcache/tests/issue0115.phpt
+index 26d99080..8794a007 100644
+--- a/ext/opcache/tests/issue0115.phpt
++++ b/ext/opcache/tests/issue0115.phpt
+@@ -32,7 +32,7 @@ $p->setStub($stub);
+ unset($p);
+ 
+ include "php_cli_server.inc";
+-php_cli_server_start('-d opcache.enable=1 -d opcache.enable_cli=1 -d extension=phar.'.PHP_SHLIB_SUFFIX);
++php_cli_server_start('-d opcache.enable=1 -d opcache.enable_cli=1 -d extension='.(substr(PHP_OS, 0, 3) == 'WIN' ? 'php_' : '').'phar.'.PHP_SHLIB_SUFFIX);
+ echo file_get_contents('http://' . PHP_CLI_SERVER_ADDRESS . '/issue0115_1.phar.php');
+ echo file_get_contents('http://' . PHP_CLI_SERVER_ADDRESS . '/issue0115_2.phar.php');
+ ?>
+diff --git a/ext/opcache/tests/issue0149.phpt b/ext/opcache/tests/issue0149.phpt
+index ba57623f..f8ff9725 100644
+--- a/ext/opcache/tests/issue0149.phpt
++++ b/ext/opcache/tests/issue0149.phpt
+@@ -20,7 +20,7 @@ $p->setStub($stub);
+ unset($p);
+ 
+ include "php_cli_server.inc";
+-php_cli_server_start('-d opcache.enable=1 -d opcache.enable_cli=1 -d extension=phar.'.PHP_SHLIB_SUFFIX);
++php_cli_server_start('-d opcache.enable=1 -d opcache.enable_cli=1 -d extension='.(substr(PHP_OS, 0, 3) == 'WIN' ? 'php_' : '').'phar.'.PHP_SHLIB_SUFFIX);
+ echo file_get_contents('http://' . PHP_CLI_SERVER_ADDRESS . '/issue0149.phar.php');
+ echo file_get_contents('http://' . PHP_CLI_SERVER_ADDRESS . '/issue0149.phar.php');
+ echo file_get_contents('http://' . PHP_CLI_SERVER_ADDRESS . '/issue0149.phar.php');
+diff --git a/ext/opcache/tests/php_cli_server.inc b/ext/opcache/tests/php_cli_server.inc
+index 456ed663..ca781b7c 100644
+--- a/ext/opcache/tests/php_cli_server.inc
++++ b/ext/opcache/tests/php_cli_server.inc
+@@ -7,16 +7,22 @@ function php_cli_server_start($ini = "") {
+ 	$php_executable = getenv('TEST_PHP_EXECUTABLE');
+ 	$doc_root = __DIR__;
+ 
+-	$descriptorspec = array(
+-		0 => STDIN,
+-		1 => STDOUT,
+-		2 => STDERR,
+-	);
+-
+ 	if (substr(PHP_OS, 0, 3) == 'WIN') {
++		$descriptorspec = array(
++			0 => STDIN,
++			1 => STDOUT,
++			2 => array("pipe", "w"),
++		);
++
+ 		$cmd = "{$php_executable} -t {$doc_root} $ini -S " . PHP_CLI_SERVER_ADDRESS;
+ 		$handle = proc_open(addslashes($cmd), $descriptorspec, $pipes, $doc_root, NULL, array("bypass_shell" => true,  "suppress_errors" => true));
+ 	} else {
++		$descriptorspec = array(
++			0 => STDIN,
++			1 => STDOUT,
++			2 => STDERR,
++		);
++
+ 		$cmd = "exec {$php_executable} -t {$doc_root} $ini -S " . PHP_CLI_SERVER_ADDRESS . " 2>/dev/null";
+ 		$handle = proc_open($cmd, $descriptorspec, $pipes, $doc_root);
+ 	}
+diff --git a/ext/pdo_mysql/tests/pdo_mysql_exec.phpt b/ext/pdo_mysql/tests/pdo_mysql_exec.phpt
+index acd90904..98307378 100644
+--- a/ext/pdo_mysql/tests/pdo_mysql_exec.phpt
++++ b/ext/pdo_mysql/tests/pdo_mysql_exec.phpt
+@@ -75,7 +75,7 @@ MySQLPDOTest::skip();
+ 			exec_and_count(19, $db, 'CREATE PROCEDURE p(OUT ver_param VARCHAR(255)) BEGIN SELECT VERSION() INTO ver_param; END;', 0);
+ 			// we got this far without problems. If there's an issue from now on, its a failure
+ 			$ignore_exception = false;
+-			exec_and_count(20, $db, 'CALL p(@version)', 0);
++			exec_and_count(20, $db, 'CALL p(@version)', 1);
+ 			$stmt = $db->query('SELECT @version AS p_version');
+ 			$tmp = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ 			if (count($tmp) > 1 || !isset($tmp[0]['p_version'])) {
+diff --git a/ext/pdo_mysql/tests/pdo_mysql_stmt_getcolumnmeta.phpt b/ext/pdo_mysql/tests/pdo_mysql_stmt_getcolumnmeta.phpt
+index 72b53156..b2c6e657 100644
+--- a/ext/pdo_mysql/tests/pdo_mysql_stmt_getcolumnmeta.phpt
++++ b/ext/pdo_mysql/tests/pdo_mysql_stmt_getcolumnmeta.phpt
+@@ -38,7 +38,7 @@ try {
+ 	if (false !== ($tmp = @$stmt->getColumnMeta(-1)))
+ 		printf("[004] Expecting false got %s\n", var_export($tmp, true));
+ 
+-	// Warning: PDOStatement::getColumnMeta() expects parameter 1 to be integer, array given in
++	// Warning: PDOStatement::getColumnMeta() expects parameter 1 to be int, array given in
+ 	if (false !== ($tmp = @$stmt->getColumnMeta(array())))
+ 		printf("[005] Expecting false got %s\n", var_export($tmp, true));
+ 
+@@ -162,37 +162,37 @@ try {
+ 	test_meta($db, 100, 'INT', -2147483648, 'LONG', ($is_mysqlnd) ? PDO::PARAM_INT : PDO::PARAM_STR);
+ 	test_meta($db, 110, 'INT UNSIGNED', 4294967295, 'LONG', ($is_mysqlnd) ? PDO::PARAM_INT : PDO::PARAM_STR);
+ 
+-	test_meta($db, 120, 'BIGINT', -9223372036854775808, 'LONGLONG', ($is_mysqlnd) ? ((PHP_INT_SIZE == 4) ? PDO::PARAM_STR : PDO::PARAM_INT) : PDO::PARAM_STR);
+-	test_meta($db, 130, 'BIGINT UNSIGNED', 18446744073709551615, 'LONGLONG', ($is_mysqlnd) ? ((PHP_INT_SIZE == 4) ? PDO::PARAM_STR : PDO::PARAM_INT) : PDO::PARAM_STR);
++	test_meta($db, 120, 'BIGINT', '-9223372036854775808', 'LONGLONG', PDO::PARAM_STR);
++	test_meta($db, 130, 'BIGINT UNSIGNED', '18446744073709551615', 'LONGLONG', PDO::PARAM_STR);
+ 
+ 	test_meta($db, 130, 'REAL', -1.01, ($real_as_float) ? 'FLOAT' : 'DOUBLE', PDO::PARAM_STR);
+ 	test_meta($db, 140, 'REAL UNSIGNED', 1.01, ($real_as_float) ? 'FLOAT' : 'DOUBLE', PDO::PARAM_STR);
+-	test_meta($db, 150, 'REAL ZEROFILL', -1.01, ($real_as_float) ? 'FLOAT' : 'DOUBLE', PDO::PARAM_STR);
++	test_meta($db, 150, 'REAL ZEROFILL', 1.01, ($real_as_float) ? 'FLOAT' : 'DOUBLE', PDO::PARAM_STR);
+ 	test_meta($db, 160, 'REAL UNSIGNED ZEROFILL', 1.01, ($real_as_float) ? 'FLOAT' : 'DOUBLE', PDO::PARAM_STR);
+ 
+ 	test_meta($db, 170, 'DOUBLE', -1.01, 'DOUBLE', PDO::PARAM_STR);
+ 	test_meta($db, 180, 'DOUBLE UNSIGNED', 1.01, 'DOUBLE', PDO::PARAM_STR);
+-	test_meta($db, 190, 'DOUBLE ZEROFILL', -1.01, 'DOUBLE', PDO::PARAM_STR);
++	test_meta($db, 190, 'DOUBLE ZEROFILL', 1.01, 'DOUBLE', PDO::PARAM_STR);
+ 	test_meta($db, 200, 'DOUBLE UNSIGNED ZEROFILL', 1.01, 'DOUBLE', PDO::PARAM_STR);
+ 
+ 	test_meta($db, 210, 'FLOAT', -1.01, 'FLOAT', PDO::PARAM_STR);
+ 	test_meta($db, 220, 'FLOAT UNSIGNED', 1.01, 'FLOAT', PDO::PARAM_STR);
+-	test_meta($db, 230, 'FLOAT ZEROFILL', -1.01, 'FLOAT', PDO::PARAM_STR);
++	test_meta($db, 230, 'FLOAT ZEROFILL', 1.01, 'FLOAT', PDO::PARAM_STR);
+ 	test_meta($db, 240, 'FLOAT UNSIGNED ZEROFILL', 1.01, 'FLOAT', PDO::PARAM_STR);
+ 
+ 	test_meta($db, 250, 'DECIMAL', -1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
+ 	test_meta($db, 260, 'DECIMAL UNSIGNED', 1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
+-	test_meta($db, 270, 'DECIMAL ZEROFILL', -1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
++	test_meta($db, 270, 'DECIMAL ZEROFILL', 1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
+ 	test_meta($db, 280, 'DECIMAL UNSIGNED ZEROFILL', 1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
+ 
+ 	test_meta($db, 290, 'NUMERIC', -1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
+ 	test_meta($db, 300, 'NUMERIC UNSIGNED', 1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
+-	test_meta($db, 310, 'NUMERIC ZEROFILL', -1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
++	test_meta($db, 310, 'NUMERIC ZEROFILL', 1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
+ 	test_meta($db, 320, 'NUMERIC UNSIGNED ZEROFILL', 1.01, array('DECIMAL', 'NEWDECIMAL'), PDO::PARAM_STR);
+ 
+ 	test_meta($db, 330, 'DATE', '2008-04-23', array('DATE', 'NEWDATE'), PDO::PARAM_STR);
+ 	test_meta($db, 340, 'TIME', '14:37:00', 'TIME', PDO::PARAM_STR);
+-	test_meta($db, 350, 'TIMESTAMP', time(), 'TIMESTAMP', PDO::PARAM_STR);
++	test_meta($db, 350, 'TIMESTAMP', '2008-03-23 14:38:00', 'TIMESTAMP', PDO::PARAM_STR);
+ 	test_meta($db, 360, 'DATETIME', '2008-03-23 14:38:00', 'DATETIME', PDO::PARAM_STR);
+ 	test_meta($db, 370, 'YEAR', '2008', 'YEAR', ($is_mysqlnd) ? PDO::PARAM_INT : PDO::PARAM_STR);
+ 
+@@ -309,6 +309,6 @@ try {
+ $db->exec('DROP TABLE IF EXISTS test');
+ print "done!";
+ ?>
+---EXPECTF--
++--EXPECT--
+ Testing native PS...
+ done!
+diff --git a/ext/pdo_pgsql/tests/bug_33876.phpt b/ext/pdo_pgsql/tests/bug_33876.phpt
+index 15c4275d..45c65c66 100644
+--- a/ext/pdo_pgsql/tests/bug_33876.phpt
++++ b/ext/pdo_pgsql/tests/bug_33876.phpt
+@@ -88,10 +88,7 @@ if (!$res->execute(array(false))) {
+ } else {
+ 	print_r($res->fetchAll(PDO::FETCH_ASSOC));
+ }
+-
+-
+-
+---EXPECT--
++--EXPECTF--
+ Array
+ (
+     [0] => Array
+@@ -120,7 +117,7 @@ Array
+ (
+     [0] => 22P02
+     [1] => 7
+-    [2] => ERROR:  invalid input syntax for type boolean: ""
++    [2] => %s:  %sboolean%s
+ )
+ EMUL
+ Array
+@@ -151,5 +148,5 @@ Array
+ (
+     [0] => 22P02
+     [1] => 7
+-    [2] => ERROR:  invalid input syntax for type boolean: ""
++    [2] => %s:  %sboolean%s
+ )
+diff --git a/ext/pdo_pgsql/tests/copy_from.phpt b/ext/pdo_pgsql/tests/copy_from.phpt
+index 31d77521..d2f1003f 100644
+--- a/ext/pdo_pgsql/tests/copy_from.phpt
++++ b/ext/pdo_pgsql/tests/copy_from.phpt
+@@ -259,7 +259,7 @@ array(6) {
+   NULL
+ }
+ Testing pgsqlCopyFromArray() with error
+-Exception: SQLSTATE[42P01]: Undefined table: 7 %s:  %s "test_error" %s
++Exception: SQLSTATE[42P01]: Undefined table: 7 %s:  %stest_error%s
+ Testing pgsqlCopyFromFile() with default parameters
+ bool(true)
+ array(6) {
+@@ -393,7 +393,7 @@ array(6) {
+   NULL
+ }
+ Testing pgsqlCopyFromFile() with error
+-Exception: SQLSTATE[42P01]: Undefined table: 7 %s:  %s "test_error" %s
++Exception: SQLSTATE[42P01]: Undefined table: 7 %s:  %stest_error%s
+ Testing pgsqlCopyFromFile() with non existing file
+ Exception: SQLSTATE[HY000]: General error: 7 Unable to open the file
+ 
+diff --git a/ext/pdo_pgsql/tests/copy_to.phpt b/ext/pdo_pgsql/tests/copy_to.phpt
+index 93aab166..c018727d 100644
+--- a/ext/pdo_pgsql/tests/copy_to.phpt
++++ b/ext/pdo_pgsql/tests/copy_to.phpt
+@@ -116,7 +116,7 @@ array(3) {
+ "
+ }
+ Testing pgsqlCopyToArray() with error
+-Exception: SQLSTATE[42P01]: Undefined table: 7 %s:  %s "test_error" %s
++Exception: SQLSTATE[42P01]: Undefined table: 7 %s:  %stest_error%s
+ Testing pgsqlCopyToFile() with default parameters
+ bool(true)
+ 0	test insert 0	\N
+@@ -133,7 +133,7 @@ bool(true)
+ 1;NULL
+ 2;NULL
+ Testing pgsqlCopyToFile() with error
+-Exception: SQLSTATE[42P01]: Undefined table: 7 %s:  %s "test_error" %s
++Exception: SQLSTATE[42P01]: Undefined table: 7 %s:  %stest_error%s
+ Testing pgsqlCopyToFile() to unwritable file
+ Exception: SQLSTATE[HY000]: General error: 7 Unable to open the file for writing
+ 
+diff --git a/ext/spl/tests/bug54291.phpt b/ext/spl/tests/bug54291.phpt
+index c0119c43..5e4a5a06 100644
+--- a/ext/spl/tests/bug54291.phpt
++++ b/ext/spl/tests/bug54291.phpt
+@@ -5,7 +5,7 @@ Bug #54291 (Crash iterating DirectoryIterator for dir name starting with \0)
+ $dir = new DirectoryIterator("\x00/abc");
+ $dir->isFile();
+ --EXPECTF--
+-Fatal error: Uncaught UnexpectedValueException: Failed to open directory "" in %s:%d
++Fatal error: Uncaught UnexpectedValueException: DirectoryIterator::__construct() expects parameter 1 to be a valid path, string given in %s:%d
+ Stack trace:
+ #0 %s(%d): DirectoryIterator->__construct('\x00/abc')
+ #1 {main}
+diff --git a/ext/standard/tests/dns_get_record.phpt b/ext/standard/tests/dns_get_record.phpt
+deleted file mode 100644
+index 2ae0acf1..00000000
+--- a/ext/standard/tests/dns_get_record.phpt
++++ /dev/null
+@@ -1,202 +0,0 @@
+---TEST--
+-array dns_get_record ( string $hostname [, int $type = DNS_ANY [, array &$authns [, array &$addtl [, bool &$raw = false ]]]] );
+---CREDITS--
+-marcosptf - <marcosptf@yahoo.com.br> - @phpsp - sao paulo - br
+---SKIPIF--
+-<?php
+-if (getenv("SKIP_ONLINE_TESTS")) { die('skip: online test'); }
+-?>
+---FILE--
+-<?php
+-$hostname = "php.net";
+-
+-var_dump(is_array(dns_get_record($hostname)));
+-var_dump(is_array(dns_get_record($hostname, DNS_A)));
+-var_dump(is_array(dns_get_record($hostname, DNS_CNAME)));
+-var_dump(is_array(dns_get_record($hostname, DNS_HINFO)));
+-var_dump(is_array(dns_get_record($hostname, DNS_MX)));
+-var_dump(is_array(dns_get_record($hostname, DNS_NS)));
+-var_dump(is_array(dns_get_record($hostname, DNS_PTR)));
+-var_dump(is_array(dns_get_record($hostname, DNS_SOA)));
+-var_dump(is_array(dns_get_record($hostname, DNS_TXT)));
+-var_dump(is_array(dns_get_record($hostname, DNS_AAAA)));
+-var_dump(is_array(dns_get_record($hostname, DNS_SRV)));
+-var_dump(is_array(dns_get_record($hostname, DNS_NAPTR)));
+-var_dump(is_array(dns_get_record($hostname, DNS_A6)));
+-var_dump(is_array(dns_get_record($hostname, DNS_ALL)));
+-var_dump(is_array(dns_get_record($hostname, DNS_ANY)));
+-
+-dns_get_record($hostname, DNS_A, $authns_DNS_A);
+-dns_get_record($hostname, DNS_CNAME, $authns_DNS_CNAME);
+-dns_get_record($hostname, DNS_HINFO, $authns_DNS_HINFO);
+-dns_get_record($hostname, DNS_MX, $authns_DNS_MX);
+-dns_get_record($hostname, DNS_NS, $authns_DNS_NS);
+-dns_get_record($hostname, DNS_PTR, $authns_DNS_PTR);
+-dns_get_record($hostname, DNS_SOA, $authns_DNS_SOA);
+-dns_get_record($hostname, DNS_TXT, $authns_DNS_TXT);
+-dns_get_record($hostname, DNS_AAAA, $authns_DNS_AAAA);
+-dns_get_record($hostname, DNS_SRV, $authns_DNS_SRV);
+-dns_get_record($hostname, DNS_NAPTR, $authns_DNS_NAPTR);
+-dns_get_record($hostname, DNS_A6, $authns_DNS_A6);
+-dns_get_record($hostname, DNS_ALL, $authns_DNS_ALL);
+-dns_get_record($hostname, DNS_ANY, $authns_DNS_ANY);
+-
+-var_dump(is_array($authns_DNS_A));
+-var_dump(is_array($authns_DNS_CNAME));
+-var_dump(is_array($authns_DNS_HINFO));
+-var_dump(is_array($authns_DNS_MX));
+-var_dump(is_array($authns_DNS_NS));
+-var_dump(is_array($authns_DNS_PTR));
+-var_dump(is_array($authns_DNS_SOA));
+-var_dump(is_array($authns_DNS_TXT));
+-var_dump(is_array($authns_DNS_AAAA));
+-var_dump(is_array($authns_DNS_SRV));
+-var_dump(is_array($authns_DNS_NAPTR));
+-var_dump(is_array($authns_DNS_A6));
+-var_dump(is_array($authns_DNS_ALL));
+-var_dump(is_array($authns_DNS_ANY));
+-
+-dns_get_record($hostname, DNS_A, $authns_DNS_A, $addtl_DNS_A);
+-dns_get_record($hostname, DNS_CNAME, $authns_DNS_CNAME, $addtl_DNS_CNAME);
+-dns_get_record($hostname, DNS_HINFO, $authns_DNS_HINFO, $addtl_DNS_HINFO);
+-dns_get_record($hostname, DNS_MX, $authns_DNS_MX, $addtl_DNS_MX);
+-dns_get_record($hostname, DNS_NS, $authns_DNS_NS, $addtl_DNS_NS);
+-dns_get_record($hostname, DNS_PTR, $authns_DNS_PTR, $addtl_DNS_PTR);
+-dns_get_record($hostname, DNS_SOA, $authns_DNS_SOA, $addtl_DNS_SOA);
+-dns_get_record($hostname, DNS_TXT, $authns_DNS_TXT, $addtl_DNS_TXT);
+-dns_get_record($hostname, DNS_AAAA, $authns_DNS_AAAA, $addtl_DNS_AAAA);
+-dns_get_record($hostname, DNS_SRV, $authns_DNS_SRV, $addtl_DNS_SRV);
+-dns_get_record($hostname, DNS_NAPTR, $authns_DNS_NAPTR, $addtl_DNS_NAPTR);
+-dns_get_record($hostname, DNS_A6, $authns_DNS_A6, $addtl_DNS_A6);
+-dns_get_record($hostname, DNS_ALL, $authns_DNS_ALL, $addtl_DNS_ALL);
+-dns_get_record($hostname, DNS_ANY, $authns_DNS_ANY, $addtl_DNS_ANY);
+-
+-var_dump(is_array($addtl_DNS_A));
+-var_dump(is_array($addtl_DNS_CNAME));
+-var_dump(is_array($addtl_DNS_HINFO));
+-var_dump(is_array($addtl_DNS_MX));
+-var_dump(is_array($addtl_DNS_NS));
+-var_dump(is_array($addtl_DNS_PTR));
+-var_dump(is_array($addtl_DNS_SOA));
+-var_dump(is_array($addtl_DNS_TXT));
+-var_dump(is_array($addtl_DNS_AAAA));
+-var_dump(is_array($addtl_DNS_SRV));
+-var_dump(is_array($addtl_DNS_NAPTR));
+-var_dump(is_array($addtl_DNS_A6));
+-var_dump(is_array($addtl_DNS_ALL));
+-var_dump(is_array($addtl_DNS_ANY));
+-
+-var_dump(is_array(dns_get_record($hostname, DNS_A, $authns_DNS_A, $addtl_DNS_A, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_CNAME, $authns_DNS_CNAME, $addtl_DNS_CNAME, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_HINFO, $authns_DNS_HINFO, $addtl_DNS_HINFO, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_MX, $authns_DNS_MX, $addtl_DNS_MX, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_NS, $authns_DNS_NS, $addtl_DNS_NS, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_PTR, $authns_DNS_PTR, $addtl_DNS_PTR, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_SOA, $authns_DNS_SOA, $addtl_DNS_SOA, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_TXT, $authns_DNS_TXT, $addtl_DNS_TXT, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_AAAA, $authns_DNS_AAAA, $addtl_DNS_AAAA, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_SRV, $authns_DNS_SRV, $addtl_DNS_SRV, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_NAPTR, $authns_DNS_NAPTR, $addtl_DNS_NAPTR, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_A6, $authns_DNS_A6, $addtl_DNS_A6, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_ALL, $authns_DNS_ALL, $addtl_DNS_ALL, false)));
+-var_dump(is_array(dns_get_record($hostname, DNS_ANY, $authns_DNS_ANY, $addtl_DNS_ANY, false)));
+-
+-var_dump(is_array(dns_get_record($hostname, DNS_A, $authns_DNS_A, $addtl_DNS_A, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_CNAME, $authns_DNS_CNAME, $addtl_DNS_CNAME, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_HINFO, $authns_DNS_HINFO, $addtl_DNS_HINFO, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_MX, $authns_DNS_MX, $addtl_DNS_MX, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_NS, $authns_DNS_NS, $addtl_DNS_NS, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_PTR, $authns_DNS_PTR, $addtl_DNS_PTR, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_SOA, $authns_DNS_SOA, $addtl_DNS_SOA, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_TXT, $authns_DNS_TXT, $addtl_DNS_TXT, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_AAAA, $authns_DNS_AAAA, $addtl_DNS_AAAA, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_SRV, $authns_DNS_SRV, $addtl_DNS_SRV, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_NAPTR, $authns_DNS_NAPTR, $addtl_DNS_NAPTR, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_A6, $authns_DNS_A6, $addtl_DNS_A6, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_ALL, $authns_DNS_ALL, $addtl_DNS_ALL, true)));
+-var_dump(is_array(dns_get_record($hostname, DNS_ANY, $authns_DNS_ANY, $addtl_DNS_ANY, true)));
+-?>
+---EXPECTF--
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(false)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-bool(true)
+-
+-Warning: dns_get_record(): Numeric DNS record type must be between %d and %d, '%s' given in %s on line %d
+-bool(false)
+-
+-Warning: dns_get_record(): Numeric DNS record type must be between %d and %d, '%s' given in %s on line %d
+-bool(false)
+-
+-Warning: dns_get_record(): Numeric DNS record type must be between %d and %d, '%s' given in %s on line %d
+-bool(false)
+-
+-Warning: dns_get_record(): Numeric DNS record type must be between %d and %d, '%s' given in %s on line %d
+-bool(false)
+-
+-Warning: dns_get_record(): Numeric DNS record type must be between %d and %d, '%s' given in %s on line %d
+-bool(false)
+-
+-Warning: dns_get_record(): Numeric DNS record type must be between %d and %d, '%s' given in %s on line %d
+-bool(false)
+diff --git a/ext/standard/tests/network/dns_get_record_caa.phpt b/ext/standard/tests/network/dns_get_record_caa.phpt
+deleted file mode 100644
+index 21286921..00000000
+--- a/ext/standard/tests/network/dns_get_record_caa.phpt
++++ /dev/null
+@@ -1,38 +0,0 @@
+---TEST--
+-dns_get_record() CAA tests
+---SKIPIF--
+-<?php
+-if (getenv("SKIP_SLOW_TESTS")) die("skip slow test");
+-if (getenv("SKIP_ONLINE_TESTS")) die("skip online test");
+-?>
+---FILE--
+-<?php
+-/* This must be domains which publish an RFC6844 CAA-type DNS record */
+-$domains = ["big.basic.caatestsuite.com", "google.com"];
+-foreach ($domains as $domain) {
+-    $match = false;
+-    $dns = dns_get_record($domain, DNS_CAA);
+-    if (count($dns) > 0) {
+-        if (array_key_exists("type", $dns[0])
+-        and $dns[0]["type"] == "CAA"
+-        and array_key_exists("flags", $dns[0])
+-        and array_key_exists("tag", $dns[0])
+-        and array_key_exists("value", $dns[0])
+-        ) {
+-            $chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.";
+-            if (strlen($dns[0]["value"]) == strspn($dns[0]["value"], $chars)) {
+-                $match = true;
+-            }
+-        }
+-    }
+-    if ($match) {
+-        echo "CAA record found\n";
+-    } else {
+-        echo "CAA lookup failed\n";
+-        var_dump($dns);
+-    }
+-}
+-?>
+---EXPECT--
+-CAA record found
+-CAA record found
+diff --git a/ext/standard/tests/streams/stream_socket_sendto.phpt b/ext/standard/tests/streams/stream_socket_sendto.phpt
+deleted file mode 100644
+index 62d9f6ef..00000000
+--- a/ext/standard/tests/streams/stream_socket_sendto.phpt
++++ /dev/null
+@@ -1,58 +0,0 @@
+---TEST--
+-int stream_socket_sendto ( resource $socket , string $data [, int $flags = 0 [, string $address ]] );
+---CREDITS--
+-marcosptf - <marcosptf@yahoo.com.br> - @phpsp - sao paulo - br
+---SKIPIF--
+-<?php
+-if (getenv("SKIP_ONLINE_TESTS")) { die('skip: online test'); }
+-?>
+---FILE--
+-<?php
+-$serverUri = "tcp://127.0.0.1:31854";
+-$serverUrl = "http://php.net";
+-$stringSocket = "out of band data.";
+-$stringFWrite = "normal data to transmit";
+-$sock = stream_socket_server($serverUri, $errno, $errstr);
+-
+-if (is_resource($sock)) {
+-    fwrite($sock, $stringFWrite);
+-    var_dump(stream_socket_sendto());
+-    var_dump(stream_socket_sendto($sock));
+-    var_dump(stream_socket_sendto($sock, $stringSocket));
+-    var_dump(stream_socket_sendto($sock, $stringSocket, STREAM_OOB));
+-    var_dump(stream_socket_sendto($sock, $stringSocket, STREAM_OOB, $serverUri));
+-    var_dump(stream_socket_sendto($sock, $stringSocket, STREAM_OOB, $serverUrl));
+-} else {
+-    die("Test stream_socket_enable_crypto has failed; Unable to connect: {$errstr} ({$errno})");
+-}
+-?>
+---EXPECTF--
+-Notice: fwrite(): send of %i bytes failed with errno=%i Broken pipe in %s on line %i
+-
+-Warning: stream_socket_sendto() expects at least %i parameters, %i given in %s on line %i
+-bool(%s)
+-
+-Warning: stream_socket_sendto() expects at least %i parameters, %i given in %s on line %i
+-bool(%s)
+-
+-Warning: stream_socket_sendto(): Broken pipe
+- in %s on line %i
+-int(%i)
+-
+-Warning: stream_socket_sendto(): Broken pipe
+- in %s on line %i
+-int(%i)
+-
+-Warning: stream_socket_sendto(): php_network_getaddresses: getaddrinfo failed: Name or service not known in %s on line %i
+-
+-Warning: stream_socket_sendto(): Failed to resolve %s: php_network_getaddresses: getaddrinfo failed: Name or service not known in %s on line %i
+-
+-Warning: stream_socket_sendto(): Failed to parse %s into a valid network address in %s on line %i
+-bool(%s)
+-
+-Warning: stream_socket_sendto(): php_network_getaddresses: getaddrinfo failed: Name or service not known in %s on line %i
+-
+-Warning: stream_socket_sendto(): Failed to resolve %s: php_network_getaddresses: getaddrinfo failed: Name or service not known in %s on line %i
+-
+-Warning: stream_socket_sendto(): Failed to parse %s into a valid network address in %s on line %i
+-bool(%s)
+diff --git a/ext/standard/tests/strings/bug65769.phpt b/ext/standard/tests/strings/bug65769.phpt
+index 1a81d487..efe5788c 100644
+--- a/ext/standard/tests/strings/bug65769.phpt
++++ b/ext/standard/tests/strings/bug65769.phpt
+@@ -26,6 +26,9 @@ foreach ($locales as $locale) {
+ 		$lconv['mon_decimal_point'],
+ 		$lconv['mon_thousands_sep']
+ 	);
++	if ($locale === 'Swedish_Sweden.1252') {
++		var_dump(in_array($lconv['mon_thousands_sep'], ['.', ' ']));
++	}
+ 	echo '++++++++++++++++++++++', "\n";
+ }
+ 
+@@ -38,7 +41,8 @@ string(1) "
+ string(3) "SEK"
+ string(2) "kr"
+ string(1) ","
+-string(1) "."
++string(1) "%c"
++bool(true)
+ ++++++++++++++++++++++
+ string(18) "French_France.1252"
+ string(1) ","
+@@ -64,7 +68,7 @@ string(1) "?"
+ string(1) ","
+ string(1) " "
+ ++++++++++++++++++++++
+-string(25) "Czech_Czech Republic.1250"
++string(%d) "Czech_Czech%s.1250"
+ string(1) ","
+ string(1) " "
+ string(3) "CZK"
+diff --git a/sapi/cli/tests/php_cli_server.inc b/sapi/cli/tests/php_cli_server.inc
+index 5ee38879..0ea90dad 100644
+--- a/sapi/cli/tests/php_cli_server.inc
++++ b/sapi/cli/tests/php_cli_server.inc
+@@ -11,13 +11,14 @@ function php_cli_server_start($code = 'echo "Hello world";', $router = 'index.ph
+ 		file_put_contents($doc_root . '/' . ($router ?: 'index.php'), '<?php ' . $code . ' ?>');
+ 	}
+ 
++	if (substr(PHP_OS, 0, 3) == 'WIN') {
+ 	$descriptorspec = array(
+ 		0 => STDIN,
+ 		1 => STDOUT,
+-		2 => STDERR,
++		2 => array("pipe","w"),
+ 	);
+ 
+-	if (substr(PHP_OS, 0, 3) == 'WIN') {
++	
+ 		$cmd = "{$php_executable} -t {$doc_root} -n {$cmd_args} -S " . PHP_CLI_SERVER_ADDRESS;
+ 		if (!is_null($router)) {
+ 			$cmd .= " {$router}";
+@@ -25,6 +26,11 @@ function php_cli_server_start($code = 'echo "Hello world";', $router = 'index.ph
+ 
+ 		$handle = proc_open(addslashes($cmd), $descriptorspec, $pipes, $doc_root, NULL, array("bypass_shell" => true,  "suppress_errors" => true));
+ 	} else {
++		$descriptorspec = array(
++		0 => STDIN,
++		1 => STDOUT,
++		2 => STDERR,
++	);
+ 		$cmd = "exec {$php_executable} -t {$doc_root} -n {$cmd_args} -S " . PHP_CLI_SERVER_ADDRESS;
+ 		if (!is_null($router)) {
+ 			$cmd .= " {$router}";

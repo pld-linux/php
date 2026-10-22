@@ -1,0 +1,27 @@
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:40:31 +0200
+Subject: [PATCH] Fix #73533: Invalid memory access in php_libxml_xmlCheckUTF8
+
+The int index overflows for strings over 2 GiB (e.g. passed to SOAP
+encoding), so the scan reads out of bounds.
+
+Origin: upstream, https://github.com/php/php-src/commit/498eb8e0529fbe1dd8a91ae3ee8592eda868d3aa
+Bug: https://bugs.php.net/73533
+PLD: taken from packages/php branch PHP_7_1, php-bug73533.patch
+---
+ ext/libxml/libxml.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/libxml/libxml.c b/ext/libxml/libxml.c
+index 3a5b69d5..6657572e 100644
+--- a/ext/libxml/libxml.c
++++ b/ext/libxml/libxml.c
+@@ -1212,7 +1212,7 @@ static PHP_FUNCTION(libxml_set_external_entity_loader)
+ /* {{{ Common functions shared by extensions */
+ int php_libxml_xmlCheckUTF8(const unsigned char *s)
+ {
+-	int i;
++	size_t i;
+ 	unsigned char c;
+ 
+ 	for (i = 0; (c = s[i++]);) {

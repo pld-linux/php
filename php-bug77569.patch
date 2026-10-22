@@ -1,0 +1,53 @@
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Thu, 13 Feb 2020 15:13:26 +0100
+Subject: Fix #77569: Write Acess Violation in DomImplementation
+
+We must not assume that the zval IS_STRING.
+
+(cherry picked from commit cec8b24c848bab8562c82422f3692c193f0afcdb)
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0114-Fix-77569-Write-Acess-Violation-in-DomImplementation.patch
+
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Fri, 14 Feb 2020 09:21:13 +0100
+Subject: Fix typo in recent bugfix
+
+(cherry picked from commit 8308196c97418ba4c8381bed0962ae160623027a)
+Debian-ELTS: php7.0 7.0.33-0+deb9u26, debian/patches/0115-Fix-typo-in-recent-bugfix.patch
+---
+ ext/dom/document.c          |  2 +-
+ ext/dom/tests/bug77569.phpt | 14 ++++++++++++++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/ext/dom/document.c b/ext/dom/document.c
+index a884087f..29ef0a8c 100644
+--- a/ext/dom/document.c
++++ b/ext/dom/document.c
+@@ -341,7 +341,7 @@ int dom_document_encoding_write(dom_object *obj, zval *newval)
+ 
+ 	str = zval_get_string(newval);
+ 
+-	handler = xmlFindCharEncodingHandler(Z_STRVAL_P(newval));
++	handler = xmlFindCharEncodingHandler(ZSTR_VAL(str));
+ 
+     if (handler != NULL) {
+ 		xmlCharEncCloseFunc(handler);
+diff --git a/ext/dom/tests/bug77569.phpt b/ext/dom/tests/bug77569.phpt
+new file mode 100644
+index 00000000..9eef2af6
+--- /dev/null
++++ b/ext/dom/tests/bug77569.phpt
+@@ -0,0 +1,14 @@
++--TEST--
++Bug #77569 (Write Access Violation in DomImplementation)
++--SKIPIF--
++<?php
++if (!extension_loaded('dom')) die('skip dom extension not available');
++?>
++--FILE--
++<?php
++$imp = new DOMImplementation;
++$dom = $imp->createDocument("", "");
++$dom->encoding = null;
++?>
++--EXPECTF--
++Warning: main(): Invalid Document Encoding in %s on line %d

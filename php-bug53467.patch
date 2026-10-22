@@ -1,0 +1,288 @@
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:50:08 +0200
+Subject: [PATCH] Fix #53467: Phar cannot compress large archives
+
+phar_flush() keeps one temporary file open per compressed entry until
+the archive is written, so compressing a phar with more entries than
+the fd limit fails with "unable to create temporary file".
+
+Deviations from upstream: the two first-loop error paths that upstream
+still leaves as "return EOF" also go through cleanup, so entries that
+already point at the shared temp file are not closed twice later;
+compressed_filesize casts the difference, not the shared temp file
+offset, so it stays right past 4 GiB of compressed data; and
+phar_convert_to_other() resets header_offset (upstream GH-16406 fix for
+the new ZEND_ASSERT, with its test). No test for #53467 itself: it needs
+more entries than ulimit -n.
+
+Origin: backport, https://github.com/php/php-src/commit/1bb2a4f91cfde36ba343184f3d88189e646cc363
+Origin: upstream, https://github.com/php/php-src/commit/6a8d0a054d6d43414427cbdfb3afcacc4aefa342
+Bug: https://bugs.php.net/53467
+Bug: https://github.com/php/php-src/issues/16406
+PLD: taken from packages/php branch PHP_7_1, php-bug53467.patch
+PLD: 7.0: php_uint32 context
+---
+ ext/phar/phar.c             | 62 ++++++++++++++++++++++++++++++-------------
+ ext/phar/phar_object.c      |  3 +++
+ ext/phar/tests/gh16406.phpt | 37 ++++++++++++++++++++++++++
+ 3 files changed, 83 insertions(+), 19 deletions(-)
+
+diff --git a/ext/phar/phar.c b/ext/phar/phar.c
+index f55e5fd4..c9386cab 100644
+--- a/ext/phar/phar.c
++++ b/ext/phar/phar.c
+@@ -2537,6 +2537,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 	smart_str main_metadata_str = {0};
+ 	int free_user_stub, free_fp = 1, free_ufp = 1;
+ 	int manifest_hack = 0;
++	php_stream *shared_cfp = NULL;
+ 
+ 	if (phar->is_persistent) {
+ 		if (error) {
+@@ -2790,7 +2791,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 			if (error) {
+ 				spprintf(error, 0, "unable to seek to start of file \"%s\" while creating new phar \"%s\"", entry->filename, phar->fname);
+ 			}
+-			return EOF;
++			goto cleanup;
+ 		}
+ 		newcrc32 = ~0;
+ 		mytime = entry->uncompressed_filesize;
+@@ -2819,13 +2820,16 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 					spprintf(error, 0, "unable to bzip2 compress file \"%s\" to new phar \"%s\"", entry->filename, phar->fname);
+ 				}
+ 			}
+-			return EOF;
++			goto cleanup;
+ 		}
+ 
+-		/* create new file that holds the compressed version */
++		/* create new file that holds the compressed versions */
+ 		/* work around inability to specify freedom in write and strictness
+ 		in read count */
+-		entry->cfp = php_stream_fopen_tmpfile();
++		if (shared_cfp == NULL) {
++			shared_cfp = php_stream_fopen_tmpfile();
++		}
++		entry->cfp = shared_cfp;
+ 		if (!entry->cfp) {
+ 			if (error) {
+ 				spprintf(error, 0, "unable to create temporary file");
+@@ -2834,8 +2838,11 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 				php_stream_close(oldfile);
+ 			}
+ 			php_stream_close(newfile);
+-			return EOF;
++			goto cleanup;
+ 		}
++		/* for real phars, header_offset is unused; we misuse it here to store the offset in the temp file */
++		ZEND_ASSERT(entry->header_offset == 0);
++		entry->header_offset = php_stream_tell(entry->cfp);
+ 		php_stream_flush(file);
+ 		if (-1 == phar_seek_efp(entry, 0, SEEK_SET, 0, 0)) {
+ 			if (closeoldfile) {
+@@ -2845,7 +2852,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 			if (error) {
+ 				spprintf(error, 0, "unable to seek to start of file \"%s\" while creating new phar \"%s\"", entry->filename, phar->fname);
+ 			}
+-			return EOF;
++			goto cleanup;
+ 		}
+ 		php_stream_filter_append((&entry->cfp->writefilters), filter);
+ 		if (SUCCESS != php_stream_copy_to_stream_ex(file, entry->cfp, entry->uncompressed_filesize, NULL)) {
+@@ -2856,15 +2863,14 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 			if (error) {
+ 				spprintf(error, 0, "unable to copy compressed file contents of file \"%s\" while creating new phar \"%s\"", entry->filename, phar->fname);
+ 			}
+-			return EOF;
++			goto cleanup;
+ 		}
+ 		php_stream_filter_flush(filter, 1);
+ 		php_stream_flush(entry->cfp);
+ 		php_stream_filter_remove(filter, 1);
+ 		php_stream_seek(entry->cfp, 0, SEEK_END);
+-		entry->compressed_filesize = (php_uint32) php_stream_tell(entry->cfp);
++		entry->compressed_filesize = (php_uint32) (php_stream_tell(entry->cfp) - entry->header_offset);
+ 		/* generate crc on compressed file */
+-		php_stream_rewind(entry->cfp);
+ 		entry->old_flags = entry->flags;
+ 		entry->is_modified = 1;
+ 		global_flags |= (entry->flags & PHAR_ENT_COMPRESSION_MASK);
+@@ -2920,7 +2926,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 			spprintf(error, 0, "unable to write manifest header of new phar \"%s\"", phar->fname);
+ 		}
+ 
+-		return EOF;
++		goto cleanup;
+ 	}
+ 
+ 	phar->alias_len = restore_alias_len;
+@@ -2941,7 +2947,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 			spprintf(error, 0, "unable to write manifest meta-data of new phar \"%s\"", phar->fname);
+ 		}
+ 
+-		return EOF;
++		goto cleanup;
+ 	}
+ 	smart_str_free(&main_metadata_str);
+ 
+@@ -2983,7 +2989,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 					spprintf(error, 0, "unable to write filename of file \"%s\" to manifest of new phar \"%s\"", entry->filename, phar->fname);
+ 				}
+ 			}
+-			return EOF;
++			goto cleanup;
+ 		}
+ 
+ 		/* set the manifest meta-data:
+@@ -3016,7 +3022,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 				spprintf(error, 0, "unable to write temporary manifest of file \"%s\" to manifest of new phar \"%s\"", entry->filename, phar->fname);
+ 			}
+ 
+-			return EOF;
++			goto cleanup;
+ 		}
+ 	}
+ 	/* Hack - see bug #65028, add padding byte to the end of the manifest */
+@@ -3032,7 +3038,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 				spprintf(error, 0, "unable to write manifest padding byte");
+ 			}
+ 
+-			return EOF;
++			goto cleanup;
+ 		}
+ 	}
+ 
+@@ -3052,7 +3058,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 
+ 		if (entry->cfp) {
+ 			file = entry->cfp;
+-			php_stream_rewind(file);
++			php_stream_seek(file, entry->header_offset, SEEK_SET);
+ 		} else {
+ 			file = phar_get_efp(entry, 0);
+ 			if (-1 == phar_seek_efp(entry, 0, SEEK_SET, 0, 0)) {
+@@ -3063,7 +3069,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 				if (error) {
+ 					spprintf(error, 0, "unable to seek to start of file \"%s\" while creating new phar \"%s\"", entry->filename, phar->fname);
+ 				}
+-				return EOF;
++				goto cleanup;
+ 			}
+ 		}
+ 
+@@ -3075,7 +3081,7 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 			if (error) {
+ 				spprintf(error, 0, "unable to seek to start of file \"%s\" while creating new phar \"%s\"", entry->filename, phar->fname);
+ 			}
+-			return EOF;
++			goto cleanup;
+ 		}
+ 
+ 		/* this will have changed for all files that have either changed compression or been modified */
+@@ -3092,14 +3098,14 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 				spprintf(error, 0, "unable to write contents of file \"%s\" to new phar \"%s\"", entry->filename, phar->fname);
+ 			}
+ 
+-			return EOF;
++			goto cleanup;
+ 		}
+ 
+ 		entry->is_modified = 0;
+ 
+ 		if (entry->cfp) {
+-			php_stream_close(entry->cfp);
+ 			entry->cfp = NULL;
++			entry->header_offset = 0;
+ 		}
+ 
+ 		if (entry->fp_type == PHAR_MOD) {
+@@ -3115,6 +3121,11 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 		}
+ 	}
+ 
++	if (shared_cfp != NULL) {
++		php_stream_close(shared_cfp);
++		shared_cfp = NULL;
++	}
++
+ 	/* append signature */
+ 	if (global_flags & PHAR_HDR_SIGNATURE) {
+ 		char sig_buf[4];
+@@ -3256,6 +3267,19 @@ int phar_flush(phar_archive_data *phar, char *user_stub, zend_long len, int conv
+ 		return EOF;
+ 	}
+ 
++	return EOF;
++
++cleanup:
++	if (shared_cfp != NULL) {
++		php_stream_close(shared_cfp);
++	}
++	ZEND_HASH_FOREACH_PTR(&phar->manifest, entry) {
++		if (entry->cfp) {
++			entry->cfp = NULL;
++			entry->header_offset = 0;
++		}
++	} ZEND_HASH_FOREACH_END();
++
+ 	return EOF;
+ }
+ /* }}} */
+diff --git a/ext/phar/phar_object.c b/ext/phar/phar_object.c
+index 05d1d765..d0753f3c 100644
+--- a/ext/phar/phar_object.c
++++ b/ext/phar/phar_object.c
+@@ -2356,6 +2356,9 @@ no_copy:
+ 			newentry.tar_type = (entry->is_dir ? TAR_DIR : TAR_FILE);
+ 		}
+ 
++		/* The header offset is only used for unmodified zips.
++		 * Once modified, phar_zip_changed_apply_int() will update the header_offset. */
++		newentry.header_offset = 0;
+ 		newentry.is_modified = 1;
+ 		newentry.phar = phar;
+ 		newentry.old_flags = newentry.flags & ~PHAR_ENT_COMPRESSION_MASK; /* remove compression from old_flags */
+diff --git a/ext/phar/tests/gh16406.phpt b/ext/phar/tests/gh16406.phpt
+new file mode 100644
+index 00000000..81a61f12
+--- /dev/null
++++ b/ext/phar/tests/gh16406.phpt
+@@ -0,0 +1,37 @@
++--TEST--
++GH-16406 (Assertion failure in ext/phar/phar.c:2808)
++--SKIPIF--
++<?php
++if (!extension_loaded("phar")) die("skip phar extension not available");
++if (!extension_loaded("zlib")) die("skip zlib extension not available");
++?>
++--INI--
++phar.readonly=0
++phar.require_hash=0
++--FILE--
++<?php
++$fname = __DIR__ . '/gh16406.phar';
++@unlink($fname . '.tar');
++@unlink($fname . '.gz');
++@unlink($fname);
++$file = '<?php __HALT_COMPILER(); ?>';
++$files['b'] = 'b';
++$files['c'] = 'c';
++include __DIR__.'/files/phar_test.inc';
++$phar = new Phar($fname);
++$phar->compressFiles(Phar::GZ);
++$phar = $phar->convertToExecutable(Phar::TAR);
++$phar = $phar->convertToExecutable(Phar::PHAR, Phar::GZ);
++var_dump($phar['b']->openFile()->fread(4096));
++var_dump($phar['c']->openFile()->fread(4096));
++?>
++--CLEAN--
++<?php
++$fname = __DIR__ . '/gh16406.phar';
++@unlink($fname . '.tar');
++@unlink($fname . '.gz');
++@unlink($fname);
++?>
++--EXPECT--
++string(1) "b"
++string(1) "c"

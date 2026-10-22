@@ -1,0 +1,121 @@
+From: Niels Dossche <7771979+nielsdos@users.noreply.github.com>
+Date: Fri, 27 Jun 2025 11:05:33 +0800
+Subject: [PATCH] Fix stream double free in phar
+
+Converting a phar with an entry added in the same request (compress(),
+convertToData()) leaves the new entry sharing the source entry's stream;
+both free it at shutdown (use after free, double free).
+
+Test: SKIPIF instead of --EXTENSIONS--, which 7.3 run-tests ignores.
+
+Origin: upstream, https://github.com/php/php-src/commit/32344c4dc463affe588496976eadf55ba6658178
+Bug: https://github.com/php/php-src/issues/18953
+PLD: taken from packages/php branch PHP_7_1, php-gh18953.patch
+---
+ ext/phar/phar_object.c      | 23 ++++++++---------------
+ ext/phar/tests/gh18953.phpt | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+), 15 deletions(-)
+
+diff --git a/ext/phar/phar_object.c b/ext/phar/phar_object.c
+index c8898a4a..05d1d765 100644
+--- a/ext/phar/phar_object.c
++++ b/ext/phar/phar_object.c
+@@ -2025,7 +2025,8 @@ static int phar_copy_file_contents(phar_entry_info *entry, php_stream *fp) /* {{
+ {
+ 	char *error;
+ 	zend_off_t offset;
+-	phar_entry_info *link;
++
++	ZEND_ASSERT(!entry->link);
+ 
+ 	if (FAILURE == phar_open_entry_fp(entry, &error, 1)) {
+ 		if (error) {
+@@ -2040,26 +2041,14 @@ static int phar_copy_file_contents(phar_entry_info *entry, php_stream *fp) /* {{
+ 	}
+ 
+ 	/* copy old contents in entirety */
+-	phar_seek_efp(entry, 0, SEEK_SET, 0, 1);
++	phar_seek_efp(entry, 0, SEEK_SET, 0, 0);
+ 	offset = php_stream_tell(fp);
+-	link = phar_get_link_source(entry);
+-
+-	if (!link) {
+-		link = entry;
+-	}
+-
+-	if (SUCCESS != php_stream_copy_to_stream_ex(phar_get_efp(link, 0), fp, link->uncompressed_filesize, NULL)) {
++	if (SUCCESS != php_stream_copy_to_stream_ex(phar_get_efp(entry, 0), fp, entry->uncompressed_filesize, NULL)) {
+ 		zend_throw_exception_ex(spl_ce_UnexpectedValueException, 0,
+ 			"Cannot convert phar archive \"%s\", unable to copy entry \"%s\" contents", entry->phar->fname, entry->filename);
+ 		return FAILURE;
+ 	}
+ 
+-	if (entry->fp_type == PHAR_MOD) {
+-		/* save for potential restore on error */
+-		entry->cfp = entry->fp;
+-		entry->fp = NULL;
+-	}
+-
+ 	/* set new location of file contents */
+ 	entry->fp_type = PHAR_FP;
+ 	entry->offset = offset;
+@@ -2349,6 +2338,10 @@ static zend_object *phar_convert_to_other(phar_archive_data *source, int convert
+ 			return NULL;
+ 		}
+ no_copy:
++		/* Reset file pointers, they have to be reset here such that if a copy happens the original
++		 * source fp can be accessed. */
++		newentry.fp = NULL;
++		newentry.cfp = NULL;
+ 		newentry.filename = estrndup(newentry.filename, newentry.filename_len);
+ 
+ 		if (Z_TYPE(newentry.metadata) != IS_UNDEF) {
+diff --git a/ext/phar/tests/gh18953.phpt b/ext/phar/tests/gh18953.phpt
+new file mode 100644
+index 00000000..9df0b789
+--- /dev/null
++++ b/ext/phar/tests/gh18953.phpt
+@@ -0,0 +1,43 @@
++--TEST--
++GH-18953 (Phar: Stream double free)
++--SKIPIF--
++<?php
++if (!extension_loaded("phar")) die("skip phar extension not loaded");
++if (!extension_loaded("zlib")) die("skip zlib extension not loaded");
++?>
++--INI--
++phar.readonly=0
++--FILE--
++<?php
++
++$phar = new Phar(__DIR__ . "/gh18953.phar");
++$phar->addFromString("file", str_repeat("123", random_int(1, 1)));
++$phar->addEmptyDir("dir");
++$phar2 = $phar->compress(Phar::GZ);
++
++var_dump($phar["dir"]);
++var_dump($phar2["dir"]);
++var_dump($phar["file"]->openFile()->fread(100));
++var_dump($phar2["file"]->openFile()->fread(100));
++
++?>
++--CLEAN--
++<?php
++@unlink(__DIR__ . "/gh18953.phar");
++@unlink(__DIR__ . "/gh18953.phar.gz");
++?>
++--EXPECTF--
++object(PharFileInfo)#%d (2) {
++  ["pathName":"SplFileInfo":private]=>
++  string(%d) "%sphar%sdir"
++  ["fileName":"SplFileInfo":private]=>
++  string(3) "dir"
++}
++object(PharFileInfo)#%d (2) {
++  ["pathName":"SplFileInfo":private]=>
++  string(%d) "%sphar.gz%sdir"
++  ["fileName":"SplFileInfo":private]=>
++  string(3) "dir"
++}
++string(3) "123"
++string(3) "123"

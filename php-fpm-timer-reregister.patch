@@ -1,0 +1,142 @@
+From: Nikita Popov <nikita.ppv@gmail.com>
+Date: Tue, 23 Jul 2019 15:54:35 +0200
+Subject: [PATCH] Fix FPM timer event re-registration
+
+A timer callback re-adding its own event is skipped while the event is
+still queued and then freed, so a reload whose workers ignore SIGQUIT
+and SIGTERM never gets to SIGKILL and hangs.
+
+Origin: upstream, https://github.com/php/php-src/commit/0ed6c3714087b254c49185568df96a31df76b2ce
+PLD: taken from packages/php branch PHP_7_1, php-fpm-timer-reregister.patch
+---
+ sapi/fpm/fpm/fpm_events.c                         | 26 ++++++----
+ .../reload-uses-sigkill-as-last-measure.phpt      | 56 +++++++++++++++++++++
+ sapi/fpm/tests/tester.inc                         |  2 +-
+ 3 files changed, 72 insertions(+), 12 deletions(-)
+
+diff --git a/sapi/fpm/fpm/fpm_events.c b/sapi/fpm/fpm/fpm_events.c
+index ca45cb16..cdb976ea 100644
+--- a/sapi/fpm/fpm/fpm_events.c
++++ b/sapi/fpm/fpm/fpm_events.c
+@@ -422,17 +422,16 @@ void fpm_event_loop(int err) /* {{{ */
+ 		/* trigger timers */
+ 		q = fpm_event_queue_timer;
+ 		while (q) {
++			struct fpm_event_queue_s *next = q->next;
+ 			fpm_clock_get(&now);
+ 			if (q->ev) {
+ 				if (timercmp(&now, &q->ev->timeout, >) || timercmp(&now, &q->ev->timeout, ==)) {
+-					fpm_event_fire(q->ev);
+-					/* sanity check */
+-					if (fpm_globals.parent_pid != getpid()) {
+-						return;
+-					}
+-					if (q->ev->flags & FPM_EV_PERSIST) {
+-						fpm_event_set_timeout(q->ev, now);
+-					} else { /* delete the event */
++					struct fpm_event_s *ev = q->ev;
++					if (ev->flags & FPM_EV_PERSIST) {
++						fpm_event_set_timeout(ev, now);
++					} else {
++						/* Delete the event. Make sure this happens before it is fired,
++						 * so that the event callback may register the same timer again. */
+ 						q2 = q;
+ 						if (q->prev) {
+ 							q->prev->next = q->next;
+@@ -446,13 +445,18 @@ void fpm_event_loop(int err) /* {{{ */
+ 								fpm_event_queue_timer->prev = NULL;
+ 							}
+ 						}
+-						q = q->next;
+ 						free(q2);
+-						continue;
++					}
++
++					fpm_event_fire(ev);
++
++					/* sanity check */
++					if (fpm_globals.parent_pid != getpid()) {
++						return;
+ 					}
+ 				}
+ 			}
+-			q = q->next;
++			q = next;
+ 		}
+ 	}
+ }
+diff --git a/sapi/fpm/tests/reload-uses-sigkill-as-last-measure.phpt b/sapi/fpm/tests/reload-uses-sigkill-as-last-measure.phpt
+new file mode 100644
+index 00000000..25c2cf25
+--- /dev/null
++++ b/sapi/fpm/tests/reload-uses-sigkill-as-last-measure.phpt
+@@ -0,0 +1,56 @@
++--TEST--
++If SIGQUIT and SIGTERM during reloading fail, SIGKILL should be sent
++--SKIPIF--
++<?php
++include "skipif.inc";
++if (!function_exists('pcntl_sigprocmask')) die('skip Requires pcntl_sigprocmask()');
++?>
++--FILE--
++<?php
++
++require_once "tester.inc";
++
++$cfg = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++pid = {{FILE:PID}}
++process_control_timeout=1
++[unconfined]
++listen = {{ADDR}}
++ping.path = /ping
++ping.response = pong
++pm = dynamic
++pm.max_children = 5
++pm.start_servers = 1
++pm.min_spare_servers = 1
++pm.max_spare_servers = 1
++EOT;
++
++$code = <<<EOT
++<?php
++pcntl_sigprocmask(SIG_BLOCK, [SIGQUIT, SIGTERM]);
++EOT;
++
++$tester = new FPM\Tester($cfg, $code);
++$tester->start();
++$tester->expectLogStartNotices();
++$tester->request()->expectEmptyBody();
++$tester->signal('USR2');
++$tester->expectLogNotice('Reloading in progress ...');
++$tester->expectLogNotice('reloading: .*');
++$tester->expectLogNotice('using inherited socket fd=\d+, "127.0.0.1:\d+"');
++$tester->expectLogStartNotices();
++$tester->ping('{{ADDR}}');
++$tester->terminate();
++$tester->expectLogTerminatingNotices();
++$tester->close();
++
++?>
++Done
++--EXPECT--
++Done
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>
+diff --git a/sapi/fpm/tests/tester.inc b/sapi/fpm/tests/tester.inc
+index 4ddee842..ecc9aef1 100644
+--- a/sapi/fpm/tests/tester.inc
++++ b/sapi/fpm/tests/tester.inc
+@@ -742,7 +742,7 @@ class Tester
+         $read = [$this->outDesc];
+         $write = null;
+         $except = null;
+-        if (stream_select($read, $write, $except, 2 )) {
++        if (stream_select($read, $write, $except, 3)) {
+             return fgets($this->outDesc);
+         } else {
+             return null;

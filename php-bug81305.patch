@@ -1,0 +1,87 @@
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:46:21 +0200
+Subject: [PATCH] Fix #81305: Built-in Webserver Drops Requests With "Upgrade"
+ Header
+
+The CLI server's HTTP parser stops at an Upgrade request (e.g. h2c
+probes from curl) and the request is never answered.
+
+Test uses fsockopen(); 7.3's php_cli_server.inc has no php_cli_server_connect().
+
+Origin: backport, https://github.com/php/php-src/commit/d1ccb5bd0c7f6ed981e1d0bbfc42fbf5c7561b2c
+Bug: https://bugs.php.net/81305
+PLD: taken from packages/php branch PHP_7_1, php-bug81305.patch
+PLD: 7.0: test expects no Date header, the 7.0 CLI server sends none
+---
+ sapi/cli/php_http_parser.c   |  5 +++++
+ sapi/cli/tests/bug81305.phpt | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
+
+diff --git a/sapi/cli/php_http_parser.c b/sapi/cli/php_http_parser.c
+index 82c74e93..0da81dda 100644
+--- a/sapi/cli/php_http_parser.c
++++ b/sapi/cli/php_http_parser.c
+@@ -1339,11 +1339,16 @@ size_t php_http_parser_execute (php_http_parser *parser,
+           }
+         }
+ 
++        /* We cannot meaningfully support upgrade requests, since we only
++         * support HTTP/1 for now.
++         */
++#if 0
+         /* Exit, the rest of the connect is in a different protocol. */
+         if (parser->upgrade) {
+           CALLBACK2(message_complete);
+           return (p - data);
+         }
++#endif
+ 
+         if (parser->flags & F_SKIPBODY) {
+           CALLBACK2(message_complete);
+diff --git a/sapi/cli/tests/bug81305.phpt b/sapi/cli/tests/bug81305.phpt
+new file mode 100644
+index 00000000..c7c673bb
+--- /dev/null
++++ b/sapi/cli/tests/bug81305.phpt
+@@ -0,0 +1,41 @@
++--TEST--
++Bug #81305 (Built-in Webserver Drops Requests With "Upgrade" Header)
++--SKIPIF--
++<?php
++include "skipif.inc";
++?>
++--FILE--
++<?php
++include "php_cli_server.inc";
++php_cli_server_start();
++
++list($host, $port) = explode(':', PHP_CLI_SERVER_ADDRESS);
++$port = intval($port)?:80;
++
++$fp = fsockopen($host, $port, $errno, $errstr, 0.5);
++if (!$fp) {
++  die("connect failed");
++}
++
++if (fwrite($fp, <<<HEADER
++GET / HTTP/1.1
++Host: {$host}
++Upgrade: HTTP/2.0
++Connection: upgrade
++
++
++HEADER
++)) {
++	fpassthru($fp);
++}
++
++fclose($fp);
++?>
++--EXPECTF--
++HTTP/1.1 200 OK
++Host: %s
++Connection: close
++X-Powered-By: PHP/%s
++Content-type: text/html; charset=UTF-8
++
++Hello world

@@ -1,0 +1,100 @@
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:40:05 +0200
+Subject: [PATCH] Fix #66783, GH-16535: UAF when appending a document to an
+ element
+
+dom_hierarchy() let a document node (XML or HTML) be inserted as a child
+of one of its own elements; freeing the tree then touches freed memory.
+GH-16535's HTML-document check is folded into dom_hierarchy() (its 8.3
+helper does not exist here); cross-document inserts hit WRONG_DOCUMENT_ERR.
+
+Origin: backport, https://github.com/php/php-src/commit/a08847ab39bb512d500cf196981a3e8780c83600
+Origin: backport, https://github.com/php/php-src/commit/51b642f2c9dcb976b10e7557f5e21b020b94c7f0
+Bug: https://bugs.php.net/66783
+Bug: https://github.com/php/php-src/issues/16535
+PLD: taken from packages/php branch PHP_7_1, php-bug66783.patch
+---
+ ext/dom/php_dom.c           | 10 +++++++---
+ ext/dom/tests/bug66783.phpt | 19 +++++++++++++++++++
+ ext/dom/tests/gh16535.phpt  | 27 +++++++++++++++++++++++++++
+ 3 files changed, 53 insertions(+), 3 deletions(-)
+
+diff --git a/ext/dom/php_dom.c b/ext/dom/php_dom.c
+index e10f2094..5ef8a117 100644
+--- a/ext/dom/php_dom.c
++++ b/ext/dom/php_dom.c
+@@ -1307,9 +1307,13 @@ int dom_hierarchy(xmlNodePtr parent, xmlNodePtr child)
+ {
+ 	xmlNodePtr nodep;
+ 
+-    if (parent == NULL || child == NULL || child->doc != parent->doc) {
+-        return SUCCESS;
+-    }
++	if (parent == NULL || child == NULL || child->doc != parent->doc) {
++		return SUCCESS;
++	}
++
++	if (child->type == XML_DOCUMENT_NODE || child->type == XML_HTML_DOCUMENT_NODE) {
++		return FAILURE;
++	}
+ 
+ 	nodep = parent;
+ 
+diff --git a/ext/dom/tests/bug66783.phpt b/ext/dom/tests/bug66783.phpt
+new file mode 100644
+index 00000000..98981a88
+--- /dev/null
++++ b/ext/dom/tests/bug66783.phpt
+@@ -0,0 +1,19 @@
++--TEST--
++Bug #66783 (UAF when appending DOMDocument to element)
++--SKIPIF--
++<?php
++if (!extension_loaded('dom')) die('skip dom extension not available');
++?>
++--FILE--
++<?php
++$doc = new DomDocument;
++$doc->loadXML('<root></root>');
++$e = $doc->createElement('e');
++try {
++    $e->appendChild($doc);
++} catch (DOMException $ex) {
++    echo $ex->getMessage(), PHP_EOL;
++}
++?>
++--EXPECTF--
++Hierarchy Request Error
+diff --git a/ext/dom/tests/gh16535.phpt b/ext/dom/tests/gh16535.phpt
+new file mode 100644
+index 00000000..b1bccd67
+--- /dev/null
++++ b/ext/dom/tests/gh16535.phpt
+@@ -0,0 +1,27 @@
++--TEST--
++GH-16535 (UAF when using document as a child)
++--SKIPIF--
++<?php
++if (!extension_loaded('dom')) die('skip dom extension not available');
++?>
++--FILE--
++<?php
++
++$v2 = new DOMDocument("t");
++
++$v2->loadHTML("t");
++$v4 = $v2->createElement('foo');
++try {
++    $v4->appendChild($v2);
++} catch (Throwable $e) {
++    echo get_class($e), ': ', $e->getMessage(), "\n";
++}
++$v2->loadHTML("<p>oU</p>");
++echo $v2->saveXML();
++
++?>
++--EXPECT--
++DOMException: Hierarchy Request Error
++<?xml version="1.0" standalone="yes"?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
++<html><body><p>oU</p></body></html>

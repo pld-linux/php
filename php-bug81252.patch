@@ -1,0 +1,61 @@
+From: =?UTF-8?q?Arkadiusz=20Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Date: Thu, 22 Oct 2026 10:45:44 +0200
+Subject: [PATCH] Fix #81252: PDO_ODBC doesn't account for SQL_NO_TOTAL
+
+An output parameter whose length comes back as SQL_NO_TOTAL (-4) is
+treated as a length and fed to zend_string_alloc()/memcpy(): crash.
+
+Origin: upstream, https://github.com/php/php-src/commit/98049e8b9ab040f5796a8d93b53173b53977fdad
+Bug: https://bugs.php.net/81252
+PLD: taken from packages/php branch PHP_7_1, php-bug81252.patch
+---
+ ext/pdo_odbc/odbc_stmt.c | 35 ++++++++++++++++-------------------
+ 1 file changed, 16 insertions(+), 19 deletions(-)
+
+diff --git a/ext/pdo_odbc/odbc_stmt.c b/ext/pdo_odbc/odbc_stmt.c
+index f45d63c1..f760926c 100644
+--- a/ext/pdo_odbc/odbc_stmt.c
++++ b/ext/pdo_odbc/odbc_stmt.c
+@@ -495,26 +495,23 @@ static int odbc_stmt_param_hook(pdo_stmt_t *stmt, struct pdo_bound_param_data *p
+ 					zval_ptr_dtor(parameter);
+ 					ZVAL_NULL(parameter);
+ 
+-					switch (P->len) {
+-						case SQL_NULL_DATA:
+-							break;
+-						default:
+-							switch (pdo_odbc_ucs22utf8(stmt, P->is_unicode, P->outbuf, P->len, &ulen)) {
+-								case PDO_ODBC_CONV_FAIL:
+-									/* something fishy, but allow it to come back as binary */
+-								case PDO_ODBC_CONV_NOT_REQUIRED:
+-									srcbuf = P->outbuf;
+-									srclen = P->len;
+-									break;
+-								case PDO_ODBC_CONV_OK:
+-									srcbuf = S->convbuf;
+-									srclen = ulen;
+-									break;
+-							}
++					if (P->len >= 0) {
++						switch (pdo_odbc_ucs22utf8(stmt, P->is_unicode, P->outbuf, P->len, &ulen)) {
++							case PDO_ODBC_CONV_FAIL:
++								/* something fishy, but allow it to come back as binary */
++							case PDO_ODBC_CONV_NOT_REQUIRED:
++								srcbuf = P->outbuf;
++								srclen = P->len;
++								break;
++							case PDO_ODBC_CONV_OK:
++								srcbuf = S->convbuf;
++								srclen = ulen;
++								break;
++						}
+ 
+-							ZVAL_NEW_STR(parameter, zend_string_alloc(srclen, 0));
+-							memcpy(Z_STRVAL_P(parameter), srcbuf, srclen);
+-							Z_STRVAL_P(parameter)[Z_STRLEN_P(parameter)] = '\0';
++						ZVAL_NEW_STR(parameter, zend_string_alloc(srclen, 0));
++						memcpy(Z_STRVAL_P(parameter), srcbuf, srclen);
++						Z_STRVAL_P(parameter)[Z_STRLEN_P(parameter)] = '\0';
+ 					}
+ 				}
+ 				return 1;

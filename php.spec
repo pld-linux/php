@@ -140,7 +140,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	48
+%define		rel	49
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -478,7 +478,8 @@ BuildRequires:	elfutils-devel
 %{?with_enchant:BuildRequires:	enchant-devel >= 1.1.3}
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
-%{!?with_mysqlnd:BuildRequires:	mysql-devel}
+# ext/mysqli includes my_global.h, which MySQL 8.0 dropped from its client headers
+%{!?with_mysqlnd:BuildRequires:	mysql-devel < 8.0}
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
 %if %{with mssql} || %{with sybase_ct}

@@ -43,7 +43,7 @@ new file mode 100644
 diff --git a/ext/standard/var_unserializer.re b/ext/standard/var_unserializer.re
 --- a/ext/standard/var_unserializer.re
 +++ b/ext/standard/var_unserializer.re
-@@ -841,6 +841,7 @@ object ":" uiv ":" ["]	{
+@@ -874,6 +874,7 @@ object ":" uiv ":" ["]	{
  		}
  
  		/* The callback function may have defined the class */
@@ -51,7 +51,7 @@ diff --git a/ext/standard/var_unserializer.re b/ext/standard/var_unserializer.re
  		if (zend_lookup_class(class_name, len2, &pce TSRMLS_CC) == SUCCESS) {
  			ce = *pce;
  		} else {
-@@ -848,6 +849,7 @@ object ":" uiv ":" ["]	{
+@@ -881,6 +882,7 @@ object ":" uiv ":" ["]	{
  			incomplete_class = 1;
  			ce = PHP_IC_ENTRY;
  		}

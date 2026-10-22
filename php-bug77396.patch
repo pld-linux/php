@@ -1,0 +1,39 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Mar 3 18:22:32 2019 -0800
+Subject: [PATCH] Fix bug #77396 - Null Pointer Dereference in phar_create_or_parse_filename
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/77b8d8974275cd14123dc27721863d548a7345d6
+---
+diff --git a/ext/phar/phar.c b/ext/phar/phar.c
+--- a/ext/phar/phar.c
++++ b/ext/phar/phar.c
+@@ -1373,6 +1373,9 @@ int phar_create_or_parse_filename(char *fname, int fname_len, char *alias, int a
+ 	/* set up our manifest */
+ 	mydata = ecalloc(1, sizeof(phar_archive_data));
+ 	mydata->fname = expand_filepath(fname, NULL TSRMLS_CC);
++	if (mydata->fname == NULL) {
++		return FAILURE;
++	}
+ 	fname_len = strlen(mydata->fname);
+ #ifdef PHP_WIN32
+ 	phar_unixify_path_separators(mydata->fname, fname_len);
+diff --git a/ext/phar/tests/bug77396.phpt b/ext/phar/tests/bug77396.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug77396.phpt
+@@ -0,0 +1,15 @@
++--TEST--
++Bug #77396 Relative filename exceeding maximum path length causes null pointer dereference.
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip"); ?>
++--FILE--
++<?php
++$path = '../' . str_repeat("x", PHP_MAXPATHLEN) . '.tar';
++$phar = new PharData($path);
++?>
++--EXPECTF--
++Fatal error: Uncaught exception 'UnexpectedValueException' with message 'Phar creation or opening failed' in %s:%d
++Stack trace:
++#0 %s/bug77396.php(%d): PharData->__construct(%s)
++#1 {main}
++  thrown in %s/bug77396.php on line %d

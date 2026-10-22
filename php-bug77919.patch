@@ -1,0 +1,47 @@
+From 245e5011da14098b8158cf5c5400483399729298 Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Mon, 29 Jul 2019 16:08:03 +0200
+Subject: [PATCH] Fix #77919: Potential UAF in Phar RSHUTDOWN
+
+We have to properly clean up in case phar_flush() is failing.
+
+We also make the expectation of the respective test case less liberal
+to avoid missing such bugs in the future.
+
+(cherry picked from commit cd1101e8c87aa175c2d5e87ddec656e50ef4ab5d)
+
+Source: PLD php PHP_5_6 branch, https://git.pld-linux.org/?p=packages/php.git;a=blob_plain;hb=refs/heads/PHP_5_6;f=php-bug77919.patch
+---
+diff --git a/ext/phar/phar_object.c b/ext/phar/phar_object.c
+--- a/ext/phar/phar_object.c
++++ b/ext/phar/phar_object.c
+@@ -2036,7 +2036,7 @@ static zval *phar_rename_archive(phar_archive_data **sphar, char *ext, zend_bool
+ 	char *newname = NULL, *newpath = NULL;
+ 	zval *ret, arg1;
+ 	zend_class_entry *ce;
+-	char *error;
++	char *error = NULL;
+ 	const char *pcr_error;
+ 	int ext_len = ext ? strlen(ext) : 0;
+ 	int oldname_len;
+@@ -2196,6 +2196,8 @@ its_ok:
+ 	phar_flush(phar, 0, 0, 1, &error TSRMLS_CC);
+ 
+ 	if (error) {
++		zend_hash_del(&(PHAR_G(phar_fname_map)), newpath, phar->fname_len);
++		*sphar = NULL;
+ 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "%s", error);
+ 		efree(error);
+ 		efree(oldpath);
+diff --git a/ext/phar/tests/bug71488.phpt b/ext/phar/tests/bug71488.phpt
+--- a/ext/phar/tests/bug71488.phpt
++++ b/ext/phar/tests/bug71488.phpt
+@@ -15,4 +15,7 @@ DONE
+ ?>
+ --EXPECTF--
+ Fatal error: Uncaught exception 'BadMethodCallException' with message 'tar-based phar "%s" cannot be created, link "%s" is too long for format' in %s:%d
+-Stack trace:%A
++Stack trace:
++#0 %s(%d): PharData->decompress('test')
++#1 {main}
++  thrown in %s on line %d

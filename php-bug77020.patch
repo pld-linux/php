@@ -1,0 +1,41 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Nov 11 10:04:01 2018 -0800
+Subject: [PATCH] Fix #77020: null pointer dereference in imap_mail
+
+If an empty $message is passed to imap_mail(), we must not set message
+to NULL, since _php_imap_mail() is not supposed to handle NULL pointers
+(opposed to pointers to NUL).
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/cf0ae5a8f0af54defd1043e6067c9c77f45eb369
+---
+diff --git a/ext/imap/php_imap.c b/ext/imap/php_imap.c
+--- a/ext/imap/php_imap.c
++++ b/ext/imap/php_imap.c
+@@ -4086,7 +4086,6 @@ PHP_FUNCTION(imap_mail)
+ 	if (!message_len) {
+ 		/* this is not really an error, so it is allowed. */
+ 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "No message string in mail command");
+-		message = NULL;
+ 	}
+ 
+ 	if (_php_imap_mail(to, subject, message, headers, cc, bcc, rpath TSRMLS_CC)) {
+diff --git a/ext/imap/tests/bug77020.phpt b/ext/imap/tests/bug77020.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/imap/tests/bug77020.phpt
+@@ -0,0 +1,15 @@
++--TEST--
++Bug #77020 (null pointer dereference in imap_mail)
++--SKIPIF--
++<?php
++if (!extension_loaded('imap')) die('skip imap extension not available');
++?>
++--FILE--
++<?php
++imap_mail('1', 1, NULL);
++
++?>
++===DONE===
++--EXPECTF--
++Warning: imap_mail(): No message string in mail command in %s on line %d
++%A===DONE===

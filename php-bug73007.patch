@@ -1,0 +1,18 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon Sep 5 18:01:35 2016 -0700
+Subject: [PATCH] Fix bug #73007: add locale length check
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/d632ef5b8e23d81a8780d3b09275f2e2be08139f
+---
+diff --git a/ext/intl/msgformat/msgformat_format.c b/ext/intl/msgformat/msgformat_format.c
+--- a/ext/intl/msgformat/msgformat_format.c
++++ b/ext/intl/msgformat/msgformat_format.c
+@@ -118,6 +118,8 @@ PHP_FUNCTION( msgfmt_format_message )
+ 		RETURN_FALSE;
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(slocale_len);
++
+ 	msgformat_data_init(&mfo->mf_data TSRMLS_CC);
+ 
+ 	if(pattern && pattern_len) {

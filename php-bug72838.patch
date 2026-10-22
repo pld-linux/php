@@ -1,0 +1,21 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon Aug 15 23:43:59 2016 -0700
+Subject: [PATCH] Fix bug #72838 - 	Integer overflow lead to heap corruption in sql_regcase
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/8217d2c74b0ccc08ee8da414c7e6d3954c0c28a8
+---
+diff --git a/ext/ereg/ereg.c b/ext/ereg/ereg.c
+--- a/ext/ereg/ereg.c
++++ b/ext/ereg/ereg.c
+@@ -743,6 +743,11 @@ PHP_EREG_API PHP_FUNCTION(sql_regcase)
+ 	
+ 	for (i = j = 0; i < string_len; i++) {
+ 		c = (unsigned char) string[i];
++		if ( j >= INT_MAX - 1 || (isalpha(c) && j >= INT_MAX - 4)) {
++			php_error_docref(NULL TSRMLS_CC, E_WARNING, "String too long, max length is %d", INT_MAX);
++			efree(tmp);
++			RETURN_FALSE;
++		}
+ 		if (isalpha(c)) {
+ 			tmp[j++] = '[';
+ 			tmp[j++] = toupper(c);

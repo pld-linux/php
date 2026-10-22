@@ -1,0 +1,39 @@
+From 353eab09221605bbf48bcd60ff3882a083b3e2d0 Mon Sep 17 00:00:00 2001
+From: Ilia Alshanetsky <ilia@ilia.ws>
+Date: Thu, 16 Jul 2026 08:30:45 -0400
+Subject: [PATCH] ext/soap: fix NULL deref on malformed HTTP status line
+
+Backport of https://github.com/php/php-src/commit/1c4bf04783b4915a908a1f7f09a4f4fe2f115ed6
+(GH-22761; fixed in PHP 8.4+, no advisory)
+
+5.6: same code change; the test uses 5.6's ServerClientTestCase
+(phpt_notify/phpt_wait, fixed port) instead of {{ ADDR }}.
+
+Source: PLD php PHP_5_6 branch, https://git.pld-linux.org/?p=packages/php.git;a=blob_plain;hb=refs/heads/PHP_5_6;f=php-gh22761.patch
+PLD: test left out: it needs ext/openssl/tests/ServerClientTestCase.inc, which 5.5 does not have
+---
+diff --git a/ext/soap/php_http.c b/ext/soap/php_http.c
+--- a/ext/soap/php_http.c
++++ b/ext/soap/php_http.c
+@@ -925,14 +925,14 @@ try_again:
+ 			if (tmp != NULL) {
+ 				tmp++;
+ 				http_status = atoi(tmp);
+-			}
+-			tmp = strstr(tmp," ");
+-			if (tmp != NULL) {
+-				tmp++;
+-				if (http_msg) {
+-					efree(http_msg);
++				tmp = strstr(tmp," ");
++				if (tmp != NULL) {
++					tmp++;
++					if (http_msg) {
++						efree(http_msg);
++					}
++					http_msg = estrdup(tmp);
+ 				}
+-				http_msg = estrdup(tmp);
+ 			}
+ 			efree(http_version);
+ 

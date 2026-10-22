@@ -1,0 +1,66 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Wed Nov 29 18:52:33 2017 +0100
+Subject: [PATCH] Fixed bug #75571: Potential infinite loop in gdImageCreateFromGifCtx
+
+Due to a signedness confusion in `GetCode_` a corrupt GIF file can
+trigger an infinite loop.  Furthermore we make sure that a GIF without
+any palette entries is treated as invalid *after* open palette entries
+have been removed.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/767b79545899adc26caac10be9e8dda2e035d522
+Binary test fixtures not included: ext/gd/tests/bug75571.gif
+---
+diff --git a/ext/gd/libgd/gd_gif_in.c b/ext/gd/libgd/gd_gif_in.c
+--- a/ext/gd/libgd/gd_gif_in.c
++++ b/ext/gd/libgd/gd_gif_in.c
+@@ -261,10 +261,6 @@ terminated:
+ 	if (!im) {
+ 		return 0;
+ 	}
+-	if (!im->colorsTotal) {
+-		gdImageDestroy(im);
+-		return 0;
+-	}
+ 	/* Check for open colors at the end, so
+ 	   we can reduce colorsTotal and ultimately
+ 	   BitsPerPixel */
+@@ -275,6 +271,10 @@ terminated:
+ 			break;
+ 		}
+ 	}
++    if (!im->colorsTotal) {
++        gdImageDestroy(im);
++        return 0;
++    }
+ 	return im;
+ }
+ /* }}} */
+@@ -375,7 +375,7 @@ static int
+ GetCode_(gdIOCtx *fd, CODE_STATIC_DATA *scd, int code_size, int flag, int *ZeroDataBlockP)
+ {
+ 	int           i, j, ret;
+-	unsigned char count;
++	int           count;
+ 
+ 	if (flag) {
+ 		scd->curbit = 0;
+diff --git a/ext/gd/tests/bug75571.phpt b/ext/gd/tests/bug75571.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug75571.phpt
+@@ -0,0 +1,15 @@
++--TEST--
++Bug #75571 (Infinite loop in GIF reading causing DoS)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++?>
++--FILE--
++<?php
++var_dump(imagecreatefromgif(__DIR__ . '/bug75571.gif'));
++?>
++===DONE===
++--EXPECTF--
++Warning: imagecreatefromgif(): '%s' is not a valid GIF file in %s on line %d
++bool(false)
++===DONE===

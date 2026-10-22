@@ -1,0 +1,53 @@
+From a4aa4f9772a6c30f69db8560cde1f5fe4545b174 Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmb@php.net>
+Date: Fri, 15 Jul 2016 00:57:36 +0200
+Subject: [PATCH] Fix bug #66502: DOM document dangling reference
+
+When we decrement the refcount of a node's document, we state that we
+won't need it anymore. Therefore we can *always* set the pointer to the
+document to NULL, what avoids invalid memory accesses for some edge cases
+as demonstrated with the PHPT.
+
+Original patch provided by Sean Heelan.
+
+Source: upstream https://github.com/php/php-src/commit/a4aa4f9772 (5.6.25)
+---
+diff --git a/ext/dom/tests/bug66502.phpt b/ext/dom/tests/bug66502.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/dom/tests/bug66502.phpt
+@@ -0,0 +1,20 @@
++--TEST--
++Bug #66502 (DOM document dangling reference)
++--SKIPIF--
++<?php
++if (!extension_loaded('dom')) die('skip requires ext/dom');
++?>
++--FILE--
++<?php
++$dom = new DOMDocument('1.0', 'UTF-8');
++$element = $dom->appendChild(new DOMElement('root'));
++$comment = new DOMComment("Comment 0");
++$comment = $element->appendChild($comment);
++
++$comment->__construct("Comment 1");
++$comment->__construct("Comment 2");
++$comment->__construct("Comment 3");
++echo 'DONE', PHP_EOL;
++?>
++--EXPECT--
++DONE
+\ No newline at end of file
+diff --git a/ext/libxml/libxml.c b/ext/libxml/libxml.c
+--- a/ext/libxml/libxml.c
++++ b/ext/libxml/libxml.c
+@@ -1286,8 +1286,8 @@ PHP_LIBXML_API int php_libxml_decrement_doc_ref(php_libxml_node_object *object T
+ 				efree(object->document->doc_props);
+ 			}
+ 			efree(object->document);
+-			object->document = NULL;
+ 		}
++		object->document = NULL;
+ 	}
+ 
+ 	return ret_refcount;

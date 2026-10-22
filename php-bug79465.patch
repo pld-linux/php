@@ -1,0 +1,27 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon Apr 13 21:07:04 2020 -0700
+Subject: [PATCH] Fix bug #79465 - use unsigneds as indexes.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/6797becc8bcd3a754e7e79fdc28b316a81ab122b
+---
+diff --git a/ext/standard/url.c b/ext/standard/url.c
+--- a/ext/standard/url.c
++++ b/ext/standard/url.c
+@@ -574,7 +574,7 @@ PHPAPI int php_url_decode(char *str, int len)
+ #ifndef CHARSET_EBCDIC
+ 			*dest = (char) php_htoi(data + 1);
+ #else
+-			*dest = os_toebcdic[(char) php_htoi(data + 1)];
++			*dest = os_toebcdic[(unsigned char) php_htoi(data + 1)];
+ #endif
+ 			data += 2;
+ 			len -= 2;
+@@ -676,7 +676,7 @@ PHPAPI int php_raw_url_decode(char *str, int len)
+ #ifndef CHARSET_EBCDIC
+ 			*dest = (char) php_htoi(data + 1);
+ #else
+-			*dest = os_toebcdic[(char) php_htoi(data + 1)];
++			*dest = os_toebcdic[(unsigned char) php_htoi(data + 1)];
+ #endif
+ 			data += 2;
+ 			len -= 2;

@@ -1,0 +1,40 @@
+From 1d32b809034ea4cd0e765ae9fda6ca16ae045fdd Mon Sep 17 00:00:00 2001
+From: ju1ius <ju1ius@laposte.net>
+Date: Sat, 30 Jul 2016 06:08:25 +0200
+Subject: [PATCH] fixes bad address given to onig_error_code_to_str
+
+Closes bug #72710
+
+(cherry picked from commit 0fb7eb6723bcc6fd98053911543e801edb5ab763)
+
+Source: upstream https://github.com/php/php-src/commit/1d32b80903 (5.6.25)
+---
+diff --git a/ext/mbstring/php_mbregex.c b/ext/mbstring/php_mbregex.c
+--- a/ext/mbstring/php_mbregex.c
++++ b/ext/mbstring/php_mbregex.c
+@@ -456,7 +456,7 @@ static php_mb_regex_t *php_mbregex_compile_pattern(const char *pattern, int patl
+ 	found = zend_hash_find(&MBREX(ht_rc), (char *)pattern, patlen+1, (void **) &rc);
+ 	if (found == FAILURE || (*rc)->options != options || (*rc)->enc != enc || (*rc)->syntax != syntax) {
+ 		if ((err_code = onig_new(&retval, (OnigUChar *)pattern, (OnigUChar *)(pattern + patlen), options, enc, syntax, &err_info)) != ONIG_NORMAL) {
+-			onig_error_code_to_str(err_str, err_code, err_info);
++			onig_error_code_to_str(err_str, err_code, &err_info);
+ 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "mbregex compile err: %s", err_str);
+ 			retval = NULL;
+ 			goto out;
+diff --git a/ext/mbstring/tests/bug72710.phpt b/ext/mbstring/tests/bug72710.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/mbstring/tests/bug72710.phpt
+@@ -0,0 +1,12 @@
++--TEST--
++Bug #72710 (`mb_ereg` causes buffer overflow on regexp compile error)
++--SKIPIF--
++<?php
++if (!extension_loaded('mbstring')) die('skip ext/mbstring required');
++?>
++--FILE--
++<?php
++mb_ereg('(?<0>a)', 'a');
++?>
++--EXPECTF--
++Warning: mb_ereg(): mbregex compile err: invalid group name <0> in %s on line %d

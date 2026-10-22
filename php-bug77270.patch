@@ -1,0 +1,48 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Sun Dec 30 13:59:26 2018 +0100
+Subject: [PATCH] Fix #77270: imagecolormatch Out Of Bounds Write on Heap
+
+At least some of the image reading functions may return images which
+use color indexes greater than or equal to im->colorsTotal.  We cater
+to this by always using a buffer size which is sufficient for
+`gdMaxColors` in `gdImageColorMatch()`.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/05496b91fdbab10cb22ea0ed8306fd93b5e2f45b
+---
+diff --git a/ext/gd/libgd/gd_color.c b/ext/gd/libgd/gd_color.c
+--- a/ext/gd/libgd/gd_color.c
++++ b/ext/gd/libgd/gd_color.c
+@@ -33,8 +33,8 @@ int gdImageColorMatch (gdImagePtr im1, gdImagePtr im2)
+ 		return -4; /* At least 1 color must be allocated */
+ 	}
+ 
+-	buf = (unsigned long *)safe_emalloc(sizeof(unsigned long), 5 * im2->colorsTotal, 0);
+-	memset( buf, 0, sizeof(unsigned long) * 5 * im2->colorsTotal );
++	buf = (unsigned long *)safe_emalloc(sizeof(unsigned long), 5 * gdMaxColors, 0);
++	memset( buf, 0, sizeof(unsigned long) * 5 * gdMaxColors );
+ 
+ 	for (x=0; x<im1->sx; x++) {
+ 		for( y=0; y<im1->sy; y++ ) {
+diff --git a/ext/gd/tests/bug77270.phpt b/ext/gd/tests/bug77270.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug77270.phpt
+@@ -0,0 +1,18 @@
++--TEST--
++Bug #77270 (imagecolormatch Out Of Bounds Write on Heap)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++if (!GD_BUNDLED && version_compare(GD_VERSION, '2.2.5', '<=')) die('skip upstream bugfix has not been released');
++?>
++--FILE--
++<?php
++$img1 = imagecreatetruecolor(0xfff, 0xfff);
++$img2 = imagecreate(0xfff, 0xfff);
++imagecolorallocate($img2, 0, 0, 0);
++imagesetpixel($img2, 0, 0, 255);
++imagecolormatch($img1, $img2);
++?>
++===DONE===
++--EXPECT--
++===DONE===

@@ -1,0 +1,20 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat Jul 28 22:16:29 2018 -0700
+Subject: [PATCH] Fix for bug #76582
+
+The brigade seems to end up in a messed up state if something fails
+in shutdown, so we clean it up.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/cb2e88f3c523d323a4f87aa4b6b107114ecf380f
+---
+diff --git a/sapi/apache2handler/sapi_apache2.c b/sapi/apache2handler/sapi_apache2.c
+--- a/sapi/apache2handler/sapi_apache2.c
++++ b/sapi/apache2handler/sapi_apache2.c
+@@ -678,6 +678,7 @@ zend_first_try {
+ 	if (!parent_req) {
+ 		php_apache_request_dtor(r TSRMLS_CC);
+ 		ctx->request_processed = 1;
++		apr_brigade_cleanup(brigade);
+ 		bucket = apr_bucket_eos_create(r->connection->bucket_alloc);
+ 		APR_BRIGADE_INSERT_TAIL(brigade, bucket);
+ 

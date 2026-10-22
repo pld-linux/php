@@ -1,0 +1,18 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon May 27 17:16:29 2019 -0700
+Subject: [PATCH] Fix bug #77988 - heap-buffer-overflow on php_jpg_get16
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/7e1d4228e5e94ba6d40300c7db855adad3ce2cad
+---
+diff --git a/ext/exif/exif.c b/ext/exif/exif.c
+--- a/ext/exif/exif.c
++++ b/ext/exif/exif.c
+@@ -3516,6 +3516,8 @@ static int exif_scan_thumbnail(image_info_type *ImageInfo TSRMLS_DC)
+ 		if (c == 0xFF)
+ 			return FALSE;
+ 		marker = c;
++		if (pos>=ImageInfo->Thumbnail.size)
++			return FALSE;
+ 		length = php_jpg_get16(data+pos);
+ 		if (length > ImageInfo->Thumbnail.size || pos >= ImageInfo->Thumbnail.size - length) {
+ 			return FALSE;

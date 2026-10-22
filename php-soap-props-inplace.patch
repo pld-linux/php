@@ -1,0 +1,81 @@
+From: Dmitry Stogov <dmitry@zend.com>
+Date: Thu Nov 10 12:32:07 2016 +0300
+Subject: [PATCH] Don't update proprties inplace.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/b89efd5feeeb18bc90fb034ab9dc9d43742390fc
+---
+diff --git a/ext/soap/soap.c b/ext/soap/soap.c
+--- a/ext/soap/soap.c
++++ b/ext/soap/soap.c
+@@ -902,6 +902,7 @@ PHP_METHOD(SoapFault, SoapFault)
+ PHP_METHOD(SoapFault, __toString)
+ {
+ 	zval *faultcode, *faultstring, *file, *line, *trace;
++	zval *faultcode_cp, *faultstring_cp, *file_cp, *line_cp;
+ 	char *str;
+ 	int len;
+ 	zend_fcall_info fci;
+@@ -930,16 +931,36 @@ PHP_METHOD(SoapFault, __toString)
+ 
+ 	zend_call_function(&fci, NULL TSRMLS_CC);
+ 
+-	convert_to_string(faultcode);
+-	convert_to_string(faultstring);
+-	convert_to_string(file);
+-	convert_to_long(line);
++	ALLOC_ZVAL(faultcode_cp);
++	INIT_PZVAL_COPY(faultcode_cp, faultcode);
++	zval_copy_ctor(faultcode_cp);
++
++	ALLOC_ZVAL(faultstring_cp);
++	INIT_PZVAL_COPY(faultstring_cp, faultstring);
++	zval_copy_ctor(faultstring_cp);
++
++	ALLOC_ZVAL(file_cp);
++	INIT_PZVAL_COPY(file_cp, file);
++	zval_copy_ctor(file_cp);
++
++	ALLOC_ZVAL(line_cp);
++	INIT_PZVAL_COPY(line_cp, line);
++	zval_copy_ctor(line_cp);
++
++	convert_to_string(faultcode_cp);
++	convert_to_string(faultstring_cp);
++	convert_to_string(file_cp);
++	convert_to_long(line_cp);
+ 	convert_to_string(trace);
+ 
+ 	len = spprintf(&str, 0, "SoapFault exception: [%s] %s in %s:%ld\nStack trace:\n%s",
+-	               Z_STRVAL_P(faultcode), Z_STRVAL_P(faultstring), Z_STRVAL_P(file), Z_LVAL_P(line),
++	               Z_STRVAL_P(faultcode_cp), Z_STRVAL_P(faultstring_cp), Z_STRVAL_P(file_cp), Z_LVAL_P(line_cp),
+ 	               Z_STRLEN_P(trace) ? Z_STRVAL_P(trace) : "#0 {main}\n");
+ 
++	zval_ptr_dtor(&faultcode_cp);
++	zval_ptr_dtor(&faultstring_cp);
++	zval_ptr_dtor(&file_cp);
++	zval_ptr_dtor(&line_cp);
+ 	zval_ptr_dtor(&trace);
+ 
+ 	RETURN_STRINGL(str, len, 0);
+diff --git a/ext/soap/tests/bug73452.phpt b/ext/soap/tests/bug73452.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/soap/tests/bug73452.phpt
+@@ -0,0 +1,17 @@
++--TEST--
++Bug #73452 Segfault (Regression for #69152)
++--SKIPIF--
++<?php require_once('skipif.inc'); ?>
++--FILE--
++<?php
++
++$data = 'O:9:"SoapFault":4:{s:9:"faultcode";i:4298448493;s:11:"faultstring";i:4298448543;s:7:"'."\0*\0".'file";i:4298447319;s:7:"'."\0*\0".'line";s:4:"ryat";}';
++echo unserialize($data);
++
++?>
++==DONE==
++--EXPECTF--
++SoapFault exception: [4298448493] 4298448543 in :0
++Stack trace:
++#0 %sbug73452.php(4): unserialize('O:9:"SoapFault"...')
++#1 {main}==DONE==

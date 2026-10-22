@@ -1,0 +1,25 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon May 27 18:04:00 2019 -0700
+Subject: [PATCH] Fix bug #77967 - Bypassing open_basedir restrictions via file uris
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/bda7984de0b4e40d4f184a8f5c739532bc79630d
+---
+diff --git a/ext/sqlite3/sqlite3.c b/ext/sqlite3/sqlite3.c
+--- a/ext/sqlite3/sqlite3.c
++++ b/ext/sqlite3/sqlite3.c
+@@ -1997,6 +1997,15 @@ static int php_sqlite3_authorizer(void *autharg, int access_type, const char *ar
+ 		{
+ 			if (memcmp(arg3, ":memory:", sizeof(":memory:")) && *arg3) {
+ 				TSRMLS_FETCH();
++				if (strncmp(arg3, "file:", 5) == 0) {
++					/* starts with "file:" */
++					if (!arg3[5]) {
++						return SQLITE_DENY;
++					}
++					if (php_check_open_basedir(arg3 + 5 TSRMLS_CC)) {
++						return SQLITE_DENY;
++					}
++				}
+ 
+ #if PHP_API_VERSION < 20100412
+ 				if (PG(safe_mode) && (!php_checkuid(arg3, NULL, CHECKUID_CHECK_FILE_AND_DIR))) {

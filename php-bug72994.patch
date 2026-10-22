@@ -1,0 +1,54 @@
+From b7259b71b430ed733441261f7cf1282f04bb80f1 Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Sun, 4 Sep 2016 16:37:06 +0200
+Subject: [PATCH] Fix #72994: mbc_to_code() out of bounds read
+
+We're backporting commit 999a3553 to the still supported PHP 5.6.
+
+Source: upstream https://github.com/php/php-src/commit/b7259b71b4 (5.6.27)
+---
+diff --git a/ext/mbstring/php_mbregex.c b/ext/mbstring/php_mbregex.c
+--- a/ext/mbstring/php_mbregex.c
++++ b/ext/mbstring/php_mbregex.c
+@@ -811,7 +811,7 @@ static void _php_mb_regex_ereg_replace_exec(INTERNAL_FUNCTION_PARAMETERS, OnigOp
+ 	OnigUChar *pos;
+ 	OnigUChar *string_lim;
+ 	char *description = NULL;
+-	char pat_buf[2];
++	char pat_buf[6];
+ 
+ 	const mbfl_encoding *enc;
+ 
+@@ -862,6 +862,10 @@ static void _php_mb_regex_ereg_replace_exec(INTERNAL_FUNCTION_PARAMETERS, OnigOp
+ 		convert_to_long_ex(arg_pattern_zval);
+ 		pat_buf[0] = (char)Z_LVAL_PP(arg_pattern_zval);
+ 		pat_buf[1] = '\0';
++		pat_buf[2] = '\0';
++		pat_buf[3] = '\0';
++		pat_buf[4] = '\0';
++		pat_buf[5] = '\0';
+ 
+ 		arg_pattern = pat_buf;
+ 		arg_pattern_len = 1;
+diff --git a/ext/mbstring/tests/bug72994.phpt b/ext/mbstring/tests/bug72994.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/mbstring/tests/bug72994.phpt
+@@ -0,0 +1,17 @@
++--TEST--
++Bug #72994 (mbc_to_code() out of bounds read)
++--SKIPIF--
++<?php
++if (!extension_loaded('mbstring')) die('skip mbstring extension not available');
++if (!function_exists('mbereg_replace')) die('skip mbereg_replace() not available');
++?>
++--FILE--
++<?php
++$var1 = mbereg_replace($var-232338951,NULL,NULL,NULL);
++var_dump($var1);
++?>
++===DONE===
++--EXPECTF--
++Notice: Undefined variable: var in %s on line %d
++string(0) ""
++===DONE===

@@ -1,0 +1,92 @@
+From f67ccd4a7b8fb4b9e55796e69b152e2a899ba3cd Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmb@php.net>
+Date: Fri, 29 Jul 2016 00:24:46 +0200
+Subject: [PATCH] Fix #71894: AddressSanitizer: global-buffer-overflow in
+ zif_cal_from_jd
+
+Julian days < 347998 denote invalid Jewish calendar dates, so
+cal_from_jd($jd, CAL_JEWISH) and jdmonthname($jd, CAL_MONTH_JEWISH) should
+actually fail. For BC we don't yet let them though, but we fix the OOB read
+that happens in this case, and we also adjust cal_from_jd()'s return value
+to have empty strings for "abbrevdayname" and "dayname" instead of "Sun"/
+"Sunday" and NULL for "dow" instead of 0, which doesn't make any sense.
+
+Source: upstream https://github.com/php/php-src/commit/f67ccd4a7b (5.6.25)
+---
+diff --git a/ext/calendar/calendar.c b/ext/calendar/calendar.c
+--- a/ext/calendar/calendar.c
++++ b/ext/calendar/calendar.c
+@@ -416,15 +416,21 @@ PHP_FUNCTION(cal_from_jd)
+ 	add_assoc_long(return_value, "year", year);
+ 
+ /* day of week */
+-	dow = DayOfWeek(jd);
+-	add_assoc_long(return_value, "dow", dow);
+-	add_assoc_string(return_value, "abbrevdayname", DayNameShort[dow], 1);
+-	add_assoc_string(return_value, "dayname", DayNameLong[dow], 1);
++	if (cal != CAL_JEWISH || year > 0) {
++		dow = DayOfWeek(jd);
++		add_assoc_long(return_value, "dow", dow);
++		add_assoc_string(return_value, "abbrevdayname", DayNameShort[dow], 1);
++		add_assoc_string(return_value, "dayname", DayNameLong[dow], 1);
++	} else {
++		add_assoc_null(return_value, "dow");
++		add_assoc_string(return_value, "abbrevdayname", "", 1);
++		add_assoc_string(return_value, "dayname", "", 1);
++	}
+ /* month name */
+ 	if(cal == CAL_JEWISH) {
+ 		/* special case for Jewish calendar */
+-		add_assoc_string(return_value, "abbrevmonth", JEWISH_MONTH_NAME(year)[month], 1);
+-		add_assoc_string(return_value, "monthname", JEWISH_MONTH_NAME(year)[month], 1);
++		add_assoc_string(return_value, "abbrevmonth", (year > 0 ? JEWISH_MONTH_NAME(year)[month] : ""), 1);
++		add_assoc_string(return_value, "monthname", (year > 0 ? JEWISH_MONTH_NAME(year)[month] : ""), 1);
+ 	} else {
+ 		add_assoc_string(return_value, "abbrevmonth", calendar->month_name_short[month], 1);
+ 		add_assoc_string(return_value, "monthname", calendar->month_name_long[month], 1);
+@@ -737,7 +743,7 @@ PHP_FUNCTION(jdmonthname)
+ 		break;
+ 	case CAL_MONTH_JEWISH:		/* jewish month */
+ 		SdnToJewish(julday, &year, &month, &day);
+-		monthname = JEWISH_MONTH_NAME(year)[month];
++		monthname = (year > 0 ? JEWISH_MONTH_NAME(year)[month] : "");
+ 		break;
+ 	case CAL_MONTH_FRENCH:		/* french month */
+ 		SdnToFrench(julday, &year, &month, &day);
+diff --git a/ext/calendar/tests/bug71894.phpt b/ext/calendar/tests/bug71894.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/calendar/tests/bug71894.phpt
+@@ -0,0 +1,32 @@
++--TEST--
++Bug #71894 (AddressSanitizer: global-buffer-overflow in zif_cal_from_jd)
++--SKIPIF--
++<?php
++if (!extension_loaded('calendar')) die('skip ext/calendar required');
++?>
++--FILE--
++<?php
++var_dump(cal_from_jd(347997, CAL_JEWISH));
++var_dump(jdmonthname(347997,CAL_MONTH_JEWISH));?>
++--EXPECT--
++array(9) {
++  ["date"]=>
++  string(5) "0/0/0"
++  ["month"]=>
++  int(0)
++  ["day"]=>
++  int(0)
++  ["year"]=>
++  int(0)
++  ["dow"]=>
++  NULL
++  ["abbrevdayname"]=>
++  string(0) ""
++  ["dayname"]=>
++  string(0) ""
++  ["abbrevmonth"]=>
++  string(0) ""
++  ["monthname"]=>
++  string(0) ""
++}
++string(0) ""

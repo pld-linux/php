@@ -1,0 +1,40 @@
+From: Nikita Popov <nikita.ppv@gmail.com>
+Date: Sun Jun 25 21:15:26 2017 +0200
+Subject: [PATCH] Fixed bug #74111
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/97ddddba0495a39499a39284902945310c6701db
+---
+diff --git a/ext/standard/tests/serialize/bug25378.phpt b/ext/standard/tests/serialize/bug25378.phpt
+--- a/ext/standard/tests/serialize/bug25378.phpt
++++ b/ext/standard/tests/serialize/bug25378.phpt
+@@ -42,7 +42,7 @@ bool(false)
+ Notice: unserialize(): Error at offset 17 of 33 bytes in %sbug25378.php on line %d
+ bool(false)
+ 
+-Notice: unserialize(): Error at offset 33 of 32 bytes in %sbug25378.php on line %d
++Notice: unserialize(): Error at offset 32 of 32 bytes in %sbug25378.php on line %d
+ bool(false)
+ 
+ Notice: unserialize(): Error at offset 2 of 13 bytes in %sbug25378.php on line %d
+diff --git a/ext/standard/var_unserializer.re b/ext/standard/var_unserializer.re
+--- a/ext/standard/var_unserializer.re
++++ b/ext/standard/var_unserializer.re
+@@ -372,13 +372,12 @@ static inline int process_nested_data(UNSERIALIZE_PARAMETER, HashTable *ht, long
+ 
+ static inline int finish_nested_data(UNSERIALIZE_PARAMETER)
+ {
+-	if (*((*p)++) == '}')
+-		return 1;
++	if (*p >= max || **p != '}') {
++		return 0;
++	}
+ 
+-#if SOMETHING_NEW_MIGHT_LEAD_TO_CRASH_ENABLE_IF_YOU_ARE_BRAVE
+-	zval_ptr_dtor(rval);
+-#endif
+-	return 0;
++	(*p)++;
++	return 1;
+ }
+ 
+ static inline int object_custom(UNSERIALIZE_PARAMETER, zend_class_entry *ce)

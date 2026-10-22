@@ -140,7 +140,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	47
+%define		rel	48
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -159,7 +159,7 @@ Epoch:		4
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
 # Source0-md5:	72302e26f153687e2ca922909f927443
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -231,6 +231,239 @@ Patch73:	libxml2.patch
 Patch74:	configure.patch
 Patch75:	types.patch
 Patch76:	includes.patch
+# Patch200+: security backports for EOL 5.5 from
+# https://github.com/shivammathur/php-src-backports/commits/PHP-5.5-security-backports
+# one patch per fix, the branch's later fix-ups folded into the patch they fix;
+# "PLD:" header lines name changes against the branch; binary test fixtures are
+# left out (GNU patch cannot apply them), so those tests fail
+Patch200:	php-bug72837.patch
+Patch201:	php-bug70436.patch
+Patch202:	php-bug72663.patch
+Patch203:	php-bug72681.patch
+Patch204:	php-bug72807.patch
+Patch205:	php-bug72838.patch
+Patch206:	php-bug72697.patch
+Patch207:	php-bug72730.patch
+Patch208:	php-bug72708.patch
+Patch209:	php-bug72848.patch
+Patch210:	php-bug72849.patch
+Patch211:	php-bug72850.patch
+Patch212:	php-bug72771.patch
+Patch213:	php-bug72749.patch
+Patch214:	php-bug72750.patch
+Patch215:	php-bug72790.patch
+Patch216:	php-bug73052.patch
+Patch217:	php-bug72293.patch
+Patch218:	php-bug72860.patch
+Patch219:	php-bug72928.patch
+Patch220:	php-bug73007.patch
+Patch221:	php-bug73029.patch
+Patch222:	php-bug73065.patch
+Patch223:	php-bug73189.patch
+Patch224:	php-bug73147.patch
+Patch225:	php-bug73190.patch
+Patch226:	php-bug73150.patch
+Patch227:	php-bug73284.patch
+Patch228:	php-bug73003.patch
+Patch229:	php-bug73218.patch
+Patch230:	php-bug73208.patch
+Patch231:	php-bug73082.patch
+Patch232:	php-bug73174.patch
+Patch233:	php-bug73276.patch
+Patch234:	php-bug73275.patch
+Patch235:	php-bug73017.patch
+Patch236:	php-bug73240.patch
+Patch237:	php-bug73073.patch
+Patch238:	php-bug73293.patch
+Patch239:	php-bug73280.patch
+Patch240:	php-bug72482.patch
+Patch241:	php-bug72696.patch
+Patch242:	php-bug73418.patch
+Patch243:	php-bug73144.patch
+Patch244:	php-bug73192.patch
+Patch245:	php-bug73331.patch
+Patch246:	php-soap-props-inplace.patch
+Patch247:	php-bug73631.patch
+Patch248:	php-bug73737.patch
+Patch249:	php-bug73868.patch
+Patch250:	php-bug73869.patch
+Patch251:	php-bug73764.patch
+Patch252:	php-bug73768.patch
+Patch253:	php-bug73773.patch
+Patch254:	php-bug73825.patch
+Patch255:	php-bug72627.patch
+Patch256:	php-bug69090.patch
+Patch257:	php-bug74145.patch
+Patch258:	php-bug74651.patch
+Patch259:	php-cve-2017-11145.patch
+Patch260:	php-bug74435.patch
+Patch261:	php-onig-cve-2017-9226.patch
+Patch262:	php-onig-cve-2017-9224.patch
+Patch263:	php-onig-cve-2017-9227.patch
+Patch264:	php-onig-cve-2017-9228.patch
+Patch265:	php-onig-cve-2017-9229.patch
+Patch266:	php-bug74603.patch
+Patch267:	php-bug75055.patch
+Patch268:	php-bug72535.patch
+Patch269:	php-bug75571.patch
+Patch270:	php-bug74782.patch
+Patch271:	php-cve-2018-10545.patch
+Patch272:	php-bug76130.patch
+Patch273:	php-bug76249.patch
+Patch274:	php-bug76248.patch
+Patch275:	php-bug76129.patch
+Patch276:	php-bug75981.patch
+Patch277:	php-bug77153.patch
+Patch278:	php-bug77242.patch
+Patch279:	php-bug77247.patch
+Patch280:	php-bug77269.patch
+Patch281:	php-bug77270.patch
+Patch282:	php-bug77371.patch
+Patch283:	php-bug77380.patch
+Patch284:	php-bug77418.patch
+Patch285:	php-bug77630.patch
+Patch286:	php-bug77431.patch
+Patch287:	php-bug77396.patch
+Patch288:	php-bug77540.patch
+Patch289:	php-bug77586.patch
+Patch290:	php-bug77563.patch
+Patch291:	php-bug76557.patch
+Patch292:	php-bug78069.patch
+Patch293:	php-bug77967.patch
+Patch294:	php-bug77973.patch
+Patch295:	php-bug77988.patch
+Patch296:	php-bug78256.patch
+Patch297:	php-bug78222.patch
+Patch298:	php-cve-2019-13224.patch
+Patch299:	php-bug78599.patch
+Patch300:	php-bug78910.patch
+Patch301:	php-bug78878.patch
+Patch302:	php-bug78793.patch
+Patch303:	php-bug78863.patch
+Patch304:	php-bug79037.patch
+Patch305:	php-bug79099.patch
+Patch306:	php-bug79082.patch
+Patch307:	php-bug79221.patch
+Patch308:	php-bug79329.patch
+Patch309:	php-bug79282.patch
+Patch310:	php-bug79330.patch
+Patch311:	php-bug79465.patch
+Patch312:	php-bug78875.patch
+Patch313:	php-bug78876.patch
+Patch314:	php-bug79877.patch
+Patch315:	php-cve-2020-7070.patch
+Patch316:	php-bug73809.patch
+Patch317:	php-bug80672.patch
+Patch318:	php-bug76448.patch
+Patch319:	php-bug81211.patch
+Patch320:	php-bug79971.patch
+Patch321:	php-bug81026.patch
+Patch322:	php-bug81720.patch
+Patch323:	php-bug81719.patch
+Patch324:	php-bug81122.patch
+Patch325:	php-bug76452.patch
+Patch326:	php-bug81726.patch
+Patch327:	php-bug81727.patch
+Patch328:	php-bug81740.patch
+Patch329:	php-cve-2023-0568.patch
+Patch330:	php-cve-2023-0567.patch
+Patch331:	php-cve-2023-0662.patch
+Patch332:	php-cve-2023-3823.patch
+Patch333:	php-cve-2023-3824.patch
+Patch334:	php-cve-2023-3247.patch
+Patch335:	php-cve-2024-2756.patch
+Patch336:	php-cve-2024-3096.patch
+Patch337:	php-cve-2024-8925.patch
+Patch338:	php-cve-2024-8927.patch
+Patch339:	php-cve-2024-11233.patch
+Patch340:	php-cve-2024-11234.patch
+Patch341:	php-cve-2024-11236.patch
+Patch342:	php-cve-2024-8929.patch
+Patch343:	php-bug77423.patch
+Patch344:	php-bug79797.patch
+Patch345:	php-bug77143.patch
+Patch346:	php-bug77020.patch
+Patch347:	php-bug76423.patch
+Patch348:	php-bug76582.patch
+Patch349:	php-bug77753.patch
+Patch350:	php-bug77367.patch
+Patch351:	php-bug77831.patch
+Patch352:	php-bug77950.patch
+Patch353:	php-bug77369.patch
+Patch354:	php-cve-2025-1217.patch
+Patch355:	php-cve-2025-6491.patch
+Patch356:	php-cve-2025-1220.patch
+Patch357:	php-bug78559.patch
+Patch358:	php-cve-2026-6722.patch
+Patch359:	php-cve-2026-7262.patch
+Patch360:	php-cve-2026-7261.patch
+Patch361:	php-cve-2026-6735.patch
+Patch362:	php-cve-2026-14355.patch
+Patch363:	php-cve-2026-7260.patch
+Patch364:	php-cve-2026-9672.patch
+Patch365:	php-cve-2026-17543.patch
+Patch366:	php-bug77370.patch
+Patch367:	php-exif-32bit-overflows.patch
+Patch368:	php-cve-2025-1735.patch
+Patch369:	php-bug79265.patch
+Patch370:	php-cve-2026-92842.patch
+Patch371:	php-cve-2025-14181.patch
+Patch372:	php-cve-2026-6103.patch
+Patch373:	php-cve-2026-91765.patch
+Patch374:	php-cve-2026-91766.patch
+Patch375:	php-cve-2026-93682.patch
+Patch376:	php-cve-2026-91768.patch
+Patch377:	php-bug72926.patch
+Patch378:	php-bug73035.patch
+Patch379:	php-bug77231.patch
+Patch380:	php-bug72135.patch
+Patch381:	php-bug73473.patch
+Patch382:	php-bug74111.patch
+Patch383:	php-bug72682.patch
+Patch384:	php-bug73342.patch
+Patch385:	php-cve-2016-7479.patch
+Patch386:	php-cve-2017-7272.patch
+Patch387:	php-cve-2026-109618.patch
+# Patch400+: fixes that branch lacks, from Remi Collet's scl-php55, PLD's PHP_5_6
+# branch and php-src/oniguruma commits; each patch header names its source
+Patch400:	php-bug72716.patch
+Patch401:	php-bug72836.patch
+Patch402:	php-bug72910.patch
+Patch403:	php-bug73356.patch
+Patch404:	php-bug73549.patch
+Patch405:	php-bug47925.patch
+Patch406:	php-bug77919.patch
+Patch407:	php-bug80710.patch
+Patch408:	php-cve-2025-14177.patch
+Patch409:	php-cve-2026-7258.patch
+Patch410:	php-gh22761.patch
+Patch411:	php-ghsa-4w77-75f9-2c8w.patch
+Patch412:	php-ghsa-ch8v-r6jh-4vvr.patch
+Patch413:	php-ghsa-www2-q4fc-65wf.patch
+Patch414:	php-libmagic-cve-2019-18218.patch
+Patch415:	php-sqlite3-defensive.patch
+Patch416:	php-zpp-path-checks.patch
+Patch417:	php-bug72494.patch
+Patch418:	php-onig-cve-2019-19204.patch
+Patch419:	php-glob-open-basedir.patch
+Patch420:	php-bug77022.patch
+Patch421:	php-bug72142.patch
+Patch422:	php-bug72710.patch
+Patch423:	php-bug66502.patch
+Patch424:	php-bug71894.patch
+Patch425:	php-bug72709.patch
+Patch426:	php-bug72823.patch
+Patch427:	php-bug72994.patch
+Patch428:	php-bug72085.patch
+Patch429:	php-bug72787.patch
+Patch430:	php-bug72776.patch
+Patch431:	php-bug73188.patch
+Patch432:	php-bug73100.patch
+Patch433:	php-bug70213.patch
+Patch434:	php-bug72907.patch
+Patch435:	php-bug71882.patch
+Patch436:	php-bug73213.patch
+Patch437:	php-mssql-dbconvert.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -287,6 +520,7 @@ BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
+BuildRequires:	re2c >= 0.13.4
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm >= 4.4.9-56
@@ -2117,6 +2351,237 @@ exit 1
 %patch -P74 -p1
 %patch -P75 -p1
 %patch -P76 -p1
+%patch -P200 -p1
+%patch -P201 -p1
+%patch -P202 -p1
+%patch -P203 -p1
+%patch -P204 -p1
+%patch -P205 -p1
+%patch -P206 -p1
+%patch -P207 -p1
+%patch -P208 -p1
+%patch -P209 -p1
+%patch -P210 -p1
+%patch -P211 -p1
+%patch -P212 -p1
+%patch -P213 -p1
+%patch -P214 -p1
+%patch -P215 -p1
+%patch -P216 -p1
+%patch -P217 -p1
+%patch -P218 -p1
+%patch -P219 -p1
+%patch -P220 -p1
+%patch -P221 -p1
+%patch -P222 -p1
+%patch -P223 -p1
+%patch -P224 -p1
+%patch -P225 -p1
+%patch -P226 -p1
+%patch -P227 -p1
+%patch -P228 -p1
+%patch -P229 -p1
+%patch -P230 -p1
+%patch -P231 -p1
+%patch -P232 -p1
+%patch -P233 -p1
+%patch -P234 -p1
+%patch -P235 -p1
+%patch -P236 -p1
+%patch -P237 -p1
+%patch -P238 -p1
+%patch -P239 -p1
+%patch -P240 -p1
+%patch -P241 -p1
+%patch -P242 -p1
+%patch -P243 -p1
+%patch -P244 -p1
+%patch -P245 -p1
+%patch -P246 -p1
+%patch -P247 -p1
+%patch -P248 -p1
+%patch -P249 -p1
+%patch -P250 -p1
+%patch -P251 -p1
+%patch -P252 -p1
+%patch -P253 -p1
+%patch -P254 -p1
+%patch -P255 -p1
+%patch -P256 -p1
+%patch -P257 -p1
+%patch -P258 -p1
+%patch -P259 -p1
+%patch -P260 -p1
+%patch -P261 -p1
+%patch -P262 -p1
+%patch -P263 -p1
+%patch -P264 -p1
+%patch -P265 -p1
+%patch -P266 -p1
+%patch -P267 -p1
+%patch -P268 -p1
+%patch -P269 -p1
+%patch -P270 -p1
+%patch -P271 -p1
+%patch -P272 -p1
+%patch -P273 -p1
+%patch -P274 -p1
+%patch -P275 -p1
+%patch -P276 -p1
+%patch -P277 -p1
+%patch -P278 -p1
+%patch -P279 -p1
+%patch -P280 -p1
+%patch -P281 -p1
+%patch -P282 -p1
+%patch -P283 -p1
+%patch -P284 -p1
+%patch -P285 -p1
+%patch -P286 -p1
+%patch -P287 -p1
+%patch -P288 -p1
+%patch -P289 -p1
+%patch -P290 -p1
+%patch -P291 -p1
+%patch -P292 -p1
+%patch -P293 -p1
+%patch -P294 -p1
+%patch -P295 -p1
+%patch -P296 -p1
+%patch -P297 -p1
+%patch -P298 -p1
+%patch -P299 -p1
+%patch -P300 -p1
+%patch -P301 -p1
+%patch -P302 -p1
+%patch -P303 -p1
+%patch -P304 -p1
+%patch -P305 -p1
+%patch -P306 -p1
+%patch -P307 -p1
+%patch -P308 -p1
+%patch -P309 -p1
+%patch -P310 -p1
+%patch -P311 -p1
+%patch -P312 -p1
+%patch -P313 -p1
+%patch -P314 -p1
+%patch -P315 -p1
+%patch -P316 -p1
+%patch -P317 -p1
+%patch -P318 -p1
+%patch -P319 -p1
+%patch -P320 -p1
+%patch -P321 -p1
+%patch -P322 -p1
+%patch -P323 -p1
+%patch -P324 -p1
+%patch -P325 -p1
+%patch -P326 -p1
+%patch -P327 -p1
+%patch -P328 -p1
+%patch -P329 -p1
+%patch -P330 -p1
+%patch -P331 -p1
+%patch -P332 -p1
+%patch -P333 -p1
+%patch -P334 -p1
+%patch -P335 -p1
+%patch -P336 -p1
+%patch -P337 -p1
+%patch -P338 -p1
+%patch -P339 -p1
+%patch -P340 -p1
+%patch -P341 -p1
+%patch -P342 -p1
+%patch -P343 -p1
+%patch -P344 -p1
+%patch -P345 -p1
+%patch -P346 -p1
+%patch -P347 -p1
+%patch -P348 -p1
+%patch -P349 -p1
+%patch -P350 -p1
+%patch -P351 -p1
+%patch -P352 -p1
+%patch -P353 -p1
+%patch -P354 -p1
+%patch -P355 -p1
+%patch -P356 -p1
+%patch -P357 -p1
+%patch -P358 -p1
+%patch -P359 -p1
+%patch -P360 -p1
+%patch -P361 -p1
+%patch -P362 -p1
+%patch -P363 -p1
+%patch -P364 -p1
+%patch -P365 -p1
+%patch -P366 -p1
+%patch -P367 -p1
+%patch -P368 -p1
+%patch -P369 -p1
+%patch -P370 -p1
+%patch -P371 -p1
+%patch -P372 -p1
+%patch -P373 -p1
+%patch -P374 -p1
+%patch -P375 -p1
+%patch -P376 -p1
+%patch -P377 -p1
+%patch -P378 -p1
+%patch -P379 -p1
+%patch -P380 -p1
+%patch -P381 -p1
+%patch -P382 -p1
+%patch -P383 -p1
+%patch -P384 -p1
+%patch -P385 -p1
+%patch -P386 -p1
+%patch -P387 -p1
+%patch -P400 -p1
+%patch -P401 -p1
+%patch -P402 -p1
+%patch -P403 -p1
+%patch -P404 -p1
+%patch -P405 -p1
+%patch -P406 -p1
+%patch -P407 -p1
+%patch -P408 -p1
+%patch -P409 -p1
+%patch -P410 -p1
+%patch -P411 -p1
+%patch -P412 -p1
+%patch -P413 -p1
+%patch -P414 -p1
+%patch -P415 -p1
+%patch -P416 -p1
+%patch -P417 -p1
+%patch -P418 -p1
+%patch -P419 -p1
+%patch -P420 -p1
+%patch -P421 -p1
+%patch -P422 -p1
+%patch -P423 -p1
+%patch -P424 -p1
+%patch -P425 -p1
+%patch -P426 -p1
+%patch -P427 -p1
+%patch -P428 -p1
+%patch -P429 -p1
+%patch -P430 -p1
+%patch -P431 -p1
+%patch -P432 -p1
+%patch -P433 -p1
+%patch -P434 -p1
+%patch -P435 -p1
+%patch -P436 -p1
+%patch -P437 -p1
+
+# backports patch only the .re sources; date has no make rule and the
+# unserializer one is skipped silently when configure finds no re2c
+re2c --no-generation-date -b -o ext/standard/var_unserializer.c ext/standard/var_unserializer.re
+re2c --no-generation-date -d -b -o ext/date/lib/parse_date.c ext/date/lib/parse_date.re
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

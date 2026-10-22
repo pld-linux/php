@@ -1,0 +1,278 @@
+From: Miguel Xavier Penha Neto <miguelxpn2@gmail.com>
+Date: Mon Feb 24 02:04:37 2020 -0300
+Subject: [PATCH] Fixes #79265: Improper injection of Host header when using fopen for http requests
+
+Check all occurrences of the string "host:" (and other headers),
+not just the first one.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/50edfd63db497b5f829635687d2c09e1be92d7ee
+---
+diff --git a/ext/standard/http_fopen_wrapper.c b/ext/standard/http_fopen_wrapper.c
+--- a/ext/standard/http_fopen_wrapper.c
++++ b/ext/standard/http_fopen_wrapper.c
+@@ -86,6 +86,17 @@
+ #define HTTP_WRAPPER_HEADER_INIT    1
+ #define HTTP_WRAPPER_REDIRECTED     2
+ 
++static zend_bool check_has_header(const char *headers, const char *header) {
++	const char *s = headers;
++	while ((s = strstr(s, header))) {
++		if (s == headers || (s - headers >= 2 && *(s-1) == '\n' && *(s-2) == '\r')) {
++			return 1;
++		}
++		s++;
++	}
++	return 0;
++}
++
+ static inline void strip_header(char *header_bag, char *lc_header_bag,
+ 		const char *lc_header_name)
+ {
+@@ -691,35 +702,23 @@ finish:
+ 				strip_header(user_headers, tmp, "content-type:");
+ 			}
+ 
+-			if ((s = strstr(tmp, "user-agent:")) &&
+-			    (s == tmp || *(s-1) == '\r' || *(s-1) == '\n' ||
+-			                 *(s-1) == '\t' || *(s-1) == ' ')) {
+-				 have_header |= HTTP_HEADER_USER_AGENT;
++			if (check_has_header(tmp, "user-agent:")) {
++				have_header |= HTTP_HEADER_USER_AGENT;
+ 			}
+-			if ((s = strstr(tmp, "host:")) &&
+-			    (s == tmp || *(s-1) == '\r' || *(s-1) == '\n' ||
+-			                 *(s-1) == '\t' || *(s-1) == ' ')) {
+-				 have_header |= HTTP_HEADER_HOST;
++			if (check_has_header(tmp, "host:")) {
++				have_header |= HTTP_HEADER_HOST;
+ 			}
+-			if ((s = strstr(tmp, "from:")) &&
+-			    (s == tmp || *(s-1) == '\r' || *(s-1) == '\n' ||
+-			                 *(s-1) == '\t' || *(s-1) == ' ')) {
+-				 have_header |= HTTP_HEADER_FROM;
+-				}
+-			if ((s = strstr(tmp, "authorization:")) &&
+-			    (s == tmp || *(s-1) == '\r' || *(s-1) == '\n' ||
+-			                 *(s-1) == '\t' || *(s-1) == ' ')) {
+-				 have_header |= HTTP_HEADER_AUTH;
++			if (check_has_header(tmp, "from:")) {
++				have_header |= HTTP_HEADER_FROM;
+ 			}
+-			if ((s = strstr(tmp, "content-length:")) &&
+-			    (s == tmp || *(s-1) == '\r' || *(s-1) == '\n' ||
+-			                 *(s-1) == '\t' || *(s-1) == ' ')) {
+-				 have_header |= HTTP_HEADER_CONTENT_LENGTH;
++			if (check_has_header(tmp, "authorization:")) {
++				have_header |= HTTP_HEADER_AUTH;
+ 			}
+-			if ((s = strstr(tmp, "content-type:")) &&
+-			    (s == tmp || *(s-1) == '\r' || *(s-1) == '\n' ||
+-			                 *(s-1) == '\t' || *(s-1) == ' ')) {
+-				 have_header |= HTTP_HEADER_TYPE;
++			if (check_has_header(tmp, "content-length:")) {
++				have_header |= HTTP_HEADER_CONTENT_LENGTH;
++			}
++			if (check_has_header(tmp, "content-type:")) {
++				have_header |= HTTP_HEADER_TYPE;
+ 			}
+ 			/* remove Proxy-Authorization header */
+ 			if (use_proxy && use_ssl && (s = strstr(tmp, "proxy-authorization:")) &&
+diff --git a/ext/standard/tests/http/bug79265.phpt b/ext/standard/tests/http/bug79265.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/bug79265.phpt
+@@ -0,0 +1,38 @@
++--TEST--
++Bug #79265 (Improper injection of Host header when using fopen for http requests)
++--INI--
++allow_url_fopen=1
++--SKIPIF--
++<?php require 'server.inc'; http_server_skipif('tcp://127.0.0.1:12342'); ?>
++--FILE--
++<?php
++require 'server.inc';
++
++$responses = array(
++    "data://text/plain,HTTP/1.0 200 OK\r\n\r\n",
++);
++
++$pid = http_server("tcp://127.0.0.1:12342", $responses, $output);
++
++$opts = array(
++  'http'=>array(
++    'method'=>"GET",
++    'header'=>"RandomHeader: localhost:8080\r\n" .
++              "Cookie: foo=bar\r\n" .
++              "Host: userspecifiedvalue\r\n"
++  )
++);
++$context = stream_context_create($opts);
++$fd = fopen('http://127.0.0.1:12342/', 'rb', false, $context);
++fseek($output, 0, SEEK_SET);
++echo stream_get_contents($output);
++fclose($fd);
++
++http_server_kill($pid);
++
++?>
++--EXPECT--
++GET / HTTP/1.0
++RandomHeader: localhost:8080
++Cookie: foo=bar
++Host: userspecifiedvalue
+diff --git a/ext/standard/tests/http/bug79265_2.phpt b/ext/standard/tests/http/bug79265_2.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/bug79265_2.phpt
+@@ -0,0 +1,37 @@
++--TEST--
++Bug #79265 variation: "host:" not at start of header
++--INI--
++allow_url_fopen=1
++--SKIPIF--
++<?php require 'server.inc'; http_server_skipif('tcp://127.0.0.1:12342'); ?>
++--FILE--
++<?php
++require 'server.inc';
++
++$responses = array(
++    "data://text/plain,HTTP/1.0 200 OK\r\n\r\n",
++);
++
++$pid = http_server("tcp://127.0.0.1:12342", $responses, $output);
++
++$opts = array(
++  'http'=>array(
++    'method'=>"GET",
++    'header'=>"RandomHeader: host:8080\r\n" .
++              "Cookie: foo=bar\r\n"
++  )
++);
++$context = stream_context_create($opts);
++$fd = fopen('http://127.0.0.1:12342/', 'rb', false, $context);
++fseek($output, 0, SEEK_SET);
++echo stream_get_contents($output);
++fclose($fd);
++
++http_server_kill($pid);
++
++?>
++--EXPECT--
++GET / HTTP/1.0
++Host: 127.0.0.1:12342
++RandomHeader: host:8080
++Cookie: foo=bar
+diff --git a/ext/standard/tests/http/ghsa-hgf5-96fm-v528-001.phpt b/ext/standard/tests/http/ghsa-hgf5-96fm-v528-001.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-hgf5-96fm-v528-001.phpt
+@@ -0,0 +1,34 @@
++--TEST--
++GHSA-hgf5-96fm-v528: Stream HTTP wrapper header check might omit basic auth header (incorrect inside pos)
++--INI--
++allow_url_fopen=1
++--SKIPIF--
++<?php require 'server.inc'; http_server_skipif('tcp://127.0.0.1:12342'); ?>
++--FILE--
++<?php
++require 'server.inc';
++
++$options = [
++    'http' => [
++        'method' => 'GET',
++        'header' => "Cookie: foo=bar\nauthorization:x\r\n",
++    ],
++];
++$ctx = stream_context_create($options);
++$responses = ["data://text/plain,HTTP/1.1 200\r\nConnection: close\r\n\r\nOK"];
++
++$pid = http_server('tcp://127.0.0.1:12342', $responses, $output);
++@file_get_contents('http://user:pwd@127.0.0.1:12342/', false, $ctx);
++fseek($output, 0, SEEK_SET);
++echo stream_get_contents($output);
++http_server_kill($pid);
++?>
++Done
++--EXPECT--
++GET / HTTP/1.0
++Authorization: Basic dXNlcjpwd2Q=
++Host: 127.0.0.1:12342
++Cookie: foo=bar
++authorization:x
++
++Done
+diff --git a/ext/standard/tests/http/ghsa-hgf5-96fm-v528-002.phpt b/ext/standard/tests/http/ghsa-hgf5-96fm-v528-002.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-hgf5-96fm-v528-002.phpt
+@@ -0,0 +1,32 @@
++--TEST--
++GHSA-hgf5-96fm-v528: Header parser of http stream wrapper does not handle folded headers (correct start pos)
++--INI--
++allow_url_fopen=1
++--SKIPIF--
++<?php require 'server.inc'; http_server_skipif('tcp://127.0.0.1:12342'); ?>
++--FILE--
++<?php
++require 'server.inc';
++
++$options = [
++    'http' => [
++        'method' => 'GET',
++        'header' => "Authorization: Bearer x\r\n",
++    ],
++];
++$ctx = stream_context_create($options);
++$responses = ["data://text/plain,HTTP/1.1 200\r\nConnection: close\r\n\r\nOK"];
++
++$pid = http_server('tcp://127.0.0.1:12342', $responses, $output);
++@file_get_contents('http://user:pwd@127.0.0.1:12342/', false, $ctx);
++fseek($output, 0, SEEK_SET);
++echo stream_get_contents($output);
++http_server_kill($pid);
++?>
++Done
++--EXPECT--
++GET / HTTP/1.0
++Host: 127.0.0.1:12342
++Authorization: Bearer x
++
++Done
+diff --git a/ext/standard/tests/http/ghsa-hgf5-96fm-v528-003.phpt b/ext/standard/tests/http/ghsa-hgf5-96fm-v528-003.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-hgf5-96fm-v528-003.phpt
+@@ -0,0 +1,33 @@
++--TEST--
++GHSA-hgf5-96fm-v528: Header parser of http stream wrapper does not handle folded headers (correct middle pos)
++--INI--
++allow_url_fopen=1
++--SKIPIF--
++<?php require 'server.inc'; http_server_skipif('tcp://127.0.0.1:12342'); ?>
++--FILE--
++<?php
++require 'server.inc';
++
++$options = [
++    'http' => [
++        'method' => 'GET',
++        'header' => "Cookie: x=y\r\nAuthorization: Bearer x\r\n",
++    ],
++];
++$ctx = stream_context_create($options);
++$responses = ["data://text/plain,HTTP/1.1 200\r\nConnection: close\r\n\r\nOK"];
++
++$pid = http_server('tcp://127.0.0.1:12342', $responses, $output);
++@file_get_contents('http://user:pwd@127.0.0.1:12342/', false, $ctx);
++fseek($output, 0, SEEK_SET);
++echo stream_get_contents($output);
++http_server_kill($pid);
++?>
++Done
++--EXPECT--
++GET / HTTP/1.0
++Host: 127.0.0.1:12342
++Cookie: x=y
++Authorization: Bearer x
++
++Done

@@ -1,0 +1,26 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Wed Mar 18 10:26:53 2020 +0100
+Subject: [PATCH] Fix #78875: Long filenames cause OOM and temp files are not cleaned
+
+We must not cast `size_t` to `int` (unless the `size_t` value is
+guaranteed to be less than or equal to `INT_MAX`).  In this case we can
+declare `array_len` as `size_t` in the first place.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/c3bc3ab668a81b3c8892a9e249ea97c76df20fe0
+---
+diff --git a/main/rfc1867.c b/main/rfc1867.c
+--- a/main/rfc1867.c
++++ b/main/rfc1867.c
+@@ -679,8 +679,10 @@ SAPI_API SAPI_POST_HANDLER_FUNC(rfc1867_post_handler) /* {{{ */
+ {
+ 	char *boundary, *s = NULL, *boundary_end = NULL, *start_arr = NULL, *array_index = NULL;
+ 	char *temp_filename = NULL, *lbuf = NULL, *abuf = NULL;
+-	int boundary_len = 0, total_bytes = 0, cancel_upload = 0, is_arr_upload = 0, array_len = 0;
+-	int max_file_size = 0, skip_upload = 0, anonindex = 0, is_anonymous;
++	int boundary_len = 0, cancel_upload = 0, is_arr_upload = 0;
++	size_t array_len = 0;
++	int64_t total_bytes = 0, max_file_size = 0;
++	int skip_upload = 0, anonindex = 0, is_anonymous;
+ 	zval *http_post_files = NULL;
+ 	HashTable *uploaded_files = NULL;
+ 	multipart_buffer *mbuff;

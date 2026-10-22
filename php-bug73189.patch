@@ -1,0 +1,42 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Wed Sep 28 23:30:48 2016 -0700
+Subject: [PATCH] Fix bug #73189 - Memcpy negative size parameter php_resolve_path
+
+Upstream: https://github.com/php/php-src/commit/da7e89cde880c66887caacd0a3eae7ecdacf9b2a
+
+Upstream: https://github.com/php/php-src/commit/c4c2cce37dd99bbcf1411ad8d6884c3c927d7bc9
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/c4cb1add9b4c76c346fd5e5f550a65c6b8b07750
+---
+diff --git a/main/fopen_wrappers.c b/main/fopen_wrappers.c
+--- a/main/fopen_wrappers.c
++++ b/main/fopen_wrappers.c
+@@ -522,7 +522,7 @@ PHPAPI char *php_resolve_path(const char *filename, int filename_length, const c
+ 		}
+ 		end = strchr(p, DEFAULT_DIR_SEPARATOR);
+ 		if (end) {
+-			if ((end-ptr) + 1 + filename_length + 1 >= MAXPATHLEN) {
++			if (filename_length > (MAXPATHLEN - 2) || (end-ptr) > MAXPATHLEN || (end-ptr) + 1 + (size_t)filename_length + 1 >= MAXPATHLEN) {
+ 				ptr = end + 1;
+ 				continue;
+ 			}
+@@ -531,9 +531,9 @@ PHPAPI char *php_resolve_path(const char *filename, int filename_length, const c
+ 			memcpy(trypath+(end-ptr)+1, filename, filename_length+1);
+ 			ptr = end+1;
+ 		} else {
+-			int len = strlen(ptr);
++			size_t len = strlen(ptr);
+ 
+-			if (len + 1 + filename_length + 1 >= MAXPATHLEN) {
++			if (filename_length > (MAXPATHLEN - 2) || len > MAXPATHLEN || (size_t)len + 1 + (size_t)filename_length + 1 >= MAXPATHLEN) {
+ 				break;
+ 			}
+ 			memcpy(trypath, ptr, len);
+@@ -571,6 +571,7 @@ PHPAPI char *php_resolve_path(const char *filename, int filename_length, const c
+ 		while ((--exec_fname_length >= 0) && !IS_SLASH(exec_fname[exec_fname_length]));
+ 		if (exec_fname && exec_fname[0] != '[' &&
+ 		    exec_fname_length > 0 &&
++			filename_length < (MAXPATHLEN - 2) &&
+ 		    exec_fname_length + 1 + filename_length + 1 < MAXPATHLEN) {
+ 			memcpy(trypath, exec_fname, exec_fname_length + 1);
+ 			memcpy(trypath+exec_fname_length + 1, filename, filename_length+1);

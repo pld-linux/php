@@ -1,0 +1,23 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Wed Oct 12 11:15:32 2016 +0200
+Subject: [PATCH] Avoid potentially dangerous signed to unsigned conversion
+
+We make sure to never pass a negative `rlen` as size to memcpy(). See
+also <https://bugs.php.net/bug.php?id=73280>.
+
+Patch provided by Emmanuel Law.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/af03ec7b2e5bb2fce6f786d4911887f39a80486f
+---
+diff --git a/ext/gd/libgd/gd_io_dp.c b/ext/gd/libgd/gd_io_dp.c
+--- a/ext/gd/libgd/gd_io_dp.c
++++ b/ext/gd/libgd/gd_io_dp.c
+@@ -237,7 +237,7 @@ static int dynamicGetbuf (gdIOCtxPtr ctx, void *buf, int len)
+ 	if (remain >= len) {
+ 		rlen = len;
+ 	} else {
+-		if (remain == 0) {
++		if (remain <= 0) {
+ 			return EOF;
+ 		}
+ 		rlen = remain;

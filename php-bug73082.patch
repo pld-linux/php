@@ -1,0 +1,45 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Sep 25 16:07:14 2016 -0700
+Subject: [PATCH] Fix bug #73082
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/ce211a85c0f47e9c88a9a291b50ff314a13cf9f2
+---
+diff --git a/ext/mbstring/mbstring.c b/ext/mbstring/mbstring.c
+--- a/ext/mbstring/mbstring.c
++++ b/ext/mbstring/mbstring.c
+@@ -3349,7 +3349,7 @@ PHP_FUNCTION(mb_encode_mimeheader)
+ 	mbfl_string_init(&result);
+ 	ret = mbfl_mime_header_encode(&string, &result, charset, transenc, linefeed, indent);
+ 	if (ret != NULL) {
+-		RETVAL_STRINGL((char *)ret->val, ret->len, 0);	/* the string is already strdup()'ed */
++		RETVAL_STRINGL_CHECK((char *)ret->val, ret->len, 0);	/* the string is already strdup()'ed */
+ 	} else {
+ 		RETVAL_FALSE;
+ 	}
+@@ -3373,7 +3373,7 @@ PHP_FUNCTION(mb_decode_mimeheader)
+ 	mbfl_string_init(&result);
+ 	ret = mbfl_mime_header_decode(&string, &result, MBSTRG(current_internal_encoding)->no_encoding);
+ 	if (ret != NULL) {
+-		RETVAL_STRINGL((char *)ret->val, ret->len, 0);	/* the string is already strdup()'ed */
++		RETVAL_STRINGL_CHECK((char *)ret->val, ret->len, 0);	/* the string is already strdup()'ed */
+ 	} else {
+ 		RETVAL_FALSE;
+ 	}
+@@ -3476,7 +3476,7 @@ PHP_FUNCTION(mb_convert_kana)
+ 
+ 	ret = mbfl_ja_jp_hantozen(&string, &result, opt);
+ 	if (ret != NULL) {
+-		RETVAL_STRINGL((char *)ret->val, ret->len, 0);		/* the string is already strdup()'ed */
++		RETVAL_STRINGL_CHECK((char *)ret->val, ret->len, 0);		/* the string is already strdup()'ed */
+ 	} else {
+ 		RETVAL_FALSE;
+ 	}
+@@ -3772,7 +3772,7 @@ php_mb_numericentity_exec(INTERNAL_FUNCTION_PARAMETERS, int type)
+ 
+ 	ret = mbfl_html_numeric_entity(&string, &result, convmap, mapsize, type);
+ 	if (ret != NULL) {
+-		RETVAL_STRINGL((char *)ret->val, ret->len, 0);
++		RETVAL_STRINGL_CHECK((char *)ret->val, ret->len, 0);
+ 	} else {
+ 		RETVAL_FALSE;
+ 	}

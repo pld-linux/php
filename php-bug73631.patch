@@ -1,0 +1,53 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon Dec 5 21:40:55 2016 -0800
+Subject: [PATCH] Fix bug #73631 - Invalid read when wddx decodes empty boolean element
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/1e14a6557c407ba31199dc3c3583d298d6c80e18
+---
+diff --git a/ext/wddx/tests/bug73631.phpt b/ext/wddx/tests/bug73631.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/wddx/tests/bug73631.phpt
+@@ -0,0 +1,18 @@
++--TEST--
++Bug #73631 (Memory leak due to invalid wddx stack processing)
++--SKIPIF--
++<?php if (!extension_loaded("wddx")) print "skip"; ?>
++--FILE--
++<?php
++$xml = <<<EOF
++<?xml version="1.0" ?>
++<wddxPacket version="1.0">
++<number>1234</number>
++<binary><boolean/></binary>
++</wddxPacket>
++EOF;
++$wddx = wddx_deserialize($xml);
++var_dump($wddx);
++?>
++--EXPECTF--
++int(1234)
+diff --git a/ext/wddx/wddx.c b/ext/wddx/wddx.c
+--- a/ext/wddx/wddx.c
++++ b/ext/wddx/wddx.c
+@@ -805,6 +805,11 @@ static void php_wddx_push_element(void *user_data, const XML_Char *name, const X
+ 				php_wddx_process_data(user_data, atts[i+1], strlen(atts[i+1]));
+ 				break;
+ 			}
++		} else {
++			ent.type = ST_BOOLEAN;
++			SET_STACK_VARNAME;
++			ZVAL_FALSE(&ent.data);
++			wddx_stack_push((wddx_stack *)stack, &ent, sizeof(st_entry));
+ 		}
+ 	} else if (!strcmp(name, EL_NULL)) {
+ 		ent.type = ST_NULL;
+@@ -1045,6 +1050,8 @@ static void php_wddx_pop_element(void *user_data, const XML_Char *name)
+ 				} else	{
+ 					zend_hash_next_index_insert(target_hash, &ent1->data, sizeof(zval *), NULL);
+ 				}
++			} else if (!strcmp(name, EL_BINARY) && Z_STRLEN_P(ent1->data) < 1) {
++				zval_ptr_dtor(&ent1->data);
+ 			}
+ 			efree(ent1);
+ 		} else {

@@ -1,0 +1,30 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Mar 15 17:26:00 2020 -0700
+Subject: [PATCH] Fixed bug #79282
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/140299f487f8305f1b665da4b4c5f3a548f92684
+---
+diff --git a/ext/exif/exif.c b/ext/exif/exif.c
+--- a/ext/exif/exif.c
++++ b/ext/exif/exif.c
+@@ -3233,6 +3233,11 @@ static void exif_process_TIFF_in_JPEG(image_info_type *ImageInfo, char *CharBuf,
+ {
+ 	unsigned exif_value_2a, offset_of_ifd;
+ 
++	if (length < 2) {
++		exif_error_docref(NULL EXIFERR_CC, ImageInfo, E_WARNING, "Missing TIFF alignment marker");
++		return;
++	}
++
+ 	/* set the thumbnail stuff to nothing so we can test to see if they get set up */
+ 	if (memcmp(CharBuf, "II", 2) == 0) {
+ 		ImageInfo->motorola_intel = 0;
+@@ -3385,7 +3390,7 @@ static int exif_scan_JPEG_header(image_info_type *ImageInfo TSRMLS_DC)
+ 			return FALSE;
+ 		}
+ 
+-		sn = exif_file_sections_add(ImageInfo, marker, itemlen+1, NULL);
++		sn = exif_file_sections_add(ImageInfo, marker, itemlen, NULL);
+ 		Data = ImageInfo->file.list[sn].data;
+ 
+ 		/* Store first two pre-read bytes. */

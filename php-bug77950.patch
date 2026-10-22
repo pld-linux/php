@@ -1,0 +1,22 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon Apr 29 23:38:12 2019 -0700
+Subject: [PATCH] Fix bug #77950 - Heap-buffer-overflow in _estrndup via exif_process_IFD_TAG
+
+I do not completely understand what is going on there, but I am pretty
+sure dir_entry <= offset_base if not a normal situation, so we better not
+to rely on such dir_entry.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/b05d8db20c4f1a74a8c3b6f9f3ebcca9ca9443ff
+---
+diff --git a/ext/exif/exif.c b/ext/exif/exif.c
+--- a/ext/exif/exif.c
++++ b/ext/exif/exif.c
+@@ -2899,7 +2899,7 @@ static int exif_process_IFD_TAG(image_info_type *ImageInfo, char *dir_entry, cha
+             offset_base is ImageInfo->file.list[sn].data-dir_offset
+             dir_entry - offset_base is dir_offset+2+i*12
+         */
+-		if (byte_count > IFDlength || offset_val > IFDlength-byte_count || value_ptr < dir_entry || offset_val < (size_t)(dir_entry-offset_base)) {
++		if (byte_count > IFDlength || offset_val > IFDlength-byte_count || value_ptr < dir_entry || offset_val < (size_t)(dir_entry-offset_base) || dir_entry <= offset_base) {
+ 			/* It is important to check for IMAGE_FILETYPE_TIFF
+ 			 * JPEG does not use absolute pointers instead its pointers are
+ 			 * relative to the start of the TIFF header in APP1 section. */

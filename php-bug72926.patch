@@ -1,0 +1,22 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Sep 4 20:49:34 2016 -0700
+Subject: [PATCH] Same issue as #72926 in another place.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/f931d7eedaaf74d99cab0dbfb360d7601a819ec1
+---
+diff --git a/ext/exif/exif.c b/ext/exif/exif.c
+--- a/ext/exif/exif.c
++++ b/ext/exif/exif.c
+@@ -3767,8 +3767,11 @@ static int exif_process_IFD_in_TIFF(image_info_type *ImageInfo, size_t dir_offse
+ 									fgot = php_stream_read(ImageInfo->infile, ImageInfo->Thumbnail.data, ImageInfo->Thumbnail.size);
+ 									if (fgot < ImageInfo->Thumbnail.size) {
+ 										EXIF_ERRLOG_THUMBEOF(ImageInfo)
++										efree(ImageInfo->Thumbnail.data);
++										ImageInfo->Thumbnail.data = NULL;
++									} else {
++										exif_thumbnail_build(ImageInfo TSRMLS_CC);
+ 									}
+-									exif_thumbnail_build(ImageInfo TSRMLS_CC);
+ 								}
+ 							}
+ 						}

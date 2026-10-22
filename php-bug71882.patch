@@ -1,0 +1,49 @@
+From 207dab585aadd9f320976a0895734d7d9ca7b862 Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Tue, 30 Aug 2016 01:53:27 +0200
+Subject: [PATCH] Fix #71882: Negative ftruncate() on php://memory exhausts
+ memory
+
+We must not pass negative sizes to a size_t parameter.
+
+From 314a9f8553625eec8f5cfc60360790533d786bc5 Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Wed, 31 Aug 2016 14:51:37 +0200
+Subject: [PATCH] Fix #71882 amendment: Negative ftruncate() on php://memory
+ exhausts memory
+
+To avoid BC breaks, we do not raise a warning for now.
+
+Source: upstream https://github.com/php/php-src/commit/207dab585a + amendment https://github.com/php/php-src/commit/314a9f8553 (5.6.26), test as in 5.6.40
+---
+diff --git a/ext/standard/file.c b/ext/standard/file.c
+--- a/ext/standard/file.c
++++ b/ext/standard/file.c
+@@ -1508,6 +1508,11 @@ PHP_NAMED_FUNCTION(php_if_ftruncate)
+ 		RETURN_FALSE;
+ 	}
+ 
++	if (size < 0) {
++		/* php_error_docref(NULL TSRMLS_CC, E_WARNING, "Negative size is not supported"); */
++		RETURN_FALSE;
++	}
++
+ 	PHP_STREAM_TO_ZVAL(stream, &fp);
+ 
+ 	if (!php_stream_truncate_supported(stream)) {
+diff --git a/ext/standard/tests/file/bug71882.phpt b/ext/standard/tests/file/bug71882.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/file/bug71882.phpt
+@@ -0,0 +1,11 @@
++--TEST--
++Bug #71882 (Negative ftruncate() on php://memory exhausts memory)
++--FILE--
++<?php
++$fd = fopen("php://memory", "w+");
++var_dump(ftruncate($fd, -1));
++?>
++==DONE==
++--EXPECTF--
++bool(false)
++==DONE==

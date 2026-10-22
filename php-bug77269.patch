@@ -1,0 +1,73 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Wed Dec 12 16:00:59 2018 +0100
+Subject: [PATCH] Fix #77269: Potential unsigned underflow in gdImageScale
+
+Belatedly, we're porting the respective upstream patch[1].
+
+[1] <https://github.com/libgd/libgd/commit/60bfb401ad5a4a8ae995dcd36372fe15c71e1a35>
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/c23d14b92f7df0b954b771a678a1b726bc98ecbc
+---
+diff --git a/ext/gd/libgd/gd_interpolation.c b/ext/gd/libgd/gd_interpolation.c
+--- a/ext/gd/libgd/gd_interpolation.c
++++ b/ext/gd/libgd/gd_interpolation.c
+@@ -882,8 +882,13 @@ static inline LineContribType * _gdContributionsAlloc(unsigned int line_length,
+ {
+ 	unsigned int u = 0;
+ 	LineContribType *res;
+-	int overflow_error = 0;
++	size_t weights_size;
+ 
++	if (overflow2(windows_size, sizeof(double))) {
++		return NULL;
++	} else {
++		weights_size = windows_size * sizeof(double);
++	}
+ 	res = (LineContribType *) gdMalloc(sizeof(LineContribType));
+ 	if (!res) {
+ 		return NULL;
+@@ -900,15 +905,10 @@ static inline LineContribType * _gdContributionsAlloc(unsigned int line_length,
+ 		return NULL;
+ 	}
+ 	for (u = 0 ; u < line_length ; u++) {
+-		if (overflow2(windows_size, sizeof(double))) {
+-			overflow_error = 1;
+-		} else {
+-			res->ContribRow[u].Weights = (double *) gdMalloc(windows_size * sizeof(double));
+-		}
+-		if (overflow_error == 1 || res->ContribRow[u].Weights == NULL) {
++		res->ContribRow[u].Weights = (double *) gdMalloc(weights_size);
++		if (res->ContribRow[u].Weights == NULL) {
+ 			unsigned int i;
+-			u--;
+-			for (i=0;i<=u;i++) {
++			for (i=0;i<u;i++) {
+ 				gdFree(res->ContribRow[i].Weights);
+ 			}
+ 			gdFree(res);
+diff --git a/ext/gd/tests/bug77269.phpt b/ext/gd/tests/bug77269.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug77269.phpt
+@@ -0,0 +1,21 @@
++--TEST--
++Bug #77269 (Potential unsigned underflow in gdImageScale)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++if (getenv("SKIP_SLOW_TESTS")) die("skip slow test");
++?>
++--INI--
++memory_limit=2G
++--FILE--
++<?php
++$im = imagecreate(pow(2, 30), 1);
++if(is_resource($im)) {
++	imagescale($im, 1, 1, IMG_TRIANGLE);
++}
++?>
++===DONE===
++--EXPECTF--
++Warning: imagecreate():%S product of memory allocation multiplication would exceed INT_MAX, failing operation gracefully
++ in %s on line %d
++===DONE===

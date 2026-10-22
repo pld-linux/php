@@ -1,0 +1,40 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Apr 22 21:26:06 2018 -0700
+Subject: [PATCH] Fix bug #76249 - fail on invalid sequences
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/e1b7ddf9bc98c4c57bbb32e891d202c4a7b2c5fa
+---
+diff --git a/ext/iconv/iconv.c b/ext/iconv/iconv.c
+--- a/ext/iconv/iconv.c
++++ b/ext/iconv/iconv.c
+@@ -2607,6 +2607,9 @@ static int php_iconv_stream_filter_append_bucket(
+ 								tcnt = 0;
+ 								break;
+ 							}
++						} else {
++						    php_error_docref(NULL TSRMLS_CC, E_WARNING, "iconv stream filter (\"%s\"=>\"%s\"): invalid multibyte sequence", self->from_charset, self->to_charset);
++						    goto out_failure;
+ 						}
+ 						break;
+ 
+diff --git a/ext/iconv/tests/bug76249.phpt b/ext/iconv/tests/bug76249.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/iconv/tests/bug76249.phpt
+@@ -0,0 +1,16 @@
++--TEST--
++Bug #76249 (stream filter convert.iconv leads to infinite loop on invalid sequence)
++--SKIPIF--
++<?php extension_loaded('iconv') or die('skip iconv extension is not available'); ?>
++--FILE--
++<?php
++$fh = fopen('php://memory', 'rw');
++fwrite($fh, "abc");
++rewind($fh);
++stream_filter_append($fh, 'convert.iconv.ucs-2/utf8//IGNORE', STREAM_FILTER_READ, []);
++echo stream_get_contents($fh);
++?>
++DONE
++--EXPECTF--
++Warning: stream_get_contents(): iconv stream filter ("ucs-2"=>"utf8//IGNORE"): invalid multibyte sequence in %sbug76249.php on line %d
++扡DONE

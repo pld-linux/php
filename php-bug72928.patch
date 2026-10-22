@@ -1,0 +1,102 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Sep 4 22:07:35 2016 -0700
+Subject: [PATCH] Fix bug #72928 - Out of bound when verify signature of zip phar in phar_parse_zipfile
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/653a06552e2bba2758993e1603f08800f44bc987
+Binary test fixtures not included: ext/phar/tests/bug72928.zip
+---
+diff --git a/ext/phar/tests/bug72928.phpt b/ext/phar/tests/bug72928.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug72928.phpt
+@@ -0,0 +1,18 @@
++--TEST--
++Phar: #72928 (Out of bound when verify signature of zip phar in phar_parse_zipfile)
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip"); ?>
++--FILE--
++<?php
++chdir(__DIR__);
++try {
++$phar = new PharData('bug72928.zip');
++var_dump($phar);
++} catch(UnexpectedValueException $e) {
++	print $e->getMessage()."\n";
++}
++?>
++DONE
++--EXPECTF--
++phar error: signature cannot be read in zip-based phar "%sbug72928.zip"
++DONE
+\ No newline at end of file
+diff --git a/ext/phar/util.c b/ext/phar/util.c
+--- a/ext/phar/util.c
++++ b/ext/phar/util.c
+@@ -1657,6 +1657,13 @@ int phar_verify_signature(php_stream *fp, size_t end_of_phar, php_uint32 sig_typ
+ 			unsigned char digest[64];
+ 			PHP_SHA512_CTX context;
+ 
++			if (sig_len < sizeof(digest)) {
++				if (error) {
++					spprintf(error, 0, "broken signature");
++				}
++				return FAILURE;
++			}
++
+ 			PHP_SHA512Init(&context);
+ 			read_len = end_of_phar;
+ 
+@@ -1690,6 +1697,13 @@ int phar_verify_signature(php_stream *fp, size_t end_of_phar, php_uint32 sig_typ
+ 			unsigned char digest[32];
+ 			PHP_SHA256_CTX context;
+ 
++			if (sig_len < sizeof(digest)) {
++                                if (error) {
++                                        spprintf(error, 0, "broken signature");
++                                }
++                                return FAILURE;
++                        }
++
+ 			PHP_SHA256Init(&context);
+ 			read_len = end_of_phar;
+ 
+@@ -1731,6 +1745,13 @@ int phar_verify_signature(php_stream *fp, size_t end_of_phar, php_uint32 sig_typ
+ 			unsigned char digest[20];
+ 			PHP_SHA1_CTX  context;
+ 
++			if (sig_len < sizeof(digest)) {
++                                if (error) {
++                                        spprintf(error, 0, "broken signature");
++                                }
++                                return FAILURE;
++                        }
++
+ 			PHP_SHA1Init(&context);
+ 			read_len = end_of_phar;
+ 
+@@ -1764,6 +1785,13 @@ int phar_verify_signature(php_stream *fp, size_t end_of_phar, php_uint32 sig_typ
+ 			unsigned char digest[16];
+ 			PHP_MD5_CTX   context;
+ 
++			if (sig_len < sizeof(digest)) {
++                                if (error) {
++                                        spprintf(error, 0, "broken signature");
++                                }
++                                return FAILURE;
++                        }
++
+ 			PHP_MD5Init(&context);
+ 			read_len = end_of_phar;
+ 
+diff --git a/ext/phar/zip.c b/ext/phar/zip.c
+--- a/ext/phar/zip.c
++++ b/ext/phar/zip.c
+@@ -430,7 +430,7 @@ foundit:
+ 			php_stream_seek(fp, sizeof(phar_zip_file_header) + entry.header_offset + entry.filename_len + PHAR_GET_16(zipentry.extra_len), SEEK_SET);
+ 			sig = (char *) emalloc(entry.uncompressed_filesize);
+ 			read = php_stream_read(fp, sig, entry.uncompressed_filesize);
+-			if (read != entry.uncompressed_filesize) {
++			if (read != entry.uncompressed_filesize || read <= 8) {
+ 				php_stream_close(sigfile);
+ 				efree(sig);
+ 				PHAR_ZIP_FAIL("signature cannot be read");

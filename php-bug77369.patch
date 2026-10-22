@@ -1,0 +1,20 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat Dec 29 20:39:08 2018 -0800
+Subject: [PATCH] Fix #77369 - memcpy with negative length via crafted DNS response
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/0e0473f7fd549199f9d2325df0ba6180cd3085c8
+---
+diff --git a/ext/standard/dns.c b/ext/standard/dns.c
+--- a/ext/standard/dns.c
++++ b/ext/standard/dns.c
+@@ -454,6 +454,10 @@ static u_char *php_parserr(u_char *cp, u_char *end, querybuf *answer, int type_t
+ 	GETLONG(ttl, cp);
+ 	GETSHORT(dlen, cp);
+ 	CHECKCP(dlen);
++	if (dlen == 0) {
++		/* No data in the response - nothing to do */
++		return NULL;
++	}
+ 	if (type_to_fetch != T_ANY && type != type_to_fetch) {
+ 		cp += dlen;
+ 		return cp;

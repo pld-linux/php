@@ -1,0 +1,63 @@
+From f5622f5c8763fe180310ed7a47b999f160d7750b Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmb@php.net>
+Date: Tue, 2 Aug 2016 18:41:20 +0200
+Subject: [PATCH] Fix #72709: imagesetstyle() causes OOB read for empty $styles
+
+Calling imagesetstyle() with an empty $styles array caused gdImageSetStyle()
+to be called with `noOfPixels==0`, what could have lead to OOB reads.
+Actually, this issue will be fixed in libgd, but to avoid issues when older
+libgd is in use, we simply disallow passing an empty $styles array to
+imagesetstyle(), what wouldn't serve a useful purpose anyway.
+
+Source: upstream https://github.com/php/php-src/commit/f5622f5c87 (5.6.25)
+---
+diff --git a/ext/gd/gd.c b/ext/gd/gd.c
+--- a/ext/gd/gd.c
++++ b/ext/gd/gd.c
+@@ -1519,6 +1519,7 @@ PHP_FUNCTION(imagesetstyle)
+ 	int * stylearr;
+ 	int index;
+ 	HashPosition pos;
++    int num_styles;
+ 
+ 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ra", &IM, &styles) == FAILURE)  {
+ 		return;
+@@ -1526,8 +1527,14 @@ PHP_FUNCTION(imagesetstyle)
+ 
+ 	ZEND_FETCH_RESOURCE(im, gdImagePtr, &IM, -1, "Image", le_gd);
+ 
++    num_styles = zend_hash_num_elements(HASH_OF(styles));
++    if (num_styles == 0) {
++        php_error_docref(NULL, E_WARNING, "styles array must not be empty");
++        RETURN_FALSE;
++    }
++
+ 	/* copy the style values in the stylearr */
+-	stylearr = safe_emalloc(sizeof(int), zend_hash_num_elements(HASH_OF(styles)), 0);
++	stylearr = safe_emalloc(sizeof(int), num_styles, 0);
+ 
+ 	zend_hash_internal_pointer_reset_ex(HASH_OF(styles), &pos);
+ 
+diff --git a/ext/gd/tests/bug72709.phpt b/ext/gd/tests/bug72709.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug72709.phpt
+@@ -0,0 +1,18 @@
++--TEST--
++Bug #72709 (imagesetstyle() causes OOB read for empty $styles)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip ext/gd not available');
++?>
++--FILE--
++<?php
++$im = imagecreatetruecolor(1, 1);
++var_dump(imagesetstyle($im, array()));
++imagesetpixel($im, 0, 0, IMG_COLOR_STYLED);
++imagedestroy($im);
++?>
++====DONE====
++--EXPECTF--
++Warning: imagesetstyle(): styles array must not be empty in %s%ebug72709.php on line %d
++bool(false)
++====DONE====

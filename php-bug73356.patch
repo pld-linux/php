@@ -1,0 +1,253 @@
+Backported from 5.6.28 by Remi.
+
+From 18fef10644d865f9d25e49ed501f4f739efe44fc Mon Sep 17 00:00:00 2001
+From: Stanislav Malyshev <stas@php.net>
+Date: Thu, 3 Nov 2016 20:36:52 -0700
+Subject: [PATCH] More string length checks & fixes
+
+From f14da6f0b01e329c3809de93c1b928ad4b4fa6fa Mon Sep 17 00:00:00 2001
+From: Stanislav Malyshev <stas@php.net>
+Date: Thu, 3 Nov 2016 22:10:22 -0700
+Subject: [PATCH] Add length check for bzcompress too - fix for bug #73356
+
+From e43b3bff6a6f5358712ff18961ffa650224dcdcb Mon Sep 17 00:00:00 2001
+From: Anatol Belski <ab@php.net>
+Date: Sun, 6 Nov 2016 17:51:25 +0100
+Subject: [PATCH] add missing RETURN_STRINGL_CHECK
+
+As RETVAL_STRINGL_CHECK is already there, this one is needed for
+completion. One place in ext/bz2 is missing that, so it will likely
+be useful for other possible fixes.
+
+Source: Remi Collet scl-php55, https://git.remirepo.net/cgit/rpms/scl-php55/php.git/tree/bug73356.patch (upstream 1fd18821e0 + 40f7fea897; bundled libxmlrpc hunks left out, PLD builds against system xmlrpc-epi)
+PLD: with the ext/zip and ext/zlib hunks of upstream 1fd18821e0 that Remi's patch lacks
+---
+diff --git a/Zend/zend_API.h b/Zend/zend_API.h
+--- a/Zend/zend_API.h
++++ b/Zend/zend_API.h
+@@ -656,6 +656,7 @@ END_EXTERN_C()
+ 	}                                       \
+ 	RETVAL_STRINGL((s), (int)__len, (dup)); \
+ } while (0)
++#define RETURN_STRINGL_CHECK(s, len, dup) { RETVAL_STRINGL_CHECK(s, len, dup); return; }
+ 
+ #define SET_VAR_STRING(n, v) {																				\
+ 								{																			\
+diff --git a/ext/bz2/bz2.c b/ext/bz2/bz2.c
+--- a/ext/bz2/bz2.c
++++ b/ext/bz2/bz2.c
+@@ -512,7 +512,7 @@ static PHP_FUNCTION(bzcompress)
+ 	dest_len   = (unsigned int) (source_len + (0.01 * source_len) + 600);
+ 
+ 	/* Allocate the destination buffer */
+-	dest = emalloc(dest_len + 1);
++	dest = safe_emalloc(dest_len, 1, 1);
+ 
+ 	/* Handle the optional arguments */
+ 	if (argc > 1) {
+@@ -532,7 +532,7 @@ static PHP_FUNCTION(bzcompress)
+ 		   so we erealloc() the buffer to the proper size */
+ 		dest = erealloc(dest, dest_len + 1);
+ 		dest[dest_len] = 0;
+-		RETURN_STRINGL(dest, dest_len, 0);
++		RETURN_STRINGL_CHECK(dest, dest_len, 0);
+ 	}
+ }
+ /* }}} */
+diff --git a/ext/iconv/iconv.c b/ext/iconv/iconv.c
+--- a/ext/iconv/iconv.c
++++ b/ext/iconv/iconv.c
+@@ -2428,7 +2428,7 @@ PHP_NAMED_FUNCTION(php_if_iconv)
+ 		&out_buffer, &out_len, out_charset, in_charset);
+ 	_php_iconv_show_error(err, out_charset, in_charset TSRMLS_CC);
+ 	if (err == PHP_ICONV_ERR_SUCCESS && out_buffer != NULL) {
+-		RETVAL_STRINGL(out_buffer, out_len, 0);
++		RETVAL_STRINGL_CHECK(out_buffer, out_len, 0);
+ 	} else {
+ 		if (out_buffer != NULL) {
+ 			efree(out_buffer);
+diff --git a/ext/imap/php_imap.c b/ext/imap/php_imap.c
+--- a/ext/imap/php_imap.c
++++ b/ext/imap/php_imap.c
+@@ -3927,7 +3927,7 @@ int _php_imap_mail(char *to, char *subject, char *message, char *headers, char *
+ #define PHP_IMAP_CLEAN	if (bufferTo) efree(bufferTo); if (bufferCc) efree(bufferCc); if (bufferBcc) efree(bufferBcc); if (bufferHeader) efree(bufferHeader);
+ #define PHP_IMAP_BAD_DEST PHP_IMAP_CLEAN; efree(tempMailTo); return (BAD_MSG_DESTINATION);
+ 
+-	bufferHeader = (char *)emalloc(bufferLen + 1);
++	bufferHeader = (char *)safe_emalloc(bufferLen, 1, 1);
+ 	memset(bufferHeader, 0, bufferLen);
+ 	if (to && *to) {
+ 		strlcat(bufferHeader, "To: ", bufferLen + 1);
+diff --git a/ext/intl/breakiterator/breakiterator_iterators.cpp b/ext/intl/breakiterator/breakiterator_iterators.cpp
+--- a/ext/intl/breakiterator/breakiterator_iterators.cpp
++++ b/ext/intl/breakiterator/breakiterator_iterators.cpp
+@@ -182,7 +182,7 @@ static void _breakiterator_parts_move_forward(zend_object_iterator *iter TSRMLS_
+ 	}
+ 	assert(next <= slen && next >= cur);
+ 	len = next - cur;
+-	res = static_cast<char*>(emalloc(len + 1));
++	res = static_cast<char*>(safe_emalloc(len, 1, 1));
+ 
+ 	memcpy(res, &s[cur], len);
+ 	res[len] = '\0';
+diff --git a/ext/intl/intl_convert.c b/ext/intl/intl_convert.c
+--- a/ext/intl/intl_convert.c
++++ b/ext/intl/intl_convert.c
+@@ -49,7 +49,7 @@ void intl_convert_utf8_to_utf16(
+ 	UErrorCode* status )
+ {
+ 	UChar*      dst_buf = NULL;
+-	int32_t     dst_len = 0;
++	uint32_t    dst_len = 0;
+ 
+ 	/* If *target is NULL determine required destination buffer size (pre-flighting).
+ 	 * Otherwise, attempt to convert source string; if *target buffer is not large enough
+diff --git a/ext/intl/locale/locale_methods.c b/ext/intl/locale/locale_methods.c
+--- a/ext/intl/locale/locale_methods.c
++++ b/ext/intl/locale/locale_methods.c
+@@ -268,6 +268,9 @@ static char* get_icu_value_internal( const char* loc_name , char* tag_name, int*
+ 	int32_t     	buflen          = 512;
+ 	UErrorCode  	status          = U_ZERO_ERROR;
+ 
++	if (strlen(loc_name) > INTL_MAX_LOCALE_LEN) {
++		return NULL;
++	}
+ 
+ 	if( strcmp(tag_name, LOC_CANONICALIZE_TAG) != 0 ){
+ 		/* Handle  grandfathered languages */
+@@ -707,6 +710,8 @@ PHP_FUNCTION( locale_get_keywords )
+         RETURN_FALSE;
+     }
+ 
++	INTL_CHECK_LOCALE_LEN(strlen(loc_name));
++
+     if(loc_name_len == 0) {
+         loc_name = intl_locale_get_default(TSRMLS_C);
+     }
+@@ -1114,6 +1119,8 @@ PHP_FUNCTION(locale_parse)
+         RETURN_FALSE;
+     }
+ 
++    INTL_CHECK_LOCALE_LEN(strlen(loc_name));
++
+     if(loc_name_len == 0) {
+         loc_name = intl_locale_get_default(TSRMLS_C);
+     }
+diff --git a/ext/intl/msgformat/msgformat_data.c b/ext/intl/msgformat/msgformat_data.c
+--- a/ext/intl/msgformat/msgformat_data.c
++++ b/ext/intl/msgformat/msgformat_data.c
+@@ -80,10 +80,10 @@ msgformat_data* msgformat_data_create( TSRMLS_D )
+ /* }}} */
+ 
+ #ifdef MSG_FORMAT_QUOTE_APOS
+-int msgformat_fix_quotes(UChar **spattern, uint32_t *spattern_len, UErrorCode *ec) 
++int msgformat_fix_quotes(UChar **spattern, uint32_t *spattern_len, UErrorCode *ec)
+ {
+ 	if(*spattern && *spattern_len && u_strchr(*spattern, (UChar)'\'')) {
+-		UChar *npattern = emalloc(sizeof(UChar)*(2*(*spattern_len)+1));
++		UChar *npattern = safe_emalloc(sizeof(UChar)*2, *spattern_len, sizeof(UChar));
+ 		uint32_t npattern_len;
+ 		npattern_len = umsg_autoQuoteApostrophe(*spattern, *spattern_len, npattern, 2*(*spattern_len)+1, ec);
+ 		efree(*spattern);
+diff --git a/ext/standard/exec.c b/ext/standard/exec.c
+--- a/ext/standard/exec.c
++++ b/ext/standard/exec.c
+@@ -133,7 +133,7 @@ PHPAPI int php_exec(int type, char *cmd, zval *array, zval *return_value TSRMLS_
+ 
+ 	if (type != 3) {
+ 		b = buf;
+-		
++
+ 		while (php_stream_get_line(stream, b, EXEC_INPUT_BUF, &bufl)) {
+ 			/* no new line found, let's read some more */
+ 			if (b[bufl - 1] != '\n' && !php_stream_eof(stream)) {
+@@ -330,7 +330,7 @@ PHPAPI char *php_escape_shell_cmd(char *str)
+ 				cmd[y++] = str[x];
+ 				break;
+ #else
+-			/* % is Windows specific for enviromental variables, ^%PATH% will 
++			/* % is Windows specific for enviromental variables, ^%PATH% will
+ 				output PATH while ^%PATH^% will not. escapeshellcmd will escape all % and !.
+ 			*/
+ 			case '%':
+@@ -492,7 +492,7 @@ PHP_FUNCTION(escapeshellcmd)
+ 			return;
+ 		}
+ 		cmd = php_escape_shell_cmd(command);
+-		RETVAL_STRING(cmd, 0);
++		RETVAL_STRINGL_CHECK(cmd, strlen(cmd), 0);
+ 	} else {
+ 		RETVAL_EMPTY_STRING();
+ 	}
+@@ -517,7 +517,7 @@ PHP_FUNCTION(escapeshellarg)
+ 			return;
+ 		}
+ 		cmd = php_escape_shell_arg(argument);
+-		RETVAL_STRING(cmd, 0);
++		RETVAL_STRINGL_CHECK(cmd, strlen(cmd), 0);
+ 	}
+ }
+ /* }}} */
+@@ -560,7 +560,7 @@ PHP_FUNCTION(shell_exec)
+ 	php_stream_close(stream);
+ 
+ 	if (total_readbytes > 0) {
+-		RETVAL_STRINGL(ret, total_readbytes, 0);
++		RETVAL_STRINGL_CHECK(ret, total_readbytes, 0);
+ 	}
+ }
+ /* }}} */
+diff --git a/ext/standard/php_smart_str.h b/ext/standard/php_smart_str.h
+--- a/ext/standard/php_smart_str.h
++++ b/ext/standard/php_smart_str.h
+@@ -57,7 +57,8 @@
+ 		newlen = (n);												\
+ 		(d)->a = newlen < SMART_STR_START_SIZE 						\
+ 				? SMART_STR_START_SIZE 								\
+-				: newlen + SMART_STR_PREALLOC;						\
++				: (newlen >= (INT_MAX - SMART_STR_PREALLOC)? newlen \
++							: (newlen + SMART_STR_PREALLOC));		\
+ 		SMART_STR_DO_REALLOC(d, what);								\
+ 	} else {														\
+ 		newlen = (d)->len + (n);									\
+diff --git a/ext/zip/php_zip.c b/ext/zip/php_zip.c
+--- a/ext/zip/php_zip.c
++++ b/ext/zip/php_zip.c
+@@ -1630,7 +1630,7 @@ static ZIPARCHIVE_METHOD(addEmptyDir)
+ 	}
+ 
+ 	if (dirname[dirname_len-1] != '/') {
+-		s=(char *)emalloc(dirname_len+2);
++		s=(char *)safe_emalloc(dirname_len, 1, 2);
+ 		strcpy(s, dirname);
+ 		s[dirname_len] = '/';
+ 		s[dirname_len+1] = '\0';
+@@ -1844,14 +1844,14 @@ static ZIPARCHIVE_METHOD(addFromString)
+ 
+ 	ze_obj = (ze_zip_object*) zend_object_store_get_object(this TSRMLS_CC);
+ 	if (ze_obj->buffers_cnt) {
+-		ze_obj->buffers = (char **)erealloc(ze_obj->buffers, sizeof(char *) * (ze_obj->buffers_cnt+1));
++		ze_obj->buffers = (char **)safe_erealloc(ze_obj->buffers, sizeof(char *), (ze_obj->buffers_cnt+1), 0);
+ 		pos = ze_obj->buffers_cnt++;
+ 	} else {
+ 		ze_obj->buffers = (char **)emalloc(sizeof(char *));
+ 		ze_obj->buffers_cnt++;
+ 		pos = 0;
+ 	}
+-	ze_obj->buffers[pos] = (char *)emalloc(buffer_len + 1);
++	ze_obj->buffers[pos] = (char *)safe_emalloc(buffer_len, 1, 1);
+ 	memcpy(ze_obj->buffers[pos], buffer, buffer_len + 1);
+ 
+ 	zs = zip_source_buffer(intern, ze_obj->buffers[pos], buffer_len, 0);
+diff --git a/ext/zlib/zlib.c b/ext/zlib/zlib.c
+--- a/ext/zlib/zlib.c
++++ b/ext/zlib/zlib.c
+@@ -673,7 +673,7 @@ static PHP_FUNCTION(name) \
+ 	if (SUCCESS != php_zlib_encode(in_buf, in_len, &out_buf, &out_len, encoding, level TSRMLS_CC)) { \
+ 		RETURN_FALSE; \
+ 	} \
+-	RETURN_STRINGL(out_buf, out_len, 0); \
++	RETVAL_STRINGL_CHECK(out_buf, out_len, 0); \
+ }
+ 
+ #define PHP_ZLIB_DECODE_FUNC(name, encoding) \

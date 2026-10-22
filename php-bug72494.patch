@@ -1,0 +1,60 @@
+From cd13d0260a9327af541176235e76cdef8af3a27a Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Tue, 25 Oct 2016 14:19:36 +0200
+Subject: [PATCH] Fix #72494: imagecropauto out-of-bounds access
+
+This issue has actually already been fixed with commit 46f2c690. We're
+adding a regression test and a NEWS entry, and also port the fix in
+gdImageCropThreshold() from libgd:
+  * <https://github.com/libgd/libgd/commit/b347e034>
+  * <https://github.com/libgd/libgd/commit/46f2c690>
+
+Source: CVE-2016-6128; upstream https://github.com/php/php-src/commit/cd13d0260a (5.6.25)
+PLD: with the imagecropauto() range check and warning in ext/gd/gd.c as in 5.6.40
+---
+diff --git a/ext/gd/gd.c b/ext/gd/gd.c
+--- a/ext/gd/gd.c
++++ b/ext/gd/gd.c
+@@ -5082,7 +5082,7 @@ PHP_FUNCTION(imagecropauto)
+ 			break;
+ 
+ 		case GD_CROP_THRESHOLD:
+-			if (color < 0) {
++			if (color < 0 || (!gdImageTrueColor(im) && color >= gdImageColorsTotal(im))) {
+ 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Color argument missing with threshold mode");
+ 				RETURN_FALSE;
+ 			}
+diff --git a/ext/gd/libgd/gd_crop.c b/ext/gd/libgd/gd_crop.c
+--- a/ext/gd/libgd/gd_crop.c
++++ b/ext/gd/libgd/gd_crop.c
+@@ -243,6 +243,10 @@ gdImagePtr gdImageCropThreshold(gdImagePtr im, const unsigned int color, const f
+ 		return NULL;
+ 	}
+ 
++	if (!gdImageTrueColor(im) && color >= gdImageColorsTotal(im)) {
++		return NULL;
++	}
++
+ 	/* TODO: Add gdImageGetRowPtr and works with ptr at the row level
+ 	 * for the true color and palette images
+ 	 * new formats will simply work with ptr
+diff --git a/ext/gd/tests/bug72494.phpt b/ext/gd/tests/bug72494.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug72494.phpt
+@@ -0,0 +1,15 @@
++--TEST--
++Bug #72494 (imagecropauto out-of-bounds access)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++?>
++--FILE--
++<?php
++$im = imagecreate(10,10);
++imagecropauto($im, IMG_CROP_THRESHOLD, 0, 1337);
++?>
++===DONE===
++--EXPECTF--
++Warning: imagecropauto(): Color argument missing with threshold mode in %s on line %d
++===DONE===

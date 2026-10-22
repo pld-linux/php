@@ -1,0 +1,57 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Tue Aug 16 18:23:36 2016 +0200
+Subject: [PATCH] Fix #73868: DOS vulnerability in gdImageCreateFromGd2Ctx()
+
+We must not pretend that there are image data if there are none. Instead
+we fail reading the image file gracefully.
+
+Upstream: https://github.com/php/php-src/commit/cdb648dc4115ce0722f3cc75e6a65115fc0e56ab
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/7ec0d57357d798191886a7d841a7fc7469382db3
+Binary test fixtures not included: ext/gd/tests/bug73868.gd2
+---
+diff --git a/ext/gd/libgd/gd_gd2.c b/ext/gd/libgd/gd_gd2.c
+--- a/ext/gd/libgd/gd_gd2.c
++++ b/ext/gd/libgd/gd_gd2.c
+@@ -340,12 +340,16 @@ gdImagePtr gdImageCreateFromGd2Ctx (gdIOCtxPtr in)
+ 					for (x = xlo; x < xhi; x++) {
+ 						if (im->trueColor) {
+ 							if (!gdGetInt(&im->tpixels[y][x], in)) {
+-								im->tpixels[y][x] = 0;
++								php_gd_error("gd2: EOF while reading\n");
++								gdImageDestroy(im);
++								return NULL;
+ 							}
+ 						} else {
+ 							int ch;
+ 							if (!gdGetByte(&ch, in)) {
+-								ch = 0;
++								php_gd_error("gd2: EOF while reading\n");
++								gdImageDestroy(im);
++								return NULL;
+ 							}
+ 							im->pixels[y][x] = ch;
+ 						}
+diff --git a/ext/gd/tests/bug73868.phpt b/ext/gd/tests/bug73868.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug73868.phpt
+@@ -0,0 +1,18 @@
++--TEST--
++Bug 73868 (DOS vulnerability in gdImageCreateFromGd2Ctx())
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++?>
++--FILE--
++<?php
++var_dump(imagecreatefromgd2(__DIR__ . DIRECTORY_SEPARATOR . 'bug73868.gd2'));
++?>
++===DONE===
++--EXPECTF--
++Warning: imagecreatefromgd2(): gd2: EOF while reading
++ in %s on line %d
++
++Warning: imagecreatefromgd2(): '%s' is not a valid GD2 file in %s on line %d
++bool(false)
++===DONE===

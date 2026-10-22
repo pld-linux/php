@@ -1,0 +1,47 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Tue Mar 27 18:42:55 2018 +0200
+Subject: [PATCH] Fix #76130: Heap Buffer Overflow (READ: 1786) in exif_iif_add_value
+
+The MakerNote is not necessarily null-terminated, so we must not use
+`strlen()` to avoid OOB reads.  Instead `php_strnlen()` is the proper
+way to handle this.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/4bc6e3780df3264813a74717c7630c4fa52cc0c7
+---
+diff --git a/ext/exif/exif.c b/ext/exif/exif.c
+--- a/ext/exif/exif.c
++++ b/ext/exif/exif.c
+@@ -1696,7 +1696,7 @@ static void exif_iif_add_value(image_info_type *image_info, int section_index, c
+ 	switch (format) {
+ 		case TAG_FMT_STRING:
+ 			if (value) {
+-				length = php_strnlen(value, length);
++				length = (int) php_strnlen(value, length);
+ 				info_value->s = estrndup(value, length);
+ 				info_data->length = length;
+ 			} else {
+diff --git a/ext/exif/tests/bug76130.phpt b/ext/exif/tests/bug76130.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/exif/tests/bug76130.phpt
+@@ -0,0 +1,20 @@
++--TEST--
++Bug #76130 (Heap Buffer Overflow (READ: 1786) in exif_iif_add_value)
++--DESCRIPTION--
++This test is meant to exhibit memory issues with the `-m` option. Since a lot of
++notices and warnings are to be expected anyway, we suppress these, since the are
++not relevant for this test.
++--INI--
++error_reporting=E_ALL & ~E_WARNING & ~E_NOTICE
++--SKIPIF--
++<?php
++if (!extension_loaded('exif')) die('skip exif extension not available');
++?>
++--FILE--
++<?php
++exif_read_data(__DIR__ . '/bug76130_1.jpg');
++exif_read_data(__DIR__ . '/bug76130_2.jpg');
++?>
++===DONE===
++--EXPECT--
++===DONE===

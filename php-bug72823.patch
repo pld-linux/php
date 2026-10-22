@@ -1,0 +1,52 @@
+From ae3b2078eac226c61bc325527e607ad275936d22 Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Sat, 13 Aug 2016 11:39:16 +0200
+Subject: [PATCH] Fix #72823: strtr out-of-bound access
+
+If php_strtr_array_prepare_repls() reports pattern_len == 0, we return
+early to avoid OOB accesses, and because there is nothing to replace anyway.
+
+Source: upstream https://github.com/php/php-src/commit/ae3b2078ea (5.6.26)
+---
+diff --git a/ext/standard/string.c b/ext/standard/string.c
+--- a/ext/standard/string.c
++++ b/ext/standard/string.c
+@@ -3007,7 +3007,7 @@ static PPRES *php_strtr_array_prepare(STR *text, PATNREPL *patterns, int patnum,
+ 			res->m = L(&patterns[i].pat);
+ 		}
+ 	}
+-	assert(res->m > 0);
++	assert(res->m > 0 && res->m != (STRLEN)-1);
+ 	res->B	= B		= MIN(B, res->m);
+ 	res->Bp	= Bp	= MIN(Bp, res->m);
+ 
+@@ -3149,6 +3149,12 @@ static void php_strtr_array(zval *return_value, char *str, int slen, HashTable *
+ 	if (patterns == NULL) {
+ 		RETURN_FALSE;
+ 	}
++	if (patterns_len == 0) {
++		efree(patterns);
++		zend_llist_destroy(allocs);
++		efree(allocs);
++		RETURN_STRINGL(str, slen, 1);
++	}
+ 	data = php_strtr_array_prepare(&text, patterns, patterns_len, 2, 2);
+ 	efree(patterns);
+ 	php_strtr_array_do_repl(&text, data, return_value);
+diff --git a/ext/standard/tests/strings/bug72823.phpt b/ext/standard/tests/strings/bug72823.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/strings/bug72823.phpt
+@@ -0,0 +1,12 @@
++--TEST--
++Bug #72823 (strtr out-of-bound access)
++--FILE--
++<?php
++var_dump(
++    strtr(11, array('aaa' => 'bbb'))
++);
++?>
++===DONE===
++--EXPECT--
++string(2) "11"
++===DONE===

@@ -1,0 +1,56 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Oct 23 21:56:35 2016 -0700
+Subject: [PATCH] Fix bug #73144 and bug #73341 - remove extra dtor
+
+Upstream: https://github.com/php/php-src/commit/f74d7d92c8bc1edc2505e0b58546217e9e1ecb40
+
+Conflicts:
+	ext/spl/spl_array.c
+
+Merged the test only, in 7.0 tree the removed dtor call is already
+not present.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/9be00c944445c905878ae415891c53673405f16c
+---
+diff --git a/ext/spl/spl_array.c b/ext/spl/spl_array.c
+--- a/ext/spl/spl_array.c
++++ b/ext/spl/spl_array.c
+@@ -1798,7 +1798,7 @@ SPL_METHOD(Array, unserialize)
+ 		ALLOC_INIT_ZVAL(intern->array);
+ 		if (!php_var_unserialize(&intern->array, &p, s + buf_len, &var_hash TSRMLS_CC)
+ 				|| (Z_TYPE_P(intern->array) != IS_ARRAY && Z_TYPE_P(intern->array) != IS_OBJECT)) {
+-			zval_ptr_dtor(&intern->array);
++			// zval_ptr_dtor(&intern->array);
+ 			goto outexcept;
+ 		}
+ 		var_push_dtor(&var_hash, &intern->array);
+diff --git a/ext/standard/tests/serialize/bug73341.phpt b/ext/standard/tests/serialize/bug73341.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/serialize/bug73341.phpt
+@@ -0,0 +1,24 @@
++--TEST--
++Bug #73144 (Use-afte-free in ArrayObject Deserialization)
++--FILE--
++<?php
++try {
++$token = 'a:2:{i:0;O:1:"0":2:0s:1:"0";i:0;s:1:"0";a:1:{i:0;C:11:"ArrayObject":7:0x:i:0;r0';
++$obj = unserialize($token);
++} catch(Exception $e) {
++	echo $e->getMessage()."\n";
++}
++
++try {
++$inner = 'x:i:1;O:8:"stdClass":1:{};m:a:0:{}';
++$exploit = 'C:11:"ArrayObject":'.strlen($inner).':{'.$inner.'}';
++unserialize($exploit);
++} catch(Exception $e) {
++	echo $e->getMessage()."\n";
++}
++?>
++--EXPECTF--
++Error at offset 6 of 7 bytes
++
++Notice: ArrayObject::unserialize(): Unexpected end of serialized data in %sbug73341.php on line %d
++Error at offset 24 of 34 bytes
+\ No newline at end of file

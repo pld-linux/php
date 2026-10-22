@@ -1,0 +1,47 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat Mar 2 15:07:40 2019 -0800
+Subject: [PATCH] Fix bug #77563 - Uninitialized read in exif_process_IFD_in_MAKERNOTE
+
+Also fix for bug #77659
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/531bb4f1fc94ac0fe28e65ab8bb3d33d5ff334be
+Binary test fixtures not included: ext/exif/tests/bug77563.jpg
+---
+diff --git a/ext/exif/exif.c b/ext/exif/exif.c
+--- a/ext/exif/exif.c
++++ b/ext/exif/exif.c
+@@ -2747,7 +2747,7 @@ static int exif_process_IFD_in_MAKERNOTE(image_info_type *ImageInfo, char * valu
+ 		break;
+ 	}
+ 
+-	if (maker_note->offset >= value_len) {
++	if (value_len < 2 || maker_note->offset >= value_len - 1) {
+ 		/* Do not go past the value end */
+ 		exif_error_docref("exif_read_data#error_ifd" EXIFERR_CC, ImageInfo, E_WARNING, "IFD data too short: 0x%04X offset 0x%04X", value_len, maker_note->offset);
+ 		return FALSE;
+@@ -2798,6 +2798,7 @@ static int exif_process_IFD_in_MAKERNOTE(image_info_type *ImageInfo, char * valu
+ 			break;
+ 		default:
+ 		case MN_OFFSET_NORMAL:
++			data_len = value_len;
+ 			break;
+ 	}
+ 
+diff --git a/ext/exif/tests/bug77563.phpt b/ext/exif/tests/bug77563.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/exif/tests/bug77563.phpt
+@@ -0,0 +1,12 @@
++--TEST--
++Bug 77563 (Uninitialized read in exif_process_IFD_in_MAKERNOTE)
++--SKIPIF--
++<?php if (!extension_loaded('exif')) print 'skip exif extension not available';?>
++--FILE--
++<?php
++$s = exif_thumbnail(__DIR__."/bug77563.jpg");
++?>
++DONE
++--EXPECTF--
++%A
++DONE
+\ No newline at end of file

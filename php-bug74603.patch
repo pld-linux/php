@@ -1,0 +1,56 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Tue Jun 20 00:09:01 2017 -0700
+Subject: [PATCH] Fix bug #74603 - use correct buffer size
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/1c1937e45c7cc71865d6686b57ce9b9d411b50e2
+---
+diff --git a/Zend/tests/bug74603.ini b/Zend/tests/bug74603.ini
+new file mode 100644
+--- /dev/null
++++ b/Zend/tests/bug74603.ini
+@@ -0,0 +1 @@
++0=0&~2000000000
+diff --git a/Zend/tests/bug74603.phpt b/Zend/tests/bug74603.phpt
+new file mode 100644
+--- /dev/null
++++ b/Zend/tests/bug74603.phpt
+@@ -0,0 +1,15 @@
++--TEST--
++Bug #74603 (PHP INI Parsing Stack Buffer Overflow Vulnerability)
++--SKIPIF--
++<?php
++if (PHP_INT_MAX !== 2147483647)
++        die('skip for 32-bit only');
++--FILE--
++<?php
++var_dump(parse_ini_file(__DIR__ . "/bug74603.ini", true, INI_SCANNER_NORMAL));
++?>
++--EXPECT--
++array(1) {
++  [0]=>
++  string(1) "0"
++}
+diff --git a/Zend/zend_ini_parser.c b/Zend/zend_ini_parser.c
+--- a/Zend/zend_ini_parser.c
++++ b/Zend/zend_ini_parser.c
+@@ -130,7 +130,7 @@ static void zend_ini_do_op(char type, zval *result, zval *op1, zval *op2)
+ {
+ 	int i_result;
+ 	int i_op1, i_op2;
+-	char str_result[MAX_LENGTH_OF_LONG];
++	char str_result[MAX_LENGTH_OF_LONG+1];
+ 
+ 	i_op1 = atoi(Z_STRVAL_P(op1));
+ 	free(Z_STRVAL_P(op1));
+diff --git a/Zend/zend_ini_parser.y b/Zend/zend_ini_parser.y
+--- a/Zend/zend_ini_parser.y
++++ b/Zend/zend_ini_parser.y
+@@ -53,7 +53,7 @@ static void zend_ini_do_op(char type, zval *result, zval *op1, zval *op2)
+ {
+ 	int i_result;
+ 	int i_op1, i_op2;
+-	char str_result[MAX_LENGTH_OF_LONG];
++	char str_result[MAX_LENGTH_OF_LONG+1];
+ 
+ 	i_op1 = atoi(Z_STRVAL_P(op1));
+ 	free(Z_STRVAL_P(op1));

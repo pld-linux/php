@@ -1,0 +1,52 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat Dec 29 19:51:24 2018 -0800
+Subject: [PATCH] Fix bug #77370 - check that we do not read past buffer end when parsing multibytes
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/70a430d3cad1a35d71526c18cc990cdaf7ea82ca
+---
+diff --git a/ext/mbstring/oniguruma/enc/unicode.c b/ext/mbstring/oniguruma/enc/unicode.c
+--- a/ext/mbstring/oniguruma/enc/unicode.c
++++ b/ext/mbstring/oniguruma/enc/unicode.c
+@@ -10971,6 +10971,7 @@ onigenc_unicode_mbc_case_fold(OnigEncoding enc,
+ 
+   code = ONIGENC_MBC_TO_CODE(enc, p, end);
+   len = enclen(enc, p);
++  if (*pp + len > end) len = end - *pp;
+   *pp += len;
+ 
+ #ifdef USE_UNICODE_CASE_FOLD_TURKISH_AZERI
+diff --git a/ext/mbstring/oniguruma/regparse.c b/ext/mbstring/oniguruma/regparse.c
+--- a/ext/mbstring/oniguruma/regparse.c
++++ b/ext/mbstring/oniguruma/regparse.c
+@@ -255,11 +255,13 @@ strdup_with_null(OnigEncoding enc, UChar* s, UChar* end)
+ #define PINC       do { \
+   pfetch_prev = p; \
+   p += ONIGENC_MBC_ENC_LEN(enc, p); \
++  if(UNEXPECTED(p > end)) p = end; \
+ } while (0)
+ #define PFETCH(c)  do { \
+   c = ONIGENC_MBC_TO_CODE(enc, p, end); \
+   pfetch_prev = p; \
+   p += ONIGENC_MBC_ENC_LEN(enc, p); \
++  if(UNEXPECTED(p > end)) p = end; \
+ } while (0)
+ 
+ #define PPEEK        (p < end ? ONIGENC_MBC_TO_CODE(enc, p, end) : PEND_VALUE)
+diff --git a/ext/mbstring/tests/bug77370.phpt b/ext/mbstring/tests/bug77370.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/mbstring/tests/bug77370.phpt
+@@ -0,0 +1,13 @@
++--TEST--
++Bug #77370 (Buffer overflow on mb regex functions - fetch_token)
++--SKIPIF--
++<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
++--FILE--
++<?php
++var_dump(mb_split("   \xfd",""));
++?>
++--EXPECT--
++array(1) {
++  [0]=>
++  string(0) ""
++}

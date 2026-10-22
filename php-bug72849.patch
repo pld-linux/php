@@ -1,0 +1,23 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Tue Aug 16 15:58:05 2016 -0700
+Subject: [PATCH] Fixed bug #72849 - integer overflow in urlencode
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/083c182f9ac08e3d484b83c8029bffbafd9749f0
+---
+diff --git a/ext/standard/url.c b/ext/standard/url.c
+--- a/ext/standard/url.c
++++ b/ext/standard/url.c
+@@ -520,6 +520,13 @@ PHPAPI char *php_url_encode(char const *s, int len, int *new_length)
+ 			*to++ = c;
+ 		}
+ 	}
++
++	if ((to-start) > INT_MAX) {
++		TSRMLS_FETCH();
++		/* E_ERROR since most clients won't check for error, and this is rather rare condition */
++		php_error_docref(NULL TSRMLS_CC, E_ERROR, "String overflow, max length is %d", INT_MAX);
++	}
++
+ 	*to = 0;
+ 	if (new_length) {
+ 		*new_length = to - start;

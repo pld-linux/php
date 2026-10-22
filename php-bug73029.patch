@@ -1,0 +1,69 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun Sep 11 20:24:13 2016 -0700
+Subject: [PATCH] Fix bug #73029 - Missing type check when unserializing SplArray
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/b40da4fdbf8fb642840bb576002ea40856f7b704
+---
+diff --git a/ext/spl/spl_array.c b/ext/spl/spl_array.c
+--- a/ext/spl/spl_array.c
++++ b/ext/spl/spl_array.c
+@@ -306,7 +306,7 @@ static zval **spl_array_get_dimension_ptr_ptr(int check_inherited, zval *object,
+ 	long index;
+ 	HashTable *ht = spl_array_get_hash_table(intern, 0 TSRMLS_CC);
+ 
+-	if (!offset) {
++	if (!offset || !ht) {
+ 		return &EG(uninitialized_zval_ptr);
+ 	}
+ 
+@@ -1796,7 +1796,9 @@ SPL_METHOD(Array, unserialize)
+ 		intern->ar_flags |= flags & SPL_ARRAY_CLONE_MASK;
+ 		zval_ptr_dtor(&intern->array);
+ 		ALLOC_INIT_ZVAL(intern->array);
+-		if (!php_var_unserialize(&intern->array, &p, s + buf_len, &var_hash TSRMLS_CC)) {
++		if (!php_var_unserialize(&intern->array, &p, s + buf_len, &var_hash TSRMLS_CC)
++				|| (Z_TYPE_P(intern->array) != IS_ARRAY && Z_TYPE_P(intern->array) != IS_OBJECT)) {
++			zval_ptr_dtor(&intern->array);
+ 			goto outexcept;
+ 		}
+ 		var_push_dtor(&var_hash, &intern->array);
+diff --git a/ext/spl/tests/bug70068.phpt b/ext/spl/tests/bug70068.phpt
+--- a/ext/spl/tests/bug70068.phpt
++++ b/ext/spl/tests/bug70068.phpt
+@@ -2,8 +2,11 @@
+ Bug #70068 (Dangling pointer in the unserialization of ArrayObject items)
+ --FILE--
+ <?php
++try {
+ $a = unserialize('a:3:{i:0;C:11:"ArrayObject":20:{x:i:0;r:3;;m:a:0:{};}i:1;d:11;i:2;S:31:"AAAAAAAABBBBCCCC\01\00\00\00\04\00\00\00\00\00\00\00\00\00\00";}');
++} catch (UnexpectedValueException $e) {
++    echo "Rejected malformed ArrayObject\n";
++}
+ ?>
+-OK
+ --EXPECT--
+-OK
+\ No newline at end of file
++Rejected malformed ArrayObject
+\ No newline at end of file
+diff --git a/ext/spl/tests/bug73029.phpt b/ext/spl/tests/bug73029.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/spl/tests/bug73029.phpt
+@@ -0,0 +1,16 @@
++--TEST--
++Bug #73029: Missing type check when unserializing SplArray
++--FILE--
++<?php
++try {
++$a = 'C:11:"ArrayObject":19:0x:i:0;r:2;;m:a:0:{}}';
++$m = unserialize($a);
++$x = $m[2];
++} catch(UnexpectedValueException $e) {
++	print $e->getMessage() . "\n";
++}
++?>
++DONE
++--EXPECTF--
++Error at offset 10 of 19 bytes
++DONE

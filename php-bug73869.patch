@@ -1,0 +1,55 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Sat Dec 17 17:06:58 2016 +0100
+Subject: [PATCH] Fix #73869: Signed Integer Overflow gd_io.c
+
+GD2 stores the number of horizontal and vertical chunks as words (i.e. 2
+byte unsigned). These values are multiplied and assigned to an int when
+reading the image, what can cause integer overflows. We have to avoid
+that, and also make sure that either chunk count is actually greater
+than zero. If illegal chunk counts are detected, we bail out from
+reading the image.
+
+Upstream: https://github.com/php/php-src/commit/5b5d9db3988b829e0b121b74bb3947f01c2796a1
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/5ef1c6c34098c7261dc883eb604273347997ec73
+Binary test fixtures not included: ext/gd/tests/bug73869a.gd2 ext/gd/tests/bug73869b.gd2
+---
+diff --git a/ext/gd/libgd/gd_gd2.c b/ext/gd/libgd/gd_gd2.c
+--- a/ext/gd/libgd/gd_gd2.c
++++ b/ext/gd/libgd/gd_gd2.c
+@@ -136,6 +136,10 @@ static int _gd2GetHeader(gdIOCtxPtr in, int *sx, int *sy, int *cs, int *vers, in
+ 	GD2_DBG(php_gd_error("%d Chunks vertically", *ncy));
+ 
+ 	if (gd2_compressed(*fmt)) {
++		if (*ncx <= 0 || *ncy <= 0 || *ncx > INT_MAX / *ncy) {
++			GD2_DBG(printf ("Illegal chunk counts: %d * %d\n", *ncx, *ncy));
++			goto fail1;
++		}
+ 		nc = (*ncx) * (*ncy);
+ 		GD2_DBG(php_gd_error("Reading %d chunk index entries", nc));
+ 		if (overflow2(sizeof(t_chunk_info), nc)) {
+diff --git a/ext/gd/tests/bug73869.phpt b/ext/gd/tests/bug73869.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug73869.phpt
+@@ -0,0 +1,19 @@
++--TEST--
++Bug #73869 (Signed Integer Overflow gd_io.c)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++?>
++--FILE--
++<?php
++var_dump(imagecreatefromgd2(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'bug73869a.gd2'));
++var_dump(imagecreatefromgd2(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'bug73869b.gd2'));
++?>
++===DONE===
++--EXPECTF--
++Warning: imagecreatefromgd2(): '%s' is not a valid GD2 file in %s on line %d
++bool(false)
++
++Warning: imagecreatefromgd2(): '%s' is not a valid GD2 file in %s on line %d
++bool(false)
++===DONE===
+\ No newline at end of file

@@ -1,0 +1,75 @@
+From: Anatol Belski <ab@php.net>
+Date: Tue Oct 24 11:28:17 2017 +0200
+Subject: [PATCH] Fixed bug #75055 Out-Of-Bounds Read in timelib_meridian()
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/d2d155e22618efb5992b56127913a7004c1f9e3a
+---
+diff --git a/ext/date/lib/parse_date.re b/ext/date/lib/parse_date.re
+--- a/ext/date/lib/parse_date.re
++++ b/ext/date/lib/parse_date.re
+@@ -907,8 +907,8 @@ isoweek          = year4 "-"? "W" weekofyear;
+ exif             = year4 ":" monthlz ":" daylz " " hour24lz ":" minutelz ":" secondlz;
+ firstdayof       = 'first day of';
+ lastdayof        = 'last day of';
+-backof           = 'back of ' hour24 space? meridian?;
+-frontof          = 'front of ' hour24 space? meridian?;
++backof           = 'back of ' hour24 (space? meridian)?;
++frontof          = 'front of ' hour24 (space? meridian)?;
+ 
+ /* Common Log Format: 10/Oct/2000:13:55:36 -0700 */
+ clf              = day "/" monthabbr "/" year4 ":" hour24lz ":" minutelz ":" secondlz space tzcorrection;
+diff --git a/ext/date/tests/bug53437_var3.phpt b/ext/date/tests/bug53437_var3.phpt
+--- a/ext/date/tests/bug53437_var3.phpt
++++ b/ext/date/tests/bug53437_var3.phpt
+@@ -40,7 +40,7 @@ object(DateInterval)#%d (15) {
+   ["special_amount"]=>
+   int(-1)
+   ["have_weekday_relative"]=>
+-  int(9)
++  int(%d)
+   ["have_special_relative"]=>
+   int(0)
+ }
+diff --git a/ext/wddx/tests/bug75055.phpt b/ext/wddx/tests/bug75055.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/wddx/tests/bug75055.phpt
+@@ -0,0 +1,20 @@
++--TEST--
++Bug #75055 Out-Of-Bounds Read in timelib_meridian()
++--SKIPIF--
++<?php if (!extension_loaded("wddx")) print "skip"; ?>
++--FILE--
++<?php
++
++$file_str = dirname(__FILE__) . "/bug75055.wddx";
++
++$wddx_str = file_get_contents($file_str);
++print strlen($wddx_str) . " bytes read.\n";
++
++var_dump(wddx_deserialize($wddx_str));
++?>
++--EXPECT--
++323 bytes read.
++array(1) {
++  ["aDateTime"]=>
++  string(12) "frONt of 0 0"
++}
+diff --git a/ext/wddx/tests/bug75055.wddx b/ext/wddx/tests/bug75055.wddx
+new file mode 100644
+--- /dev/null
++++ b/ext/wddx/tests/bug75055.wddx
+@@ -0,0 +1,13 @@
++<?xml version='1.0'?>
++<!DOCTYPE wddxPacket SYSTEM 'wddx_0100.dtd'>
++<wddxPacket version='1.0'>
++<header/>
++	<data>
++        	<struct>
++                    <var name='aDateTime'>
++                         <dateTime>frONt of 0 0</dateTime>
++                     </var>
++                </struct>
++	</data>
++</wddxPacket>
++

@@ -1,0 +1,97 @@
+From 69f5e7992bfc239e42a3a82e290399ca75bc56a6 Mon Sep 17 00:00:00 2001
+From: Stanislav Malyshev <stas@php.net>
+Date: Sat, 1 Dec 2018 21:04:56 -0800
+Subject: [PATCH] Fix bug #77022 - use file mode or umask for new files
+
+From aabdb71dc3739f5e06916e2a4e24deb37437b1e8 Mon Sep 17 00:00:00 2001
+From: Stanislav Malyshev <stas@php.net>
+Date: Sun, 2 Dec 2018 12:54:19 -0800
+Subject: [PATCH] Fix TSRM signature - php_stream_stat macro has it's own TSRM
+
+Source: upstream https://github.com/php/php-src/commit/69f5e7992b (5.6.39)
+PLD: with upstream follow-up aabdb71dc3 (php_stream_stat() takes no TSRMLS argument; a ZTS build fails without it)
+---
+diff --git a/ext/phar/phar_object.c b/ext/phar/phar_object.c
+--- a/ext/phar/phar_object.c
++++ b/ext/phar/phar_object.c
+@@ -3639,7 +3639,8 @@ static void phar_add_file(phar_archive_data **pphar, char *filename, int filenam
+ 	char *error;
+ 	size_t contents_len;
+ 	phar_entry_data *data;
+-	php_stream *contents_file;
++	php_stream *contents_file = NULL;
++	php_stream_statbuf ssb;
+ 
+ 	if (filename_len >= sizeof(".phar")-1 && !memcmp(filename, ".phar", sizeof(".phar")-1) && (filename[5] == '/' || filename[5] == '\\' || filename[5] == '\0')) {
+ 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "Cannot create any files in magic \".phar\" directory", (*pphar)->fname);
+@@ -3673,10 +3674,20 @@ static void phar_add_file(phar_archive_data **pphar, char *filename, int filenam
+ 				}
+ 				phar_stream_copy_to_stream(contents_file, data->fp, PHP_STREAM_COPY_ALL, &contents_len);
+ 			}
+-
+ 			data->internal_file->compressed_filesize = data->internal_file->uncompressed_filesize = contents_len;
+ 		}
+ 
++		if (contents_file != NULL && php_stream_stat(contents_file, &ssb) != -1) {
++			data->internal_file->flags = ssb.sb.st_mode & PHAR_ENT_PERM_MASK ;
++		} else {
++#ifndef _WIN32
++			mode_t mask;
++			mask = umask(0);
++			umask(mask);
++			data->internal_file->flags &= ~mask;
++#endif
++		}
++
+ 		/* check for copy-on-write */
+ 		if (pphar[0] != data->phar) {
+ 			*pphar = data->phar;
+diff --git a/ext/phar/tests/bug77022.phpt b/ext/phar/tests/bug77022.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/phar/tests/bug77022.phpt
+@@ -0,0 +1,32 @@
++--TEST--
++Phar: Bug #77022: PharData always creates new files with mode 0666
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip"); ?>
++--FILE--
++<?php
++umask(022);
++var_dump(decoct(umask()));
++
++$sFile = tempnam(__DIR__, 'test77022');
++var_dump(decoct(stat($sFile)['mode']));
++
++foreach([Phar::TAR => 'tar', Phar::ZIP => 'zip'] as $mode => $ext) {
++	$phar = new PharData(__DIR__ . '/test77022.' . $ext, null, null, $mode);
++	$phar->addFile($sFile, 'test-file-phar');
++	$phar->addFromString("test-from-string", 'test-file-phar');
++	$phar->extractTo(__DIR__);
++	var_dump(decoct(stat(__DIR__ . '/test-file-phar')['mode']));
++	var_dump(decoct(stat(__DIR__ . '/test-from-string')['mode']));
++	unlink(__DIR__ . '/test-file-phar');
++	unlink(__DIR__ . '/test-from-string');
++	unlink(__DIR__ . '/test77022.' . $ext);
++}
++unlink($sFile);
++?>
++--EXPECT--
++string(2) "22"
++string(6) "100600"
++string(6) "100600"
++string(6) "100644"
++string(6) "100600"
++string(6) "100644"
+\ No newline at end of file
+diff --git a/ext/phar/tests/stat.phpt b/ext/phar/tests/stat.phpt
+--- a/ext/phar/tests/stat.phpt
++++ b/ext/phar/tests/stat.phpt
+@@ -7,6 +7,7 @@ phar.require_hash=1
+ phar.readonly=0
+ --FILE--
+ <?php
++umask(0);
+ Phar::interceptFileFuncs();
+ var_dump(stat(""));
+ 

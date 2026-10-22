@@ -1,0 +1,20 @@
+From: Christoph M. Becker <cmbecker69@gmx.de>
+Date: Tue Jul 14 17:04:24 2020 +0200
+Subject: [PATCH] Fix #79797: Use of freed hash key in the phar_parse_zipfile function
+
+We must not use heap memory after we freed it.
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/9715ea39a9524333190945410b377ec40be7408c
+---
+diff --git a/ext/phar/zip.c b/ext/phar/zip.c
+--- a/ext/phar/zip.c
++++ b/ext/phar/zip.c
+@@ -687,7 +687,7 @@ foundit:
+ 			efree(actual_alias);
+ 		}
+ 
+-		zend_hash_add(&(PHAR_GLOBALS->phar_alias_map), actual_alias, mydata->alias_len, (void*)&mydata, sizeof(phar_archive_data*), NULL);
++		zend_hash_add(&(PHAR_GLOBALS->phar_alias_map), mydata->alias, mydata->alias_len, (void*)&mydata, sizeof(phar_archive_data*), NULL);
+ 	} else {
+ 		phar_archive_data **fd_ptr;
+ 

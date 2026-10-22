@@ -1,0 +1,78 @@
+From 7e49e8e7970b423968de7a53ea9a0796f4634276 Mon Sep 17 00:00:00 2001
+From: Sara Golemon <pollita@php.net>
+Date: Mon, 9 Jan 2017 11:02:50 -0800
+Subject: [PATCH] Fix open_basedir check for glob:// opendir wrapper
+
+php_check_open_basedir() expects a local filesystem path,
+but we're handing it a `glob://...` URI instead.
+
+Move the check to after the path trim so that we're checking
+a meaningful pathspec.
+
+Source: upstream https://github.com/php/php-src/commit/7e49e8e797 (5.6.30)
+---
+diff --git a/ext/standard/tests/streams/glob-wrapper.phpt b/ext/standard/tests/streams/glob-wrapper.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/streams/glob-wrapper.phpt
+@@ -0,0 +1,35 @@
++--TEST--
++Glob wrapper bypasses open_basedir
++--INI--
++open_basedir=/does_not_exist
++--SKIPIF--
++<?php
++if (!in_array("glob", stream_get_wrappers())) echo "skip";
++--FILE--
++<?php
++
++foreach ( [ __DIR__, "glob://".__DIR__ ] as $spec) {
++  echo "** Opening $spec\n";
++  $dir = opendir($spec);
++  if (!$dir) {
++    echo "Failed to open $spec\n";
++    continue;
++  }
++  if (false === readdir($dir)) {
++    echo "No files in $spec\n";
++    continue;
++  }
++}
++--EXPECTF--
++** Opening %s
++
++Warning: opendir(): open_basedir restriction in effect. File(/%s) is not within the allowed path(s): (/does_not_exist) in %s/glob-wrapper.php on line 5
++
++Warning: opendir(/%s): failed to open dir: Operation not permitted in %s/glob-wrapper.php on line 5
++Failed to open /%s
++** Opening glob://%s
++
++Warning: opendir(): open_basedir restriction in effect. File(/%s) is not within the allowed path(s): (/does_not_exist) in %s/glob-wrapper.php on line 5
++
++Warning: opendir(glob://%s): failed to open dir: operation failed in %s/glob-wrapper.php on line 5
++Failed to open glob://%s
+diff --git a/main/streams/glob_wrapper.c b/main/streams/glob_wrapper.c
+--- a/main/streams/glob_wrapper.c
++++ b/main/streams/glob_wrapper.c
+@@ -213,10 +213,6 @@ static php_stream *php_glob_stream_opener(php_stream_wrapper *wrapper, char *pat
+ 	int ret;
+ 	char *tmp, *pos;
+ 
+-	if (((options & STREAM_DISABLE_OPEN_BASEDIR) == 0) && php_check_open_basedir(path TSRMLS_CC)) {
+-		return NULL;
+-	}
+-
+ 	if (!strncmp(path, "glob://", sizeof("glob://")-1)) {
+ 		path += sizeof("glob://")-1;
+ 		if (opened_path) {
+@@ -224,6 +220,10 @@ static php_stream *php_glob_stream_opener(php_stream_wrapper *wrapper, char *pat
+ 		}
+ 	}
+ 
++	if (((options & STREAM_DISABLE_OPEN_BASEDIR) == 0) && php_check_open_basedir(path TSRMLS_CC)) {
++		return NULL;
++	}
++
+ 	pglob = ecalloc(sizeof(*pglob), 1);
+ 	
+ 	if (0 != (ret = glob(path, pglob->flags & GLOB_FLAGMASK, NULL, &pglob->glob))) {

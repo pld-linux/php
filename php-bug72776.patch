@@ -1,0 +1,20 @@
+From 493b2bff02531b0ead233177a2a0846c75e94777 Mon Sep 17 00:00:00 2001
+From: Jakub Zelenka <bukka@php.net>
+Date: Sun, 6 Nov 2016 20:40:51 +0000
+Subject: [PATCH] Fix bug #72776 (Invalid parameter in memcpy function trough
+ openssl_pbkdf2)
+
+Source: upstream https://github.com/php/php-src/commit/493b2bff02 (5.6.29)
+---
+diff --git a/ext/openssl/openssl.c b/ext/openssl/openssl.c
+--- a/ext/openssl/openssl.c
++++ b/ext/openssl/openssl.c
+@@ -3678,7 +3678,7 @@ PHP_FUNCTION(openssl_pbkdf2)
+ 		return;
+ 	}
+ 
+-	if (key_length <= 0) {
++	if (key_length <= 0 || key_length > INT_MAX) {
+ 		RETURN_FALSE;
+ 	}
+ 

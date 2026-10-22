@@ -1,0 +1,86 @@
+From 5049ef2f1c496c4964cd147e185c1f765ab0347b Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Thu, 17 Nov 2016 13:44:30 +0100
+Subject: [PATCH] Fix #73549: Use after free when stream is passed to imagepng
+
+If a stream is passed to imagepng() or other image output functions,
+opposed to a filename, we must not close this stream.
+
+Source: Remi Collet scl-php55, https://git.remirepo.net/cgit/rpms/scl-php55/php.git/tree/bug73549.patch
+---
+diff --git a/ext/gd/gd_ctx.c b/ext/gd/gd_ctx.c
+--- a/ext/gd/gd_ctx.c
++++ b/ext/gd/gd_ctx.c
+@@ -61,6 +61,16 @@ static int _php_image_stream_putbuf(struct gdIOCtx *ctx, const void* buf, int l)
+ }
+ 
+ static void _php_image_stream_ctxfree(struct gdIOCtx *ctx)
++{
++	if(ctx->data) {
++		ctx->data = NULL;
++	}
++	if(ctx) {
++		efree(ctx);
++	}
++} /* }}} */
++
++static void _php_image_stream_ctxfreeandclose(struct gdIOCtx *ctx) /* {{{ */
+ {
+ 	TSRMLS_FETCH();
+ 
+@@ -87,6 +97,7 @@ static void _php_image_output_ctx(INTERNAL_FUNCTION_PARAMETERS, int image_type,
+ 	gdIOCtx *ctx = NULL;
+ 	zval *to_zval = NULL;
+ 	php_stream *stream;
++	int close_stream = 1;
+ 
+ 	/* The third (quality) parameter for Wbmp stands for the threshold when called from image2wbmp().
+ 	 * The third (quality) parameter for Wbmp and Xbm stands for the foreground color index when called
+@@ -123,6 +134,7 @@ static void _php_image_output_ctx(INTERNAL_FUNCTION_PARAMETERS, int image_type,
+ 			if (stream == NULL) {
+ 				RETURN_FALSE;
+ 			}
++			close_stream = 0;
+ 		} else if (Z_TYPE_P(to_zval) == IS_STRING) {
+ 			if (CHECK_ZVAL_NULL_PATH(to_zval)) {
+ 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid 2nd parameter, filename must not contain null bytes");
+@@ -154,7 +166,11 @@ static void _php_image_output_ctx(INTERNAL_FUNCTION_PARAMETERS, int image_type,
+ 		ctx = emalloc(sizeof(gdIOCtx));
+ 		ctx->putC = _php_image_stream_putc;
+ 		ctx->putBuf = _php_image_stream_putbuf;
+-		ctx->gd_free = _php_image_stream_ctxfree;
++		if (close_stream) {
++			ctx->gd_free = _php_image_stream_ctxfreeandclose;
++		} else {
++			ctx->gd_free = _php_image_stream_ctxfree;
++		}
+ 		ctx->data = (void *)stream;
+ 	}
+ 
+diff --git a/ext/gd/tests/bug73549.phpt b/ext/gd/tests/bug73549.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/gd/tests/bug73549.phpt
+@@ -0,0 +1,22 @@
++--TEST--
++Bug #73549 (Use after free when stream is passed to imagepng)
++--SKIPIF--
++<?php
++if (!extension_loaded('gd')) die('skip gd extension not available');
++?>
++--FILE--
++<?php
++$stream = fopen(__DIR__ . DIRECTORY_SEPARATOR . 'bug73549.png', 'w');
++$im = imagecreatetruecolor(8, 8);
++var_dump(imagepng($im, $stream));
++var_dump($stream);
++?>
++===DONE===
++--EXPECTF--
++bool(true)
++resource(%d) of type (stream)
++===DONE===
++--CLEAN--
++<?php
++unlink(__DIR__ . DIRECTORY_SEPARATOR . 'bug73549.png');
++?>

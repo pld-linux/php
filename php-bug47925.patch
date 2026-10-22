@@ -1,0 +1,38 @@
+From 582b22583f53fcfeea4ba397cd8b2295bdb40dfb Mon Sep 17 00:00:00 2001
+From: Niels Dossche <7771979+nielsdos@users.noreply.github.com>
+Date: Sat, 25 May 2024 16:11:43 +0200
+Subject: [PATCH] Fix bug #47925: PHPClient can't decompress response
+
+Backport of https://github.com/php/php-src/commit/35e62e9b590690f24fe78e3097d5bddcfb913e61
+and https://github.com/php/php-src/commit/ce7ed6e040f4c57604a19e6a7d2ed5e401f6f02d
+(net effect: gzip bodies go to gzdecode() whole, deflate unchanged)
+
+5.6: the old code passed http_body+10 with length http_body_size-10 without
+copying, so a gzip response shorter than 10 bytes gave gzinflate() a
+negative length and inflate() read past the heap buffer. Not an upstream
+advisory; the test needs pcntl and the 8.x server.inc API and is not
+included.
+
+Source: PLD php PHP_5_6 branch, https://git.pld-linux.org/?p=packages/php.git;a=blob_plain;hb=refs/heads/PHP_5_6;f=php-bug47925.patch
+---
+diff --git a/ext/soap/php_http.c b/ext/soap/php_http.c
+--- a/ext/soap/php_http.c
++++ b/ext/soap/php_http.c
+@@ -1256,12 +1256,14 @@ try_again:
+ 	  zval param;
+ 		zval *params[1];
+ 
++		/* Warning: the zlib function names are chosen in an unfortunate manner.
++		 * Check zlib.c to see how a function corresponds with a particular format. */
+ 		if ((strcmp(content_encoding,"gzip") == 0 ||
+ 		     strcmp(content_encoding,"x-gzip") == 0) &&
+-		     zend_hash_exists(EG(function_table), "gzinflate", sizeof("gzinflate"))) {
+-			ZVAL_STRING(&func, "gzinflate", 0);
++		     zend_hash_exists(EG(function_table), "gzdecode", sizeof("gzdecode"))) {
++			ZVAL_STRING(&func, "gzdecode", 0);
+ 			params[0] = &param;
+-			ZVAL_STRINGL(params[0], http_body+10, http_body_size-10, 0);
++			ZVAL_STRINGL(params[0], http_body, http_body_size, 0);
+ 			INIT_PZVAL(params[0]);
+ 		} else if (strcmp(content_encoding,"deflate") == 0 &&
+ 		           zend_hash_exists(EG(function_table), "gzuncompress", sizeof("gzuncompress"))) {

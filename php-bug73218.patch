@@ -1,0 +1,98 @@
+From: Stanislav Malyshev <stas@php.net>
+Date: Tue Oct 4 22:40:09 2016 -0700
+Subject: [PATCH] Bug #73218: add mitigation for ICU int overflow
+
+Upstream: https://github.com/php/php-src/commit/d946d102936525bc7dcd01f3827d0a6e0bb971b0
+
+Upstream: https://github.com/php/php-src/commit/b26b02b2df95eaa647ea3f4e7b42bd11eea4ed2c
+
+5.5 backport: https://github.com/shivammathur/php-src-backports/commit/654ededb242c203cbab35e66c1a9579513b2a4b4
+---
+diff --git a/ext/intl/locale/locale_methods.c b/ext/intl/locale/locale_methods.c
+--- a/ext/intl/locale/locale_methods.c
++++ b/ext/intl/locale/locale_methods.c
+@@ -401,6 +401,8 @@ static void get_icu_value_src_php( char* tag_name, INTERNAL_FUNCTION_PARAMETERS)
+ 		loc_name = intl_locale_get_default(TSRMLS_C);
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(strlen(loc_name));
++
+ 	/* Call ICU get */
+ 	tag_value = get_icu_value_internal( loc_name , tag_name , &result ,0);
+ 
+@@ -1164,6 +1166,7 @@ PHP_FUNCTION(locale_get_all_variants)
+ 		loc_name = intl_locale_get_default(TSRMLS_C);
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(strlen(loc_name));
+ 
+ 	array_init( return_value );
+ 
+@@ -1272,6 +1275,9 @@ PHP_FUNCTION(locale_filter_matches)
+ 		RETURN_TRUE;
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(strlen(loc_range));
++	INTL_CHECK_LOCALE_LEN(strlen(lang_tag));
++
+ 	if( boolCanonical ){
+ 		/* canonicalize loc_range */
+ 		can_loc_range=get_icu_value_internal( loc_range , LOC_CANONICALIZE_TAG , &result , 0);
+@@ -1554,6 +1560,8 @@ PHP_FUNCTION(locale_lookup)
+ 		loc_range = intl_locale_get_default(TSRMLS_C);
+ 	}
+ 
++	INTL_CHECK_LOCALE_LEN(strlen(loc_range));
++
+ 	hash_arr = HASH_OF(arr);
+ 
+ 	if( !hash_arr || zend_hash_num_elements( hash_arr ) == 0 ) {
+diff --git a/ext/intl/resourcebundle/resourcebundle_class.c b/ext/intl/resourcebundle/resourcebundle_class.c
+--- a/ext/intl/resourcebundle/resourcebundle_class.c
++++ b/ext/intl/resourcebundle/resourcebundle_class.c
+@@ -105,6 +105,13 @@ static void resourcebundle_ctor(INTERNAL_FUNCTION_PARAMETERS)
+ 		locale = intl_locale_get_default(TSRMLS_C);
+ 	}
+ 
++	if (bundlename_len >= MAXPATHLEN) {
++		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,	"Bundle name too long", 0 TSRMLS_CC );
++		zval_dtor(return_value);
++		ZVAL_NULL(return_value);
++		RETURN_NULL();
++	}
++
+ 	if (fallback) {
+ 		rb->me = ures_open(bundlename, locale, &INTL_DATA_ERROR_CODE(rb));
+ 	} else {
+@@ -327,6 +334,11 @@ PHP_FUNCTION( resourcebundle_locales )
+ 		RETURN_FALSE;
+ 	}
+ 
++	if (bundlename_len >= MAXPATHLEN) {
++		intl_error_set( NULL, U_ILLEGAL_ARGUMENT_ERROR,	"resourcebundle_locales: bundle name too long", 0 TSRMLS_CC );
++		RETURN_FALSE;
++	}
++
+ 	if(bundlename_len == 0) {
+ 		// fetch default locales list
+ 		bundlename = NULL;
+diff --git a/ext/intl/tests/bug72241.phpt b/ext/intl/tests/bug72241.phpt
+--- a/ext/intl/tests/bug72241.phpt
++++ b/ext/intl/tests/bug72241.phpt
+@@ -9,6 +9,4 @@ $out = locale_get_primary_language($var1);
+ echo strlen($out) . PHP_EOL;
+ echo unpack('H*', $out)[1] . PHP_EOL;
+ --EXPECT--
+-1000
+-61616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161
+-
++0
+diff --git a/ext/spl/tests/spl_cachingiterator___toString_basic.phpt b/ext/spl/tests/spl_cachingiterator___toString_basic.phpt
+--- a/ext/spl/tests/spl_cachingiterator___toString_basic.phpt
++++ b/ext/spl/tests/spl_cachingiterator___toString_basic.phpt
+@@ -13,4 +13,4 @@ $ci->__toString() // if conversion to string is done by echo, for example, an ex
+ );
+ ?>
+ --EXPECTF--
+-NULL
++string(0) ""

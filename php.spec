@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	51
+%define		rel	52
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -236,6 +236,7 @@ Patch86:	mbstring.patch
 Patch87:	pgsql.patch
 Patch88:	zip.patch
 Patch89:	xmlwriter.patch
+Patch90:	security-backports.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -243,8 +244,6 @@ Patch314:	php-5.3.6-39199.patch
 # 5.3.7
 #Patch333: php-5.3.7-bug-54924.patch
 Patch355:	php-5.3.7-bug-55323.patch
-# Bug-323016 CVE-2012-0831
-Patch402:	php-5.2.17-bug-323016.patch
 URL:		https://code.google.com/archive/p/php52-backports/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -306,6 +305,7 @@ BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 %{?with_pgsql:BuildRequires:	postgresql-backend-devel >= 7.2}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
+BuildRequires:	re2c
 BuildRequires:	readline-devel
 %{?with_recode:BuildRequires:	recode-devel >= 3.5d-3}
 BuildRequires:	rpm >= 4.4.9-56
@@ -2011,11 +2011,17 @@ done
 # Bugfix backport from 5.3.6
 %patch -P311 -p1 -b .bug-47435
 %patch -P314 -p1 -b .bug-39199
+%patch -P90 -p1
+
+# security-backports.patch changes only the .re scanner sources, and the
+# Makefiles have regeneration rules for just two of these four
+for f in ext/date/lib/parse_date ext/pdo/pdo_sql_parser ext/standard/url_scanner_ex ext/standard/var_unserializer; do
+	re2c -b -o $f.c $f.re
+done
+
 # Bugfix backport from 5.3.7
 #accert %%patch -P333 -p1 -b .bug-54924
 #soap %%patch -P355 -p1 -b .bug-55323
-# causes regression -> magic_quotes_gpc setting cannot be changed
-#%%patch -P402 -p1 -b .bug-323016
 
 # cleanup backups after patching
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f

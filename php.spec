@@ -149,7 +149,7 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.1.34
-Release:	6
+Release:	7
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -207,6 +207,28 @@ Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
 Patch72:	php-xml-attr-entity.patch
 Patch73:	opcache-revalidate-path-once.patch
+# https://github.com/php/php-src/commit/d3ef80649e66066fc675d707d0783b167aee19e0
+Patch74:	zend_vm_gen-php85.patch
+# post_max_size part of https://github.com/php/php-src/commit/01a40e89fbfc499936e3b05888d8f00bfde886df, missing in the 8.1 minimal fix
+Patch191:	php-cve-2026-109618-post_max_size.patch
+# Patch200+: security backports for EOL 8.1 by Remi Collet, numbered as in
+# https://git.remirepo.net/cgit/rpms/scl-php81/php.git/tree/php.spec
+# (same commits as https://github.com/shivammathur/php-src-backports/tree/PHP-8.1-security-backports)
+Patch200:	php-cve-2025-14179.patch
+Patch201:	php-cve-2026-6722.patch
+Patch202:	php-cve-2026-7261.patch
+Patch203:	php-cve-2026-7262.patch
+Patch204:	php-cve-2026-6735.patch
+Patch205:	php-cve-2026-7259.patch
+Patch206:	php-cve-2026-7568.patch
+Patch207:	php-cve-2026-7258.patch
+Patch208:	php-cve-2026-14355.patch
+Patch209:	php-cve-2026-9672.patch
+Patch210:	php-cve-2026-17543.patch
+Patch211:	php-cve-2026-7260.patch
+Patch212:	php-gh22643.patch
+Patch213:	php-from-8.2.34-to-8.1.patch
+Patch214:	php-8.1-cve-2026-109618.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1907,6 +1929,23 @@ cp -p php.ini-production php.ini
 %patch -P71 -p1 -b .libdb-info
 %patch -P72 -p1 -b .attr-entity
 %patch -P73 -p1
+%patch -P74 -p1
+%patch -P200 -p1
+%patch -P201 -p1
+%patch -P202 -p1
+%patch -P203 -p1
+%patch -P204 -p1
+%patch -P205 -p1
+%patch -P206 -p1
+%patch -P207 -p1
+%patch -P208 -p1
+%patch -P209 -p1
+%patch -P210 -p1
+%patch -P211 -p1
+%patch -P212 -p1
+%patch -P213 -p1
+%patch -P214 -p1
+%patch -P191 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \
@@ -2451,6 +2490,7 @@ libtool --mode=install install -p sapi/litespeed/php $RPM_BUILD_ROOT%{_sbindir}/
 %endif
 
 libtool --mode=install install -p libphp_common.la $RPM_BUILD_ROOT%{_libdir}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libphp_common.a
 
 # install CGI/FCGI
 %if %{with cgi}
@@ -2511,6 +2551,7 @@ cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/cli.d/php.ini
 cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/httpd/conf.d/70_mod_php.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/apache2handler.d/php.ini
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/apache/libphp8.a
 %endif
 
 # ensure that paths are correct for current php version and arch

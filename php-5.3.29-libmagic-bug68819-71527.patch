@@ -1,0 +1,30 @@
+Bundled libmagic (taken from PHP-5.6) fixes from php-src PHP-5.6:
+f938112c49 bug #68819 (CVE-2015-4604, CVE-2015-4605), fe13566c93 + 4b0b1cec00 bug #71527
+
+diff --git a/ext/fileinfo/libmagic/funcs.c b/ext/fileinfo/libmagic/funcs.c
+index c15d21fca..3efcb26a9 100644
+--- a/ext/fileinfo/libmagic/funcs.c
++++ b/ext/fileinfo/libmagic/funcs.c
+@@ -414,7 +414,7 @@ file_check_mem(struct magic_set *ms, unsigned int level)
+ 	size_t len;
+ 
+ 	if (level >= ms->c.len) {
+-		len = (ms->c.len += 20) * sizeof(*ms->c.li);
++		len = (ms->c.len = 20 + level) * sizeof(*ms->c.li);
+ 		ms->c.li = CAST(struct level_info *, (ms->c.li == NULL) ?
+ 		    emalloc(len) :
+ 		    erealloc(ms->c.li, len));
+diff --git a/ext/fileinfo/libmagic/softmagic.c b/ext/fileinfo/libmagic/softmagic.c
+index 1ef31f0f8..04bff5001 100644
+--- a/ext/fileinfo/libmagic/softmagic.c
++++ b/ext/fileinfo/libmagic/softmagic.c
+@@ -1072,6 +1072,9 @@ mcopy(struct magic_set *ms, union VALUETYPE *p, int type, int indir,
+ 			if (bytecnt > nbytes) {
+ 				bytecnt = nbytes;
+ 			}
++			if (offset > bytecnt) {
++				offset = bytecnt;
++			}
+ 			if (s == NULL) {
+ 				ms->search.s_len = 0;
+ 				ms->search.s = NULL;

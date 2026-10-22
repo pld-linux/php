@@ -143,7 +143,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_alternatives
 %endif
 
-%define		rel	72
+%define		rel	73
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -257,23 +257,20 @@ Patch80:	configure.patch
 Patch81:	types.patch
 Patch82:	includes.patch
 # Fixes for security bugs
-# https://repo.webtatic.com/yum/centos/5/SRPMS/repoview/php.html
-# also from RHEL6/CentOS7
-Patch220:	php-5.3.3-CVE-2011-4153.patch
-Patch221:	CVE-2019-11043.patch
-
-Patch247:	php-5.3.3-CVE-2014-2497.patch
-
-Patch249:	php-5.3.29-CVE-2014-3597.patch
-Patch250:	php-5.3.3-CVE-2014-4698.patch
-Patch251:	php-5.3.3-CVE-2014-4670.patch
-Patch252:	php-5.3.3-CVE-2014-3668.patch
-Patch253:	php-5.3.3-CVE-2014-3669.patch
-Patch254:	php-5.3.3-CVE-2014-3670.patch
-
-Patch256:	php-5.3.29-CVE-2014-8142.patch
-Patch257:	php-5.3.29-CVE-2015-0231.patch
-Patch258:	php-5.3.29-CVE-2015-0232.patch
+# https://github.com/shivammathur/php-src-backports/tree/PHP-5.3-security-backports
+Patch220:	php-5.3.29-security-backports.patch
+# backports of php-src fixes missing in the above
+Patch221:	php-5.3.29-libmagic-bug68819-71527.patch
+Patch222:	php-5.3.29-CVE-2025-1736.patch
+Patch223:	php-5.3.29-GHSA-ch8v-r6jh-4vvr.patch
+Patch224:	php-5.3.29-CVE-2026-7258.patch
+Patch225:	php-5.3.29-CVE-2026-7568.patch
+Patch226:	php-5.3.29-CVE-2025-14177.patch
+Patch227:	php-5.3.29-GHSA-www2-q4fc-65wf.patch
+Patch228:	php-5.3.29-GHSA-wg4p-4hqh-c3g9.patch
+Patch229:	php-5.3.29-CVE-2025-1735.patch
+Patch230:	php-5.3.29-CVE-2026-6722.patch
+Patch231:	php-5.3.29-CVE-2026-109618.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -291,7 +288,7 @@ BuildRequires:	file
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 BuildRequires:	libatomic-devel
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10-3}
-BuildRequires:	mysql-devel
+BuildRequires:	mysql-devel < 8.0
 BuildRequires:	pkgconfig
 BuildRequires:	re2c
 BuildRequires:	sed >= 4.0
@@ -2181,19 +2178,18 @@ gzip -dc %{SOURCE15} | tar xf - -C sapi/
 
 %patch -P220 -p1
 %patch -P221 -p1
-
-%patch -P247 -p1
-
-%patch -P249 -p1
-%patch -P250 -p1
-%patch -P251 -p1
-%patch -P252 -p1
-%patch -P253 -p1
-%patch -P254 -p1
-
-%patch -P256 -p1
-%patch -P257 -p1
-%patch -P258 -p1
+%patch -P222 -p1
+%patch -P223 -p1
+%patch -P224 -p1
+%patch -P225 -p1
+%patch -P226 -p1
+%patch -P227 -p1
+%patch -P228 -p1
+%patch -P229 -p1
+%patch -P230 -p1
+%patch -P231 -p1
+# the patches carry the regenerated scanners, keep make from rebuilding them
+touch ext/date/lib/parse_date.c ext/standard/var_unserializer.c Zend/zend_ini_parser.c
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

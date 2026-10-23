@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.4.33
-Release:	18
+Release:	19
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -260,6 +260,16 @@ Patch240:	php-cve-2026-7260.patch
 Patch241:	php-gh22643.patch
 Patch242:	php-from-8.2.34-to-7.4.patch
 Patch243:	php-7.4-cve-2026-109618.patch
+# session part of https://github.com/php/php-src/commit/3584a98bda0f instead of disabling upload progress
+Patch244:	php-cve-2026-109618-session.patch
+# memory limit error raised at a safe point like in 8.2 (https://github.com/php/php-src/commit/3584a98bda0f), not _exit(1) from Patch243
+Patch245:	php-cve-2026-109618-delayed-oom.patch
+# Patch219 frees row fields that the result set still owns when a row fails to decode
+Patch246:	php-cve-2025-1218-row-undef.patch
+# Patch300+: upstream fixes that never reached 7.4, backported
+Patch300:	php-c99-configure.patch
+Patch301:	php-bug66049.patch
+Patch302:	php-gh18953.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2031,6 +2041,12 @@ cp -p php.ini-production php.ini
 %patch -P242 -p1
 %patch -P243 -p1
 %patch -P191 -p1
+%patch -P244 -p1
+%patch -P245 -p1
+%patch -P246 -p1
+%patch -P300 -p1
+%patch -P301 -p1
+%patch -P302 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

@@ -1,0 +1,96 @@
+From: Florian Weimer <fweimer@redhat.com>
+Subject: Port various autoconf bits to C99 compilers
+
+gcc >= 14 rejects implicit int and implicit declarations, so run-time
+configure tests fail silently; PHP_TEST_WRITE_STDOUT fails and CLI/CGI write
+through stdio instead of write(2).
+
+Origin: backport, https://github.com/php/php-src/commit/aeaab8ee3e52f74c042a861e394437d6554b36be
+Backported to the 7.4 build/php.m4 layout, configure parts only; 7.4 already
+includes <stdlib.h> and <string.h> in the crypt checks
+---
+diff --git a/Zend/Zend.m4 b/Zend/Zend.m4
+index 6c33ca4e..bc513728 100644
+--- a/Zend/Zend.m4
++++ b/Zend/Zend.m4
+@@ -157,6 +157,7 @@ AC_MSG_CHECKING(whether double cast to long preserves least significant bits)
+ 
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <limits.h>
++#include <stdlib.h>
+ 
+ int main()
+ {
+@@ -256,6 +257,7 @@ AC_MSG_CHECKING(for MM alignment and log values)
+ 
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <stdio.h>
++#include <stdlib.h>
+ 
+ typedef union _mm_align_test {
+   void *ptr;
+diff --git a/build/libtool.m4 b/build/libtool.m4
+index 1faed63a..e6960367 100644
+--- a/build/libtool.m4
++++ b/build/libtool.m4
+@@ -945,6 +945,7 @@ else
+ #endif
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ 
+ #ifdef RTLD_GLOBAL
+ #  define LT_DLGLOBAL		RTLD_GLOBAL
+diff --git a/build/php.m4 b/build/php.m4
+index f69d4c53..3fe7d878 100644
+--- a/build/php.m4
++++ b/build/php.m4
+@@ -1119,7 +1119,7 @@ AC_CACHE_CHECK(for type of reentrant time-related functions, ac_cv_time_r_type,[
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <time.h>
+ 
+-main() {
++int main() {
+ char buf[27];
+ struct tm t;
+ time_t old = 0;
+@@ -1135,7 +1135,7 @@ return (1);
+ ],[
+   AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <time.h>
+-main() {
++int main() {
+   struct tm t, *s;
+   time_t old = 0;
+   char buf[27], *p;
+@@ -1596,7 +1596,7 @@ AC_DEFUN([PHP_CHECK_FUNC_LIB],[
+   if test "$found" = "yes"; then
+     ac_libs=$LIBS
+     LIBS="$LIBS -l$2"
+-    AC_RUN_IFELSE([AC_LANG_SOURCE([[main() { return (0); }]])],[found=yes],[found=no],[found=no])
++    AC_RUN_IFELSE([AC_LANG_SOURCE([[int main() { return (0); }]])],[found=yes],[found=no],[found=no])
+     LIBS=$ac_libs
+   fi
+ 
+@@ -2293,7 +2293,7 @@ AC_DEFUN([PHP_TEST_WRITE_STDOUT],[
+ 
+ #define TEXT "This is the test message -- "
+ 
+-main()
++int main()
+ {
+   int n;
+ 
+diff --git a/configure.ac b/configure.ac
+index 7e016652..311cd6a5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -672,6 +672,8 @@ AC_CACHE_CHECK([for getaddrinfo], ac_cv_func_getaddrinfo,
+ #include <string.h>
+ #include <netdb.h>
+ #include <sys/types.h>
++#include <string.h>
++#include <stdlib.h>
+ #ifndef AF_INET
+ # include <sys/socket.h>
+ #endif

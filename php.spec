@@ -129,8 +129,8 @@
 %define		orgname		php
 %define		ver_suffix	86
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
-%define		subver		RC4
-%define		rel		0.5
+%define		subver		%{nil}
+%define		rel		1
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -145,10 +145,8 @@ Epoch:		4
 # TSRM which has its own BSD variant
 License:	BSD
 Group:		Libraries
-#XSource0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
-# XSource0-md5:	b78bb233fa181461a6069c90d95a94a4
-Source0:	https://downloads.php.net/~mbeccati/php-%{version}%{subver}.tar.xz
-# Source0-md5:	9ab7ed17a84f49387fbad09c50f5b4a4
+Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.xz
+# Source0-md5:	51f36141735095af4b4379fdfc0233a0
 Source1:	opcache.ini
 Source2:	%{orgname}-mod_php.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -268,7 +266,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir			%{php_sysconfdir}
 
 # must be in sync with source. extra check ensuring that it is so is done in %%build
-%define		php_api_version		20260924
+%define		php_api_version		20261112
 %define		zend_module_api		%{php_api_version}
 %define		zend_extension_api	4%{zend_module_api}
 %define		php_pdo_api_version	20240423

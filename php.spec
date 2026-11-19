@@ -143,7 +143,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_alternatives
 %endif
 
-%define		rel	75
+%define		rel	76
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -284,6 +284,10 @@ Patch241:	php-5.3.29-CVE-2026-128064.patch
 Patch242:	php-5.3.29-CVE-2026-127960.patch
 Patch243:	php-5.3.29-CVE-2026-129481.patch
 Patch244:	php-phar-openssl-sign-uaf.patch
+Patch245:	php-bug77185.patch
+# PLD-only: SplFileObject frees a borrowed file name after a bailout in a user wrapper
+Patch246:	php-spl-file-open-bailout.patch
+Patch247:	php-user-stream-filename-reset.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2214,6 +2218,9 @@ gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch -P242 -p1
 %patch -P243 -p1
 %patch -P244 -p1
+%patch -P245 -p1
+%patch -P246 -p1
+%patch -P247 -p1
 # the patches carry the regenerated scanners, keep make from rebuilding them
 touch ext/date/lib/parse_date.c ext/standard/var_unserializer.c Zend/zend_ini_parser.c
 

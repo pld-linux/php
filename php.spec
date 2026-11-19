@@ -140,7 +140,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	51
+%define		rel	52
 %define		orgname	php
 %define		ver_suffix 55
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -464,6 +464,19 @@ Patch434:	php-bug72907.patch
 Patch435:	php-bug71882.patch
 Patch436:	php-bug73213.patch
 Patch437:	php-mssql-dbconvert.patch
+Patch438:	php-cve-2026-129538.patch
+Patch439:	php-cve-2026-129496.patch
+Patch440:	php-cve-2026-129292.patch
+Patch441:	php-cve-2026-129291.patch
+Patch442:	php-cve-2026-128090.patch
+Patch443:	php-cve-2026-126714.patch
+Patch444:	php-cve-2026-115560.patch
+Patch445:	php-cve-2026-15353.patch
+Patch446:	php-cve-2026-129506.patch
+Patch447:	php-cve-2026-128064.patch
+Patch448:	php-cve-2026-127960.patch
+Patch449:	php-cve-2026-129481.patch
+Patch450:	php-cve-2026-129289.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2578,6 +2591,19 @@ exit 1
 %patch -P435 -p1
 %patch -P436 -p1
 %patch -P437 -p1
+%patch -P438 -p1
+%patch -P439 -p1
+%patch -P440 -p1
+%patch -P441 -p1
+%patch -P442 -p1
+%patch -P443 -p1
+%patch -P444 -p1
+%patch -P445 -p1
+%patch -P446 -p1
+%patch -P447 -p1
+%patch -P448 -p1
+%patch -P449 -p1
+%patch -P450 -p1
 
 # backports patch only the .re sources; date has no make rule and the
 # unserializer one is skipped silently when configure finds no re2c

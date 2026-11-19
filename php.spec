@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.4.33
-Release:	19
+Release:	20
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -266,6 +266,21 @@ Patch244:	php-cve-2026-109618-session.patch
 Patch245:	php-cve-2026-109618-delayed-oom.patch
 # Patch219 frees row fields that the result set still owns when a row fails to decode
 Patch246:	php-cve-2025-1218-row-undef.patch
+# Patch247+: PHP 8.2.36 security fixes, plus newer-branch ones that also hit 7.4 (Patch259-260), backported
+Patch247:	php-cve-2026-129538.patch
+Patch248:	php-cve-2026-129496.patch
+Patch249:	php-cve-2026-129289.patch
+Patch250:	php-cve-2026-129292.patch
+Patch251:	php-cve-2026-129291.patch
+Patch252:	php-cve-2026-128090.patch
+Patch253:	php-cve-2026-126714.patch
+Patch254:	php-cve-2026-115560.patch
+Patch255:	php-cve-2026-15353.patch
+Patch256:	php-cve-2026-129506.patch
+Patch257:	php-cve-2026-128064.patch
+Patch258:	php-cve-2026-127960.patch
+Patch259:	php-cve-2026-129474.patch
+Patch260:	php-cve-2026-129481.patch
 # Patch300+: upstream fixes that never reached 7.4, backported
 Patch300:	php-c99-configure.patch
 Patch301:	php-bug66049.patch
@@ -2044,6 +2059,20 @@ cp -p php.ini-production php.ini
 %patch -P244 -p1
 %patch -P245 -p1
 %patch -P246 -p1
+%patch -P247 -p1
+%patch -P248 -p1
+%patch -P249 -p1
+%patch -P250 -p1
+%patch -P251 -p1
+%patch -P252 -p1
+%patch -P253 -p1
+%patch -P254 -p1
+%patch -P255 -p1
+%patch -P256 -p1
+%patch -P257 -p1
+%patch -P258 -p1
+%patch -P259 -p1
+%patch -P260 -p1
 %patch -P300 -p1
 %patch -P301 -p1
 %patch -P302 -p1

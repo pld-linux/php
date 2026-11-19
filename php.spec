@@ -148,7 +148,7 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.0.30
-Release:	1
+Release:	2
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -252,6 +252,22 @@ Patch235:	php-cve-2026-7260.patch
 Patch236:	php-gh22643.patch
 Patch237:	php-from-8.2.34-to-8.0.patch
 Patch238:	php-8.0-cve-2026-109618.patch
+# Patch239+: backports of the php-src 8.2.36 security fixes
+Patch239:	php-cve-2026-129538.patch
+Patch240:	php-cve-2026-129289.patch
+Patch241:	php-cve-2026-129291.patch
+Patch242:	php-cve-2026-126714.patch
+Patch243:	php-cve-2026-15353.patch
+Patch244:	php-cve-2026-129506.patch
+Patch245:	php-cve-2026-128064.patch
+Patch246:	php-cve-2026-127960.patch
+Patch247:	php-cve-2026-129496.patch
+Patch248:	php-cve-2026-129292.patch
+Patch249:	php-cve-2026-128090.patch
+Patch250:	php-cve-2026-129474.patch
+Patch251:	php-cve-2026-129481.patch
+Patch252:	php-cve-2026-7258-sapi.patch
+Patch253:	php-cve-2025-1735-leak.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1995,6 +2011,21 @@ cp -p php.ini-production php.ini
 %patch -P238 -p1
 %patch -P191 -p1
 %patch -P192 -p1
+%patch -P239 -p1
+%patch -P240 -p1
+%patch -P241 -p1
+%patch -P242 -p1
+%patch -P243 -p1
+%patch -P244 -p1
+%patch -P245 -p1
+%patch -P246 -p1
+%patch -P247 -p1
+%patch -P248 -p1
+%patch -P249 -p1
+%patch -P250 -p1
+%patch -P251 -p1
+%patch -P252 -p1
+%patch -P253 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

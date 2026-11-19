@@ -138,7 +138,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	57
+%define		rel	58
 %define		orgname	php
 %define		ver_suffix 54
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -555,7 +555,7 @@ BuildRequires:	elfutils-devel
 %{?with_kerberos5:BuildRequires:	heimdal-devel}
 %{!?with_mysql:BuildRequires:	libatomic-devel}
 %{?with_system_libzip:BuildRequires:	libzip-devel >= 0.10.1-2}
-%{!?with_mysqlnd:BuildRequires:	mysql-devel}
+%{!?with_mysqlnd:BuildRequires:	mysql-devel < 8.0}
 BuildRequires:	pkgconfig
 BuildRequires:	sed >= 4.0
 %if %{with mssql} || %{with sybase_ct}

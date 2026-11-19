@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	52
+%define		rel	53
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -237,6 +237,16 @@ Patch87:	pgsql.patch
 Patch88:	zip.patch
 Patch89:	xmlwriter.patch
 Patch90:	security-backports.patch
+Patch91:	CVE-2026-129538.patch
+Patch92:	CVE-2026-129496.patch
+Patch93:	CVE-2026-129291.patch
+Patch94:	CVE-2026-129289.patch
+Patch95:	CVE-2026-15353.patch
+Patch96:	CVE-2026-129506.patch
+Patch97:	CVE-2026-126714.patch
+Patch98:	CVE-2026-128064.patch
+Patch99:	CVE-2026-127960.patch
+Patch101:	CVE-2026-129481.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -2012,6 +2022,18 @@ done
 %patch -P311 -p1 -b .bug-47435
 %patch -P314 -p1 -b .bug-39199
 %patch -P90 -p1
+%patch -P91 -p1
+%patch -P92 -p1
+%if %{with fpm}
+%patch -P93 -p1
+%endif
+%patch -P94 -p1
+%patch -P95 -p1
+%patch -P96 -p1
+%patch -P97 -p1
+%patch -P98 -p1
+%patch -P99 -p1
+%patch -P101 -p1
 
 # security-backports.patch changes only the .re scanner sources, and the
 # Makefiles have regeneration rules for just two of these four

@@ -1,0 +1,22 @@
+PLD-only: phar_call_openssl_signverify() freed the openssl_sign() result
+before testing it, so OpenSSL phar signing randomly fell back to SHA-1.
+
+--- a/ext/phar/util.c
++++ b/ext/phar/util.c
+@@ -1542,14 +1542,15 @@ static int phar_call_openssl_signverify(
+ 			efree(retval_ptr);
+ 			return FAILURE;
+ 		case IS_BOOL:
+-			efree(retval_ptr);
+ 			if (Z_BVAL_P(retval_ptr)) {
++				efree(retval_ptr);
+ 				*signature = estrndup(Z_STRVAL_P(zsig), Z_STRLEN_P(zsig));
+ 				*signature_len = Z_STRLEN_P(zsig);
+ 				zval_dtor(zsig);
+ 				efree(zsig);
+ 				return SUCCESS;
+ 			}
++			efree(retval_ptr);
+ 			zval_dtor(zsig);
+ 			efree(zsig);
+ 			return FAILURE;

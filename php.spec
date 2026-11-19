@@ -143,7 +143,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_alternatives
 %endif
 
-%define		rel	73
+%define		rel	74
 %define		orgname	php
 %define		ver_suffix 53
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -162,7 +162,7 @@ Epoch:		4
 # TSRM is licensed under BSD
 License:	PHP 3.01 and Zend and BSD
 Group:		Libraries
-Source0:	http://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
+Source0:	https://www.php.net/distributions/%{orgname}-%{version}.tar.bz2
 # Source0-md5:	9469e240cbe6ac865aeaec89b253dd30
 Source2:	%{orgname}-mod_%{orgname}.conf
 Source3:	%{orgname}-cgi-fcgi.ini
@@ -173,7 +173,7 @@ Source11:	%{orgname}-fpm.logrotate
 Source12:	%{orgname}-branch.sh
 Source13:	dep-tests.sh
 Source14:	skip-tests.sh
-Source15:	http://litespeedtech.com/packages/lsapi/%{orgname}-litespeed-%{litespeed_version}.tgz
+Source15:	https://litespeedtech.com/packages/lsapi/%{orgname}-litespeed-%{litespeed_version}.tgz
 # Source15-md5:	9d58485d5fd6b5f5fefcec41b9ce283e
 Patch0:		%{orgname}-shared.patch
 Patch1:		%{orgname}-pldlogo.patch
@@ -271,6 +271,18 @@ Patch228:	php-5.3.29-GHSA-wg4p-4hqh-c3g9.patch
 Patch229:	php-5.3.29-CVE-2025-1735.patch
 Patch230:	php-5.3.29-CVE-2026-6722.patch
 Patch231:	php-5.3.29-CVE-2026-109618.patch
+Patch232:	php-5.3.29-CVE-2026-129538.patch
+Patch233:	php-5.3.29-CVE-2026-129496.patch
+Patch234:	php-5.3.29-CVE-2026-129292.patch
+Patch235:	php-5.3.29-CVE-2026-129291.patch
+Patch236:	php-5.3.29-CVE-2026-129289.patch
+Patch237:	php-5.3.29-CVE-2026-128090.patch
+Patch238:	php-5.3.29-CVE-2026-15353.patch
+Patch239:	php-5.3.29-CVE-2026-129506.patch
+Patch240:	php-5.3.29-CVE-2026-126714.patch
+Patch241:	php-5.3.29-CVE-2026-128064.patch
+Patch242:	php-5.3.29-CVE-2026-127960.patch
+Patch243:	php-5.3.29-CVE-2026-129481.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2188,6 +2200,18 @@ gzip -dc %{SOURCE15} | tar xf - -C sapi/
 %patch -P229 -p1
 %patch -P230 -p1
 %patch -P231 -p1
+%patch -P232 -p1
+%patch -P233 -p1
+%patch -P234 -p1
+%patch -P235 -p1
+%patch -P236 -p1
+%patch -P237 -p1
+%patch -P238 -p1
+%patch -P239 -p1
+%patch -P240 -p1
+%patch -P241 -p1
+%patch -P242 -p1
+%patch -P243 -p1
 # the patches carry the regenerated scanners, keep make from rebuilding them
 touch ext/date/lib/parse_date.c ext/standard/var_unserializer.c Zend/zend_ini_parser.c
 

@@ -142,7 +142,7 @@
 %define		ver_suffix	82
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		1
+%define		rel		2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -209,6 +209,8 @@ Patch67:	mysql-lib-ver-mismatch.patch
 Patch68:	php-mysql-ssl-context.patch
 Patch71:	libdb-info.patch
 Patch72:	opcache-revalidate-path-once.patch
+Patch73:	CVE-2026-129481.patch
+Patch74:	CVE-2026-129474.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1910,6 +1912,8 @@ cp -p php.ini-production php.ini
 #%%patch68 -p1 DROP or update to 7.0 APIs
 %patch -P71 -p1 -b .libdb-info
 %patch -P72 -p1
+%patch -P73 -p1
+%patch -P74 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \
 	ext/ext_skel.php \

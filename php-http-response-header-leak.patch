@@ -1,0 +1,23 @@
+From: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date: Thu Nov 19 15:33:37 2026 +0100
+Subject: [PATCH] Do not leak stored HTTP response header lines
+
+The 5.4 port of the folded header parser copies every stored response
+header into $http_response_header and never frees its own buffer, so
+each header leaks until the end of the request; a long running script
+fetching URLs grows without bound. Hand the buffer over to the zval,
+as 8.x does with ZVAL_NEW_STR().
+PLD: PLD fix for the 5.4 port of the GHSA-v8xr-gpvj-cx9g folding fix
+---
+diff --git a/ext/standard/http_fopen_wrapper.c b/ext/standard/http_fopen_wrapper.c
+--- a/ext/standard/http_fopen_wrapper.c
++++ b/ext/standard/http_fopen_wrapper.c
+@@ -374,7 +374,7 @@ static zend_bool php_stream_http_response_headers_parse(php_stream_wrapper *wrap
+ 		zval *http_response;
+ 
+ 		MAKE_STD_ZVAL(http_response);
+-		ZVAL_STRINGL(http_response, last_header_line_str, last_header_line_length, 1);
++		ZVAL_STRINGL(http_response, last_header_line_str, last_header_line_length, 0);
+ 		zend_hash_next_index_insert(Z_ARRVAL_P(response_header), &http_response, sizeof(zval *), NULL);
+ 	} else {
+ 		efree(last_header_line_str);

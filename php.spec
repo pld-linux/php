@@ -138,7 +138,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	55
+%define		rel	56
 %define		orgname	php
 %define		ver_suffix 54
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -524,6 +524,20 @@ Patch543:	php-bug70979.patch
 Patch544:	php-cve-2026-109618-session.patch
 Patch545:	php-cve-2026-109618-post_max_size.patch
 Patch546:	php-cve-2026-109618-delayed-oom.patch
+Patch547:	php-cve-2026-129538.patch
+Patch548:	php-cve-2026-129496.patch
+Patch549:	php-cve-2026-129289.patch
+Patch550:	php-cve-2026-129292.patch
+Patch551:	php-cve-2026-129291.patch
+Patch552:	php-cve-2026-128090.patch
+Patch553:	php-cve-2026-15353.patch
+Patch554:	php-cve-2026-129506.patch
+Patch555:	php-cve-2026-126714.patch
+Patch556:	php-cve-2026-115560.patch
+Patch557:	php-cve-2026-128064.patch
+Patch558:	php-cve-2026-127960.patch
+Patch559:	php-http-response-header-leak.patch
+Patch560:	php-cve-2026-129481.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2654,6 +2668,20 @@ cp -p php.ini-production php.ini
 %patch -P544 -p1
 %patch -P545 -p1
 %patch -P546 -p1
+%patch -P547 -p1
+%patch -P548 -p1
+%patch -P549 -p1
+%patch -P550 -p1
+%patch -P551 -p1
+%patch -P552 -p1
+%patch -P553 -p1
+%patch -P554 -p1
+%patch -P555 -p1
+%patch -P556 -p1
+%patch -P557 -p1
+%patch -P558 -p1
+%patch -P559 -p1
+%patch -P560 -p1
 
 # backports patch only the .re sources; date has no make rule and the
 # unserializer one is skipped silently when configure finds no re2c

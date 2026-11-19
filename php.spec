@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	45
+%define		rel	46
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -385,6 +385,10 @@ Patch445:	php-cve-2026-129481.patch
 Patch446:	php-cve-2026-128090.patch
 # PLD-only: openssl_sign() result read after efree() (5.x-only code)
 Patch447:	php-phar-openssl-sign-uaf.patch
+Patch448:	php-bug77185.patch
+# PLD-only: SplFileObject frees a borrowed file name after a bailout in a user wrapper
+Patch449:	php-spl-file-open-bailout.patch
+Patch450:	php-user-stream-filename-reset.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2445,6 +2449,9 @@ exit 1
 %patch -P445 -p1
 %patch -P446 -p1
 %patch -P447 -p1
+%patch -P448 -p1
+%patch -P449 -p1
+%patch -P450 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

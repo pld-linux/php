@@ -138,7 +138,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	58
+%define		rel	59
 %define		orgname	php
 %define		ver_suffix 54
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -539,6 +539,10 @@ Patch558:	php-cve-2026-127960.patch
 Patch559:	php-http-response-header-leak.patch
 Patch560:	php-cve-2026-129481.patch
 Patch561:	php-phar-openssl-sign-uaf.patch
+Patch562:	php-bug77185.patch
+# PLD-only: SplFileObject frees a borrowed file name after a bailout in a user wrapper
+Patch563:	php-spl-file-open-bailout.patch
+Patch564:	php-user-stream-filename-reset.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2684,6 +2688,9 @@ cp -p php.ini-production php.ini
 %patch -P559 -p1
 %patch -P560 -p1
 %patch -P561 -p1
+%patch -P562 -p1
+%patch -P563 -p1
+%patch -P564 -p1
 
 # backports patch only the .re sources; date has no make rule and the
 # unserializer one is skipped silently when configure finds no re2c

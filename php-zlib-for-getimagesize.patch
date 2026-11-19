@@ -33,3 +33,12 @@ upstream: https://github.com/php/php-src/pull/4681
  			result = php_handle_swc(stream);
  #else
  			php_error_docref(NULL, E_NOTICE, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled");
+--- php-8.3.37/ext/zlib/config0.m4
++++ php-8.3.37/ext/zlib/config0.m4
+@@ -13,4 +13,6 @@
+ 
+   PHP_NEW_EXTENSION(zlib, zlib.c zlib_fopen_wrapper.c zlib_filter.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
+   PHP_SUBST(ZLIB_SHARED_LIBADD)
++  dnl getimagesize() in core uses uncompress() even with shared zlib
++  PHP_EVAL_LIBLINE($ZLIB_LIBS)
+ fi

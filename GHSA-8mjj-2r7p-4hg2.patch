@@ -1,0 +1,129 @@
+GHSA-8mjj-2r7p-4hg2 (CVE-2026-129474): backtraces read __call/__callStatic trampoline args from
+the wrong stack slots (stale, possibly freed zvals); 8.5-only Zend test dropped.
+https://github.com/php/php-src/commit/03c403286d9440c2b3a840812652be4e221d1be7
+
+diff -urNp a/sapi/phpdbg/phpdbg.c b/sapi/phpdbg/phpdbg.c
+--- a/sapi/phpdbg/phpdbg.c
++++ b/sapi/phpdbg/phpdbg.c
+@@ -120,6 +120,7 @@ static inline void php_phpdbg_globals_ct
+ 	pg->flags = PHPDBG_DEFAULT_FLAGS;
+ 	memset(pg->io, 0, sizeof(pg->io));
+ 	pg->frame.num = 0;
++	pg->frame.generator = 0;
+ 	pg->sapi_name_ptr = NULL;
+ 	pg->unclean_eval = 0;
+ 
+diff -urNp a/sapi/phpdbg/phpdbg_frame.c b/sapi/phpdbg/phpdbg_frame.c
+--- a/sapi/phpdbg/phpdbg_frame.c
++++ b/sapi/phpdbg/phpdbg_frame.c
+@@ -56,6 +56,12 @@ zend_string *phpdbg_compile_stackframe(z
+ 	uint32_t i = 0, first_extra_arg = op_array->num_args, num_args = ZEND_CALL_NUM_ARGS(ex);
+ 	zval *p = ZEND_CALL_ARG(ex, 1);
+ 
++	if (ex->func->op_array.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE) {
++		/* A __call/__callStatic trampoline doesn't move extra args
++		 * behind the CVs and TMPs (see i_init_func_execute_data()). */
++		first_extra_arg = num_args;
++	}
++
+ 	if (op_array->scope) {
+ 		smart_str_append(&s, op_array->scope->name);
+ 		smart_str_appends(&s, "::");
+@@ -86,6 +92,8 @@ zend_string *phpdbg_compile_stackframe(z
+ 		smart_str_appends(&s, " [internal function]");
+ 	}
+ 
++	smart_str_0(&s);
++
+ 	return s.s;
+ }
+ 
+diff -urNp a/sapi/phpdbg/tests/GHSA-8mjj-2r7p-4hg2-001.phpt b/sapi/phpdbg/tests/GHSA-8mjj-2r7p-4hg2-001.phpt
+--- a/sapi/phpdbg/tests/GHSA-8mjj-2r7p-4hg2-001.phpt
++++ b/sapi/phpdbg/tests/GHSA-8mjj-2r7p-4hg2-001.phpt
+@@ -0,0 +1,34 @@
++--TEST--
++GHSA-8mjj-2r7p-4hg2: phpdbg frame display for __call trampoline
++--INI--
++fatal_error_backtraces=0
++zend.exception_ignore_args=1
++--PHPDBG--
++b ZEND_CALL_TRAMPOLINE
++r
++f 1
++f 0
++q
++--EXPECTF--
++[Successful compilation of %s]
++prompt> [Breakpoint #0 added at ZEND_CALL_TRAMPOLINE]
++prompt> [Breakpoint #0 in ZEND_CALL_TRAMPOLINE at %s:0, hits: 1]
++ 00001: <?php
++ 00002: class C { static function __callStatic($name, $args) {} }
++prompt> [Switched to frame #1: caller() at %s:5]
++>00005:     C::test(1, 2, 3, 4);
++ 00006: }
++ 00007:%w
++prompt> [Switched to frame #0: C::test(1, 2, 3, 4) at %s:0]
++ 00001: <?php
++ 00002: class C { static function __callStatic($name, $args) {} }
++prompt>
++--FILE--
++<?php
++class C { static function __callStatic($name, $args) {} }
++
++function caller() {
++    C::test(1, 2, 3, 4);
++}
++
++caller();
+diff -urNp a/sapi/phpdbg/tests/GHSA-8mjj-2r7p-4hg2-002.phpt b/sapi/phpdbg/tests/GHSA-8mjj-2r7p-4hg2-002.phpt
+--- a/sapi/phpdbg/tests/GHSA-8mjj-2r7p-4hg2-002.phpt
++++ b/sapi/phpdbg/tests/GHSA-8mjj-2r7p-4hg2-002.phpt
+@@ -0,0 +1,31 @@
++--TEST--
++GHSA-8mjj-2r7p-4hg2: phpdbg backtrace for __call trampoline with attached symbol table
++--INI--
++fatal_error_backtraces=0
++zend.exception_ignore_args=0
++--PHPDBG--
++b ZEND_CALL_TRAMPOLINE
++r
++i v
++back
++q
++--EXPECTF--
++[Successful compilation of %s]
++prompt> [Breakpoint #0 added at ZEND_CALL_TRAMPOLINE]
++prompt> [Breakpoint #0 in ZEND_CALL_TRAMPOLINE at %s:0, hits: 1]
++ 00001: <?php
++ 00002: class C { static function __callStatic($name, $args) {} }
++prompt> [Variables in C::test() (0)]
++prompt> frame #0: C::test(1, 2, 3, 4) at %s:0
++frame #1: caller() at %s:5
++frame #2: {main} at %s:8
++prompt>
++--FILE--
++<?php
++class C { static function __callStatic($name, $args) {} }
++
++function caller() {
++    C::test(1, 2, 3, 4);
++}
++
++caller();
+diff -urNp a/Zend/zend_builtin_functions.c b/Zend/zend_builtin_functions.c
+--- a/Zend/zend_builtin_functions.c
++++ b/Zend/zend_builtin_functions.c
+@@ -1561,7 +1561,11 @@ static bool debug_backtrace_get_args(zen
+ 			return false;
+ 		}
+ 		ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(arg_array)) {
+-			if (call->func->type == ZEND_USER_FUNCTION) {
++			/* Extra args are moved after CVs and TMPs in user functions, except
++			 * for trampoline frames (see i_init_func_execute_data()).
++			 */
++			if (call->func->type == ZEND_USER_FUNCTION
++			 && !(call->func->op_array.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE)) {
+ 				uint32_t first_extra_arg = MIN(num_args, call->func->op_array.num_args);
+ 
+ 				if (UNEXPECTED(ZEND_CALL_INFO(call) & ZEND_CALL_HAS_SYMBOL_TABLE)) {

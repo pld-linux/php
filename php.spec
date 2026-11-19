@@ -155,7 +155,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.3.33
-Release:	22
+Release:	23
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -303,6 +303,21 @@ Patch265:	php-cve-2026-109618-session.patch
 Patch266:	php-cve-2026-109618-delayed-oom.patch
 # Patch256 frees row fields that the result set still owns when a row fails to decode
 Patch267:	php-cve-2025-1218-row-undef.patch
+# Patch268+: fixes from the upstream PHP 8.2.36 security release, backported
+Patch268:	php-cve-2026-129538.patch
+Patch269:	php-cve-2026-129496.patch
+Patch270:	php-cve-2026-129289.patch
+Patch271:	php-cve-2026-129292.patch
+Patch272:	php-cve-2026-129291.patch
+Patch273:	php-cve-2026-128090.patch
+Patch274:	php-cve-2026-126714.patch
+Patch275:	php-cve-2026-115560.patch
+Patch276:	php-cve-2026-15353.patch
+Patch277:	php-cve-2026-129506.patch
+Patch278:	php-cve-2026-128064.patch
+Patch279:	php-cve-2026-127960.patch
+Patch280:	php-cve-2026-129474.patch
+Patch281:	php-cve-2026-129481.patch
 # Patch300+: upstream 7.4 fixes backported by Remi Collet,
 # https://git.remirepo.net/cgit/rpms/scl-php73/php.git/tree/php.spec
 Patch300:	php-pcre1038.patch
@@ -2241,6 +2256,20 @@ cp -p php.ini-production php.ini
 %patch -P265 -p1
 %patch -P266 -p1
 %patch -P267 -p1
+%patch -P268 -p1
+%patch -P269 -p1
+%patch -P270 -p1
+%patch -P271 -p1
+%patch -P272 -p1
+%patch -P273 -p1
+%patch -P274 -p1
+%patch -P275 -p1
+%patch -P276 -p1
+%patch -P277 -p1
+%patch -P278 -p1
+%patch -P279 -p1
+%patch -P280 -p1
+%patch -P281 -p1
 %patch -P300 -p1
 %patch -P301 -p1
 %patch -P302 -p1

@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.0.33
-Release:	32
+Release:	33
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -384,6 +384,20 @@ Patch344:	php-bug80915.patch
 Patch345:	php-bug76601.patch
 Patch346:	php-bug74544.patch
 Patch347:	php-bug78680.patch
+Patch348:	php-cve-2026-15353.patch
+Patch349:	php-cve-2026-128090.patch
+Patch350:	php-cve-2026-129538.patch
+Patch351:	php-cve-2026-129292.patch
+Patch352:	php-cve-2026-129289.patch
+Patch353:	php-cve-2026-129506.patch
+Patch354:	php-cve-2026-129496.patch
+Patch355:	php-cve-2026-126714.patch
+Patch356:	php-cve-2026-115560.patch
+Patch357:	php-cve-2026-128064.patch
+Patch358:	php-cve-2026-127960.patch
+Patch359:	php-cve-2026-129291.patch
+Patch360:	php-cve-2026-129481.patch
+Patch361:	php-cve-2026-129474.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2352,6 +2366,20 @@ cp -p php.ini-production php.ini
 %patch -P345 -p1
 %patch -P346 -p1
 %patch -P347 -p1
+%patch -P348 -p1
+%patch -P349 -p1
+%patch -P350 -p1
+%patch -P351 -p1
+%patch -P352 -p1
+%patch -P353 -p1
+%patch -P354 -p1
+%patch -P355 -p1
+%patch -P356 -p1
+%patch -P357 -p1
+%patch -P358 -p1
+%patch -P359 -p1
+%patch -P360 -p1
+%patch -P361 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

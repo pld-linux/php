@@ -155,7 +155,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %undefine	with_filter
 %endif
 
-%define		rel	43
+%define		rel	44
 %define		orgname	php
 %define		ver_suffix 56
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -370,6 +370,18 @@ Patch431:	php-bug47925.patch
 Patch432:	php-gh22761.patch
 # PLD-only: text-protocol row fields left untyped when decoding fails, then freed (5.6-specific code)
 Patch433:	php-mysqlnd-row-uninit-free.patch
+Patch434:	php-cve-2026-129538.patch
+Patch435:	php-cve-2026-129496.patch
+Patch436:	php-cve-2026-129289.patch
+Patch437:	php-cve-2026-129292.patch
+Patch438:	php-cve-2026-129291.patch
+Patch439:	php-cve-2026-126714.patch
+Patch440:	php-cve-2026-115560.patch
+Patch441:	php-cve-2026-15353.patch
+Patch442:	php-cve-2026-129506.patch
+Patch443:	php-cve-2026-128064.patch
+Patch444:	php-cve-2026-127960.patch
+Patch445:	php-cve-2026-129481.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2416,6 +2428,18 @@ exit 1
 %patch -P431 -p1
 %patch -P432 -p1
 %patch -P433 -p1
+%patch -P434 -p1
+%patch -P435 -p1
+%patch -P436 -p1
+%patch -P437 -p1
+%patch -P438 -p1
+%patch -P439 -p1
+%patch -P440 -p1
+%patch -P441 -p1
+%patch -P442 -p1
+%patch -P443 -p1
+%patch -P444 -p1
+%patch -P445 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

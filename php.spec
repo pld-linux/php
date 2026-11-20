@@ -155,7 +155,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.2.34
-Release:	28
+Release:	29
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -380,6 +380,9 @@ Patch331:	php-cve-2026-129496.patch
 Patch332:	php-cve-2026-129474.patch
 Patch333:	php-cve-2026-129481.patch
 Patch334:	php-bug77185.patch
+# PLD-only: SplFileObject frees a borrowed file name after a bailout in a user wrapper
+Patch335:	php-spl-file-open-bailout.patch
+Patch336:	php-user-stream-filename-reset.patch
 URL:		https://www.php.net/
 %{?with_interbase:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2353,6 +2356,8 @@ cp -p php.ini-production php.ini
 %patch -P332 -p1
 %patch -P333 -p1
 %patch -P334 -p1
+%patch -P335 -p1
+%patch -P336 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       run-tests.php

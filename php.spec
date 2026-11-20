@@ -142,7 +142,7 @@
 %define		ver_suffix	82
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		2
+%define		rel		3
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -211,6 +211,8 @@ Patch71:	libdb-info.patch
 Patch72:	opcache-revalidate-path-once.patch
 Patch73:	CVE-2026-129481.patch
 Patch74:	CVE-2026-129474.patch
+# PLD-only: SplFileObject frees a borrowed file name after a bailout in a user wrapper
+Patch75:	php-spl-file-open-bailout.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1914,6 +1916,7 @@ cp -p php.ini-production php.ini
 %patch -P72 -p1
 %patch -P73 -p1
 %patch -P74 -p1
+%patch -P75 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \
 	ext/ext_skel.php \

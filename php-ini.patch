@@ -232,6 +232,22 @@
  
  [Session]
  ; Handler used to store/retrieve data.
+@@ -1547,11 +1448,11 @@
+ session.sid_bits_per_character = 5
+ 
+ ; Enable upload progress tracking in $_SESSION
+-; Default Value: On
+-; Development Value: On
+-; Production Value: On
++; Default Value: Off
++; Development Value: Off
++; Production Value: Off
+ ; https://php.net/session.upload-progress.enabled
+-;session.upload_progress.enabled = On
++;session.upload_progress.enabled = Off
+ 
+ ; Cleanup the progress information as soon as all POST data has been read
+ ; (i.e. upload completed).
 @@ -1747,7 +1661,7 @@
  
  ; Sets the directory name where SOAP extension will put cache files.

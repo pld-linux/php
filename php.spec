@@ -149,7 +149,7 @@ Summary(ru.UTF-8):	PHP - язык препроцессирования HTML-фа
 Summary(uk.UTF-8):	PHP - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	8.1.34
-Release:	8
+Release:	9
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -245,6 +245,8 @@ Patch225:	php-cve-2026-128064.patch
 Patch226:	php-cve-2026-127960.patch
 Patch227:	php-cve-2026-129474.patch
 Patch228:	php-cve-2026-129481.patch
+# PLD-only: SplFileObject frees a borrowed file name after a bailout in a user wrapper
+Patch229:	php-spl-file-open-bailout.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -1976,6 +1978,7 @@ cp -p php.ini-production php.ini
 %patch -P226 -p1
 %patch -P227 -p1
 %patch -P228 -p1
+%patch -P229 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \

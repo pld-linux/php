@@ -1,0 +1,24 @@
+From d0b3096ff0f6f6f491833858f126a80f18b81151 Mon Sep 17 00:00:00 2001
+From: Dmitry Stogov <dmitry@zend.com>
+Date: Mon, 12 Sep 2022 11:38:31 +0300
+Subject: [PATCH] Reset FG(user_stream_current_filename) at the end of request
+
+A bailout inside a user stream wrapper's stream_open or dir_opendir left
+the recursion guard pointing into the finished request, so a later request
+of the same process could read freed memory and fail with "infinite
+recursion prevented" when it opened the same URL.
+
+Origin: upstream, https://github.com/php/php-src/commit/d0b3096ff0f6f6f491833858f126a80f18b81151
+---
+diff --git a/main/streams/streams.c b/main/streams/streams.c
+index b00280a9..e9aab013 100644
+--- a/main/streams/streams.c
++++ b/main/streams/streams.c
+@@ -1627,6 +1627,7 @@ static void stream_resource_persistent_dtor(zend_resource *rsrc)
+ 
+ void php_shutdown_stream_hashes(void)
+ {
++	FG(user_stream_current_filename) = NULL;
+ 	if (FG(stream_wrappers)) {
+ 		zend_hash_destroy(FG(stream_wrappers));
+ 		efree(FG(stream_wrappers));

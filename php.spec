@@ -130,7 +130,7 @@
 %define		ver_suffix	86
 %define		php_suffix	%{!?with_default_php:%{ver_suffix}}
 %define		subver		%{nil}
-%define		rel		1
+%define		rel		2
 Summary:	PHP: Hypertext Preprocessor
 Summary(fr.UTF-8):	Le langage de script embarque-HTML PHP
 Summary(pl.UTF-8):	Język skryptowy PHP
@@ -189,6 +189,8 @@ Patch66:	php-db.patch
 Patch67:	mysql-lib-ver-mismatch.patch
 Patch71:	libdb-info.patch
 Patch72:	opcache-revalidate-path-once.patch
+# PLD-only: SplFileObject frees a borrowed file name after a bailout in a user wrapper
+Patch73:	php-spl-file-open-bailout.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 3.0}}
 BuildRequires:	autoconf >= 2.68
@@ -1775,6 +1777,7 @@ cp -p php.ini-production php.ini
 %patch -P67 -p1 -b .mysql-lib-ver-mismatch
 %patch -P71 -p1 -b .libdb-info
 %patch -P72 -p1
+%patch -P73 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env php,%{_bindir}/php,' \
 	ext/ext_skel.php \

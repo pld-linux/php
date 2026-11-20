@@ -1,0 +1,53 @@
+Subject: [PATCH] spl: own the SplFileObject file name before opening it
+
+spl_filesystem_file_open() kept the caller's file name without a reference
+until the open succeeded. A fatal error or a timeout inside a user stream
+wrapper's url_stat or stream_open left it there, and the object's free then
+released a reference it did not own: after SplFileInfo::openFile() the
+source object's name was released twice (use after free at shutdown).
+
+PLD-only: php-src (master too) still borrows the name until the open
+succeeds.
+---
+diff --git a/ext/spl/spl_directory.c b/ext/spl/spl_directory.c
+index c5dc56d4..2e767708 100644
+--- a/ext/spl/spl_directory.c
++++ b/ext/spl/spl_directory.c
+@@ -319,10 +319,14 @@ static zend_result spl_filesystem_file_open(spl_filesystem_object *intern, bool
+ 	zval tmp;
+ 
+ 	intern->type = SPL_FS_FILE;
++	/* file_name is borrowed from the caller; take a reference before user wrapper
++	 * code can bail out, as spl_filesystem_object_free_storage() releases it */
++	intern->file_name = zend_string_copy(intern->file_name);
+ 	php_stat(intern->file_name, FS_IS_DIR, &tmp);
+ 	if (Z_TYPE(tmp) == IS_TRUE) {
+ 		zend_string_release(intern->u.file.open_mode);
+ 		intern->u.file.open_mode = NULL;
++		zend_string_release(intern->file_name);
+ 		intern->file_name = NULL;
+ 		zend_throw_exception_ex(spl_ce_LogicException, 0, "Cannot use SplFileObject with directories");
+ 		return FAILURE;
+@@ -337,7 +341,8 @@ static zend_result spl_filesystem_file_open(spl_filesystem_object *intern, bool
+ 		}
+ 		zend_string_release(intern->u.file.open_mode);
+ 		intern->u.file.open_mode = NULL;
+-		intern->file_name = NULL; /* until here it is not a copy */
++		zend_string_release(intern->file_name);
++		intern->file_name = NULL;
+ 		return FAILURE;
+ 	}
+ 
+@@ -352,9 +357,9 @@ static zend_result spl_filesystem_file_open(spl_filesystem_object *intern, bool
+ 	*/
+ 
+ 	if (ZSTR_LEN(intern->file_name) > 1 && IS_SLASH_AT(ZSTR_VAL(intern->file_name), ZSTR_LEN(intern->file_name)-1)) {
+-		intern->file_name = zend_string_init(ZSTR_VAL(intern->file_name), ZSTR_LEN(intern->file_name)-1, 0);
+-	} else {
+-		intern->file_name = zend_string_copy(intern->file_name);
++		zend_string *file_name = zend_string_init(ZSTR_VAL(intern->file_name), ZSTR_LEN(intern->file_name)-1, 0);
++		zend_string_release(intern->file_name);
++		intern->file_name = file_name;
+ 	}
+ 
+ 	intern->orig_path = zend_string_init(intern->u.file.stream->orig_path, strlen(intern->u.file.stream->orig_path), 0);

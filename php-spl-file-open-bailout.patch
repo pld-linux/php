@@ -1,0 +1,54 @@
+Subject: [PATCH] spl: own the SplFileObject file name before opening it
+
+spl_filesystem_file_open() kept pointing at the caller's file name until the
+open succeeded. exit(), a fatal error or a timeout inside a user stream
+wrapper's stream_open left it there, and the object's free then
+released an interned literal or another SplFileInfo's name (invalid or
+double free at shutdown).
+
+PLD-only: php-src (master too) still borrows the name until the open
+succeeds; shivammathur/php-src-backports, remicollet/php-src-security and
+Debian/Freexian php5 and php7.0 have no fix.
+---
+diff --git a/ext/spl/spl_directory.c b/ext/spl/spl_directory.c
+index a1f8309..1b6b013 100755
+--- a/ext/spl/spl_directory.c
++++ b/ext/spl/spl_directory.c
+@@ -202,6 +202,12 @@ static void spl_filesystem_dir_open(spl_filesystem_object* intern, char *path TS
+ static int spl_filesystem_file_open(spl_filesystem_object *intern, int use_include_path, int silent TSRMLS_DC) /* {{{ */
+ {
+ 	intern->type = SPL_FS_FILE;
++
++	/* both are borrowed from the caller; copy them before user wrapper code can
++	 * bail out, as spl_filesystem_object_free_storage() frees file_name */
++	intern->file_name = estrndup(intern->file_name, intern->file_name_len);
++	intern->u.file.open_mode = estrndup(intern->u.file.open_mode, intern->u.file.open_mode_len);
++
+ 	intern->u.file.context = php_stream_context_from_zval(intern->u.file.zcontext, 0);
+ 	intern->u.file.stream = php_stream_open_wrapper_ex(intern->file_name, intern->u.file.open_mode, (use_include_path ? USE_PATH : 0) | ENFORCE_SAFE_MODE | REPORT_ERRORS, NULL, intern->u.file.context);
+ 
+@@ -209,7 +215,9 @@ static int spl_filesystem_file_open(spl_filesystem_object *intern, int use_inclu
+ 		if (!EG(exception)) {
+ 			zend_throw_exception_ex(spl_ce_RuntimeException, 0 TSRMLS_CC, "Cannot open file '%s'", intern->file_name_len ? intern->file_name : "");
+ 		}
+-		intern->file_name = NULL; /* until here it is not a copy */
++		efree(intern->file_name);
++		intern->file_name = NULL;
++		efree(intern->u.file.open_mode);
+ 		intern->u.file.open_mode = NULL;
+ 		return FAILURE;
+ 	}
+@@ -223,12 +231,9 @@ static int spl_filesystem_file_open(spl_filesystem_object *intern, int use_inclu
+ 	  ||intern->file_name[intern->file_name_len-1] == '\\'
+ #endif
+ 	) {
+-		intern->file_name_len--;
++		intern->file_name[--intern->file_name_len] = '\0';
+ 	}
+ 
+-	intern->file_name = estrndup(intern->file_name, intern->file_name_len);
+-	intern->u.file.open_mode = estrndup(intern->u.file.open_mode, intern->u.file.open_mode_len);
+-
+ 	/* avoid reference counting in debug mode, thus do it manually */
+ 	ZVAL_RESOURCE(&intern->u.file.zresource, php_stream_get_resource_id(intern->u.file.stream));
+ 	intern->u.file.zresource.refcount = 1;

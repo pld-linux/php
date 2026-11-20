@@ -112,7 +112,7 @@ ERROR: You need to select at least one Apache SAPI to build shared modules.
 %define		magic_mime	/usr/share/misc/magic.mime
 %endif
 
-%define		rel	53
+%define		rel	54
 %define		orgname	php
 %define		ver_suffix 52
 %define		php_suffix %{!?with_default_php:%{ver_suffix}}
@@ -247,6 +247,9 @@ Patch97:	CVE-2026-126714.patch
 Patch98:	CVE-2026-128064.patch
 Patch99:	CVE-2026-127960.patch
 Patch101:	CVE-2026-129481.patch
+# PLD-only: SplFileObject frees a borrowed file name after a bailout in a user wrapper
+Patch102:	php-spl-file-open-bailout.patch
+Patch103:	php-user-stream-filename-reset.patch
 # CENTALT patches
 # Backport from 5.3.6
 Patch311:	php-5.3.6-bug-47435.patch
@@ -2034,6 +2037,8 @@ done
 %patch -P98 -p1
 %patch -P99 -p1
 %patch -P101 -p1
+%patch -P102 -p1
+%patch -P103 -p1
 
 # security-backports.patch changes only the .re scanner sources, and the
 # Makefiles have regeneration rules for just two of these four

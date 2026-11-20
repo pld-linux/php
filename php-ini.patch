@@ -219,6 +219,22 @@ diff -urNp -x '*.orig' php-7.1.33.org/php.ini php-7.1.33/php.ini
  
  [Session]
  ; Handler used to store/retrieve data.
+@@ -1535,11 +1451,11 @@
+ session.sid_bits_per_character = 5
+ 
+ ; Enable upload progress tracking in $_SESSION
+-; Default Value: On
+-; Development Value: On
+-; Production Value: On
++; Default Value: Off
++; Development Value: Off
++; Production Value: Off
+ ; http://php.net/session.upload-progress.enabled
+-;session.upload_progress.enabled = On
++;session.upload_progress.enabled = Off
+ 
+ ; Cleanup the progress information as soon as all POST data has been read
+ ; (i.e. upload completed).
 @@ -1763,7 +1679,7 @@ soap.wsdl_cache_enabled=1
  
  ; Sets the directory name where SOAP extension will put cache files.

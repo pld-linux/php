@@ -1,0 +1,60 @@
+Subject: [PATCH] spl: own the SplFileObject file name before opening it
+
+spl_filesystem_file_open() kept pointing at the caller's file name until the
+open succeeded. A fatal error or a timeout inside a user stream
+wrapper's url_stat or stream_open left it there, and the object's free then
+released an interned literal or another SplFileInfo's name (invalid or
+double free at shutdown).
+
+PLD-only: php-src (master too) still borrows the name until the open
+succeeds; shivammathur/php-src-backports and remicollet/php-src-security
+have no fix.
+---
+diff --git a/ext/spl/spl_directory.c b/ext/spl/spl_directory.c
+index 8646ba20..0c50f622 100644
+--- a/ext/spl/spl_directory.c
++++ b/ext/spl/spl_directory.c
+@@ -290,9 +290,16 @@ static int spl_filesystem_file_open(spl_filesystem_object *intern, int use_inclu
+ 
+ 	intern->type = SPL_FS_FILE;
+ 
++	/* both are borrowed from the caller; copy them before user wrapper code can
++	 * bail out, as spl_filesystem_object_free_storage() frees file_name */
++	intern->file_name = estrndup(intern->file_name, intern->file_name_len);
++	intern->u.file.open_mode = estrndup(intern->u.file.open_mode, intern->u.file.open_mode_len);
++
+ 	php_stat(intern->file_name, intern->file_name_len, FS_IS_DIR, &tmp);
+ 	if (Z_TYPE(tmp) == IS_TRUE) {
++		efree(intern->u.file.open_mode);
+ 		intern->u.file.open_mode = NULL;
++		efree(intern->file_name);
+ 		intern->file_name = NULL;
+ 		zend_throw_exception_ex(spl_ce_LogicException, 0, "Cannot use SplFileObject with directories");
+ 		return FAILURE;
+@@ -305,7 +312,9 @@ static int spl_filesystem_file_open(spl_filesystem_object *intern, int use_inclu
+ 		if (!EG(exception)) {
+ 			zend_throw_exception_ex(spl_ce_RuntimeException, 0, "Cannot open file '%s'", intern->file_name_len ? intern->file_name : "");
+ 		}
+-		intern->file_name = NULL; /* until here it is not a copy */
++		efree(intern->file_name);
++		intern->file_name = NULL;
++		efree(intern->u.file.open_mode);
+ 		intern->u.file.open_mode = NULL;
+ 		return FAILURE;
+ 	}
+@@ -318,14 +327,11 @@ static int spl_filesystem_file_open(spl_filesystem_object *intern, int use_inclu
+ 	*/
+ 
+ 	if (intern->file_name_len > 1 && IS_SLASH_AT(intern->file_name, intern->file_name_len-1)) {
+-		intern->file_name_len--;
++		intern->file_name[--intern->file_name_len] = '\0';
+ 	}
+ 
+ 	intern->orig_path = estrndup(intern->u.file.stream->orig_path, strlen(intern->u.file.stream->orig_path));
+ 
+-	intern->file_name = estrndup(intern->file_name, intern->file_name_len);
+-	intern->u.file.open_mode = estrndup(intern->u.file.open_mode, intern->u.file.open_mode_len);
+-
+ 	/* avoid reference counting in debug mode, thus do it manually */
+ 	ZVAL_RES(&intern->u.file.zresource, intern->u.file.stream->res);
+ 	/*!!! TODO: maybe bug?

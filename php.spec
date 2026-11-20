@@ -150,7 +150,7 @@ Summary(ru.UTF-8):	PHP Версии 7 - язык препроцессирова�
 Summary(uk.UTF-8):	PHP Версії 7 - мова препроцесування HTML-файлів, виконувана на сервері
 Name:		%{orgname}%{php_suffix}
 Version:	7.4.33
-Release:	20
+Release:	21
 Epoch:		4
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -285,6 +285,9 @@ Patch260:	php-cve-2026-129481.patch
 Patch300:	php-c99-configure.patch
 Patch301:	php-bug66049.patch
 Patch302:	php-gh18953.patch
+# PLD-only: SplFileObject frees a borrowed file name after a bailout in a user wrapper
+Patch303:	php-spl-file-open-bailout.patch
+Patch304:	php-user-stream-filename-reset.patch
 URL:		https://www.php.net/
 %{?with_pdo_firebird:%{!?with_interbase_inst:BuildRequires:	Firebird-devel >= 1.0.2.908-2}}
 %{?with_pspell:BuildRequires:	aspell-devel >= 2:0.50.0}
@@ -2076,6 +2079,8 @@ cp -p php.ini-production php.ini
 %patch -P300 -p1
 %patch -P301 -p1
 %patch -P302 -p1
+%patch -P303 -p1
+%patch -P304 -p1
 
 sed -E -i -e '1s,#!\s*/usr/bin/env\s+(.*),#!%{__bindir}\1,' \
       ext/ext_skel.php \
